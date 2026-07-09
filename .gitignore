@@ -1,0 +1,13 @@
+# Generated output — commit SVGs selectively, ignore PNGs and HTML by default
+output/*.png
+output/*.html
+output/*.bom.tsv
+output/*.gv
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# macOS
+.DS_Store
