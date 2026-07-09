@@ -1,0 +1,504 @@
+# maxxecu-m52.wv
+# MaxxECU Race ↔ BMW M52 Engine Harness (Phase 1)
+#
+# Source: https://www.maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html
+# Harness revision: REV 2
+# Note: Harness is built for non-VANOS M50 head.
+#       M52 VANOS cam sensor requires sensor swap to BMW 12141726590.
+#
+# This build adds to the base harness:
+#   - ZF 8HP70 CAN (MaxxECU GEN1 native, via 16-pin CAN H/L)
+#   - DCT Shifter paddle (4-wire, DIN 1/2)
+#   - Flex fuel sensor (DIN 3 / GPO 7)
+#   - Bosch PST-F1 oil sensor (AIN 1 temp, AIN 3 pressure)
+#   - Gauge.S cluster CAN (shared CAN bus with 8HP)
+#   - SPAL fan PWM (GPO 6 → relay)
+
+connectors:
+
+  # ── MaxxECU Race auxiliary connectors ──────────────────────────────────────
+
+  ECU_16PIN:
+    type: "Cinch 16-pin auxiliary"
+    pincount: 16
+    pinlabels:
+      - "+5V OUT"
+      - "Sensor GND"
+      - "INJ 7 (N/A M52)"
+      - "GPO 8 / TACHO"
+      - "GPO 7 / DIN 3"
+      - "GPO 6"
+      - "GPO 3"
+      - "GPO 2"
+      - "CAN L"
+      - "CAN H"
+      - "AIN 4"
+      - "AIN 3"
+      - "AIN 2"
+      - "AIN 1"
+      - "DIN 2"
+      - "DIN 1"
+    notes: "REV 2 pinout. See maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html"
+
+  ECU_12PIN:
+    type: "Cinch 12-pin power/chassis"
+    pincount: 12
+    pinlabels:
+      - "+12V Coils+Inj Power"
+      - "Engine GND"
+      - "GPO 2 (Fuel Pump)"
+      - "GPO 6 (FAN)"
+      - "(spare)"
+      - "Starter Trigger"
+      - "+12V ECU Power"
+      - "(spare)"
+      - "(spare)"
+      - "(spare)"
+      - "(spare)"
+      - "Alternator +12V (D+)"
+    notes: "REV 2. Pin 1 fuse 20A, pin 7 fuse 20A (separate relays)."
+
+  # ── Engine sensors ──────────────────────────────────────────────────────────
+
+  CRANK_VR:
+    type: "Bosch JPT 3-way"
+    subtype: "M52 60-2 VR crank trigger"
+    pincount: 3
+    pinlabels: [Signal+, Signal-, Shield]
+    notes: "OEM M52 crank sensor — 60-2 missing tooth. MaxxECU trigger type: N-1."
+
+  CAM_HALL:
+    type: "BMW 12141726590"
+    subtype: "M52 VANOS cam Hall sensor (swapped connector)"
+    pincount: 3
+    pinlabels: ["+12V", Signal, "Sensor GND"]
+    notes: >
+      VANOS head requires sensor swap to BMW PN 12141726590 (fits non-VANOS harness connector).
+      Alternative: cut harness connector and add VANOS-type plug + switched 12V.
+
+  CLT:
+    type: "Bosch JPT 2-way"
+    subtype: "M52 coolant temp (NTC)"
+    pincount: 2
+    pinlabels: [Signal, "Sensor GND"]
+
+  IAT:
+    type: "OEM M52"
+    subtype: "Intake air temp (NTC)"
+    pincount: 2
+    pinlabels: [Signal, "Sensor GND"]
+    notes: "Mounted in intake boot upstream of throttle body."
+
+  TPS:
+    type: "OEM M52"
+    subtype: "Throttle position sensor (0–5V)"
+    pincount: 3
+    pinlabels: ["+5V", Signal, GND]
+    notes: "OEM M52 TPS. 3-wire potentiometer."
+
+  VANOS_SOL:
+    type: "Bosch JPT 2-way"
+    subtype: "M52 VANOS intake solenoid"
+    pincount: 2
+    pinlabels: ["+12V", GND]
+    notes: "PWM via GPO 3. Disable in tune at 07K swap."
+
+  IDLE_VALVE:
+    type: "Bosch JPT 3-way"
+    subtype: "M52 idle air control valve"
+    pincount: 3
+    pinlabels: [GND, "Coil A", "Coil B"]
+    notes: "Dual-coil stepper-style ICV. GPO 4 and GPO 5."
+
+  # ── Fueling ─────────────────────────────────────────────────────────────────
+
+  INJ_1:
+    type: "Bosch JPT 2-way"
+    subtype: "Injector 1 (Bosch 440cc EV1)"
+    pincount: 2
+    pinlabels: ["+12V", "INJ 1"]
+
+  INJ_2:
+    type: "Bosch JPT 2-way"
+    subtype: "Injector 2"
+    pincount: 2
+    pinlabels: ["+12V", "INJ 2"]
+
+  INJ_3:
+    type: "Bosch JPT 2-way"
+    subtype: "Injector 3"
+    pincount: 2
+    pinlabels: ["+12V", "INJ 3"]
+
+  INJ_4:
+    type: "Bosch JPT 2-way"
+    subtype: "Injector 4"
+    pincount: 2
+    pinlabels: ["+12V", "INJ 4"]
+
+  INJ_5:
+    type: "Bosch JPT 2-way"
+    subtype: "Injector 5"
+    pincount: 2
+    pinlabels: ["+12V", "INJ 5"]
+
+  INJ_6:
+    type: "Bosch JPT 2-way"
+    subtype: "Injector 6"
+    pincount: 2
+    pinlabels: ["+12V", "INJ 6"]
+
+  FUEL_PUMP_RELAY:
+    type: "SPDT relay"
+    subtype: "Walbro 255LPH pump relay"
+    pincount: 4
+    pinlabels: ["85 Coil GND", "86 Coil +12V trigger", "87 +12V battery", "30 Pump +12V"]
+    notes: "GPO 2 → pin 86. Pump draws ~8A."
+
+  # ── Ignition ─────────────────────────────────────────────────────────────────
+
+  IGN_1:
+    type: "VAG 4-way COP"
+    subtype: "Coil 1 (BMW S54 COP)"
+    pincount: 4
+    pinlabels: ["+12V", GND, Signal, Shield]
+    notes: "S54 COP uses VAG 4-pin connector. IGN 1 firing order cyl 1."
+
+  IGN_2:
+    type: "VAG 4-way COP"
+    subtype: "Coil 2"
+    pincount: 4
+    pinlabels: ["+12V", GND, Signal, Shield]
+
+  IGN_3:
+    type: "VAG 4-way COP"
+    subtype: "Coil 3"
+    pincount: 4
+    pinlabels: ["+12V", GND, Signal, Shield]
+
+  IGN_4:
+    type: "VAG 4-way COP"
+    subtype: "Coil 4"
+    pincount: 4
+    pinlabels: ["+12V", GND, Signal, Shield]
+
+  IGN_5:
+    type: "VAG 4-way COP"
+    subtype: "Coil 5"
+    pincount: 4
+    pinlabels: ["+12V", GND, Signal, Shield]
+
+  IGN_6:
+    type: "VAG 4-way COP"
+    subtype: "Coil 6"
+    pincount: 4
+    pinlabels: ["+12V", GND, Signal, Shield]
+
+  # ── Wideband O2 ─────────────────────────────────────────────────────────────
+
+  WIDEBAND:
+    type: "Bosch LSU 4.2 6-way"
+    subtype: "Wideband lambda sensor"
+    pincount: 6
+    pinlabels: ["IP", "VS", "APE", "Trim", "Hs+", "Hs-"]
+    notes: >
+      MaxxECU M50 harness includes built-in wideband controller and LSU 4.2 connector.
+      Sensor: Modern Racing LSU 4.2. Bung: 18mm×1.5 welded in exhaust.
+      Carries to 07K phase — re-weld bung in new exhaust header.
+
+  # ── Boost ────────────────────────────────────────────────────────────────────
+
+  BOOST_SOL:
+    type: "Superseal 2-way"
+    subtype: "Turbosmart boost solenoid (2-port PWM)"
+    pincount: 2
+    pinlabels: ["+12V", "GPO 1 signal"]
+    notes: "MaxxECU GPO 1 → PWM duty control. Budget alt: Bosch N75 0280142431."
+
+  # ── Cooling ─────────────────────────────────────────────────────────────────
+
+  FAN_RELAY:
+    type: "SPDT relay"
+    subtype: "SPAL fan relay"
+    pincount: 4
+    pinlabels: ["85 Coil GND", "86 Coil trigger (GPO 6)", "87 +12V battery", "30 Fan +12V"]
+    notes: >
+      Stage 1: OEM thermostat switch triggers relay standalone.
+      Stage 2 (MaxxECU): GPO 6 triggers relay in parallel with thermostat switch.
+      SPAL PWM upgrade: swap fan motor to SPAL 30102049 and wire GPO 6 direct PWM.
+
+  # ── This-build additions ─────────────────────────────────────────────────────
+
+  DCT_SHIFTER:
+    type: "DCT Shifter paddle harness"
+    subtype: "DCT Shifter E36 (4-wire)"
+    pincount: 4
+    pinlabels: ["+12V switched", GND, "UP signal", "DOWN signal"]
+    notes: >
+      UP → MaxxECU DIN 2 (Transmission UP shift).
+      DOWN → MaxxECU DIN 1 (Transmission DOWN shift).
+      MTune: Advanced → 8HP → Shifter type → 8HP SEQ shifter.
+      Hold UP = launch control / transbrake.
+
+  FLEX_FUEL:
+    type: "3-pin inline"
+    subtype: "Ethanol content sensor (digital)"
+    pincount: 3
+    pinlabels: ["+12V", GND, "Signal (PWM out)"]
+    notes: "Digital PWM signal → MaxxECU DIN 3 (GPO 7). MaxxECU reads ethanol % natively."
+
+  PST_F1:
+    type: "Bosch PST-F1 4-pin"
+    subtype: "Dual oil temp+pressure sensor"
+    pincount: 4
+    pinlabels: ["+5V", "GND", "Pressure (0–5V)", "Temp (NTC)"]
+    notes: >
+      Mount: M52 VANOS banjo bolt (M14×1.5 → M10×1.0 adapter → PST-F1).
+      Pressure → AIN 3 (0–5V, 0–10 bar / 0–145 psi).
+      Temp → AIN 1 (NTC, –40 to +140°C).
+      Moves to iABED 07K oil housing M10×1.0 port at Phase 3 with no wiring changes.
+
+  CAN_BUS_JUNCTION:
+    type: "Splice / junction"
+    subtype: "CAN H/L shared bus junction"
+    pincount: 4
+    pinlabels: ["CAN H in (ECU)", "CAN L in (ECU)", "CAN H out (8HP+GaugeS)", "CAN L out (8HP+GaugeS)"]
+    notes: >
+      MaxxECU CAN 1 (16-pin pins 9–10) feeds both the 8HP CAN harness and Gauge.S cluster.
+      Bus speed: 500kbps. MaxxECU CAN 1 has built-in 120Ω terminator.
+      Add 120Ω terminator at far end of bus if run > 1m total.
+
+  HP8_CAN:
+    type: "MaxxECU 8HP GEN1 CAN harness"
+    subtype: "ZF 8HP70 transmission CAN connector"
+    pincount: 2
+    pinlabels: ["CAN H", "CAN L"]
+    notes: >
+      MaxxECU GEN1 8HP CAN harness ~$368.61.
+      See maxxecu.com/store/gearbox/8hp/maxxecu-8hp-gen1-cable-harness.
+      Verify hardware ID before purchase: maxxecu.com/webhelp/advanced-8hp-hardware_identifier.html
+
+  GAUGES_CAN:
+    type: "Gauge.S cluster CAN"
+    subtype: "Gauge.S E36 PNP cluster CAN input"
+    pincount: 2
+    pinlabels: ["CAN H", "CAN L"]
+    notes: >
+      Gauge.S receives MaxxECU Default 1.3 CAN output (500kbps).
+      Config file: maxxecu.json (see gauge-s-maxxecu repo).
+      Enable in MTune: CAN → Default CAN output → MaxxECU Default 1.3.
+
+  CHASSIS_GND:
+    type: "Ring terminal"
+    subtype: "Chassis/battery ground"
+    pincount: 1
+    pinlabels: [GND]
+
+  BATT_12V:
+    type: "Ring terminal"
+    subtype: "Battery +12V (fused)"
+    pincount: 1
+    pinlabels: ["+12V"]
+
+  IGN_12V:
+    type: "Ring terminal"
+    subtype: "Ignition-switched +12V"
+    pincount: 1
+    pinlabels: ["+12V IGN"]
+
+
+cables:
+
+  # Power feeds
+  W_COIL_PWR:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V coils/inj"]
+    notes: "Fused 20A. From relay → 12-pin pin 1."
+
+  W_ECU_PWR:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V ECU"]
+    notes: "Fused 20A. From relay → 12-pin pin 7."
+
+  W_ENGINE_GND:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: ["Engine GND"]
+    notes: "Brown wire → cylinder head ground stud. Do not omit."
+
+  # Sensors
+  W_CRANK:
+    wirecount: 3
+    colors: [WH, BK, GY]
+    wirelabels: [Signal+, Signal-, Shield]
+    length: 1.2m
+
+  W_CAM:
+    wirecount: 3
+    colors: [WH, BK, RD]
+    wirelabels: [Signal, "Sensor GND", "+12V"]
+    length: 0.8m
+    notes: "BMW 12141726590 sensor — non-VANOS connector on harness side."
+
+  W_CLT:
+    wirecount: 2
+    colors: [WH, BK]
+    wirelabels: [Signal, GND]
+    length: 0.5m
+
+  W_IAT:
+    wirecount: 2
+    colors: [WH, BK]
+    wirelabels: [Signal, GND]
+    length: 0.6m
+
+  W_TPS:
+    wirecount: 3
+    colors: [RD, WH, BK]
+    wirelabels: ["+5V", Signal, GND]
+    length: 0.5m
+
+  W_VANOS:
+    wirecount: 2
+    colors: [RD, BK]
+    wirelabels: ["+12V", "GPO 3"]
+    length: 0.6m
+
+  # CAN bus
+  W_CAN:
+    wirecount: 2
+    colors: [WH, BL]
+    wirelabels: ["CAN H", "CAN L"]
+    length: 2.0m
+    notes: "Twisted pair. 120Ω at far end if run > 1m."
+
+  # DCT Shifter
+  W_SHIFTER:
+    wirecount: 4
+    colors: [RD, BK, GN, YE]
+    wirelabels: ["+12V IGN", GND, "UP (DIN 2)", "DOWN (DIN 1)"]
+    length: 1.5m
+
+  # Flex fuel
+  W_FLEXFUEL:
+    wirecount: 3
+    colors: [RD, BK, WH]
+    wirelabels: ["+12V", GND, "Signal (DIN 3)"]
+    length: 0.8m
+
+  # PST-F1
+  W_PST_F1:
+    wirecount: 4
+    colors: [RD, BK, GN, YE]
+    wirelabels: ["+5V", GND, "Pressure (AIN 3)", "Temp (AIN 1)"]
+    length: 0.6m
+
+  # Boost solenoid
+  W_BOOST:
+    wirecount: 2
+    colors: [RD, BK]
+    wirelabels: ["+12V", "GPO 1"]
+    length: 0.8m
+
+  # Fan relay
+  W_FAN:
+    wirecount: 2
+    colors: [BK, GN]
+    wirelabels: [GND, "GPO 6"]
+    length: 1.0m
+
+  # Fuel pump relay trigger
+  W_FUELPUMP:
+    wirecount: 2
+    colors: [BK, GN]
+    wirelabels: [GND, "GPO 2"]
+    length: 0.8m
+
+
+connections:
+
+  # ── Power rails ──────────────────────────────────────────────────────────────
+  - - BATT_12V: [1]
+    - W_COIL_PWR: [1]
+    - ECU_12PIN: [1]
+
+  - - IGN_12V: [1]
+    - W_ECU_PWR: [1]
+    - ECU_12PIN: [7]
+
+  - - CHASSIS_GND: [1]
+    - W_ENGINE_GND: [1]
+    - ECU_12PIN: [2]
+
+  # ── Crank trigger ────────────────────────────────────────────────────────────
+  - - CRANK_VR: [1, 2, 3]
+    - W_CRANK: [1, 2, 3]
+    - ECU_CMC: [TRIGGER+, TRIGGER-, SHIELD]
+
+  # ── Cam / HOME trigger ───────────────────────────────────────────────────────
+  - - CAM_HALL: [1, 2, 3]
+    - W_CAM: [1, 2, 3]
+    - ECU_CMC: [HOME_SIG, HOME_GND, HOME_12V]
+
+  # ── CLT ─────────────────────────────────────────────────────────────────────
+  - - CLT: [1, 2]
+    - W_CLT: [1, 2]
+    - ECU_CMC: [CLT_SIG, SENSOR_GND]
+
+  # ── IAT ─────────────────────────────────────────────────────────────────────
+  - - IAT: [1, 2]
+    - W_IAT: [1, 2]
+    - ECU_CMC: [IAT_SIG, SENSOR_GND]
+
+  # ── TPS ─────────────────────────────────────────────────────────────────────
+  - - TPS: [1, 2, 3]
+    - W_TPS: [1, 2, 3]
+    - ECU_CMC: [5V_OUT, TPS_SIG, SENSOR_GND]
+
+  # ── VANOS solenoid ───────────────────────────────────────────────────────────
+  - - VANOS_SOL: [1, 2]
+    - W_VANOS: [1, 2]
+    - ECU_16PIN: [1, 7]
+
+  # ── CAN bus (shared: 8HP + Gauge.S) ─────────────────────────────────────────
+  - - ECU_16PIN: [10, 9]
+    - W_CAN: [1, 2]
+    - CAN_BUS_JUNCTION: [1, 2]
+
+  - - CAN_BUS_JUNCTION: [3, 4]
+    - HP8_CAN: [1, 2]
+
+  - - CAN_BUS_JUNCTION: [3, 4]
+    - GAUGES_CAN: [1, 2]
+
+  # ── DCT Shifter ──────────────────────────────────────────────────────────────
+  - - DCT_SHIFTER: [1, 2, 3, 4]
+    - W_SHIFTER: [1, 2, 3, 4]
+    - ECU_16PIN: [1, 2, 15, 16]
+
+  # ── Flex fuel sensor ─────────────────────────────────────────────────────────
+  - - FLEX_FUEL: [1, 2, 3]
+    - W_FLEXFUEL: [1, 2, 3]
+    - ECU_16PIN: [1, 2, 5]
+
+  # ── PST-F1 oil sensor ────────────────────────────────────────────────────────
+  - - PST_F1: [1, 2, 3, 4]
+    - W_PST_F1: [1, 2, 3, 4]
+    - ECU_16PIN: [1, 2, 12, 14]
+
+  # ── Boost solenoid ───────────────────────────────────────────────────────────
+  - - BOOST_SOL: [1, 2]
+    - W_BOOST: [1, 2]
+    - ECU_CMC: [12V_SWITCHED, GPO1]
+
+  # ── Fan relay trigger ─────────────────────────────────────────────────────────
+  - - FAN_RELAY: [1, 2]
+    - W_FAN: [1, 2]
+    - ECU_16PIN: [2, 6]
+
+  # ── Fuel pump relay trigger ───────────────────────────────────────────────────
+  - - FUEL_PUMP_RELAY: [1, 2]
+    - W_FUELPUMP: [1, 2]
+    - ECU_12PIN: [2, 3]
