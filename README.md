@@ -14,6 +14,7 @@ Click any link to view the interactive diagram with full BOM in your browser —
 |---|---|---|
 | MaxxECU ↔ M52 engine harness | [maxxecu-m52.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/maxxecu-m52.html) | `harnesses/maxxecu-m52.wv` |
 | E36 X20 body connector / Gauge.S | [body-x20.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/body-x20.html) | `harnesses/body-x20.wv` |
+| Power distribution (relay board + fuse block) | [power-distribution.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/power-distribution.html) | `harnesses/power-distribution.wv` |
 
 ### MaxxECU ↔ M52 engine harness
 
@@ -22,6 +23,10 @@ Click any link to view the interactive diagram with full BOM in your browser —
 ### E36 X20 body connector / Gauge.S interface
 
 ![E36 X20 Body Connector](output/body-x20.svg)
+
+### Power distribution — relay board and fuse block
+
+![Power Distribution](output/power-distribution.svg)
 
 ## Harnesses
 

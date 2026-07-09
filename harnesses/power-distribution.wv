@@ -1,0 +1,513 @@
+metadata:
+  project: E36 Restomod -- Power Distribution
+  description: >-
+    Relay board and fuse block wiring for MaxxECU Race installation.
+    Phase 1 (M52 engine). All values are stubs -- confirm fuse sizes,
+    wire gauges, relay part numbers, and physical layout before building.
+    Cross-reference harnesses/maxxecu-m52.wv for ECU pin assignments.
+
+# ── TODO list ──────────────────────────────────────────────────────────────────
+#
+#   RELAY BOARD:
+#   [ ] Confirm relay board physical location (firewall? fender well?)
+#   [ ] Confirm whether to use a pre-made relay/fuse block combo (e.g.
+#       Mictuning, Bussmann, or custom) or individual relays on a DIN rail
+#   [ ] Size wire gauges for each run -- use a wire gauge calculator:
+#       12 AWG :: up to 20A for engine bay runs (3-5ft)
+#       10 AWG :: up to 30A
+#        8 AWG :: up to 40A (fan, fuel pump on long runs)
+#        4 AWG :: main battery cable to fuse block
+#   [ ] Confirm fuse sizes after confirming all load current draws
+#
+#   BATTERY:
+#   [ ] Confirm battery location (stock E36 = driver footwell OR engine bay)
+#   [ ] If trunk or footwell: run 4 AWG battery cable + separate ground
+#   [ ] Add fusible link or ANL fuse within 18 inches of battery positive
+#
+#   GROUND STRATEGY:
+#   [ ] Main battery negative :: chassis stud (engine bay)
+#   [ ] Separate engine block ground strap (M52 cylinder head :: chassis)
+#   [ ] E36 has known ground issues -- run new straps, do not rely on OEM
+#
+#   FUEL PUMP:
+#   [ ] Confirm pump model (OEM Bosch vs Walbro 255 vs AEM 320)
+#   [ ] Walbro 255 draws ~8A max :: 15A fuse is correct
+#   [ ] AEM 340 draws up to 12A :: use 20A fuse
+#
+#   FAN:
+#   [ ] Confirm SPAL fan model -- single speed vs PWM
+#   [ ] Single-speed SPAL 30102049 (12-inch puller): 15A draw :: 20A fuse
+#   [ ] Phase 2: swap to PWM SPAL, wire GPO 6 direct for variable speed
+#
+#   ECU MAIN RELAY:
+#   [ ] MaxxECU Race has its own power relay -- confirm if external relay
+#       is also needed or if ECU handles this internally
+#   [ ] See maxxecu.com/webhelp/wirings-power_supply.html
+
+# ── Connectors ─────────────────────────────────────────────────────────────────
+
+connectors:
+
+  # ── Battery ────────────────────────────────────────────────────────────────
+  BATT_POS:
+    type: "Battery positive terminal"
+    subtype: "12V lead-acid or AGM"
+    pincount: 1
+    pinlabels: ["+12V BATT"]
+    notes: >-
+      TODO: confirm battery location and cable run length.
+      E36 stock location is driver-side footwell -- long cable run.
+      Many builds relocate battery to engine bay or trunk for weight.
+
+  BATT_NEG:
+    type: "Battery negative terminal"
+    subtype: "12V lead-acid or AGM"
+    pincount: 1
+    pinlabels: ["BATT GND"]
+    notes: >-
+      Negative goes directly to chassis stud.
+      Do NOT run battery negative through the cabin.
+
+  # ── Main fuse (close to battery) ───────────────────────────────────────────
+  MAIN_FUSE:
+    type: "Inline ANL or MAXI fuse holder"
+    subtype: "TODO: size -- likely 60-80A"
+    pincount: 2
+    pinlabels: ["In (from BATT+)", "Out (to fuse block)"]
+    notes: >-
+      Must be mounted within 18 inches of battery positive terminal.
+      Protects entire power distribution loom from dead short.
+      TODO: size after summing all fused circuit loads with 20% headroom.
+      Blue Sea 5191 (ANL) or equivalent.
+
+  # ── Chassis ground stud ────────────────────────────────────────────────────
+  CHASSIS_GND:
+    type: "Chassis ground stud"
+    subtype: "M8 engine bay stud"
+    pincount: 1
+    pinlabels: ["GND"]
+    notes: >-
+      All negative returns terminate here.
+      E36 engine bay ground stud is on the strut tower or firewall.
+      TODO: confirm exact stud location for this car.
+      Add engine block-to-chassis ground strap (16 AWG min) separately.
+
+  # ── Ignition-switched +12V source ─────────────────────────────────────────
+  IGN_12V_SOURCE:
+    type: "Ignition-switched +12V"
+    subtype: "From ignition switch or X20 -- TODO confirm pin"
+    pincount: 1
+    pinlabels: ["+12V IGN"]
+    notes: >-
+      TODO: confirm which ignition switch terminal or X20 pin carries
+      key-on switched +12V for this RHD car.
+      On E36, the ignition switch (pin 15) provides switched +12V.
+      May be accessible at the fuse box or tapped from X20.
+      Wire gauge: 12 AWG to relay coil fuses.
+
+  # ── Fuse block ─────────────────────────────────────────────────────────────
+  FUSE_BLOCK:
+    type: "Mini blade fuse block"
+    subtype: "8-position -- TODO: source block"
+    pincount: 8
+    pinlabels:
+      - "F1: ECU logic (10A)"
+      - "F2: Coil+Inj relay coil (5A)"
+      - "F3: Fan relay coil (5A)"
+      - "F4: Fuel pump relay coil (5A)"
+      - "F5: Coil+Inj load feed (20A)"
+      - "F6: Fan load feed (20A)"
+      - "F7: Fuel pump load feed (15A)"
+      - "F8: Spare / accessories (10A)"
+    notes: >-
+      Pins 1-4 powered by IGN-switched +12V (relay coil circuits).
+      Pins 5-7 powered by battery +12V via main fuse (relay load circuits).
+      Relays switch the load circuits -- the fuses here protect the wires,
+      not the loads. Size fuse slightly above max load current.
+      TODO: confirm fuse block part. Options: Blue Sea ST Blade (5025),
+      Bussmann 15600, or a pre-made relay+fuse combo block.
+
+  # ── Relay board ────────────────────────────────────────────────────────────
+  # Standard Bosch ISO mini relay (5-pin):
+  #   85 -- coil negative (pulled to GND to activate)
+  #   86 -- coil positive (+12V IGN to energize)
+  #   30 -- common / power input (from fused battery +12V)
+  #   87 -- normally open (NO) contact -- load output when relay is ON
+  #   87a -- normally closed (NC) contact -- load output when relay is OFF
+  #
+  # MaxxECU GPOs are low-side switches (they pull to GND).
+  # So: 86 = +12V IGN (constant), 85 = ECU GPO (switches to GND).
+
+  RELAY_ECU_MAIN:
+    type: "Bosch ISO mini relay"
+    subtype: "12V coil / 30A contacts"
+    pincount: 5
+    pinlabels:
+      - "85 (coil-)"
+      - "86 (coil+)"
+      - "30 (batt+)"
+      - "87 (NO load out)"
+      - "87a (NC -- unused)"
+    notes: >-
+      ECU logic power relay.
+      Coil: 86 from IGN +12V (F1), 85 to chassis GND.
+      Load: 30 from fused batt+, 87 to MaxxECU 12-pin pin 7 (+12V ECU logic).
+      Keeps ECU unpowered when ignition is off.
+      TODO: MaxxECU Race may handle main relay internally -- verify
+      whether this external relay is required. See maxxecu.com/webhelp
+      section on power supply wiring.
+      Part: Bosch 0332019150 or Tyco V23134 or equivalent.
+
+  RELAY_COIL_INJ:
+    type: "Bosch ISO mini relay"
+    subtype: "12V coil / 30A contacts"
+    pincount: 5
+    pinlabels:
+      - "85 (coil-)"
+      - "86 (coil+)"
+      - "30 (batt+)"
+      - "87 (NO load out)"
+      - "87a (NC -- unused)"
+    notes: >-
+      Coil pack and injector supply relay.
+      Coil: 86 from IGN +12V (F2), 85 to chassis GND.
+      Load: 30 from fused batt+ (F5 20A), 87 to coil+inj +12V rail.
+      Output feeds MaxxECU 12-pin pin 1 (+12V coil/injector supply).
+      TODO: confirm whether this relay is triggered by IGN directly
+      or by a dedicated ECU relay output. MaxxECU Race has a relay
+      drive output -- check wiring PDF.
+      Wire gauge: 12 AWG on load side.
+
+  RELAY_FAN:
+    type: "Bosch ISO mini relay"
+    subtype: "12V coil / 30A contacts"
+    pincount: 5
+    pinlabels:
+      - "85 (coil-)"
+      - "86 (coil+)"
+      - "30 (batt+)"
+      - "87 (NO load out)"
+      - "87a (NC -- unused)"
+    notes: >-
+      Radiator fan relay.
+      Coil: 86 from IGN +12V (F3), 85 from MaxxECU GPO 6 (12-pin pin 6).
+      Load: 30 from fused batt+ (F6), 87 to SPAL fan motor positive.
+      Fan motor negative to chassis GND.
+      MaxxECU pulls 85 to GND to energize relay and spin fan.
+      TODO: confirm SPAL fan model and current draw.
+      TODO: Phase 2 upgrade -- SPAL PWM fan wired direct from GPO 6,
+      relay no longer needed. Check SPAL PWM wiring instructions.
+
+  RELAY_FUEL_PUMP:
+    type: "Bosch ISO mini relay"
+    subtype: "12V coil / 30A contacts"
+    pincount: 5
+    pinlabels:
+      - "85 (coil-)"
+      - "86 (coil+)"
+      - "30 (batt+)"
+      - "87 (NO load out)"
+      - "87a (NC -- unused)"
+    notes: >-
+      Fuel pump relay.
+      Coil: 86 from IGN +12V (F4), 85 from MaxxECU GPO 2 (12-pin pin 3).
+      Load: 30 from fused batt+ (F7), 87 to fuel pump positive.
+      Pump negative to chassis GND.
+      MaxxECU pulls 85 to GND to energize pump on engine run.
+      TODO: confirm pump model (OEM, Walbro 255, AEM 340).
+      TODO: confirm wire gauge -- Walbro 255 draws 8A :: 14 AWG is fine.
+
+  # ── Load stubs ─────────────────────────────────────────────────────────────
+  ECU_POWER_STUBS:
+    type: "MaxxECU Race 12-pin power stub"
+    subtype: "Cross-reference maxxecu-m52.wv ECU_12PIN"
+    pincount: 2
+    pinlabels: ["Pin 1 (+12V coil/inj)", "Pin 7 (+12V ECU logic)"]
+    notes: >-
+      Both power pins must be supplied.
+      Pin 1: coil and injector supply -- from RELAY_COIL_INJ output.
+      Pin 7: ECU logic supply -- from RELAY_ECU_MAIN output.
+      See maxxecu-m52.wv for full 12-pin connector wiring.
+
+  FAN_MOTOR:
+    type: "Radiator fan motor"
+    subtype: "TODO: SPAL model -- 2-pin"
+    pincount: 2
+    pinlabels: ["+12V", "GND"]
+    notes: >-
+      TODO: confirm SPAL fan model and connector.
+      Puller vs pusher depends on radiator position.
+      Common choice: SPAL 30102049 (12-inch puller, 15A).
+      For PWM: SPAL 30102057 + wire GPO 6 direct (no relay needed).
+
+  FUEL_PUMP_MOTOR:
+    type: "Fuel pump"
+    subtype: "TODO: in-tank or external -- 2-pin"
+    pincount: 2
+    pinlabels: ["+12V", "GND"]
+    notes: >-
+      TODO: confirm pump model and connector type.
+      OEM E36 Bosch pump is in-tank with 4-pin connector (includes sender).
+      Walbro 255 (E85 compatible) uses a separate 2-pin connector for pump.
+      AEM 340 similar.
+      If keeping OEM in-tank unit: only the pump +12V and GND matter for
+      this relay circuit. Fuel sender wires go to instrument cluster.
+
+  # ── ECU GPO cross-references (from maxxecu-m52.wv) ────────────────────────
+  # These are not physical connectors on the power board -- they represent
+  # the wire coming from the ECU 12-pin connector to the relay coil.
+  ECU_GPO_FAN:
+    type: "MaxxECU GPO 6 trigger"
+    subtype: "12-pin pin 6 -- see maxxecu-m52.wv"
+    pincount: 1
+    pinlabels: ["GPO 6 (fan trigger)"]
+    notes: >-
+      Low-side switch output. Pulls relay pin 85 to GND when fan is commanded.
+      Defined in maxxecu-m52.wv W_FAN cable.
+
+  ECU_GPO_PUMP:
+    type: "MaxxECU GPO 2 trigger"
+    subtype: "12-pin pin 3 -- see maxxecu-m52.wv"
+    pincount: 1
+    pinlabels: ["GPO 2 (pump trigger)"]
+    notes: >-
+      Low-side switch output. Pulls relay pin 85 to GND when pump is commanded.
+      Defined in maxxecu-m52.wv W_FUELPUMP cable.
+
+
+# ── Cables ─────────────────────────────────────────────────────────────────────
+
+cables:
+
+  # ── Main power path ─────────────────────────────────────────────────────────
+  W_BATT_POS_MAIN:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V batt"]
+    notes: "TODO: 4 AWG or 2 AWG depending on cable run length. Red. Ring lug both ends."
+
+  W_BATT_NEG_MAIN:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: ["batt GND"]
+    notes: "TODO: same gauge as positive cable. Black. Chassis stud to battery negative."
+
+  W_MAIN_TO_FUSE_BLOCK:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V fused batt"]
+    notes: "TODO: 8-10 AWG from ANL fuse output to fuse block batt+ rail."
+
+  # ── IGN switched feed to fuse block ────────────────────────────────────────
+  W_IGN_FEED:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V IGN"]
+    notes: "12 AWG. IGN-switched +12V from ignition switch to fuse block IGN rail."
+
+  # ── Relay coil pin 86 feeds (+12V IGN from fuse block) ──────────────────────
+  # Each relay gets its own wire. 18 AWG is sufficient for coil current (~150-200mA).
+  W_ECU_RELAY_86:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V IGN (86)"]
+    notes: "Fuse F1 :: RELAY_ECU_MAIN pin 86. 18 AWG."
+
+  W_COIL_INJ_RELAY_86:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V IGN (86)"]
+    notes: "Fuse F2 :: RELAY_COIL_INJ pin 86. 18 AWG."
+
+  W_FAN_RELAY_86:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V IGN (86)"]
+    notes: "Fuse F3 :: RELAY_FAN pin 86. 18 AWG."
+
+  W_PUMP_RELAY_86:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V IGN (86)"]
+    notes: "Fuse F4 :: RELAY_FUEL_PUMP pin 86. 18 AWG."
+
+  # ── Relay coil pin 85 GND (for ECU main and coil/inj -- straight to chassis GND)
+  # Fan and pump relay pin 85 comes from ECU GPO (defined below).
+  W_ECU_RELAY_85_GND:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: ["coil GND (85)"]
+    notes: "RELAY_ECU_MAIN pin 85 :: chassis GND. 18 AWG."
+
+  W_COIL_INJ_RELAY_85_GND:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: ["coil GND (85)"]
+    notes: "RELAY_COIL_INJ pin 85 :: chassis GND. 18 AWG."
+
+  # ── ECU GPO trigger wires (cross-reference to maxxecu-m52.wv) ───────────────
+  W_GPO6_FAN_TRIGGER:
+    wirecount: 1
+    colors: [GN]
+    wirelabels: ["GPO 6 (85)"]
+    notes: "MaxxECU 12-pin pin 6 :: RELAY_FAN pin 85. 18 AWG. Low-side switch (pulls to GND)."
+
+  W_GPO2_PUMP_TRIGGER:
+    wirecount: 1
+    colors: [GN]
+    wirelabels: ["GPO 2 (85)"]
+    notes: "MaxxECU 12-pin pin 3 :: RELAY_FUEL_PUMP pin 85. 18 AWG. Low-side switch."
+
+  # ── Relay load feeds (fused batt+ to relay pin 30) ──────────────────────────
+  W_COIL_INJ_LOAD_FEED:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["batt+ (30)"]
+    notes: "Fuse F5 (20A) :: RELAY_COIL_INJ pin 30. 12 AWG."
+
+  W_FAN_LOAD_FEED:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["batt+ (30)"]
+    notes: "Fuse F6 (20A) :: RELAY_FAN pin 30. 12 AWG."
+
+  W_PUMP_LOAD_FEED:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["batt+ (30)"]
+    notes: "Fuse F7 (15A) :: RELAY_FUEL_PUMP pin 30. 14 AWG."
+
+  # ── Relay outputs to loads (relay pin 87 :: load positive) ─────────────────
+  W_ECU_MAIN_RELAY_OUT:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["ECU logic +12V (87)"]
+    notes: "RELAY_ECU_MAIN pin 87 :: ECU 12-pin pin 7. 16 AWG."
+
+  W_COIL_INJ_RELAY_OUT:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["coil+inj +12V (87)"]
+    notes: "RELAY_COIL_INJ pin 87 :: ECU 12-pin pin 1. 12 AWG."
+
+  W_FAN_POS:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["fan +12V (87)"]
+    notes: "RELAY_FAN pin 87 :: FAN_MOTOR pin 1. 12 AWG."
+
+  W_FAN_GND:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: ["fan GND"]
+    notes: "FAN_MOTOR pin 2 :: chassis GND. 12 AWG. Return current path."
+
+  W_PUMP_POS:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["pump +12V (87)"]
+    notes: "RELAY_FUEL_PUMP pin 87 :: FUEL_PUMP_MOTOR pin 1. 14 AWG."
+
+  W_PUMP_GND:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: ["pump GND"]
+    notes: "FUEL_PUMP_MOTOR pin 2 :: chassis GND. 14 AWG. Return current path."
+
+
+# ── Connections ─────────────────────────────────────────────────────────────────
+# Format: connector -- cable -- connector (must strictly alternate)
+# Every connection must have the same pin count on both connector ends.
+
+connections:
+
+  # ── Main power path ──────────────────────────────────────────────────────────
+  - - BATT_POS: [1]
+    - W_BATT_POS_MAIN: [1]
+    - MAIN_FUSE: [1]
+
+  - - MAIN_FUSE: [2]
+    - W_MAIN_TO_FUSE_BLOCK: [1]
+    - FUSE_BLOCK: [5]
+
+  - - BATT_NEG: [1]
+    - W_BATT_NEG_MAIN: [1]
+    - CHASSIS_GND: [1]
+
+  # ── IGN feed to fuse block ───────────────────────────────────────────────────
+  - - IGN_12V_SOURCE: [1]
+    - W_IGN_FEED: [1]
+    - FUSE_BLOCK: [1]
+
+  # ── Relay coil pin 86 (+12V IGN from fuse block) ─────────────────────────────
+  - - FUSE_BLOCK: [1]
+    - W_ECU_RELAY_86: [1]
+    - RELAY_ECU_MAIN: [2]
+
+  - - FUSE_BLOCK: [2]
+    - W_COIL_INJ_RELAY_86: [1]
+    - RELAY_COIL_INJ: [2]
+
+  - - FUSE_BLOCK: [3]
+    - W_FAN_RELAY_86: [1]
+    - RELAY_FAN: [2]
+
+  - - FUSE_BLOCK: [4]
+    - W_PUMP_RELAY_86: [1]
+    - RELAY_FUEL_PUMP: [2]
+
+  # ── Relay coil pin 85 GND (ECU main and coil/inj go straight to GND) ─────────
+  - - CHASSIS_GND: [1]
+    - W_ECU_RELAY_85_GND: [1]
+    - RELAY_ECU_MAIN: [1]
+
+  - - CHASSIS_GND: [1]
+    - W_COIL_INJ_RELAY_85_GND: [1]
+    - RELAY_COIL_INJ: [1]
+
+  # ── Fan and pump relay coil pin 85 from ECU GPO ──────────────────────────────
+  - - ECU_GPO_FAN: [1]
+    - W_GPO6_FAN_TRIGGER: [1]
+    - RELAY_FAN: [1]
+
+  - - ECU_GPO_PUMP: [1]
+    - W_GPO2_PUMP_TRIGGER: [1]
+    - RELAY_FUEL_PUMP: [1]
+
+  # ── Relay load inputs (fused batt+ to relay pin 30) ──────────────────────────
+  - - FUSE_BLOCK: [5]
+    - W_COIL_INJ_LOAD_FEED: [1]
+    - RELAY_COIL_INJ: [3]
+
+  - - FUSE_BLOCK: [6]
+    - W_FAN_LOAD_FEED: [1]
+    - RELAY_FAN: [3]
+
+  - - FUSE_BLOCK: [7]
+    - W_PUMP_LOAD_FEED: [1]
+    - RELAY_FUEL_PUMP: [3]
+
+  # ── Relay outputs to loads ────────────────────────────────────────────────────
+  - - RELAY_ECU_MAIN: [4]
+    - W_ECU_MAIN_RELAY_OUT: [1]
+    - ECU_POWER_STUBS: [2]
+
+  - - RELAY_COIL_INJ: [4]
+    - W_COIL_INJ_RELAY_OUT: [1]
+    - ECU_POWER_STUBS: [1]
+
+  - - RELAY_FAN: [4]
+    - W_FAN_POS: [1]
+    - FAN_MOTOR: [1]
+
+  - - CHASSIS_GND: [1]
+    - W_FAN_GND: [1]
+    - FAN_MOTOR: [2]
+
+  - - RELAY_FUEL_PUMP: [4]
+    - W_PUMP_POS: [1]
+    - FUEL_PUMP_MOTOR: [1]
+
+  - - CHASSIS_GND: [1]
+    - W_PUMP_GND: [1]
+    - FUEL_PUMP_MOTOR: [2]
