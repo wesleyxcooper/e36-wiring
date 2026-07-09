@@ -10,14 +10,14 @@
 #   https://megasquirt.325ix.com/MS_to_Motronic/C101_to_X20.html
 #   BMW E36 ETM (Electrical Troubleshooting Manual)
 #
-# Applicability: 1993–1999 E36 (OBD2 cars use same X20 layout)
+# Applicability: 1993-1999 E36 (OBD2 cars use same X20 layout)
 #
 # ─────────────────────────────────────────────────────────────────────────────
 # TODOs — gaps before this diagram is build-ready:
 #
 # TODO: Full 25-pin X20 pinout verification for the specific build car
-#       Pinout below is from the 1993–1995 E36 community reference.
-#       OBD2 cars (1996–1999) may differ on some accessory pins.
+#       Pinout below is from the 1993-1995 E36 community reference.
+#       OBD2 cars (1996-1999) may differ on some accessory pins.
 #       Verify against the specific car's ETM before wiring.
 #       BMW ETM for 96+ E36: request from bimmerworld or ISTA/GT1 access.
 #
@@ -69,11 +69,11 @@
 #
 # TODO: Tachometer signal continuity check
 #       X20 pin 20 (SW) = RPM signal from DME to cluster.
-#       MaxxECU GPO 8 / TACHO outputs tach signal → drives X20 pin 20.
+#       MaxxECU GPO 8 / TACHO outputs tach signal :: drives X20 pin 20.
 #       Gauge.S cluster uses CAN for RPM (not this wire) but other body systems
 #       (e.g., OBC, trip computer) may still depend on X20 pin 20.
 #       Confirm whether X20 pin 20 is still needed with Gauge.S installed.
-#       If yes: keep GPO 8 → X20 pin 20 wired. If no: can omit.
+#       If yes: keep GPO 8 :: X20 pin 20 wired. If no: can omit.
 # ─────────────────────────────────────────────────────────────────────────────
 
 connectors:
@@ -109,7 +109,7 @@ connectors:
       - "Econometer MPG (WS/SW)"
       - "Alternator + (BL)"
     notes: >
-      Source: 1993–1995 E36 community pinout. Verify against car-specific ETM for
+      Source: 1993-1995 E36 community pinout. Verify against car-specific ETM for
       OBD2 build year. Wire color format: SW=Black, BR=Brown, WS=White, BL=Blue,
       GN=Green, GE=Yellow, GR=Gray, RT=Red, VI=Violet, OR=Orange.
 
@@ -152,10 +152,10 @@ connectors:
     pincount: 1
     pinlabels: ["GPO 8 TACHO"]
     notes: >
-      MaxxECU outputs tachometer signal → X20 pin 20 (SW wire) → OEM cluster wiring.
+      MaxxECU outputs tachometer signal :: X20 pin 20 (SW wire) :: OEM cluster wiring.
       Gauge.S cluster reads RPM via CAN (not this wire) but other body systems
       may use X20 pin 20. Keep connected unless confirmed unused.
-      Configure in MTune: Outputs → Tacho → Output = GPO 8.
+      Configure in MTune: Outputs :: Tacho :: Output = GPO 8.
 
   MAXXECU_CHECK_ENGINE:
     type: "MaxxECU GPO"
@@ -163,9 +163,9 @@ connectors:
     pincount: 1
     pinlabels: ["GPO (TBD)"]
     notes: >
-      TODO: Confirm which GPO drives check engine. MaxxECU → X20 pin 8 (GR wire).
+      TODO: Confirm which GPO drives check engine. MaxxECU :: X20 pin 8 (GR wire).
       Gauge.S cluster may handle MIL indicator via CAN instead of this wire.
-      Verify in MTune: Outputs → Check Engine Light.
+      Verify in MTune: Outputs :: Check Engine Light.
 
   MAXXECU_FP_TRIGGER:
     type: "MaxxECU 12-pin aux"
@@ -173,7 +173,7 @@ connectors:
     pincount: 1
     pinlabels: ["GPO 2 (12-pin pin 3)"]
     notes: >
-      MaxxECU GPO 2 → fuel pump relay coil → relay 87 → Walbro pump.
+      MaxxECU GPO 2 :: fuel pump relay coil :: relay 87 :: Walbro pump.
       OEM: DME used X20 pin 13 (GN/VI) to trigger FP relay.
       With MaxxECU M50 harness: fuel pump is triggered via 12-pin connector.
       Confirm whether X20 pin 13 is still in the relay circuit or bypassed.
@@ -201,15 +201,15 @@ connectors:
 
   GAUGES_CAN_FEED:
     type: "CAN bus wires"
-    subtype: "MaxxECU CAN → Gauge.S cluster"
+    subtype: "MaxxECU CAN :: Gauge.S cluster"
     pincount: 2
     pinlabels: ["CAN H", "CAN L"]
     notes: >
       Two wires routed from MaxxECU 16-pin aux (pins 10/9) to cluster location.
       Shared CAN bus with 8HP GEN1 harness (same MaxxECU CAN 1 output).
-      500kbps. MaxxECU end has 120Ω built-in. Add 120Ω at cluster end if bus > 1m.
+      500kbps. MaxxECU end has 120ohm built-in. Add 120ohm at cluster end if bus run over 1m.
       Routing: through planned Deutsch AS47 bulkhead (preferred) or alongside X20 grommet.
-      Enable in MTune: CAN → CAN 1 → Output → MaxxECU Default 1.3.
+      Enable in MTune: CAN :: CAN 1 :: Output :: MaxxECU Default 1.3.
 
   # ── OEM body components at X20 (context) ────────────────────────────────────
 
@@ -233,7 +233,7 @@ connectors:
     type: "OEM oil pressure switch"
     subtype: "Simple on/off, ~0.5 bar"
     pincount: 1
-    pinlabels: ["Signal (BR/GN → X20 pin 23)"]
+    pinlabels: ["Signal (BR/GN :: X20 pin 23)"]
     notes: >
       OEM: on/off switch, lights warning lamp below ~0.5 bar.
       With this build: PST-F1 on MaxxECU AIN 3 provides actual pressure reading.
@@ -258,55 +258,70 @@ cables:
 
   W_TACHO:
     wirecount: 1
-    colors: [SW]
+    colors: [BK]
     wirelabels: ["RPM/TACHO (SW)"]
-    length: 0.5m
-    notes: "MaxxECU GPO 8 → X20 pin 20. Black wire per OEM color code."
+    length: 0.5 m
+    notes: "MaxxECU GPO 8 :: X20 pin 20. Black wire per OEM color code."
 
   W_CHECK_ENG:
     wirecount: 1
-    colors: [GR]
+    colors: [GY]
     wirelabels: ["Check Engine (GR)"]
-    length: 0.5m
-    notes: "MaxxECU GPO → X20 pin 8. Gray wire per OEM color code. TODO: confirm GPO assignment."
+    length: 0.5 m
+    notes: "MaxxECU GPO :: X20 pin 8. Gray wire per OEM color code. TODO: confirm GPO assignment."
 
   W_GAUGES_CAN:
     wirecount: 2
-    colors: [WH, BL]
+    colors: [WH, BU]
     wirelabels: ["CAN H", "CAN L"]
-    length: 2.5m
+    length: 2.5 m
     notes: >
       New wires — not part of OEM X20 harness.
       Route from MaxxECU 16-pin (pins 10/9) to cluster location.
-      Twisted pair, 22 AWG, 120Ω at cluster end.
+      Twisted pair, 22 AWG, 120ohm at cluster end.
       Use Deutsch AS47 bulkhead pin allocation when bulkhead is installed.
 
   W_IGN_POWER:
     wirecount: 1
     colors: [GN]
     wirelabels: ["+12V IGN (GN)"]
-    length: 0.3m
-    notes: "X20 pin 21 → cluster +12V IGN. Green wire per OEM color code."
+    length: 0.3 m
+    notes: "X20 pin 21 :: cluster +12V IGN. Green wire per OEM color code."
 
   W_OIL_PRESS:
     wirecount: 1
     colors: [BN]
     wirelabels: ["Oil Pressure SW (BR/GN)"]
-    length: 0.5m
+    length: 0.5 m
     notes: "X20 pin 23. OEM oil pressure switch signal. See TODO above re: PST-F1 replacement."
+
+  W_TACH_BODY:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: ["RPM (SW)"]
+    length: 0.8 m
+    notes: "OEM body harness wire from X20 cabin pin 20 to cluster location."
+
+  W_ALT_D_PLUS:
+    wirecount: 1
+    colors: [BU]
+    wirelabels: ["Alt D+ (BL)"]
+    length: 0.5 m
+    notes: "Alternator D+ excite wire to X20 engine side pin 25."
 
 
 connections:
 
-  # ── Tachometer: MaxxECU GPO 8 → X20 → body harness → cluster location ──────
+  # ── Tachometer: MaxxECU GPO 8 :: X20 :: body harness :: cluster location ──────
   - - MAXXECU_TACHO_OUT: [1]
     - W_TACHO: [1]
     - X20_ENGINE_SIDE: [20]
 
   - - X20_CABIN_SIDE: [20]
+    - W_TACH_BODY: [1]
     - GAUGES_CLUSTER_CONN: [5]
 
-  # ── Check Engine: MaxxECU GPO → X20 → cluster ───────────────────────────────
+  # ── Check Engine: MaxxECU GPO :: X20 :: cluster ───────────────────────────────
   - - MAXXECU_CHECK_ENGINE: [1]
     - W_CHECK_ENG: [1]
     - X20_ENGINE_SIDE: [8]
@@ -328,4 +343,5 @@ connections:
 
   # ── Alternator D+ through X20 ────────────────────────────────────────────────
   - - ALTERNATOR_D_PLUS: [1]
+    - W_ALT_D_PLUS: [1]
     - X20_ENGINE_SIDE: [25]

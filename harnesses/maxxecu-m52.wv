@@ -16,12 +16,12 @@
 #       (requires account). Update ECU_CMC connector below with real pin numbers.
 #
 # TODO: Injector firing order — which MaxxECU INJ output maps to which cylinder
-#       M52 firing order: 1-5-3-6-2-4. Verify INJ 1–6 assignment in MaxxTune
-#       → Engine → Ignition → Firing order. Document here.
+#       M52 firing order: 1-5-3-6-2-4. Verify INJ 1-6 assignment in MaxxTune
+#       :: Engine :: Ignition :: Firing order. Document here.
 #
 # TODO: Ignition firing order — which MaxxECU IGN output maps to which coil
-#       Same firing order as injectors. Confirm IGN 1–6 coil numbering from
-#       MaxxTune → Engine → Ignition → Coil assignments.
+#       Same firing order as injectors. Confirm IGN 1-6 coil numbering from
+#       MaxxTune :: Engine :: Ignition :: Coil assignments.
 #
 # TODO: Alternator D+ wiring
 #       12-pin pin 12 (M) = Alternator +12V (D+ excite terminal).
@@ -44,24 +44,24 @@
 #       Confirm CMC pin numbers from downloaded pinout PDF.
 #
 # TODO: GPO 1 (boost solenoid) CMC pin number
-#       Boost solenoid wired via Superseal 2-pin in harness → GPO 1 on CMC.
+#       Boost solenoid wired via Superseal 2-pin in harness :: GPO 1 on CMC.
 #       Confirm CMC pin from downloaded PDF.
 #
 # TODO: Firewall bulkhead connector (Deutsch AS47 or AS79)
 #       Planned installation during Phase 1 chassis prep.
-#       Cabin side: ECU CMC connector, fuse block, relay board → bulkhead permanently.
+#       Cabin side: ECU CMC connector, fuse block, relay board :: bulkhead permanently.
 #       M52 harness terminates at mating plug; 07K harness also terminates at mating plug.
 #       Add a separate body-bulkhead.wv diagram once connector part numbers confirmed.
-#       Source: RaceSpec Online (racespeconline.com) — AS series 47-way (~$80–120).
+#       Source: RaceSpec Online (racespeconline.com) — AS series 47-way (~$80-120).
 #
 # TODO: Wire gauges throughout
 #       12-pin power wires (12V coils, ECU power, engine GND) require minimum 14 AWG.
-#       Injector/ignition wires: 18–20 AWG typical.
-#       CAN bus: 22 AWG twisted pair, 120Ω impedance.
+#       Injector/ignition wires: 18-20 AWG typical.
+#       CAN bus: 22 AWG twisted pair, 120ohm impedance.
 #       Confirm all gauges from harness as-received and document.
 #
 # TODO: PST-F1 mounting confirmation
-#       M52 VANOS banjo bolt path (M14×1.5 → M10×1.0 adapter → PST-F1) is the plan.
+#       M52 VANOS banjo bolt path (M14x1.5 :: M10x1.0 adapter :: PST-F1) is the plan.
 #       Confirm the adapter thread spec matches the PST-F1 body at install.
 #       PST-F1 4-pin connector pinout should be confirmed against Gauge.S docs.
 #
@@ -77,7 +77,7 @@
 #   - Flex fuel sensor (DIN 3 / GPO 7)
 #   - Bosch PST-F1 oil sensor (AIN 1 temp, AIN 3 pressure)
 #   - Gauge.S cluster CAN (shared CAN bus with 8HP)
-#   - SPAL fan PWM (GPO 6 → relay)
+#   - SPAL fan PWM (GPO 6 :: relay)
 
 connectors:
 
@@ -156,7 +156,7 @@ connectors:
 
   TPS:
     type: "OEM M52"
-    subtype: "Throttle position sensor (0–5V)"
+    subtype: "Throttle position sensor (0-5V)"
     pincount: 3
     pinlabels: ["+5V", Signal, GND]
     notes: "OEM M52 TPS. 3-wire potentiometer."
@@ -218,7 +218,7 @@ connectors:
     subtype: "Walbro 255LPH pump relay"
     pincount: 4
     pinlabels: ["85 Coil GND", "86 Coil +12V trigger", "87 +12V battery", "30 Pump +12V"]
-    notes: "GPO 2 → pin 86. Pump draws ~8A."
+    notes: "GPO 2 :: pin 86. Pump draws ~8A."
 
   # ── Ignition ─────────────────────────────────────────────────────────────────
 
@@ -268,7 +268,7 @@ connectors:
     pinlabels: ["IP", "VS", "APE", "Trim", "Hs+", "Hs-"]
     notes: >
       MaxxECU M50 harness includes built-in wideband controller and LSU 4.2 connector.
-      Sensor: Modern Racing LSU 4.2. Bung: 18mm×1.5 welded in exhaust.
+      Sensor: Modern Racing LSU 4.2. Bung: 18mmx1.5 welded in exhaust.
       Carries to 07K phase — re-weld bung in new exhaust header.
 
   # ── Boost ────────────────────────────────────────────────────────────────────
@@ -278,7 +278,7 @@ connectors:
     subtype: "Turbosmart boost solenoid (2-port PWM)"
     pincount: 2
     pinlabels: ["+12V", "GPO 1 signal"]
-    notes: "MaxxECU GPO 1 → PWM duty control. Budget alt: Bosch N75 0280142431."
+    notes: "MaxxECU GPO 1 :: PWM duty control. Budget alt: Bosch N75 0280142431."
 
   # ── Cooling ─────────────────────────────────────────────────────────────────
 
@@ -300,9 +300,9 @@ connectors:
     pincount: 4
     pinlabels: ["+12V switched", GND, "UP signal", "DOWN signal"]
     notes: >
-      UP → MaxxECU DIN 2 (Transmission UP shift).
-      DOWN → MaxxECU DIN 1 (Transmission DOWN shift).
-      MTune: Advanced → 8HP → Shifter type → 8HP SEQ shifter.
+      UP :: MaxxECU DIN 2 (Transmission UP shift).
+      DOWN :: MaxxECU DIN 1 (Transmission DOWN shift).
+      MTune: Advanced :: 8HP :: Shifter type :: 8HP SEQ shifter.
       Hold UP = launch control / transbrake.
 
   FLEX_FUEL:
@@ -310,18 +310,18 @@ connectors:
     subtype: "Ethanol content sensor (digital)"
     pincount: 3
     pinlabels: ["+12V", GND, "Signal (PWM out)"]
-    notes: "Digital PWM signal → MaxxECU DIN 3 (GPO 7). MaxxECU reads ethanol % natively."
+    notes: "Digital PWM signal :: MaxxECU DIN 3 (GPO 7). MaxxECU reads ethanol % natively."
 
   PST_F1:
     type: "Bosch PST-F1 4-pin"
     subtype: "Dual oil temp+pressure sensor"
     pincount: 4
-    pinlabels: ["+5V", "GND", "Pressure (0–5V)", "Temp (NTC)"]
+    pinlabels: ["+5V", "GND", "Pressure (0-5V)", "Temp (NTC)"]
     notes: >
-      Mount: M52 VANOS banjo bolt (M14×1.5 → M10×1.0 adapter → PST-F1).
-      Pressure → AIN 3 (0–5V, 0–10 bar / 0–145 psi).
-      Temp → AIN 1 (NTC, –40 to +140°C).
-      Moves to iABED 07K oil housing M10×1.0 port at Phase 3 with no wiring changes.
+      Mount: M52 VANOS banjo bolt (M14x1.5 :: M10x1.0 adapter :: PST-F1).
+      Pressure :: AIN 3 (0-5V, 0-10 bar / 0-145 psi).
+      Temp :: AIN 1 (NTC, -40 to +140°C).
+      Moves to iABED 07K oil housing M10x1.0 port at Phase 3 with no wiring changes.
 
   CAN_BUS_JUNCTION:
     type: "Splice / junction"
@@ -329,9 +329,9 @@ connectors:
     pincount: 4
     pinlabels: ["CAN H in (ECU)", "CAN L in (ECU)", "CAN H out (8HP+GaugeS)", "CAN L out (8HP+GaugeS)"]
     notes: >
-      MaxxECU CAN 1 (16-pin pins 9–10) feeds both the 8HP CAN harness and Gauge.S cluster.
-      Bus speed: 500kbps. MaxxECU CAN 1 has built-in 120Ω terminator.
-      Add 120Ω terminator at far end of bus if run > 1m total.
+      MaxxECU CAN 1 (16-pin pins 9-10) feeds both the 8HP CAN harness and Gauge.S cluster.
+      Bus speed: 500kbps. MaxxECU CAN 1 has built-in 120ohm terminator.
+      Add 120ohm terminator at far end of bus if bus run over 1 meter total.
 
   HP8_CAN:
     type: "MaxxECU 8HP GEN1 CAN harness"
@@ -351,7 +351,7 @@ connectors:
     notes: >
       Gauge.S receives MaxxECU Default 1.3 CAN output (500kbps).
       Config file: maxxecu.json (see gauge-s-maxxecu repo).
-      Enable in MTune: CAN → Default CAN output → MaxxECU Default 1.3.
+      Enable in MTune: CAN :: Default CAN output :: MaxxECU Default 1.3.
 
   CHASSIS_GND:
     type: "Ring terminal"
@@ -371,6 +371,43 @@ connectors:
     pincount: 1
     pinlabels: ["+12V IGN"]
 
+  # ── MaxxECU CMC main connector (STUB — pin numbers TBD) ────────────────────
+  # TODO: Replace pin numbers with actual CMC assignments from maxxecu.com/downloads PDF
+  ECU_CMC:
+    type: "Cinch CMC (MaxxECU Race main)"
+    subtype: "STUB — pin numbers not yet confirmed"
+    pincount: 26
+    pinlabels:
+      - "TRIGGER+"
+      - "TRIGGER-"
+      - "TRIGGER_SHIELD"
+      - "HOME_SIG"
+      - "HOME_GND"
+      - "HOME_12V"
+      - "CLT_SIG"
+      - "IAT_SIG"
+      - "SENSOR_GND"
+      - "5V_OUT"
+      - "TPS_SIG"
+      - "12V_SWITCHED"
+      - "GPO1_BOOST"
+      - "INJ1"
+      - "INJ2"
+      - "INJ3"
+      - "INJ4"
+      - "INJ5"
+      - "INJ6"
+      - "IGN1"
+      - "IGN2"
+      - "IGN3"
+      - "IGN4"
+      - "IGN5"
+      - "IGN6"
+      - "GPO4_GPO5_ICV"
+    notes: >-
+      STUB ONLY. Actual Cinch CMC pin numbers unknown — download Race wiring PDF
+      from maxxecu.com/downloads to fill in. Pin labels here are logical names only.
+
 
 cables:
 
@@ -379,107 +416,121 @@ cables:
     wirecount: 1
     colors: [RD]
     wirelabels: ["+12V coils/inj"]
-    notes: "Fused 20A. From relay → 12-pin pin 1."
+    notes: "Fused 20A. From relay :: 12-pin pin 1."
 
   W_ECU_PWR:
     wirecount: 1
     colors: [RD]
     wirelabels: ["+12V ECU"]
-    notes: "Fused 20A. From relay → 12-pin pin 7."
+    notes: "Fused 20A. From relay :: 12-pin pin 7."
 
   W_ENGINE_GND:
     wirecount: 1
     colors: [BK]
     wirelabels: ["Engine GND"]
-    notes: "Brown wire → cylinder head ground stud. Do not omit."
+    notes: "Brown wire :: cylinder head ground stud. Do not omit."
 
   # Sensors
   W_CRANK:
     wirecount: 3
     colors: [WH, BK, GY]
     wirelabels: [Signal+, Signal-, Shield]
-    length: 1.2m
+    length: 1.2 m
 
   W_CAM:
     wirecount: 3
     colors: [WH, BK, RD]
     wirelabels: [Signal, "Sensor GND", "+12V"]
-    length: 0.8m
+    length: 0.8 m
     notes: "BMW 12141726590 sensor — non-VANOS connector on harness side."
 
   W_CLT:
     wirecount: 2
     colors: [WH, BK]
     wirelabels: [Signal, GND]
-    length: 0.5m
+    length: 0.5 m
 
   W_IAT:
     wirecount: 2
     colors: [WH, BK]
     wirelabels: [Signal, GND]
-    length: 0.6m
+    length: 0.6 m
 
   W_TPS:
     wirecount: 3
     colors: [RD, WH, BK]
     wirelabels: ["+5V", Signal, GND]
-    length: 0.5m
+    length: 0.5 m
 
   W_VANOS:
     wirecount: 2
     colors: [RD, BK]
     wirelabels: ["+12V", "GPO 3"]
-    length: 0.6m
+    length: 0.6 m
 
   # CAN bus
   W_CAN:
     wirecount: 2
-    colors: [WH, BL]
+    colors: [WH, BU]
     wirelabels: ["CAN H", "CAN L"]
-    length: 2.0m
-    notes: "Twisted pair. 120Ω at far end if run > 1m."
+    length: 2.0 m
+    notes: "Twisted pair. 120ohm at far end if bus run over 1 m."
 
   # DCT Shifter
   W_SHIFTER:
     wirecount: 4
     colors: [RD, BK, GN, YE]
     wirelabels: ["+12V IGN", GND, "UP (DIN 2)", "DOWN (DIN 1)"]
-    length: 1.5m
+    length: 1.5 m
 
   # Flex fuel
   W_FLEXFUEL:
     wirecount: 3
     colors: [RD, BK, WH]
     wirelabels: ["+12V", GND, "Signal (DIN 3)"]
-    length: 0.8m
+    length: 0.8 m
 
   # PST-F1
   W_PST_F1:
     wirecount: 4
     colors: [RD, BK, GN, YE]
     wirelabels: ["+5V", GND, "Pressure (AIN 3)", "Temp (AIN 1)"]
-    length: 0.6m
+    length: 0.6 m
 
   # Boost solenoid
   W_BOOST:
     wirecount: 2
     colors: [RD, BK]
     wirelabels: ["+12V", "GPO 1"]
-    length: 0.8m
+    length: 0.8 m
 
   # Fan relay
   W_FAN:
     wirecount: 2
     colors: [BK, GN]
     wirelabels: [GND, "GPO 6"]
-    length: 1.0m
+    length: 1.0 m
 
   # Fuel pump relay trigger
   W_FUELPUMP:
     wirecount: 2
     colors: [BK, GN]
     wirelabels: [GND, "GPO 2"]
-    length: 0.8m
+    length: 0.8 m
+
+  # CAN to 8HP
+  W_CAN_8HP:
+    wirecount: 2
+    colors: [WH, BU]
+    wirelabels: ["CAN H", "CAN L"]
+    length: 0.3 m
+
+  # CAN to Gauge.S
+  W_CAN_GAUGES:
+    wirecount: 2
+    colors: [WH, BU]
+    wirelabels: ["CAN H", "CAN L"]
+    length: 0.3 m
 
 
 connections:
@@ -500,27 +551,27 @@ connections:
   # ── Crank trigger ────────────────────────────────────────────────────────────
   - - CRANK_VR: [1, 2, 3]
     - W_CRANK: [1, 2, 3]
-    - ECU_CMC: [TRIGGER+, TRIGGER-, SHIELD]
+    - ECU_CMC: [1, 2, 3]
 
   # ── Cam / HOME trigger ───────────────────────────────────────────────────────
   - - CAM_HALL: [1, 2, 3]
     - W_CAM: [1, 2, 3]
-    - ECU_CMC: [HOME_SIG, HOME_GND, HOME_12V]
+    - ECU_CMC: [4, 5, 6]
 
   # ── CLT ─────────────────────────────────────────────────────────────────────
   - - CLT: [1, 2]
     - W_CLT: [1, 2]
-    - ECU_CMC: [CLT_SIG, SENSOR_GND]
+    - ECU_CMC: [7, 9]
 
   # ── IAT ─────────────────────────────────────────────────────────────────────
   - - IAT: [1, 2]
     - W_IAT: [1, 2]
-    - ECU_CMC: [IAT_SIG, SENSOR_GND]
+    - ECU_CMC: [8, 9]
 
   # ── TPS ─────────────────────────────────────────────────────────────────────
   - - TPS: [1, 2, 3]
     - W_TPS: [1, 2, 3]
-    - ECU_CMC: [5V_OUT, TPS_SIG, SENSOR_GND]
+    - ECU_CMC: [10, 11, 9]
 
   # ── VANOS solenoid ───────────────────────────────────────────────────────────
   - - VANOS_SOL: [1, 2]
@@ -533,9 +584,11 @@ connections:
     - CAN_BUS_JUNCTION: [1, 2]
 
   - - CAN_BUS_JUNCTION: [3, 4]
+    - W_CAN_8HP: [1, 2]
     - HP8_CAN: [1, 2]
 
   - - CAN_BUS_JUNCTION: [3, 4]
+    - W_CAN_GAUGES: [1, 2]
     - GAUGES_CAN: [1, 2]
 
   # ── DCT Shifter ──────────────────────────────────────────────────────────────
@@ -556,7 +609,7 @@ connections:
   # ── Boost solenoid ───────────────────────────────────────────────────────────
   - - BOOST_SOL: [1, 2]
     - W_BOOST: [1, 2]
-    - ECU_CMC: [12V_SWITCHED, GPO1]
+    - ECU_CMC: [12, 13]
 
   # ── Fan relay trigger ─────────────────────────────────────────────────────────
   - - FAN_RELAY: [1, 2]
