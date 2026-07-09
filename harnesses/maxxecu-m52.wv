@@ -6,6 +6,71 @@
 # Note: Harness is built for non-VANOS M50 head.
 #       M52 VANOS cam sensor requires sensor swap to BMW 12141726590.
 #
+# ─────────────────────────────────────────────────────────────────────────────
+# TODOs — data needed before this diagram is build-ready:
+#
+# TODO: MaxxECU CMC main connector pin assignments
+#       The CMC connector carries all INJ/IGN/TRIGGER/HOME/CLT/IAT/TPS/GPO1
+#       outputs but MaxxECU does not publish pin-level CMC assignments publicly.
+#       Source: download the Race wiring PDF from maxxecu.com/downloads
+#       (requires account). Update ECU_CMC connector below with real pin numbers.
+#
+# TODO: Injector firing order — which MaxxECU INJ output maps to which cylinder
+#       M52 firing order: 1-5-3-6-2-4. Verify INJ 1–6 assignment in MaxxTune
+#       → Engine → Ignition → Firing order. Document here.
+#
+# TODO: Ignition firing order — which MaxxECU IGN output maps to which coil
+#       Same firing order as injectors. Confirm IGN 1–6 coil numbering from
+#       MaxxTune → Engine → Ignition → Coil assignments.
+#
+# TODO: Alternator D+ wiring
+#       12-pin pin 12 (M) = Alternator +12V (D+ excite terminal).
+#       Must be wired in series with a charge bulb (or resistor) to +12V ignition.
+#       Without this the alternator will not regulate charging below ~1500 RPM.
+#       Confirm wire gauge and bulb spec from MaxxECU install guide.
+#
+# TODO: EWS2 bypass wiring
+#       M52 (OBD2) has EWS2 immobilizer — MaxxECU has no EWS protocol.
+#       Without bypass: cranks but will not fire.
+#       Option A (preferred): EWS delete emulator module — confirm pinout and
+#         which X20 / ECU connector pins are affected.
+#       Option B: hard-wire bypass at ECU connector.
+#       Research MaxxECU community for current preferred method before install.
+#       Document bypass connections here once method is confirmed.
+#
+# TODO: Idle air control valve (IDLE_VALVE) GPO 4 + GPO 5 pinout
+#       The M52 ICV is a dual-coil stepper driven by GPO 4 and GPO 5.
+#       GPO 4 and GPO 5 are on the MaxxECU CMC connector (not the 16-pin aux).
+#       Confirm CMC pin numbers from downloaded pinout PDF.
+#
+# TODO: GPO 1 (boost solenoid) CMC pin number
+#       Boost solenoid wired via Superseal 2-pin in harness → GPO 1 on CMC.
+#       Confirm CMC pin from downloaded PDF.
+#
+# TODO: Firewall bulkhead connector (Deutsch AS47 or AS79)
+#       Planned installation during Phase 1 chassis prep.
+#       Cabin side: ECU CMC connector, fuse block, relay board → bulkhead permanently.
+#       M52 harness terminates at mating plug; 07K harness also terminates at mating plug.
+#       Add a separate body-bulkhead.wv diagram once connector part numbers confirmed.
+#       Source: RaceSpec Online (racespeconline.com) — AS series 47-way (~$80–120).
+#
+# TODO: Wire gauges throughout
+#       12-pin power wires (12V coils, ECU power, engine GND) require minimum 14 AWG.
+#       Injector/ignition wires: 18–20 AWG typical.
+#       CAN bus: 22 AWG twisted pair, 120Ω impedance.
+#       Confirm all gauges from harness as-received and document.
+#
+# TODO: PST-F1 mounting confirmation
+#       M52 VANOS banjo bolt path (M14×1.5 → M10×1.0 adapter → PST-F1) is the plan.
+#       Confirm the adapter thread spec matches the PST-F1 body at install.
+#       PST-F1 4-pin connector pinout should be confirmed against Gauge.S docs.
+#
+# TODO: MAP sensor connector and vacuum port
+#       MaxxECU M50 harness includes MAP sensor with vacuum hose.
+#       Confirm MAP sensor connector type, hose routing to intake manifold.
+#       Tee into intake manifold vacuum port before throttle body.
+# ─────────────────────────────────────────────────────────────────────────────
+#
 # This build adds to the base harness:
 #   - ZF 8HP70 CAN (MaxxECU GEN1 native, via 16-pin CAN H/L)
 #   - DCT Shifter paddle (4-wire, DIN 1/2)
