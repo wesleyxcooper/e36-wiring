@@ -6,6 +6,23 @@ Engine: VW 07K 2.5L I5 (turbo, longitudinal) · ECU: MaxxECU Race · Trans: ZF 8
 Diagrams are authored in [WireViz](https://github.com/wireviz/WireViz) YAML format — plain text,
 git-diffable, outputs SVG/PNG/HTML/BOM automatically.
 
+## Diagrams
+
+Click any link to view the interactive diagram with full BOM in your browser — no code checkout needed.
+
+| Harness | Interactive HTML | Source |
+|---|---|---|
+| MaxxECU ↔ M52 engine harness | [maxxecu-m52.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/maxxecu-m52.html) | `harnesses/maxxecu-m52.wv` |
+| E36 X20 body connector / Gauge.S | [body-x20.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/body-x20.html) | `harnesses/body-x20.wv` |
+
+### MaxxECU ↔ M52 engine harness
+
+![MaxxECU M52 Harness](output/maxxecu-m52.svg)
+
+### E36 X20 body connector / Gauge.S interface
+
+![E36 X20 Body Connector](output/body-x20.svg)
+
 ## Harnesses
 
 | File | Description | Phase |
@@ -40,6 +57,7 @@ git-diffable, outputs SVG/PNG/HTML/BOM automatically.
 ## Setup
 
 ```bash
+brew install graphviz      # macOS — required, WireViz depends on the dot binary
 pip install -r requirements.txt
 ```
 
@@ -55,7 +73,7 @@ Generate a single harness:
 wireviz harnesses/maxxecu-07k.wv -o output/
 ```
 
-Output files go to `output/` — SVGs are committed, PNGs/HTML are gitignored.
+Output files go to `output/` — SVGs and HTML are committed to the repo. PNGs and raw `.gv` DOT files are gitignored.
 
 ## 07K harness signal map
 
@@ -73,6 +91,53 @@ The M52 and 07K share MaxxECU trigger type (`N-1 missing tooth`, 60-2 wheel). Si
 | MAP sensor | Same | Same | Nothing |
 | Flex fuel | Digital input | Same | Nothing |
 | 8HP CAN | Connected | Still connected | Nothing |
+
+## WireViz authoring gotchas
+
+Hard-won fixes from getting these diagrams to render — save yourself the debugging:
+
+**Install Graphviz separately** — `pip install wireviz` is not enough. Graphviz (`dot`) must be on your PATH.
+```bash
+brew install graphviz   # macOS
+sudo apt install graphviz   # Debian/Ubuntu
+```
+
+**Cable lengths need a space** — `1.2m` is a parse error. Use `1.2 m`.
+```yaml
+# Bad
+length: 1.2m
+# Good
+length: 1.2 m
+```
+
+**No `>` characters in `notes:` fields** — WireViz writes notes into graphviz DOT HTML labels. A bare `>` (even as part of `->`) terminates the label token early and produces a cryptic `syntax error near 'X'` in the generated `.tmp` file. Use words instead: `::` for arrows, `over` for comparisons.
+
+**No Unicode in `notes:` fields** — Characters like `Ω`, `→`, `–`, `×` can also break the graphviz DOT parser depending on version. Stick to ASCII in any field that gets rendered (notes, labels, subtypes).
+
+**Connections must strictly alternate connector → cable → connector** — You cannot connect two connectors directly without a cable between them, even for a simple one-wire pass-through. WireViz 0.4+ enforces this and the error message (`Expected cable/arrow, but "X" is connector`) points at the second connector, not the missing cable.
+
+**Color codes are WireViz-specific** — Common confusion with OEM BMW wire color codes:
+| OEM code | Meaning | WireViz code |
+|---|---|---|
+| `SW` | Schwarz (black) | `BK` |
+| `GR` | Grau (gray) | `GY` |
+| `BL` | Blau (blue) | `BU` |
+| `BR` | Braun (brown) | `BN` |
+
+**All referenced connectors must be defined** — If a connector name appears in `connections:` but not in `connectors:`, WireViz fails silently or with a generic error. Stub unknown connectors with `pincount: N` and placeholder `pinlabels`.
+
+## What WireViz can and cannot do
+
+WireViz is a **harness documentation tool**, not a schematic capture tool. It shows physical connectors, wire runs, colors, gauges, and lengths — the kind of diagram a fabricator uses to build a loom.
+
+**It does not have graphical symbols** for resistors, capacitors, relays, diodes, MOSFETs, or any other circuit components. If you want a relay or termination resistor to appear as a schematic symbol, you need a different tool.
+
+For circuit-level schematics alongside this harness documentation, use:
+- [KiCad](https://www.kicad.org/) — free, open source, industry-grade schematic + PCB
+- [EasyEDA](https://easyeda.com/) — free, web-based, good for quick schematics
+- [LTspice](https://www.analog.com/en/resources/design-tools-and-calculators/ltspice-simulator.html) — free, ideal when you also need SPICE simulation (relay coil snubbers, power circuits, etc.)
+
+The typical workflow for a build like this is: WireViz for the harness routing / pinout documentation, KiCad or EasyEDA for any relay/fuse block or power distribution schematic that needs component-level detail.
 
 ## Contributing
 

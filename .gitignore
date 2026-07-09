@@ -1,6 +1,5 @@
-# Generated output — commit SVGs selectively, ignore PNGs and HTML by default
+# Generated output — commit SVGs and HTML for GitHub viewing; ignore PNGs and raw DOT files
 output/*.png
-output/*.html
 output/*.bom.tsv
 output/*.gv
 
