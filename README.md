@@ -36,10 +36,29 @@ Click any link to view the interactive diagram with full BOM in your browser —
 | `harnesses/maxxecu-07k.wv` | MaxxECU Race ↔ 07K engine harness (Phase 3) | 3 |
 | `harnesses/8hp-can.wv` | MaxxECU ↔ 8HP70 CAN harness | 1 |
 | `harnesses/gauge-s-can.wv` | MaxxECU ↔ Gauge.S cluster CAN | 1 |
-| `harnesses/firewall-bulkhead.wv` | Deutsch AS47/AS79 firewall bulkhead connector | 1 |
+| `harnesses/firewall-bulkhead.wv` | Deutsch AS47/AS79 firewall bulkhead connector (**TODO — not yet authored**) | 1 |
 | `harnesses/body-x20.wv` | E36 X20 body connector interface (MaxxECU outputs → dash/instruments) | 1 |
 | `harnesses/dct-shifter.wv` | DCT Shifter paddle → MaxxECU DIN wiring | 1 |
 | `harnesses/pst-f1-sensor.wv` | Bosch PST-F1 oil temp/pressure → Gauge.S analog inputs | 1 |
+
+## Open TODOs
+
+### `harnesses/firewall-bulkhead.wv` — Firewall bulkhead connector pinout
+
+The firewall bulkhead (Deutsch Autosport AS series or Souriau 8STA, 47-way or 79-way) is the single connector that separates the cabin-side wiring from the engine harness. Defining its pinout in WireViz is the connective tissue between `maxxecu-m52.wv` and `power-distribution.wv`, and is what enables the M52 → 07K engine swap to be a single unplug operation with zero cabin wiring changes.
+
+**Work to do:**
+- Extract all engine-crossing signals from `maxxecu-m52.wv` and `power-distribution.wv`
+- Assign each signal to a numbered pin in the bulkhead shell, grouped by type (sensors, actuators, power, grounds, CAN)
+- Apply contact sizing from the enhancements doc (Size 20 / sensors, Size 16 / injectors+solenoids, Size 12 / power feeds)
+- Stub unknowns (shared ground strategy, final wire gauges, pin count choice 47 vs 79)
+- Verify total pin count fits chosen shell size
+- Replicate the same pinout assignment in the future `maxxecu-07k.wv` so both harnesses mate identically
+
+> **Reference:** Connector options, contact sizing table, cost breakdown, and the two-swap rationale are documented in the private project planning doc — access must be requested from the author:
+> https://docs.google.com/document/d/1RNRvGEeiQ2WlrQ-GTXO0aizO8udv_5p_oNJf_OOMEbc/edit?usp=sharing
+
+---
 
 ## Key interfaces
 
