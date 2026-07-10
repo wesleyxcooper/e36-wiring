@@ -97,6 +97,76 @@ The M52 and 07K share MaxxECU trigger type (`N-1 missing tooth`, 60-2 wheel). Si
 | Flex fuel | Digital input | Same | Nothing |
 | 8HP CAN | Connected | Still connected | Nothing |
 
+## Circuit schematics (why you need both)
+
+WireViz tells you **which wire goes in which hole**. A circuit schematic tells you **how the circuit actually works**. For building and troubleshooting, you want both.
+
+Example — the same fan relay circuit, two ways:
+
+| WireViz (harness diagram) | Circuit schematic |
+|---|---|
+| Shows: connector pin numbers, wire colors, cable lengths | Shows: current flow, switching logic, component symbols |
+| Answers: "where does this wire terminate?" | Answers: "why does the fan turn on?" |
+| Good for: building the loom, ordering parts | Good for: troubleshooting, understanding |
+
+The `schematics/` directory contains Python scripts that generate circuit schematics using [schemdraw](https://schemdraw.readthedocs.io) — a free library that draws proper electrical symbols (relays, fuses, motors, switches, etc.).
+
+### Generate the fan relay schematic
+
+```bash
+# Install dependencies (one time)
+pip install schemdraw matplotlib
+
+# Generate the schematic
+python3 schematics/fan-relay.py
+
+# Open it
+open schematics/fan-relay.svg
+```
+
+This produces a schematic showing the RELAY_FAN circuit from `power-distribution.wv`:
+
+![Fan Relay Schematic](schematics/fan-relay.svg)
+
+### How to read the schematic
+
+The fan relay has two completely separate circuits inside one component:
+
+**Coil circuit (left side of relay symbol)** — low current, controls the switch:
+- IGN +12V feeds the coil through a 5A fuse → relay pin 86
+- MaxxECU GPO 6 is a transistor that pulls relay pin 85 to GND when the ECU commands the fan on
+- When both sides of the coil are connected, current flows → magnetic field is created
+
+**Load circuit (right side of relay symbol)** — high current, powers the fan:
+- BATT+ sits at relay pin 30 through a 20A fuse, always ready
+- When the coil energizes, it magnetically closes the switch (contact)
+- Pin 30 connects to pin 87 → BATT+ reaches the fan motor
+
+The dotted line in the relay symbol is the schematic convention for "these two parts are mechanically linked inside the same component."
+
+### Create your own schematic
+
+Copy `schematics/fan-relay.py` and modify it. The `schemdraw` library has elements for everything you need:
+
+```python
+import schemdraw.elements as elm
+
+elm.Relay()       # relay (coil + switch contact, dotted link)
+elm.Fuse()        # fuse
+elm.Motor()       # motor (circle with M)
+elm.Battery()     # battery
+elm.Switch()      # switch (generic or SPST/SPDT)
+elm.Resistor()    # resistor (for termination resistors, pull-ups, etc.)
+elm.Diode()       # diode (for flyback protection on relay coils)
+elm.Capacitor()   # capacitor
+elm.Ground()      # GND symbol
+elm.Dot()         # junction dot (wire crossing that connects)
+elm.Line()        # plain wire
+elm.Label()       # text label anywhere on the diagram
+```
+
+Full documentation: https://schemdraw.readthedocs.io
+
 ## WireViz authoring gotchas
 
 Hard-won fixes from getting these diagrams to render — save yourself the debugging:
