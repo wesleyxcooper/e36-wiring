@@ -1,0 +1,191 @@
+metadata:
+  project: E36 Restomod -- Radium 20-1170 Fuel Pump Hanger Wiring
+  description: >-
+    Radium Engineering 20-1170 fuel pump hanger + Walbro F90000267 (465 LPH E85)
+    controlled by MaxxECU RACE via PWM GPO through a DC solid state relay (SSR).
+    Phase 1 install -- carries through 07K Phase 3 with no re-work.
+    SSR (Crydom D1D40 or equiv 40A DC-DC) sits between fused BATT+ and pump(+).
+    MaxxECU GPO sinks SSR ctrl(-) to GND when active; IGN switched 12V feeds ctrl(+).
+    Cross-reference fuel-pump-hanger-reference.md for full specs, part numbers,
+    PWM duty table, and MTune config. Install PDF: radiumauto.com/pages/instructions (20-1170).
+
+# ── TODO list ──────────────────────────────────────────────────────────────────
+#
+#   [ ] Verify F90000267 fits chosen Radium hanger slot -- 39mm/50mm DCSS body confirmed
+#   [ ] Source 40A DC SSR (Crydom D1D40 preferred; generic 40A DC SSR acceptable)
+#       Mount SSR to chassis/fuse block -- needs heatsink at sustained high duty
+#   [ ] Confirm MaxxECU RACE GPO pin assignment for fuel pump PWM
+#       MTune: Outputs -> Output config -> Function: PWM fuel pump control
+#       Recommended frequency: 100-500 Hz (SSR compatible; Crydom D1D40 rated 1kHz)
+#   [ ] Thread 20-1000-1010 swivel fitting (10AN ORB) into pump-out port HAND-TIGHT
+#       then attach -10AN braided line before final torque -- allows rotation to route
+#   [ ] Return port: use included 8.5mm barb adapter (OEM return line)
+#       OR add 20-1000-0606 (6AN ORB swivel) if converting to full AN return
+#   [ ] Dedicate chassis GND stud for pump(-) -- do not share with ECU sensor grounds
+#   [ ] Inline 25A AGC fuse within 12 inches of battery on BATT+ feed to SSR
+
+# ── Connectors ─────────────────────────────────────────────────────────────────
+
+connectors:
+
+  BATT_POS:
+    type: "Battery positive terminal"
+    subtype: "12V AGM"
+    pincount: 1
+    pinlabels: ["+12V BATT (always-on)"]
+    notes: >-
+      Inline 25A AGC fuse within 12 inches of battery terminal.
+      Feeds SSR load input only -- NOT connected to pump directly.
+      12 AWG minimum for this run (14.1A max pump draw; 25A fuse).
+
+  CHASSIS_GND:
+    type: "Chassis ground stud (body metal)"
+    pincount: 1
+    pinlabels: ["GND"]
+    notes: >-
+      Dedicated ground for pump(-) terminal on Radium hanger.
+      Do not share with ECU sensor grounds or other high-current grounds.
+      12 AWG minimum. Ring terminal, solid bolt to body metal.
+      Separate stud from any signal ground star-point.
+
+  DC_SSR:
+    type: "DC Solid State Relay -- Crydom D1D40 or generic 40A DC-DC SSR"
+    subtype: "0-60V load / 3-32V control / 40A rated / opto-isolated"
+    pincount: 4
+    pinlabels:
+      - "Load(+) -- fused BATT+ in"
+      - "Load(-) -- pump(+) out"
+      - "Ctrl(+) -- IGN switched 12V"
+      - "Ctrl(-) -- MaxxECU GPO (GND sink)"
+    notes: >-
+      Opto-isolated DC-DC SSR. No mechanical contacts -- PWM-compatible.
+      Control input: 3-32V DC, ~10-15mA draw. Load: 0-60V DC, 40A continuous.
+      Crydom D1D40 rated: control 3-32V, load 0-60V, 40A, 1kHz max switching.
+      Mount to chassis or fuse block -- add small heatsink if duty cycles above 80%.
+      SSR switches ON when ctrl circuit is energized (IGN high + GPO sinks GND).
+      PWM frequency at MaxxECU GPO: 100-500 Hz recommended (smooth speed control,
+      within SSR switching rating).
+
+  MAXXECU_GPO:
+    type: "MaxxECU RACE -- PWM General Purpose Output"
+    subtype: "GEN1 low-drive (GND-sinking), max 2A -- GPO pin TBD"
+    pincount: 1
+    pinlabels: ["PWM GND-sink out (100-500 Hz)"]
+    notes: >-
+      MaxxECU GEN1 GPO: active = pulls to GND. When GPO sinks GND, SSR ctrl circuit
+      completes and SSR switches ON. Duty cycle controls pump speed.
+      Assign function in MTune: Outputs → Output config → PWM fuel pump control.
+      Recommended duty table (by MAP/RPM): 65% idle / 80% cruise / 100% WOT.
+      Phase 3 (07K turbo): tune duty table to boost pressure -- 100% under full boost.
+      22 AWG from GPO pin to SSR Ctrl(-) -- low current (SSR ctrl draws ~10-15mA).
+
+  IGN_12V:
+    type: "IGN switched 12V source (via ignition relay)"
+    subtype: "Key-on, key-off -- same bus as MaxxECU main power"
+    pincount: 1
+    pinlabels: ["IGN +12V (switched)"]
+    notes: >-
+      Feeds SSR Ctrl(+). When key-on, IGN relay energizes, 12V appears at SSR ctrl+.
+      Combined with MaxxECU GPO sinking SSR ctrl-, pump runs.
+      At key-off, IGN relay drops → SSR ctrl+ loses power → SSR opens → pump stops.
+      22 AWG from IGN bus to SSR Ctrl(+). Short run preferred -- stay near fuse block.
+
+  RADIUM_HANGER:
+    type: "Radium Engineering 20-1170 -- stainless stud electrical terminals"
+    subtype: "Top-plate external studs -- anti-rotation, hermetically sealed"
+    pincount: 2
+    pinlabels:
+      - "Pump(+) -- switched 12V from SSR Load(-)"
+      - "Pump(-) -- chassis GND"
+    notes: >-
+      Radium 20-1170 uses custom stainless steel studs through the top plate (not a
+      multi-pin connector). External connection via ring terminals + anodized acorn nuts.
+      Anti-rotation feature prevents stud from spinning during install.
+      Hermetically sealed and impervious to E85, gasoline, methanol.
+      Ring terminals: 12 AWG crimp ring, M4 or M5 stud diameter (confirm at install).
+      In-tank wiring insulated with ETFE -- chemically resistant to all fuel types.
+      Single pump install (F90000267): re-use OEM pump wiring for signal side or
+      run new 12 AWG from SSR Load(-) directly to pump(+) stud.
+
+# ── Cables ─────────────────────────────────────────────────────────────────────
+
+cables:
+
+  CABLE_PWR_BATT:
+    gauge: "12 AWG"
+    length: "0.5 m"
+    colors: [RD]
+    wirecount: 1
+    notes: >-
+      BATT+ to SSR Load(+). Inline 25A AGC fuse within 12 inches of battery.
+      12 AWG minimum (14.1A max pump draw; 25A fuse). Ring terminal at battery,
+      blade or ring terminal at SSR load terminal.
+
+  CABLE_PWR_PUMP:
+    gauge: "12 AWG"
+    length: "1.5 m"
+    colors: [RD]
+    wirecount: 1
+    notes: >-
+      SSR Load(-) to Radium hanger pump(+) stud. Switched +12V pump supply.
+      12 AWG minimum. Route through tunnel/chassis to fuel tank hanger location.
+      Keep clear of exhaust tunnel runs where possible.
+
+  CABLE_GND:
+    gauge: "12 AWG"
+    length: "0.5 m"
+    colors: [BK]
+    wirecount: 1
+    notes: >-
+      Radium hanger pump(-) stud to chassis ground stud.
+      12 AWG minimum. Dedicated ground -- do not share with ECU sensor ground bus.
+      Ring terminal at both ends.
+
+  CABLE_SSR_CTRL_POS:
+    gauge: "22 AWG"
+    length: "0.3 m"
+    colors: [GN]
+    wirecount: 1
+    notes: >-
+      IGN switched 12V to SSR Ctrl(+). Low current (SSR opto draws ~15mA).
+      22 AWG sufficient. Short run -- fuse block to SSR.
+
+  CABLE_SSR_CTRL_NEG:
+    gauge: "22 AWG"
+    length: "2.0 m"
+    colors: [VT]
+    wirecount: 1
+    notes: >-
+      MaxxECU GPO to SSR Ctrl(-). PWM signal (GND-sink, 100-500 Hz).
+      22 AWG. Route from MaxxECU through firewall grommet to SSR location.
+      Shielded wire preferred -- drain to chassis GND at ECU end only.
+      Keep away from ignition coil primaries and injector wires.
+
+# ── Connections ────────────────────────────────────────────────────────────────
+
+connections:
+  # BATT+ (fused 25A) -> SSR Load(+)
+  -
+    - BATT_POS: [1]
+    - CABLE_PWR_BATT: [1]
+    - DC_SSR: [1]
+  # SSR Load(-) -> pump(+) stud on Radium hanger
+  -
+    - DC_SSR: [2]
+    - CABLE_PWR_PUMP: [1]
+    - RADIUM_HANGER: [1]
+  # pump(-) stud -> chassis GND
+  -
+    - RADIUM_HANGER: [2]
+    - CABLE_GND: [1]
+    - CHASSIS_GND: [1]
+  # IGN +12V -> SSR Ctrl(+)
+  -
+    - IGN_12V: [1]
+    - CABLE_SSR_CTRL_POS: [1]
+    - DC_SSR: [3]
+  # MaxxECU GPO -> SSR Ctrl(-) (GND sink closes SSR control circuit)
+  -
+    - MAXXECU_GPO: [1]
+    - CABLE_SSR_CTRL_NEG: [1]
+    - DC_SSR: [4]

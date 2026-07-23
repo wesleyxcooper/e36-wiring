@@ -16,6 +16,7 @@ Click any link to view the interactive diagram with full BOM in your browser —
 | E36 X20 body connector / Gauge.S | [body-x20.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/body-x20.html) | `harnesses/body-x20.wv` |
 | Power distribution (relay board + fuse block) | [power-distribution.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/power-distribution.html) | `harnesses/power-distribution.wv` |
 | Pierburg CWA400 electric water pump | [ewp-controller.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ewp-controller.html) | `harnesses/ewp-controller.wv` |
+| Radium 20-1170 fuel pump hanger (F90000267 + DC SSR + MaxxECU PWM) | _run wireviz to generate_ | `harnesses/fuel-pump-hanger.wv` |
 
 ### MaxxECU ↔ M52 engine harness
 
@@ -33,6 +34,10 @@ Click any link to view the interactive diagram with full BOM in your browser —
 
 ![CWA400 EWP Harness](output/ewp-controller.svg)
 
+### Radium 20-1170 fuel pump hanger
+
+_Run `wireviz harnesses/fuel-pump-hanger.wv -o output/` to generate. Cross-reference `fuel-pump-hanger-reference.md` and `schematics/fuel-pump-pwm.py`._
+
 ## Harnesses
 
 | File | Description | Phase |
@@ -40,6 +45,7 @@ Click any link to view the interactive diagram with full BOM in your browser —
 | `harnesses/maxxecu-m52.wv` | MaxxECU Race ↔ M52 engine harness (Phase 1) | 1 |
 | `harnesses/maxxecu-07k.wv` | MaxxECU Race ↔ 07K engine harness (Phase 3) | 3 |
 | `harnesses/ewp-controller.wv` | Pierburg CWA400 (PWM version) + MaxxECU RACE GPO control | 3 |
+| `harnesses/fuel-pump-hanger.wv` | Radium 20-1170 hanger + Walbro F90000267 + DC SSR + MaxxECU PWM GPO | 1 |
 | `harnesses/8hp-can.wv` | MaxxECU ↔ 8HP70 CAN harness | 1 |
 | `harnesses/gauge-s-can.wv` | MaxxECU ↔ Gauge.S cluster CAN | 1 |
 | `harnesses/firewall-bulkhead.wv` | Deutsch AS47/AS79 firewall bulkhead connector (**TODO — not yet authored**) | 1 |
@@ -163,6 +169,17 @@ open schematics/ewp-controller.svg
 Shows the Pierburg CWA400 + MaxxECU RACE circuit: BATT+ through 40A relay to CWA400 Pin 3, IGN-switched relay coil, MaxxECU GPO PWM signal (680 Hz) to CWA400 Pin 1, and post-shutdown power hold relay logic. Cross-reference `harnesses/ewp-controller.wv` for physical connector/pin layout.
 
 ![EWP Controller Schematic](schematics/ewp-controller.svg)
+
+### Generate the fuel pump PWM schematic
+
+```bash
+python3 schematics/fuel-pump-pwm.py
+open schematics/fuel-pump-pwm.svg
+```
+
+Shows the Radium 20-1170 + Walbro F90000267 circuit: BATT+ through 25A fuse to DC SSR Load(+), SSR Load(-) to pump(+) stud on hanger, IGN switched 12V to SSR Ctrl(+), MaxxECU GPO (GND-sink) to SSR Ctrl(-). PWM duty cycle controls pump speed (65% idle → 100% WOT/boost). Cross-reference `harnesses/fuel-pump-hanger.wv` for physical pin layout and `fuel-pump-hanger-reference.md` for full specs and MTune config.
+
+_SVG generated on first run — not committed until generated._
 
 ### How to read the schematic
 
