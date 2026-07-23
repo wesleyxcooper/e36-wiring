@@ -1,6 +1,6 @@
 """
-EWP controller circuit schematic
-Davies Craig Digital Controller (#8002 LCD) + EWP150 (40 LPM)
+CWA400 electric water pump circuit schematic
+Pierburg CWA400 (PWM version) + MaxxECU RACE GPO control
 
 This script generates a circuit schematic using schemdraw.
 Run it to produce ewp-controller.svg in the same directory.
@@ -9,36 +9,34 @@ The schematic shows HOW the circuit works (current flow, switching logic).
 The WireViz file (harnesses/ewp-controller.wv) shows WHERE each wire terminates.
 You need both to build and troubleshoot the circuit.
 
-Davies Craig controller wire colors:
-  RED         always-on BATT+ (controller internal power + post-shutdown run-on)
-  BROWN       chassis earth
-  GREEN       ignition sense +12V (relay output ONLY -- see warning below)
-  GREEN/BLK   fan relay pin 85 output (controller earths pin 85)
-  BLUE        pump motor + (PWM variable voltage -- speed control)
-  BLACK       pump motor GND
+CWA400 connector pinout (Kostal 2+2):
+  Pin 1  PWM signal in  (MaxxECU GPO, 22 AWG shielded)
+  Pin 2  BSD diagnostic (leave floating -- not used with MaxxECU)
+  Pin 3  +12V power     (from 40A relay, 10 AWG)
+  Pin 4  GND            (chassis ground, 10 AWG)
 
-CRITICAL WIRING WARNING:
-  The GREEN ignition wire is a sense input only -- it does NOT power the pump.
-  The pump is powered from BATT+ (RED, always-on) through the controller.
-  GREEN must connect to a RELAY pin 87 output providing clean switched +12V.
-  DO NOT connect GREEN to the MaxxECU or ignition coil circuit.
-  Davies Craig explicitly warns this can cause controller malfunction or ECU damage.
+Standard Bosch ISO mini relay pin numbers:
+  85  coil negative  -- chassis GND
+  86  coil positive  -- IGN +12V (key-on)
+  30  common         -- BATT+ (always-on), fused at 40A
+  87  normally open  -- output to CWA400 Pin 3 when relay is ON
 
 How this circuit works:
-  1. Key on -> IGN relay energizes -> pin 87 output goes to +12V
-  2. GREEN wire goes high -> controller wakes up and begins monitoring CLT sensor
-  3. Controller reads NTC thermistor in upper/hot-side hose
-  4. Controller PWMs voltage on BLUE wire to pump motor, adjusting speed with temp
-  5. Key off -> GREEN goes low -> controller detects shutdown
-  6. Controller continues running pump from BATT+ (RED, always-on) until CLT
-     drops 10C below setpoint OR 3 minutes elapse -- whichever comes first
-  7. Post-shutdown run-on eliminates turbo heat soak without MaxxECU power latch
+  1. Key on -> IGN relay energizes -> relay coil pin 86 gets +12V
+  2. Coil pin 85 is at GND -> coil circuit complete -> relay energizes
+  3. Relay contact closes -> pin 30 connects to pin 87 -> CWA400 Pin 3 gets +12V
+  4. MaxxECU boots -> sends >=3ms high pulse on GPO -> CWA400 wakes from standby
+  5. MaxxECU reads CLT -> outputs PWM at 680 Hz on GPO -> CWA400 adjusts speed
+     (duty cycle map: 20% at 60C / 55% at 85C / 97% at 105C)
+  6. Key off -> relay de-energizes -> Pin 3 loses power... BUT:
+  7. MaxxECU power hold relay keeps ECU alive after key-off
+  8. MaxxECU continues commanding pump via GPO until CLT < 70C
+  9. Once CLT < 70C, MaxxECU releases power hold relay -> pump stops
 
-MaxxECU integration:
-  - MaxxECU uses a SEPARATE NTC sensor in its own coolant port (BBG rear flange)
-  - No shared sensors between MaxxECU and Davies Craig controller
-  - MaxxECU does not command the EWP -- controller is the sole PWM driver
-  - EWP150 has no external signal input for ECU override
+Version warning:
+  PWM version ONLY: Pierburg 7.07223.10.0 / BMW 11515A05704 / 11517563659
+  LIN version (NOT compatible): Pierburg 7.03665.66.0 / BMW 11517604027
+  Post-March 2024 production = LIN bus only -- verify part number before sourcing.
 
 Usage:
   pip install schemdraw matplotlib
@@ -57,90 +55,71 @@ OUT = os.path.join(os.path.dirname(__file__), "ewp-controller.svg")
 with schemdraw.Drawing(show=False) as d:
     d.config(fontsize=10.5)
 
-    # ── BATT+ always-on power: BATT+ -> 10A fuse -> controller RED ───────────
-    # Draw left to right across the top
-    batt = d.add(elm.Battery().at((0, 4)).right().reverse().label("12V BATT+\n(always-on)", loc="top"))
-    d.add(elm.Line().right().length(0.4))
-    d.add(elm.Fuse().right().label("F_EWP_PWR\n10A", loc="top"))
-    d.add(elm.Line().right().length(0.4))
-    pwr_in = d.add(elm.Dot())
-    d.add(elm.Label().label("  RED", loc="right"))
+    # ── Place relay in center of diagram ──────────────────────────────────────
+    # elm.Relay draws coil (left) + switch contact (right) with dotted coupling link.
+    # in1/in2 = coil terminals (86/85), a/b = contact terminals (30/87)
+    relay = d.add(elm.Relay(switch='spst').at((4.5, 0)).label("MAIN_RELAY\n40A (Bosch 0 332 002 150)\nISO mini relay", loc="top"))
 
-    # Battery negative bus -- drop down from battery left terminal
-    d.add(elm.Line().down().at(batt.start).length(4.5))
-    batt_gnd = d.add(elm.Ground())
+    # ── COIL CIRCUIT: IGN +12V -> pin 86 -> coil -> pin 85 -> GND ────────────
+    # Left from relay.in1 (coil+, pin 86) -> IGN switched +12V source
+    d.add(elm.Line().left().at(relay.in1).length(2.0))
+    ign_node = d.add(elm.Dot())
+    d.add(elm.Line().up().length(0.6))
+    d.add(elm.Label().label("IGN +12V\n(key-on switched relay)", loc="right"))
 
-    # ── IGN sense input: IGN relay pin 87 -> 7.5A fuse -> controller GREEN ───
-    # Below the BATT+ circuit; IGN does NOT power the pump -- sense input only
-    d.add(elm.Line().at((0, 2.2)).right().length(0.3))
-    d.add(elm.Fuse().right().label("F_EWP_IGN\n7.5A", loc="top"))
-    d.add(elm.Line().right().length(0.4))
-    ign_in = d.add(elm.Dot())
-    d.add(elm.Label().label("  GREEN (IGN sense)", loc="right"))
+    # Left from relay.in2 (coil-, pin 85) -> chassis GND
+    d.add(elm.Line().left().at(relay.in2).length(2.0))
+    d.add(elm.Ground())
 
-    # IGN source label at left
-    d.add(elm.Label().at((0, 2.2)).label("IGN relay pin 87", loc="left"))
+    # Coil pin labels
+    d.add(elm.Label().at(relay.in1).label("  86", loc="right"))
+    d.add(elm.Label().at(relay.in2).label("  85", loc="right"))
 
-    # Warning annotation below IGN line
-    d.add(elm.Label().at((2.2, 1.6)).label(
-        "!! relay pin 87 output ONLY --\nNOT MaxxECU, NOT coil circuit !!",
-        loc="center"
+    # ── LOAD CIRCUIT: BATT+ -> 40A fuse -> relay pin 30 -> 87 -> CWA400 ──────
+    # Up from relay.a (contact input, pin 30) -> 40A fuse -> BATT+
+    d.add(elm.Line().up().at(relay.a).length(1.5))
+    d.add(elm.Line().left().length(0.6))
+    d.add(elm.Fuse().left().label("F_CWA_PWR -- 40A\n(fuse within 12\" of batt)", loc="top"))
+    d.add(elm.Line().left().length(0.5))
+    batt_node = d.add(elm.Dot())
+    d.add(elm.Line().left().length(1.2))
+    d.add(elm.Battery().up().reverse().label("12V BATT", loc="right"))
+    d.add(elm.Label().label("  10 AWG", loc="right"))
+
+    # Battery negative rail (drop down from batt_node to GND)
+    d.add(elm.Line().down().at(batt_node.end).length(3.8))
+    d.add(elm.Ground())
+
+    # Right from relay.b (contact output, pin 87) -> CWA400 Pin 3 -> motor -> GND
+    d.add(elm.Line().right().at(relay.b).length(0.5))
+    d.add(elm.Label().label("Pin 3 (+12V)\n10 AWG", loc="top"))
+    d.add(elm.Motor().right().label("CWA400\n150 LPM @ 0.85 bar\n(Pierburg 7.07223.10.0)", loc="top"))
+    d.add(elm.Line().right().length(0.3))
+    d.add(elm.Ground())
+    d.add(elm.Label().at(relay.b).label("  Pin 4 (GND) -- 10 AWG", loc="bottom"))
+
+    # Contact pin labels
+    d.add(elm.Label().at(relay.a).label("  30", loc="left"))
+    d.add(elm.Label().at(relay.b).label("  87", loc="left"))
+
+    # ── PWM SIGNAL: MaxxECU GPO -> 680 Hz -> CWA400 Pin 1 ───────────────────
+    # Separate signal circuit drawn below the relay section
+    pwm_y = -2.0
+    d.add(elm.Line().at((1.5, pwm_y)).right().length(5.5))
+    pwm_end = d.add(elm.Dot())
+    d.add(elm.Label().label(
+        "  CWA400 Pin 1 (PWM signal in)\n"
+        "  680 Hz | 13-85% = speed ctrl | 86-97% = full speed\n"
+        "  Pin 2 (BSD): leave floating",
+        loc="right"
     ))
-
-    # ── Controller BROWN -> chassis GND ──────────────────────────────────────
-    # Branch downward from the controller side
-    d.add(elm.Line().at((5.2, 0.8)).down().length(0.6))
-    d.add(elm.Ground())
-    d.add(elm.Label().at((5.2, 0.8)).label("BROWN  ", loc="right"))
-    ctrl_gnd = d.add(elm.Dot().at((5.2, 0.8)))
-
-    # ── Controller vertical bus (left edge of controller region) ──────────────
-    # Vertical line connecting pwr_in (top) down through ign_in to ctrl_gnd
-    # This represents the controller's left terminal cluster
-    d.add(elm.Line().at(pwr_in.end).down().length(3.2))
-
-    # Connect ign_in into this vertical bus
-    d.add(elm.Line().at(ign_in.end).right().length(0.3))
-    ctrl_ign_join = d.add(elm.Dot())
-
-    # ── Controller output -> EWP150 pump motor ────────────────────────────────
-    # From the controller right side, draw pump output circuit
-    ctrl_out_y = 2.8
-    d.add(elm.Line().at((5.5, ctrl_out_y)).right().length(0.5))
-    d.add(elm.Label().at((5.5, ctrl_out_y)).label("BLUE (PWM)", loc="top"))
-    d.add(elm.Motor().right().label("EWP150\n40 LPM", loc="top"))
-    d.add(elm.Line().right().length(0.4))
-    d.add(elm.Ground())
-
-    # BLACK return label (below motor)
-    d.add(elm.Label().at((7.2, 2.4)).label("BLACK (motor GND)", loc="center"))
-
-    # Controller right-side annotation
-    d.add(elm.Label().at((5.5, ctrl_out_y)).label("  controller varies\n  voltage for speed", loc="bottom"))
-
-    # ── NTC thermistor sensor circuit ─────────────────────────────────────────
-    # Thermistor in upper/hot-side hose -> controller sensor input
-    # Draw from left, terminating at controller sensor input node
-    d.add(elm.Resistor().at((1.2, -0.8)).right().label("NTC thermistor\n(upper hose -- engine exit,\npre-radiator)", loc="top"))
-    d.add(elm.Line().right().length(0.4))
-    sensor_in = d.add(elm.Dot())
-    d.add(elm.Label().label("  SENSOR", loc="right"))
-
-    # Thermistor other end -> GND (sensor return)
-    d.add(elm.Line().down().at((1.2, -0.8)).length(0.6))
-    d.add(elm.Ground())
-
-    # ── Controller box label (center of diagram) ──────────────────────────────
-    d.add(elm.Label().at((5.0, 3.8)).label(
-        "Davies Craig Digital\nController (#8002 LCD)\n-- mounted in cabin --",
-        loc="center"
-    ))
+    d.add(elm.Label().at((1.5, pwm_y)).label("MaxxECU GPO\n22 AWG shielded\n(drain at ECU end only)", loc="left"))
 
     # ── Explanation note at bottom ────────────────────────────────────────────
-    d.add(elm.Label().at((3.5, -2.2)).label(
-        "Power: pump runs from BATT+ (RED, always-on) -- IGN is sense input only, does not power pump\n"
-        "Post-shutdown: controller runs pump after key-off until CLT drops 10C below setpoint or 3 min\n"
-        "MaxxECU: separate NTC in own coolant port -- no shared sensors, no MaxxECU pump command",
+    d.add(elm.Label().at((5.5, -4.2)).label(
+        "Wake pulse: MaxxECU outputs >=3ms uninterrupted high on GPO at key-on before transitioning to CLT duty map\n"
+        "Post-shutdown: MaxxECU power hold relay keeps ECU alive -- commands pump via GPO until CLT < 70C\n"
+        "VERSION: PWM only (pre-March 2024) -- NOT compatible with LIN version (Pierburg 7.03665.66.0 / BMW 11517604027)",
         loc="center"
     ))
 

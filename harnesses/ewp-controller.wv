@@ -1,26 +1,27 @@
 metadata:
-  project: E36 Restomod -- EWP Controller Wiring
+  project: E36 Restomod -- CWA400 Electric Water Pump Wiring
   description: >-
-    Davies Craig Digital Controller (#8002 LCD) + EWP150 (40 LPM) harness.
-    Phase 3 (07K engine). Replaces OEM belt-driven 07K water pump entirely.
-    OEM pump 07K121011B excluded. Cross-reference schematics/ewp-controller.py
-    for circuit schematic (current flow and switching logic).
-    Installation notes: docs/ewp-wiring-reference.md
+    Pierburg CWA400 (PWM version) controlled by MaxxECU RACE via PWM GPO.
+    Phase 3 (07K engine). OEM pump 07K121011B impeller removed, housing stays
+    as coolant manifold. No separate pump controller -- MaxxECU is the sole
+    PWM driver. Cross-reference ewp-wiring-reference.md for full specs,
+    part numbers, duty cycle map, and post-shutdown relay config.
+    Confirmed: @wingman703 (07K/8HP build, identical drivetrain).
 
 # ── TODO list ──────────────────────────────────────────────────────────────────
 #
-#   [ ] Confirm fuse sizes (10A BATT+, 7.5A IGN sense -- verify from DC docs)
-#   [ ] Confirm wire gauges: RED/BROWN upgrade to 12 AWG for long engine-bay runs
-#   [ ] Confirm firewall grommet location for harness pass-through (~20mm hole)
-#   [ ] Decide whether Davies Craig controller also handles SPAL fan relay, or
-#       if MaxxECU GPO handles fan independently -- determines whether FAN_RELAY_85
-#       connection is used
-#   [ ] Thermistor sensor location: inline adapter in upper/hot-side hose (preferred)
-#       OR 1/4 NPT bung welded into BBG rear coolant flange
-#   [ ] Confirm IGN relay source: must be a relay output pin 87, NOT the MaxxECU
-#       or ignition coil circuit (Davies Craig explicit warning -- ECU damage risk)
-#   [ ] Bleeding procedure: before first fire, use kit basic wiring harness to
-#       run pump directly off battery (BLUE=BATT+, BLACK=GND) -- no controller
+#   [ ] Verify CWA400 part number on sourced unit -- PWM version only
+#       (Pierburg 7.07223.10.0 / BMW 11515A05704 / 11517563659 / 11517568594)
+#       Do NOT accept Pierburg 7.03665.66.0 or BMW 11517604027 (LIN version)
+#   [ ] Confirm 40A relay location -- engine bay fuse/relay block or dedicated
+#   [ ] Confirm MaxxECU RACE GPO pin assignment for CWA400 PWM signal
+#   [ ] Confirm MaxxECU power hold relay wiring for post-shutdown pump soak
+#   [ ] Set MaxxECU PWM output frequency to 680 Hz in software
+#   [ ] Verify wake pulse config: MaxxECU must send >= 3ms high pulse at
+#       ignition-on before transitioning to CLT duty-cycle map
+#   [ ] Bleeding procedure: tie Pin 1 to +12V (forces emergency run) +
+#       Pin 3 direct to BATT+ before relay install for pre-fire bleed/leak test
+#   [ ] Confirm Kostal 2+2 connector and terminals sourced before Phase 3 build
 
 # ── Connectors ─────────────────────────────────────────────────────────────────
 
@@ -32,168 +33,156 @@ connectors:
     pincount: 1
     pinlabels: ["+12V BATT (always-on)"]
     notes: >-
-      Inline 10A fuse required on RED wire within 12 inches of battery terminal.
-      This wire is always-on (not switched) -- controller draws from BATT+ directly
-      to enable post-shutdown pump run-on after key-off.
+      Inline 40A fuse required within 12 inches of battery terminal.
+      Feeds relay pin 30 only -- NOT connected directly to pump.
+      10 AWG minimum for this run (35.5A pump draw).
 
   CHASSIS_GND:
     type: "Chassis ground stud (body metal)"
     pincount: 1
     pinlabels: ["GND"]
     notes: >-
-      Davies Craig requires solid metal contact for BROWN earth wire.
-      Self-tapping screw to body metal (ring terminal supplied in kit).
-      Do not share with high-current grounds (fan motor, fuel pump).
+      Dedicated ground for pump Pin 4 -- do not share with signal grounds
+      or high-current grounds from other loads (fan motor, fuel pump).
+      10 AWG minimum. Ring terminal, solid bolt to body metal.
 
-  IGN_RELAY_OUT:
-    type: "Switched +12V -- relay pin 87 output"
-    subtype: "CRITICAL: relay output ONLY -- not MaxxECU, not ignition coils"
+  MAIN_RELAY:
+    type: "40A automotive relay (Bosch 0 332 002 150 or equiv)"
+    subtype: "Standard 4-pin or 5-pin relay"
+    pincount: 4
+    pinlabels:
+      - "Pin 30 (BATT+ in)"
+      - "Pin 87 (switched +12V out to pump)"
+      - "Pin 86 (coil +12V -- IGN switched)"
+      - "Pin 85 (coil GND)"
+    notes: >-
+      Relay coil (pin 86) driven from MaxxECU relay output or IGN bus relay.
+      Relay coil (pin 85) to chassis GND.
+      Relay output (pin 87) to pump Pin 3 via 10 AWG.
+      Relay input (pin 30) from fused BATT+ via 10 AWG.
+
+  MAXXECU_GPO:
+    type: "MaxxECU RACE -- PWM General Purpose Output"
+    subtype: "GPO pin TBD -- confirm in MaxxECU pin assignment"
     pincount: 1
-    pinlabels: ["+12V IGN switched"]
+    pinlabels: ["PWM signal out (680 Hz)"]
     notes: >-
-      CRITICAL WIRING WARNING: Davies Craig GREEN ignition wire connects here.
-      Must be a relay pin 87 output (relay coil on main IGN bus, output clean +12V).
-      DO NOT connect GREEN to MaxxECU output or ignition coil circuit --
-      Davies Craig explicitly warns this causes controller malfunction or ECU damage.
-      Inline 7.5A fuse between relay pin 87 and controller GREEN wire.
+      MaxxECU GPO configured as PWM output at 680 Hz.
+      CLT-to-duty-cycle map: 20% at 60C / 55% at 85C / 97% at 105C.
+      MaxxECU GPO high = 12V; CWA400 requires V_Hi at least 0.6 x Ub (~7.2V) -- compliant.
+      Wake pulse: MaxxECU must output at least 3ms uninterrupted high at ignition-on
+      before transitioning to CLT map -- configure startup duty override in software.
+      Duty cycle 0-12%: pump off or emergency run -- do not use in normal map.
+      Duty cycle 13-85%: controlled operation (linear min to max speed).
+      Duty cycle 86-97%: full speed. 98-100%: emergency run (~5900 RPM).
 
-  DC_CONTROLLER:
-    type: "Davies Craig Digital Controller (#8002 LCD)"
-    subtype: "Mount inside passenger compartment -- NOT engine bay"
-    pincount: 8
-    pinlabels:
-      - "RED (BATT+ always-on)"
-      - "BROWN (chassis earth)"
-      - "GREEN (IGN sense +12V)"
-      - "GREEN/BLK (fan relay pin 85 output)"
-      - "BLUE (pump motor+ T-connector)"
-      - "BLACK (pump motor GND T-connector)"
-      - "SENSOR SIG (thermistor)"
-      - "SENSOR GND (thermistor)"
-    notes: >-
-      Must be mounted inside passenger compartment -- ambient temp and moisture.
-      Route harness through firewall via existing grommet or new 20mm hole.
-      Post-shutdown behaviour: controller continues powering EWP from BATT+ (RED)
-      after key-off until CLT drops 10C below setpoint OR 3 minutes -- whichever first.
-      MaxxECU is off during post-shutdown run-on; no MaxxECU power latch needed.
-      Setpoint: set to match engine target CLT (e.g. 85C for a boosted 07K).
-      Thermistor sensor wire must NOT be cut -- Davies Craig explicit warning.
-
-  EWP_PUMP:
-    type: "Davies Craig EWP150 pump (T-connector)"
-    subtype: "40 LPM -- installed in lower radiator hose (cold/return side)"
-    pincount: 2
-    pinlabels:
-      - "BLUE (motor +)"
-      - "BLACK (motor GND)"
-    notes: >-
-      T-connector from controller loom mates directly to EWP150 pump connector.
-      EWP150 has NO external PWM signal input -- speed is controlled entirely
-      by the Davies Craig controller varying voltage on the BLUE wire.
-      MaxxECU does not command the pump -- controller is the sole PWM driver.
-      Install pump in LOWER radiator hose (cold/return side, post-radiator) --
-      gravity-fed from radiator, runs cooler, easier to bleed.
-      Soft-mount only -- use Part #8700 bracket; do NOT hard-mount to structure.
-
-  DC_THERMISTOR:
-    type: "Davies Craig NTC thermistor sensor (kit-supplied)"
-    subtype: "Inline adapter (35mm hose barb -- included in kit)"
-    pincount: 2
-    pinlabels:
-      - "Sensor signal"
-      - "Sensor GND"
-    notes: >-
-      Install in UPPER/HOT-SIDE hose (engine coolant exit, pre-radiator).
-      Do NOT install in lower/cold-side hose -- reads 10-20C below actual
-      engine temp; controller setpoint would need significant compensation.
-      Alternative: 1/4 NPT bung welded or threaded into BBG rear coolant flange.
-      Sensor lead must NOT be cut (Davies Craig explicit warning).
-      This is a SEPARATE sensor from the MaxxECU CLT sensor -- do not share.
-      MaxxECU CLT sensor is a standard 2-wire NTC in its own coolant port.
-
-  FAN_RELAY_85:
-    type: "Fan relay coil negative (pin 85)"
-    subtype: "Optional -- only if Davies Craig controller handles fan in addition to pump"
+  MAXXECU_PHOLD:
+    type: "MaxxECU RACE -- Power Hold Relay Output"
+    subtype: "Keeps MaxxECU powered after key-off for post-shutdown pump soak"
     pincount: 1
-    pinlabels: ["Relay coil- (pin 85)"]
+    pinlabels: ["Power hold relay coil trigger"]
     notes: >-
-      Davies Craig controller EARTHS pin 85 -- it does not power it.
-      Fan relay wiring: pin 86 to IGN +12V, pin 30 to fused BATT+, pin 87 to fan motor.
-      OPTIONAL: if MaxxECU GPO is handling SPAL fan control independently,
-      this connection is not needed and the GREEN/BLK wire is left unconnected.
-      Confirm fan control strategy before Phase 3 wiring build.
+      MaxxECU power hold relay: coil energized by MaxxECU output after key-off.
+      Relay pin 87 feeds MaxxECU main 12V supply (keeps ECU alive).
+      MaxxECU continues commanding CWA400 via GPO until CLT drops below setpoint.
+      Configure in MaxxECU: Outputs -- Power Hold Relay, condition = CLT below 70C AND engine-off.
+      Without this relay, MaxxECU shuts off at key-off and pump stops immediately.
+
+  CWA400_PUMP:
+    type: "Pierburg CWA400 (PWM version) -- Kostal 2+2 connector"
+    subtype: "150 LPM @ 0.85 bar -- installed in lower radiator hose"
+    pincount: 4
+    pinlabels:
+      - "Pin 1 (PWM signal in -- from MaxxECU GPO)"
+      - "Pin 2 (BSD diagnostic -- leave floating)"
+      - "Pin 3 (+12V power -- via 40A relay)"
+      - "Pin 4 (GND)"
+    notes: >-
+      PWM version ONLY: Pierburg 7.07223.10.0 / BMW 11515A05704 / 11517563659.
+      Do NOT use LIN version (Pierburg 7.03665.66.0 / BMW 11517604027).
+      Connector: Kostal 2+2 (10098866). Pins 1-2: SLK 2.8 ELA terminals (22124499560).
+      Pins 3-4: SLK 5.8 ELA terminals (22124544900).
+      Install inline in lower radiator hose (cold/return side), outlet toward engine.
+      Pin 2 (BSD): leave floating -- not used with MaxxECU PWM control.
+      35.5A nominal draw -- 10 AWG minimum on power/ground pins.
 
 # ── Cables ─────────────────────────────────────────────────────────────────────
 
 cables:
 
-  HARNESS_DC_MAIN:
-    gauge: "16 AWG"
+  CABLE_PWR_IN:
+    gauge: "10 AWG"
+    length: "0.5 m"
+    colors: [RD]
+    wirecount: 1
+    notes: >-
+      BATT+ to relay pin 30. Fused 40A within 12 inches of battery.
+      10 AWG minimum (35.5A pump load). Ring terminal at battery, blade or
+      ring terminal at relay pin 30 socket.
+
+  CABLE_PWR_OUT:
+    gauge: "10 AWG"
     length: "1.5 m"
-    colors: [RD, BN, GN, GNBK]
-    wirecount: 4
+    colors: [RD]
+    wirecount: 1
     notes: >-
-      Davies Craig kit wiring harness (supplied with #8002 controller).
-      Wire 1 RED: BATT+ always-on power -- upgrade to 12 AWG for long runs.
-      Wire 2 BROWN: chassis earth -- upgrade to 12 AWG for long runs.
-      Wire 3 GREEN: ignition sense +12V -- relay output ONLY (see IGN_RELAY_OUT).
-        Inline 7.5A fuse between relay pin 87 and this wire.
-      Wire 4 GREEN/BLK: fan relay pin 85 output -- controller grounds pin 85.
+      Relay pin 87 to CWA400 Pin 3. Switched +12V pump supply.
+      10 AWG minimum. Route through engine bay to pump location.
 
-  HARNESS_PUMP:
-    gauge: "14 AWG"
-    length: "1.0 m"
-    colors: [BU, BK]
-    wirecount: 2
+  CABLE_GND:
+    gauge: "10 AWG"
+    length: "1.5 m"
+    colors: [BK]
+    wirecount: 1
     notes: >-
-      T-connector from Davies Craig controller loom to EWP150 pump motor.
-      Wire 1 BLUE: pump motor positive (controller varies voltage for speed control).
-      Wire 2 BLACK: pump motor ground.
-      Route through engine bay to EWP150 pump location in lower radiator hose.
+      CWA400 Pin 4 to chassis ground stud.
+      10 AWG minimum. Dedicated ground -- do not share.
 
-  CABLE_SENSOR:
+  CABLE_PWM:
     gauge: "22 AWG"
     length: "2.0 m"
-    colors: [BK, BK]
+    colors: [VT]
+    wirecount: 1
+    notes: >-
+      MaxxECU GPO to CWA400 Pin 1 (PWM signal).
+      22 AWG signal wire. Route from ECU through firewall grommet to pump.
+      Keep away from ignition coil wiring and high-current runs where possible.
+      Shielded wire preferred for EMC -- drain to chassis GND at ECU end only.
+
+  CABLE_RELAY_COIL:
+    gauge: "18 AWG"
+    length: "1.0 m"
+    colors: [GN, BK]
     wirecount: 2
     notes: >-
-      Davies Craig thermistor sensor lead (supplied with controller).
-      MUST NOT be cut or shortened -- Davies Craig explicit installation warning.
-      Routes from controller (in cabin) through firewall grommet to upper/hot-side hose.
-      Terminates at inline adapter barb fitting or 1/4 NPT bung on coolant flange.
-      Uses proprietary Davies Craig thermistor connector -- not interchangeable with
-      standard automotive NTC sensor connectors.
+      Wire 1 GREEN: relay coil pin 86 -- switched +12V IGN source.
+      Wire 2 BLACK: relay coil pin 85 -- chassis GND.
+      18 AWG sufficient for relay coil (low current).
 
 # ── Connections ────────────────────────────────────────────────────────────────
 
 connections:
-  # BATT+ always-on power → controller RED
+  # BATT+ → relay pin 30 (fused 40A)
   -
     - BATT_POS: [1]
-    - HARNESS_DC_MAIN: [1]
-    - DC_CONTROLLER: [1]
-  # Controller BROWN → chassis earth
+    - CABLE_PWR_IN: [1]
+    - MAIN_RELAY: [1]
+  # Relay pin 87 → pump Pin 3 (+12V switched)
   -
-    - DC_CONTROLLER: [2]
-    - HARNESS_DC_MAIN: [2]
+    - MAIN_RELAY: [2]
+    - CABLE_PWR_OUT: [1]
+    - CWA400_PUMP: [3]
+  # Pump Pin 4 → chassis GND
+  -
+    - CWA400_PUMP: [4]
+    - CABLE_GND: [1]
     - CHASSIS_GND: [1]
-  # IGN relay output → controller GREEN (ignition sense)
+  # MaxxECU GPO → pump Pin 1 (PWM signal)
   -
-    - IGN_RELAY_OUT: [1]
-    - HARNESS_DC_MAIN: [3]
-    - DC_CONTROLLER: [3]
-  # Controller → fan relay pin 85 (optional)
+    - MAXXECU_GPO: [1]
+    - CABLE_PWM: [1]
+    - CWA400_PUMP: [1]
+  # Relay coil: IGN switched +12V → pin 86, GND → pin 85
   -
-    - DC_CONTROLLER: [4]
-    - HARNESS_DC_MAIN: [4]
-    - FAN_RELAY_85: [1]
-  # Controller → EWP150 pump motor (T-connector, BLUE + BLACK)
-  -
-    - DC_CONTROLLER: [5, 6]
-    - HARNESS_PUMP: [1, 2]
-    - EWP_PUMP: [1, 2]
-  # Controller → Davies Craig thermistor sensor
-  -
-    - DC_CONTROLLER: [7, 8]
-    - CABLE_SENSOR: [1, 2]
-    - DC_THERMISTOR: [1, 2]
+    - MAIN_RELAY: [3, 4]
+    - CABLE_RELAY_COIL: [1, 2]
