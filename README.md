@@ -15,6 +15,7 @@ Click any link to view the interactive diagram with full BOM in your browser —
 | MaxxECU ↔ M52 engine harness | [maxxecu-m52.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/maxxecu-m52.html) | `harnesses/maxxecu-m52.wv` |
 | E36 X20 body connector / Gauge.S | [body-x20.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/body-x20.html) | `harnesses/body-x20.wv` |
 | Power distribution (relay board + fuse block) | [power-distribution.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/power-distribution.html) | `harnesses/power-distribution.wv` |
+| Davies Craig EWP controller wiring | *(run `wireviz` to generate)* | `harnesses/ewp-controller.wv` |
 
 ### MaxxECU ↔ M52 engine harness
 
@@ -28,12 +29,17 @@ Click any link to view the interactive diagram with full BOM in your browser —
 
 ![Power Distribution](output/power-distribution.svg)
 
+### Davies Craig EWP150 controller wiring
+
+![EWP Controller Harness](output/ewp-controller.svg)
+
 ## Harnesses
 
 | File | Description | Phase |
 |---|---|---|
 | `harnesses/maxxecu-m52.wv` | MaxxECU Race ↔ M52 engine harness (Phase 1) | 1 |
 | `harnesses/maxxecu-07k.wv` | MaxxECU Race ↔ 07K engine harness (Phase 3) | 3 |
+| `harnesses/ewp-controller.wv` | Davies Craig Digital Controller (#8002) + EWP150 coolant pump | 3 |
 | `harnesses/8hp-can.wv` | MaxxECU ↔ 8HP70 CAN harness | 1 |
 | `harnesses/gauge-s-can.wv` | MaxxECU ↔ Gauge.S cluster CAN | 1 |
 | `harnesses/firewall-bulkhead.wv` | Deutsch AS47/AS79 firewall bulkhead connector (**TODO — not yet authored**) | 1 |
@@ -146,6 +152,17 @@ open schematics/fan-relay.svg
 This produces a schematic showing the RELAY_FAN circuit from `power-distribution.wv`:
 
 ![Fan Relay Schematic](schematics/fan-relay.svg)
+
+### Generate the EWP controller schematic
+
+```bash
+python3 schematics/ewp-controller.py
+open schematics/ewp-controller.svg
+```
+
+Shows the Davies Craig Digital Controller circuit: BATT+ always-on power path, IGN sense input (relay output only — not MaxxECU), PWM pump output to EWP150 motor, thermistor sensor input, and post-shutdown run-on logic. Cross-reference `harnesses/ewp-controller.wv` for physical connector/pin layout.
+
+![EWP Controller Schematic](schematics/ewp-controller.svg)
 
 ### How to read the schematic
 
