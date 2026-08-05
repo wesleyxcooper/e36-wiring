@@ -94,6 +94,7 @@ The firewall bulkhead (Deutsch Autosport AS series or Souriau 8STA, 47-way or 79
 - [MaxxECU 8HP GEN1 CAN harness](https://www.maxxecu.com/store/gearbox/8hp/maxxecu-8hp-gen1-cable-harness)
 - [WireViz documentation](https://github.com/wireviz/WireViz)
 - **[`docs/dbw-pinouts.md`](docs/dbw-pinouts.md)** — E46 pedal (bench-verified), Hella fallback pedal, 07K TB pinouts, TB upgrade table, bulkhead pin allocation for DBW
+- **[`docs/etb-pid-tuning.md`](docs/etb-pid-tuning.md)** — E-throttle PID tuning: pre-conditions, MTune calibration sequence, PID auto-tune, scope evaluation, symptom table, safety monitoring, TB upgrade re-tune notes
 
 ## Setup
 
@@ -174,6 +175,17 @@ open schematics/ewp-controller.svg
 Shows the Pierburg CWA400 + MaxxECU RACE circuit: BATT+ through 40A relay to CWA400 Pin 3, IGN-switched relay coil, MaxxECU GPO PWM signal (680 Hz) to CWA400 Pin 1, and post-shutdown power hold relay logic. Cross-reference `harnesses/ewp-controller.wv` for physical connector/pin layout.
 
 ![EWP Controller Schematic](schematics/ewp-controller.svg)
+
+### Generate the E46 DBW pedal schematic
+
+```bash
+python3 schematics/epedal-dbw.py
+open schematics/epedal-dbw.svg
+```
+
+Shows the dual-track hall-effect sensor circuit: MaxxECU +5V SENS1/SENS2 into the pedal module, APS1/APS2 signal outputs back to MaxxECU AIN inputs, both sensor grounds, and the firewall bulkhead crossing point. Annotated with voltage ranges at each key node. Cross-reference `harnesses/epedal-bmw-e46.wv` for physical wire routing.
+
+![E46 DBW Pedal Schematic](schematics/epedal-dbw.svg)
 
 ### Generate the fuel pump PWM schematic
 
