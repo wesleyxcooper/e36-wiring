@@ -49,6 +49,8 @@ _Run `wireviz harnesses/fuel-pump-hanger.wv -o output/` to generate. Cross-refer
 | `harnesses/8hp-can.wv` | MaxxECU ↔ 8HP70 CAN harness | 1 |
 | `harnesses/gauge-s-can.wv` | MaxxECU ↔ Gauge.S cluster CAN | 1 |
 | `harnesses/firewall-bulkhead.wv` | Deutsch AS47/AS79 firewall bulkhead connector (**TODO — not yet authored**) | 1 |
+| `harnesses/epedal-bmw-e46.wv` | BMW E46 accelerator pedal (35426786282) → bulkhead → MaxxECU APS1/APS2 (**primary option**) | 3 |
+| `harnesses/epedal-hella-6pv.wv` | Hella 6PV010946-141 accelerator pedal → bulkhead → MaxxECU APS1/APS2 (**RHD fallback**) | 3 |
 | `harnesses/body-x20.wv` | E36 X20 body connector interface (MaxxECU outputs → dash/instruments) | 1 |
 | `harnesses/dct-shifter.wv` | DCT Shifter paddle → MaxxECU DIN wiring | 1 |
 | `harnesses/pst-f1-sensor.wv` | Bosch PST-F1 oil temp/pressure → Gauge.S analog inputs | 1 |
@@ -89,6 +91,7 @@ The firewall bulkhead (Deutsch Autosport AS series or Souriau 8STA, 47-way or 79
 - [E36 X20 connector pinout (Scribd)](https://www.scribd.com/document/649295040/bmw-e36-x20-pinout)
 - [MaxxECU 8HP GEN1 CAN harness](https://www.maxxecu.com/store/gearbox/8hp/maxxecu-8hp-gen1-cable-harness)
 - [WireViz documentation](https://github.com/wireviz/WireViz)
+- **[`docs/dbw-pinouts.md`](docs/dbw-pinouts.md)** — E46 pedal (bench-verified), Hella fallback pedal, 07K TB pinouts, TB upgrade table, bulkhead pin allocation for DBW
 
 ## Setup
 
