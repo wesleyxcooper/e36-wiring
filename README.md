@@ -18,7 +18,7 @@ Click any link to view the interactive diagram with full BOM in your browser —
 | E36 X20 body connector / Gauge.S | [body-x20.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/body-x20.html) | `harnesses/body-x20.wv` |
 | Power distribution (relay board + fuse block) | [power-distribution.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/power-distribution.html) | `harnesses/power-distribution.wv` |
 | Pierburg CWA400 electric water pump | [ewp-controller.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ewp-controller.html) | `harnesses/ewp-controller.wv` |
-| Radium 20-1170 fuel pump hanger (F90000267 + DC SSR + MaxxECU PWM) | _run wireviz to generate_ | `harnesses/fuel-pump-hanger.wv` |
+| Radium 20-1170 fuel pump hanger (F90000267 + DC SSR + MaxxECU PWM) | [fuel-pump-hanger.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/fuel-pump-hanger.html) | `harnesses/fuel-pump-hanger.wv` |
 
 ### MaxxECU ↔ M52 engine harness
 
@@ -38,7 +38,9 @@ Click any link to view the interactive diagram with full BOM in your browser —
 
 ### Radium 20-1170 fuel pump hanger
 
-_Run `wireviz harnesses/fuel-pump-hanger.wv -o output/` to generate. Cross-reference `fuel-pump-hanger-reference.md` and `schematics/fuel-pump-pwm.py`._
+![Fuel Pump Hanger](output/fuel-pump-hanger.svg)
+
+Radium 20-1170 + Walbro F90000267 + Crydom D1D40 DC SSR + MaxxECU RACE PWM GPO. Cross-reference `fuel-pump-hanger-reference.md` and `schematics/fuel-pump-pwm.py`.
 
 ## Harnesses
 
@@ -195,8 +197,6 @@ open schematics/fuel-pump-pwm.svg
 ```
 
 Shows the Radium 20-1170 + Walbro F90000267 circuit: BATT+ through 25A fuse to DC SSR Load(+), SSR Load(-) to pump(+) stud on hanger, IGN switched 12V to SSR Ctrl(+), MaxxECU GPO (GND-sink) to SSR Ctrl(-). PWM duty cycle controls pump speed (65% idle → 100% WOT/boost). Cross-reference `harnesses/fuel-pump-hanger.wv` for physical pin layout and `fuel-pump-hanger-reference.md` for full specs and MTune config.
-
-_SVG generated on first run — not committed until generated._
 
 ### How to read the schematic
 
