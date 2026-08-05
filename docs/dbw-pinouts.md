@@ -40,6 +40,21 @@ Output 2 is intentionally ~half Output 1 at every position — MaxxECU uses the 
 
 **Sources:** [HP Academy bench test](https://www.hpacademy.com/forum/efi-wiring-fundamentals/show/bmw-epedal-for-dbw-setup-wiring/) · [openinverter.org BMW Throttle Pedal wiki](https://openinverter.org/wiki/BMW_Electronic_Throttle_Pedal)
 
+**Sourcing — used E46 pedal (buy used, sensor does not wear):**
+
+> [eBay saved search — `35426786282`](https://www.ebay.com/sch/i.html?_nkw=bmw+35426786282&_svsrch=1)
+
+| eBay Item | Price | Condition | Notes |
+|---|---|---|---|
+| [407117477828](https://www.ebay.com/itm/407117477828) | $119.98 OBO | Used / US domestic | Lists multiple chassis (E46/E38/E39/X5) — confirm PN `35426786282` with seller before buying |
+| [176400301948](https://www.ebay.com/itm/176400301948) | £59 (~$79 + intl. shipping) | Used / UK | E46 M3/330i/328i/325i manual — correct chassis |
+| [176400305397](https://www.ebay.com/itm/176400305397) | £59 (~$79 + intl. shipping) | Used / UK | E46 330i manual — correct chassis |
+| [176400302753](https://www.ebay.com/itm/176400302753) | £59 (~$79 + intl. shipping) | Used / UK | E46 323i/320i/318i/316i manual — correct chassis |
+
+> ⚠️ **Do not buy** [176400306849](https://www.ebay.com/itm/176400306849) — listed alongside the above but is an **E39/E38/X5/E53** pedal with a different connector and pinout. Will not work.
+
+UK listings land at ~$100–125 all-in after international shipping. US domestic listing with best offer is comparable and avoids customs. MaxxECU re-calibrates from scratch via wizard regardless of pedal age — buying used is correct here.
+
 **MaxxECU mapping:**
 ```
 APS1 signal  →  AIN (use lowest available number, e.g. AIN 5)
