@@ -33,12 +33,12 @@ connectors:
     subtype: "Universal floor-mount -- fabricate bracket, no OEM pedal box needed"
     pincount: 6
     pinlabels:
-      - "Pin 1 -- GND 1 (sensor ground, circuit 1)"
-      - "Pin 2 -- +5V 2 (sensor supply, circuit 2)"
-      - "Pin 3 -- TPS 2 / APS2 signal"
-      - "Pin 4 -- GND 2 (sensor ground, circuit 2)"
-      - "Pin 5 -- +5V 1 (sensor supply, circuit 1)"
-      - "Pin 6 -- TPS 1 / APS1 signal"
+      - "Pin 1 (GND 1 / sensor GND circuit 1)"
+      - "Pin 2 (+5V 2 / sensor supply circuit 2)"
+      - "Pin 3 (TPS 2 / APS2 signal)"
+      - "Pin 4 (GND 2 / sensor GND circuit 2)"
+      - "Pin 5 (+5V 1 / sensor supply circuit 1)"
+      - "Pin 6 (TPS 1 / APS1 signal)"
     notes: >-
       6-pin dual-track hall-effect sensor (same dual-redundancy principle as E46 pedal).
       MaxxECU has a native pre-defined Hella profile -- select it in MTune before
@@ -53,12 +53,12 @@ connectors:
     subtype: "Size 20 contacts -- 6 pins reserved for e-pedal (pins TBD)"
     pincount: 6
     pinlabels:
-      - "Bulkhead pin TBD-A -- APS GND 1 (pass-through)"
-      - "Bulkhead pin TBD-B -- APS GND 2 (pass-through)"
-      - "Bulkhead pin TBD-C -- +5V 1 (pass-through)"
-      - "Bulkhead pin TBD-D -- APS1 signal (pass-through)"
-      - "Bulkhead pin TBD-E -- +5V 2 (pass-through)"
-      - "Bulkhead pin TBD-F -- APS2 signal (pass-through)"
+      - "TBD-A (APS GND 1 pass-through)"
+      - "TBD-B (APS GND 2 pass-through)"
+      - "TBD-C (+5V 1 pass-through)"
+      - "TBD-D (APS1 signal pass-through)"
+      - "TBD-E (+5V 2 pass-through)"
+      - "TBD-F (APS2 signal pass-through)"
     notes: >-
       Identical bulkhead pin allocation to epedal-bmw-e46.wv.
       The bulkhead is pedal-agnostic -- only the cabin connector and pin mapping
@@ -70,12 +70,12 @@ connectors:
     subtype: "Size 20 contacts -- 6 pins reserved for e-pedal (pins TBD)"
     pincount: 6
     pinlabels:
-      - "Bulkhead pin TBD-A -- APS GND 1 (pass-through)"
-      - "Bulkhead pin TBD-B -- APS GND 2 (pass-through)"
-      - "Bulkhead pin TBD-C -- +5V 1 (pass-through)"
-      - "Bulkhead pin TBD-D -- APS1 signal (pass-through)"
-      - "Bulkhead pin TBD-E -- +5V 2 (pass-through)"
-      - "Bulkhead pin TBD-F -- APS2 signal (pass-through)"
+      - "TBD-A (APS GND 1 pass-through)"
+      - "TBD-B (APS GND 2 pass-through)"
+      - "TBD-C (+5V 1 pass-through)"
+      - "TBD-D (APS1 signal pass-through)"
+      - "TBD-E (+5V 2 pass-through)"
+      - "TBD-F (APS2 signal pass-through)"
     notes: >-
       Mating plug, engine side. Identical to epedal-bmw-e46.wv engine side.
       Pedal choice does not affect this connector or the MaxxECU side -- only the
@@ -86,17 +86,17 @@ connectors:
     subtype: "CMC connector -- AIN pins TBD, 5V SENS OUT, SGND"
     pincount: 6
     pinlabels:
-      - "SGND (sensor GND 1) -- shared sensor ground bus"
-      - "+5V SENS OUT (supply 2) -- MaxxECU 5V sensor reference"
-      - "AIN x (APS2 signal) -- configure as APS2 in MTune"
-      - "SGND (sensor GND 2) -- shared sensor ground bus"
-      - "+5V SENS OUT (supply 1) -- MaxxECU 5V sensor reference"
-      - "AIN y (APS1 signal) -- configure as APS1 in MTune"
+      - "SGND 1 (sensor ground bus)"
+      - "+5V SENS OUT 2 (sensor reference)"
+      - "AIN x (APS2 signal input)"
+      - "SGND 2 (sensor ground bus)"
+      - "+5V SENS OUT 1 (sensor reference)"
+      - "AIN y (APS1 signal input)"
     notes: >-
       Same MaxxECU connector as epedal-bmw-e46.wv -- this side is identical.
       Pin order within the MaxxECU connector is re-mapped from the Hella pin order.
       Load MaxxECU native Hella 6PV010946-141 profile before calibration wizard.
-      MTune path: Settings -> E-Throttle -> Pedal position.
+      MTune path: Settings, E-Throttle, Pedal position.
 
 # ── Cables ─────────────────────────────────────────────────────────────────────
 

@@ -33,12 +33,12 @@ connectors:
     subtype: "PN 35426786282 (manual) / 35426786281 (auto) -- same in RHD"
     pincount: 6
     pinlabels:
-      - "Pin 1 -- GND 1 (APS1 sensor ground)"
-      - "Pin 2 -- GND 2 (APS2 sensor ground)"
-      - "Pin 3 -- VCC 2 (+5V supply, circuit 2)"
-      - "Pin 4 -- Output 1 / APS1 (0.70V idle → 4.50V WOT)"
-      - "Pin 5 -- VCC 1 (+5V supply, circuit 1)"
-      - "Pin 6 -- Output 2 / APS2 (0.36V idle → 2.20V WOT)"
+      - "Pin 1 (GND 1 / APS1 sensor GND)"
+      - "Pin 2 (GND 2 / APS2 sensor GND)"
+      - "Pin 3 (VCC 2 / +5V circuit 2)"
+      - "Pin 4 (Output 1 / APS1 signal)"
+      - "Pin 5 (VCC 1 / +5V circuit 1)"
+      - "Pin 6 (Output 2 / APS2 signal)"
     notes: >-
       6-pin dual-track hall-effect sensor. Two fully independent circuits.
       Total current draw: ~20 mA. 24 AWG wire sufficient on all pins.
@@ -54,12 +54,12 @@ connectors:
     subtype: "Size 20 contacts -- 6 pins reserved for e-pedal (pins TBD)"
     pincount: 6
     pinlabels:
-      - "Bulkhead pin TBD-A -- APS GND 1 (pass-through)"
-      - "Bulkhead pin TBD-B -- APS GND 2 (pass-through)"
-      - "Bulkhead pin TBD-C -- VCC 2 (pass-through)"
-      - "Bulkhead pin TBD-D -- APS1 signal (pass-through)"
-      - "Bulkhead pin TBD-E -- VCC 1 (pass-through)"
-      - "Bulkhead pin TBD-F -- APS2 signal (pass-through)"
+      - "TBD-A (APS GND 1 pass-through)"
+      - "TBD-B (APS GND 2 pass-through)"
+      - "TBD-C (VCC 2 pass-through)"
+      - "TBD-D (APS1 signal pass-through)"
+      - "TBD-E (VCC 1 pass-through)"
+      - "TBD-F (APS2 signal pass-through)"
     notes: >-
       Panel-mount receptacle, cabin side. Exact pin numbers TBD -- assign 6
       adjacent pins in same contact-size zone during firewall-bulkhead.wv authoring.
@@ -72,12 +72,12 @@ connectors:
     subtype: "Size 20 contacts -- 6 pins reserved for e-pedal (pins TBD)"
     pincount: 6
     pinlabels:
-      - "Bulkhead pin TBD-A -- APS GND 1 (pass-through)"
-      - "Bulkhead pin TBD-B -- APS GND 2 (pass-through)"
-      - "Bulkhead pin TBD-C -- VCC 2 (pass-through)"
-      - "Bulkhead pin TBD-D -- APS1 signal (pass-through)"
-      - "Bulkhead pin TBD-E -- VCC 1 (pass-through)"
-      - "Bulkhead pin TBD-F -- APS2 signal (pass-through)"
+      - "TBD-A (APS GND 1 pass-through)"
+      - "TBD-B (APS GND 2 pass-through)"
+      - "TBD-C (VCC 2 pass-through)"
+      - "TBD-D (APS1 signal pass-through)"
+      - "TBD-E (VCC 1 pass-through)"
+      - "TBD-F (APS2 signal pass-through)"
     notes: >-
       Mating plug, engine side. Part of the 07K engine harness plug --
       same connector mated here as maxxecu-07k.wv. Unplug this plug to
@@ -88,18 +88,18 @@ connectors:
     subtype: "CMC connector -- AIN pins TBD, 5V SENS OUT, SGND"
     pincount: 6
     pinlabels:
-      - "SGND (sensor GND 1) -- shared sensor ground bus"
-      - "SGND (sensor GND 2) -- shared sensor ground bus"
-      - "+5V SENS OUT (supply 2) -- MaxxECU 5V sensor reference"
-      - "AIN x (APS1 signal) -- configure as APS1 in MTune"
-      - "+5V SENS OUT (supply 1) -- MaxxECU 5V sensor reference"
-      - "AIN y (APS2 signal) -- configure as APS2 in MTune"
+      - "SGND 1 (sensor ground bus)"
+      - "SGND 2 (sensor ground bus)"
+      - "+5V SENS OUT 2 (sensor reference)"
+      - "AIN x (APS1 signal input)"
+      - "+5V SENS OUT 1 (sensor reference)"
+      - "AIN y (APS2 signal input)"
     notes: >-
       Assign lowest available AIN numbers for APS1 and APS2 (e.g. AIN 5 / AIN 6).
       MaxxECU has two independent +5V sensor supply outputs -- use separate ones
       for each pedal circuit if available; tie to same output only if MaxxECU
       current budget allows (check MaxxECU Race +5V sensor supply max load).
-      MTune path: Settings -> E-Throttle -> Pedal position.
+      MTune path: Settings, E-Throttle, Pedal position.
       Run e-throttle calibration wizard after wiring -- captures min/max automatically.
 
 # ── Cables ─────────────────────────────────────────────────────────────────────
