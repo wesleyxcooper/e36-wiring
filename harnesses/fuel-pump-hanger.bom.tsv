@@ -1,0 +1,9 @@
+Id	Description	Qty	Unit	Designators
+1	Cable, 1 x 12 AWG	2.5	m	CABLE_GND, CABLE_PWR_BATT, CABLE_PWR_PUMP
+2	Cable, 1 x 22 AWG	2.3	m	CABLE_SSR_CTRL_NEG, CABLE_SSR_CTRL_POS
+3	Connector, Battery positive terminal, 12V AGM, 1 pins	1		BATT_POS
+4	Connector, Chassis ground stud (body metal), 1 pins	1		CHASSIS_GND
+5	Connector, DC Solid State Relay -- Crydom D1D40 or generic 40A DC-DC SSR, 0-60V load / 3-32V control / 40A rated / opto-isolated, 4 pins	1		DC_SSR
+6	Connector, IGN switched 12V source (via ignition relay), Key-on, key-off -- same bus as MaxxECU main power, 1 pins	1		IGN_12V
+7	Connector, MaxxECU RACE -- PWM General Purpose Output, GEN1 low-drive (GND-sinking), max 2A -- GPO pin TBD, 1 pins	1		MAXXECU_GPO
+8	Connector, Radium Engineering 20-1170 -- stainless stud electrical terminals, Top-plate external studs -- anti-rotation, hermetically sealed, 2 pins	1		RADIUM_HANGER
