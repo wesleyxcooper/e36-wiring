@@ -65,6 +65,7 @@ connectors:
       SSR switches ON when ctrl circuit is energized (IGN high + GPO sinks GND).
       PWM frequency at MaxxECU GPO: 100-500 Hz recommended (smooth speed control,
       within SSR switching rating).
+      Datasheet: https://www.sensata.com/products/relays/1-dc-series-d1d40
 
   MAXXECU_GPO:
     type: "MaxxECU RACE -- PWM General Purpose Output"
@@ -106,6 +107,8 @@ connectors:
       In-tank wiring insulated with ETFE -- chemically resistant to all fuel types.
       Single pump install (F90000267): re-use OEM pump wiring for signal side or
       run new 12 AWG from SSR Load(-) directly to pump(+) stud.
+      Hanger: https://www.radiumauto.com/products/bmw-e36-fuel-pump-hanger
+      Pump: https://www.walbrofuelpumps.com/product/f90000267/
 
 # ── Cables ─────────────────────────────────────────────────────────────────────
 

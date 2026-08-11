@@ -78,7 +78,8 @@ connectors:
       Must be mounted within 18 inches of battery positive terminal.
       Protects entire power distribution loom from dead short.
       TODO: size after summing all fused circuit loads with 20% headroom.
-      Blue Sea 5191 (ANL) or equivalent.
+      Blue Sea 5191 (MRBF) or equivalent.
+      Product: https://www.bluesea.com/products/5191/MRBF_Terminal_Fuse_Block_-_30_to_300A
 
   # ── Chassis ground stud ────────────────────────────────────────────────────
   CHASSIS_GND:

@@ -21,6 +21,7 @@ connectors:
       Pressure output: 0.5V = 0 bar, 4.5V = 10 bar (linear 0-5V).
       Temp output: NTC thermistor — calibrate in MTune against resistance table.
       Phase 3: moves to 07K iABED oil housing (M10x1.0 port) unchanged.
+      Product: https://www.bosch-motorsport.com/products/sensors/pressure-and-temperature/pressure-sensor-combined-pst-f-1/
 
   # Bulkhead passthrough — engine side to cabin side
   # Full 79-pin diagram: harnesses/firewall-bulkhead.wv

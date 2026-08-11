@@ -45,6 +45,7 @@ connectors:
       Config file: maxxecu.json (gauge-s-maxxecu repo).
       Verify Gauge.S internal 120Ω termination; add external if absent.
       Power: fused ignition-switched +12V (1A fuse sufficient).
+      Product: https://shop.sorek.uk/products/gauge-s-bmw-e36-320i-323i-328i-m3-direct-replacement-instrument-cluster-pnp
 
   IGN_12V:
     type: "Spade / ring terminal"

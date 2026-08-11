@@ -393,7 +393,9 @@ connectors:
     subtype: "Injector 1 (ID1050x)"
     pincount: 2
     pinlabels: ["+12V", "INJ 1"]
-    notes: "MaxxECU M50 harness ships with EV1 connector ends — replace with EV14 pigtails for 07K."
+    notes: >-
+      MaxxECU M50 harness ships with EV1 connector ends — replace with EV14 pigtails for 07K.
+      Product: http://injectordynamics.com/injectors/id1050-xds/
 
   INJ_2:
     type: "Bosch EV14 2-pin (USCAR)"
@@ -440,6 +442,7 @@ connectors:
       Same harness wiring as M52. Bung: weld 18mm x1.5 in 07K custom top-mount
       exhaust manifold, min 6in from collector, upstream of turbo.
       Sensor: Bosch 0 258 017 025 (LSU 4.9).
+      Product: https://www.bosch-motorsport.com/products/sensors/lambda/lambda-sensor-lsu-4-9/
 
   BOOST_SOL:
     type: "Superseal 2-way"

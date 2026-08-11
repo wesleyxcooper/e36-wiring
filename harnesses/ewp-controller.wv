@@ -105,6 +105,8 @@ connectors:
       Install inline in lower radiator hose (cold/return side), outlet toward engine.
       Pin 2 (BSD): leave floating -- not used with MaxxECU PWM control.
       35.5A nominal draw -- 10 AWG minimum on power/ground pins.
+      Datasheet: https://tecomotive.com/download/datasheets/CWA400_PWM_EN.pdf
+      Product: https://www.tecomotive.com/en/products/CWA400_PWM.html
 
 # ── Cables ─────────────────────────────────────────────────────────────────────
 

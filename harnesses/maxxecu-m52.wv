@@ -38,6 +38,7 @@
 #         which X20 / ECU connector pins are affected.
 #       Option B: hard-wire bypass at ECU connector.
 #       Research MaxxECU community for current preferred method before install.
+#       Ref: https://falkmfg.com/blogs/news/how-to-bypass-ews2-for-e36-bmw
 #       Document bypass connections here once method is confirmed.
 #
 # DONE: Idle air control valve (IDLE_VALVE) GPO 4 + GPO 5 CMC pins
@@ -273,6 +274,7 @@ connectors:
       MaxxECU M50 terminated harness includes built-in wideband controller and LSU 4.9 connector.
       Sensor: Bosch 0 258 017 025 (LSU 4.9). Bung: 18mm×1.5 welded in exhaust.
       Carries to 07K phase — re-weld bung in new exhaust header.
+      Product: https://www.bosch-motorsport.com/products/sensors/lambda/lambda-sensor-lsu-4-9/
 
   # ── Boost ────────────────────────────────────────────────────────────────────
 
@@ -281,7 +283,9 @@ connectors:
     subtype: "Turbosmart boost solenoid (2-port PWM)"
     pincount: 2
     pinlabels: ["+12V", "GPO 1 signal"]
-    notes: "MaxxECU GPO 1 :: PWM duty control. Budget alt: Bosch N75 0280142431."
+    notes: >-
+      MaxxECU GPO 1 :: PWM duty control. Budget alt: Bosch N75 0280142431.
+      Solenoid: https://www.turbosmart.com/product/eb2-ebs-spare-3-port-solenoid-kit/
 
   # ── Cooling ─────────────────────────────────────────────────────────────────
 
