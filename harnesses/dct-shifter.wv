@@ -17,8 +17,8 @@ connectors:
       Passive momentary switches — no +12V supply needed.
       UP: closes UP pin to GND on upshift pull.
       DOWN: closes DOWN pin to GND on downshift pull.
-      Hold UP >= 1 s activates launch control / transbrake.
-      MTune: Advanced :: 8HP :: Shifter type :: 8HP SEQ shifter.
+      Hold UP 1+ s activates launch control / transbrake.
+      MTune: Transmission, Shifter type, Sequential.
 
   ECU_16PIN:
     type: "MaxxECU M50 terminated harness — 16-pin aux breakout"

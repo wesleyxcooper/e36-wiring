@@ -505,7 +505,7 @@ cables:
 
   W_DBW_MOTOR:
     wirecount: 2
-    colors: [OR, VT]
+    colors: [OG, VT]
     wirelabels: ["Motor+ (ETh GPO3)", "Motor- (ETh GPO4)"]
     length: 0.5 m
     notes: "Heavier gauge — 20 AWG minimum (3A H-bridge output). Verify polarity before final assembly."
