@@ -19,6 +19,7 @@ Click any link to view the interactive diagram with full BOM in your browser —
 | Power distribution (relay board + fuse block) | [power-distribution.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/power-distribution.html) | `harnesses/power-distribution.wv` |
 | Pierburg CWA400 electric water pump | [ewp-controller.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ewp-controller.html) | `harnesses/ewp-controller.wv` |
 | Radium 20-1170 fuel pump hanger (F90000267 + DC SSR + MaxxECU PWM) | [fuel-pump-hanger.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/fuel-pump-hanger.html) | `harnesses/fuel-pump-hanger.wv` |
+| PD2-18012AJA 12V electric AC compressor + PWM controller + MaxxECU idle-up | [ac-compressor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ac-compressor.html) | `harnesses/ac-compressor.wv` |
 
 ### MaxxECU ↔ M52 engine harness
 
@@ -50,6 +51,7 @@ Radium 20-1170 + Walbro F90000267 + Crydom D1D40 DC SSR + MaxxECU RACE PWM GPO. 
 | `harnesses/maxxecu-07k.wv` | MaxxECU Race ↔ 07K engine harness (Phase 3) | 3 |
 | `harnesses/ewp-controller.wv` | Pierburg CWA400 (PWM version) + MaxxECU RACE GPO control | 3 |
 | `harnesses/fuel-pump-hanger.wv` | Radium 20-1170 hanger + Walbro F90000267 + DC SSR + MaxxECU PWM GPO | 1 |
+| `harnesses/ac-compressor.wv` | Alibaba PD2-18012AJA 12V scroll compressor + included PWM controller + 100A relay + MaxxECU DIN idle-up | 2 |
 | `harnesses/8hp-can.wv` | MaxxECU ↔ 8HP70 CAN harness | 1 |
 | `harnesses/gauge-s-can.wv` | MaxxECU ↔ Gauge.S cluster CAN | 1 |
 | `harnesses/firewall-bulkhead.wv` | Deutsch AS47/AS79 firewall bulkhead connector (**TODO — not yet authored**) | 1 |
@@ -196,6 +198,15 @@ Shows the dual-track hall-effect sensor circuit: MaxxECU +5V SENS1/SENS2 into th
 python3 schematics/fuel-pump-pwm.py
 open schematics/fuel-pump-pwm.svg
 ```
+
+### Generate the 12V electric AC compressor schematic
+
+```bash
+python3 schematics/ac-compressor-pwm.py
+open schematics/ac-compressor-pwm.svg
+```
+
+Shows the Alibaba PD2-18012AJA + included PWM controller circuit: BATT+ through 100A fuse to AC relay (100A ISO mini), relay contact to PWM controller +IN, PWM controller output to compressor motor, IGN-switched AC button to relay coil, and AC enable signal tap to MaxxECU DIN for idle-up compensation. Duty cycle guidance annotated: start at ~45% (≈3,000 RPM, 51–54°F vent at 90°F ambient) — do not run at 95% (≈5,000 RPM causes near-stall idle dip).
 
 Shows the Radium 20-1170 + Walbro F90000267 circuit: BATT+ through 25A fuse to DC SSR Load(+), SSR Load(-) to pump(+) stud on hanger, IGN switched 12V to SSR Ctrl(+), MaxxECU GPO (GND-sink) to SSR Ctrl(-). PWM duty cycle controls pump speed (65% idle → 100% WOT/boost). Cross-reference `harnesses/fuel-pump-hanger.wv` for physical pin layout and `fuel-pump-hanger-reference.md` for full specs and MTune config.
 

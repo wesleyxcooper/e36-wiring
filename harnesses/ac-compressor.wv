@@ -1,0 +1,249 @@
+metadata:
+  project: E36 Restomod -- 12V Electric AC Compressor Wiring
+  description: >-
+    Alibaba PD2-18012AJA 12V electric scroll compressor (18cc, 10,000 BTU,
+    R134a) with included PWM speed controller. Controlled via cabin AC switch
+    + 100A relay; MaxxECU RACE DIN receives AC enable signal for idle-up
+    compensation. No belt drive -- compressor mounts anywhere in engine bay.
+    Cross-reference schematics/ac-compressor-pwm.py for circuit-level detail.
+    Source: Rawrkee Episode 3 (YouTube) + @jfantis comments.
+
+# ── TODO list ──────────────────────────────────────────────────────────────────
+#
+#   [ ] Verify exact connector type on received PWM controller and compressor
+#       (Chinese units vary -- may be bare ring terminals, Deutsch DT, or
+#       proprietary 2-pin push-lock. Measure and confirm on delivery.)
+#   [ ] Confirm PWM controller enable/signal wire if present (some units have
+#       a 3rd wire for external on/off; if so, add MAXXECU_GPO connection)
+#   [ ] Confirm AC relay location -- engine bay fuse/relay block or dedicated
+#   [ ] Confirm MaxxECU RACE DIN pin assignment for AC enable signal
+#   [ ] Configure MaxxECU idle-up: DIN type = ON/OFF switch, target +150-200 RPM
+#       when AC enable input is HIGH
+#   [ ] Flush AC system: remove all PAG oil, replace receiver/drier before commissioning
+#   [ ] Fill with POE 68 oil (not PAG) -- see plan doc Phase 2 AC row
+#   [ ] Wire condenser fan circuit (fan MUST be present or controller won't enable)
+#   [ ] Set PWM controller duty cycle to ~45% initially (3,000 RPM) --
+#       do not start at 95% (5,000 RPM causes near-stall idle dip)
+#   [ ] Test with engine running: monitor idle, adjust duty cycle in 5% increments
+
+# ── Connectors ─────────────────────────────────────────────────────────────────
+
+connectors:
+
+  BATT_POS:
+    type: "Battery positive terminal"
+    subtype: "12V, trunk-mounted (0 AWG OFC Big Three run)"
+    pincount: 1
+    pinlabels: ["+12V BATT (always-on)"]
+    notes: >-
+      Inline 100A fuse required within 12 inches of battery terminal.
+      0 AWG OFC from battery to engine bay junction post (Big Three upgrade
+      required alongside AC install for clean power delivery at 50A draw).
+      Feeds relay pin 30 only -- NOT connected directly to compressor.
+
+  CHASSIS_GND:
+    type: "Chassis ground stud (body metal)"
+    pincount: 1
+    pinlabels: ["GND"]
+    notes: >-
+      Shared ground reference for relay coil, PWM controller GND, and
+      compressor motor GND. Use dedicated ring terminal bolts at each
+      grounding point -- do not daisy-chain high-current motor GND through
+      signal ground studs. 8 AWG minimum for motor GND run.
+
+  AC_RELAY:
+    type: "100A automotive relay (Bosch ISO mini or equiv)"
+    subtype: "Standard 4-pin relay -- coil 85/86, contact 30/87"
+    pincount: 4
+    pinlabels:
+      - "Pin 30 (BATT+ in, fused 100A)"
+      - "Pin 87 (switched +12V out to PWM ctrl)"
+      - "Pin 86 (coil +12V -- IGN via AC switch)"
+      - "Pin 85 (coil GND)"
+    notes: >-
+      Relay coil pin 86 driven from IGN +12V through cabin AC switch.
+      Relay coil pin 85 to chassis GND.
+      Relay output pin 87 feeds PWM controller +IN.
+      Relay input pin 30 from 100A fused BATT+.
+      AC enable tap: junction at relay coil 86 wire (after AC switch,
+      before relay coil) runs to MaxxECU DIN for idle-up signal.
+
+  AC_SWITCH:
+    type: "Cabin AC on/off switch"
+    subtype: "Existing E36 AC switch or standalone toggle -- SPST"
+    pincount: 2
+    pinlabels:
+      - "IGN +12V in"
+      - "Switched +12V out (to relay coil pin 86 + MaxxECU DIN tap)"
+    notes: >-
+      Existing E36 AC switch can be reused if wired to enable relay coil.
+      Alternatively: standalone rocker switch on dash. Must be IGN-switched
+      (not always-on) so compressor cannot run with key off.
+
+  MAXXECU_DIN:
+    type: "MaxxECU RACE -- Digital Input (AC enable)"
+    subtype: "DIN pin TBD -- confirm in MaxxECU pin assignment"
+    pincount: 1
+    pinlabels: ["AC switch signal in (DIN)"]
+    notes: >-
+      Receives switched +12V when AC switch is on and relay coil is energized.
+      Configure in MTune: Digital Input type = ON/OFF switch,
+      function = AC enable, idle-up = +150-200 RPM when active.
+      This prevents idle dip when compressor load engages.
+      Source: @jfantis YouTube comment on Rawrkee Episode 3.
+
+  PWM_CONTROLLER:
+    type: "PD2-18012AJA included 3-phase inverter/controller"
+    subtype: "Standalone box, manual duty cycle and frequency knobs -- converts 12V DC to 3-phase for PMSM motor"
+    pincount: 5
+    pinlabels:
+      - "+DC_IN (switched +12V from relay pin 87)"
+      - "GND_IN (DC neg)"
+      - "U (phase U out to motor)"
+      - "V (phase V out to motor)"
+      - "W (phase W out to motor)"
+    notes: >-
+      Controller is included in PD2-18012AJA kit -- no separate purchase.
+      This is a 3-phase inverter/VFD: DC 12V in, 3-phase PMSM drive out.
+      Manual duty cycle knob: start at ~45% (3,000 RPM, 51-54 degF vent at
+      90 degF ambient). Do NOT start at 95% (5,000 RPM -- near-stall idle dip).
+      Manual frequency knob: leave at factory default unless specified in manual.
+      DC side connector: verify on delivery (ring terminals or proprietary).
+      Motor side: 3 orange pigtail wires (U/V/W) -- confirmed from Alibaba product photos.
+      Controller will NOT enable compressor without condenser fan present.
+
+  COMPRESSOR:
+    type: "Alibaba PD2-18012AJA 12V scroll compressor"
+    subtype: "18cc displacement, 3.65 kW / 12,454 BTU, R134a or R1234yf -- Three-phase PMSM motor"
+    pincount: 3
+    pinlabels:
+      - "U (phase U from inverter)"
+      - "V (phase V from inverter)"
+      - "W (phase W from inverter)"
+    notes: >-
+      Motor type: Three-phase PMSM -- driven by included inverter controller.
+      3 orange pigtail wires (U/V/W) -- confirmed from Alibaba product photos.
+      Phase order: follow controller labeling -- swapping any two phases reverses rotation.
+      Base price: $260 (Alibaba listing). DDP sea freight all-in: ~$340-360
+      per @jfantis YouTube comments. Do NOT use FedEx Express (~$680 Rawrkee total).
+      Oil: POE 68 only -- flush all PAG from AC system before install.
+      Max RPM: 5,000 (at 100% PWM duty). Recommended: ~3,000 RPM (45% duty).
+      Condenser fan required: controller will not activate without fan circuit.
+      Proven longevity: 4+ years / 3,000+ hours per @jfantis YouTube comments.
+
+# ── Cables ─────────────────────────────────────────────────────────────────────
+
+cables:
+
+  CABLE_BATT_TO_RELAY:
+    gauge: "8 AWG"
+    length: "0.5 m"
+    colors: [RD]
+    wirecount: 1
+    notes: >-
+      BATT+ to relay pin 30. 100A fuse within 12 inches of battery.
+      8 AWG minimum (50A compressor draw). OFC preferred.
+      Ring terminal at battery junction post; blade/ring at relay pin 30.
+
+  CABLE_RELAY_TO_PWM:
+    gauge: "8 AWG"
+    length: "1.5 m"
+    colors: [RD]
+    wirecount: 1
+    notes: >-
+      Relay pin 87 to PWM controller +IN. Switched +12V supply.
+      8 AWG minimum. Route through engine bay to compressor mounting location.
+
+  CABLE_PWM_TO_MOTOR:
+    gauge: "8 AWG"
+    length: "0.5 m"
+    colors: [RD, YE, BU]
+    wirecount: 3
+    notes: >-
+      Inverter controller 3-phase output (U/V/W) to compressor PMSM motor.
+      Short run -- inverter mounted adjacent to compressor.
+      3x 8 AWG minimum. Colors per kit harness -- typically all orange from factory.
+      Swapping any two phases reverses motor rotation (compressor will not compress).
+
+  CABLE_MOTOR_GND:
+    gauge: "8 AWG"
+    length: "0.3 m"
+    colors: [BK]
+    wirecount: 1
+    notes: >-
+      Inverter controller -DC_IN to chassis ground.
+      Short stub -- inverter and compressor share ground via DC side only.
+      The 3-phase PMSM motor GND is handled internally by the inverter.
+      8 AWG minimum. Ring terminal to chassis ground stud.
+
+  CABLE_RELAY_COIL:
+    gauge: "18 AWG"
+    length: "2.0 m"
+    colors: [GN, BK]
+    wirecount: 2
+    notes: >-
+      Wire 1 GREEN: AC switch output to relay coil pin 86. IGN-switched +12V.
+      Wire 2 BLACK: relay coil pin 85 to chassis GND.
+      18 AWG sufficient for relay coil (low current).
+
+  CABLE_AC_ENABLE:
+    gauge: "22 AWG"
+    length: "2.5 m"
+    colors: [VT]
+    wirecount: 1
+    notes: >-
+      AC enable signal: junction at relay coil pin 86 wire (after AC switch)
+      to MaxxECU DIN. Carries IGN +12V when AC switch is on.
+      22 AWG signal wire. Route through firewall grommet to ECU.
+      Shielded preferred -- drain at ECU end only.
+
+  CABLE_IGN_TO_SWITCH:
+    gauge: "18 AWG"
+    length: "0.5 m"
+    colors: [RD]
+    wirecount: 1
+    notes: >-
+      IGN +12V to AC cabin switch input.
+      Source from IGN relay output -- key-switched only.
+
+# ── Connections ────────────────────────────────────────────────────────────────
+
+connections:
+  # BATT+ -> relay pin 30 (fused 100A)
+  -
+    - BATT_POS: [1]
+    - CABLE_BATT_TO_RELAY: [1]
+    - AC_RELAY: [1]
+  # Relay pin 87 -> PWM controller +IN (switched supply)
+  -
+    - AC_RELAY: [2]
+    - CABLE_RELAY_TO_PWM: [1]
+    - PWM_CONTROLLER: [1]
+  # Inverter 3-phase output (U/V/W) -> compressor PMSM motor
+  -
+    - PWM_CONTROLLER: [3, 4, 5]
+    - CABLE_PWM_TO_MOTOR: [1, 2, 3]
+    - COMPRESSOR: [1, 2, 3]
+  # Inverter -DC_IN -> chassis GND
+  -
+    - PWM_CONTROLLER: [2]
+    - CABLE_MOTOR_GND: [1]
+    - CHASSIS_GND: [1]
+  # IGN +12V -> AC switch -> relay coil pin 86 (+ AC enable tap to MaxxECU)
+  -
+    - AC_SWITCH: [1]
+    - CABLE_IGN_TO_SWITCH: [1]
+  -
+    - AC_SWITCH: [2]
+    - CABLE_RELAY_COIL: [1]
+    - AC_RELAY: [3]
+  # Relay coil pin 85 -> chassis GND
+  -
+    - AC_RELAY: [4]
+    - CABLE_RELAY_COIL: [2]
+    - CHASSIS_GND: [1]
+  # AC enable signal tap -> MaxxECU DIN (for idle-up)
+  -
+    - AC_SWITCH: [2]
+    - CABLE_AC_ENABLE: [1]
+    - MAXXECU_DIN: [1]
