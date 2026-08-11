@@ -43,6 +43,12 @@ Click any link to view the interactive diagram with full BOM in your browser —
 
 Radium 20-1170 + Walbro F90000267 + Crydom D1D40 DC SSR + MaxxECU RACE PWM GPO. Cross-reference `fuel-pump-hanger-reference.md` and `schematics/fuel-pump-pwm.py`.
 
+### Alibaba PD2-18012AJA 12V electric AC compressor
+
+![AC Compressor Harness](output/ac-compressor.svg)
+
+Posung PD2-18012AJA (18cc, 3.65 kW / 12,454 BTU, Three-phase PMSM) + included 3-phase inverter/controller + 100A relay. AC enable signal taps to MaxxECU DIN for idle-up compensation. Cross-reference `harnesses/ac-compressor.wv` and `schematics/ac-compressor-pwm.py`.
+
 ## Harnesses
 
 | File | Description | Phase |
