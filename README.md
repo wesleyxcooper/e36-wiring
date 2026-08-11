@@ -13,8 +13,14 @@ Click any link to view the interactive diagram with full BOM in your browser —
 | Harness | Interactive HTML | Source |
 |---|---|---|
 | MaxxECU ↔ M52 engine harness | [maxxecu-m52.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/maxxecu-m52.html) | `harnesses/maxxecu-m52.wv` |
-| E46 DBW pedal → bulkhead → MaxxECU (primary) | [epedal-bmw-e46.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/epedal-bmw-e46.html) | `harnesses/epedal-bmw-e46.wv` |
-| Hella 6PV pedal → bulkhead → MaxxECU (RHD fallback) | [epedal-hella-6pv.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/epedal-hella-6pv.html) | `harnesses/epedal-hella-6pv.wv` |
+| MaxxECU ↔ VW 07K engine harness (Phase 3) | [maxxecu-07k.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/maxxecu-07k.html) | `harnesses/maxxecu-07k.wv` |
+| Deutsch AS79 firewall bulkhead — cabin + M52/07K engine plugs | [firewall-bulkhead.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/firewall-bulkhead.html) | `harnesses/firewall-bulkhead.wv` |
+| E46 DBW pedal → bulkhead pins 72-77 → MaxxECU APS (primary) | [epedal-bmw-e46.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/epedal-bmw-e46.html) | `harnesses/epedal-bmw-e46.wv` |
+| Hella 6PV pedal → bulkhead → MaxxECU APS (RHD fallback) | [epedal-hella-6pv.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/epedal-hella-6pv.html) | `harnesses/epedal-hella-6pv.wv` |
+| ZF 8HP70 TCU CAN + power wiring | [8hp-can.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/8hp-can.html) | `harnesses/8hp-can.wv` |
+| Gauge.S CAN cluster (cabin-to-cabin) | [gauge-s-can.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/gauge-s-can.html) | `harnesses/gauge-s-can.wv` |
+| DCT Shifter paddle → MaxxECU DIN (cabin-to-cabin) | [dct-shifter.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/dct-shifter.html) | `harnesses/dct-shifter.wv` |
+| Bosch PST-F1 oil temp+pressure sensor | [pst-f1-sensor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/pst-f1-sensor.html) | `harnesses/pst-f1-sensor.wv` |
 | E36 X20 body connector / Gauge.S | [body-x20.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/body-x20.html) | `harnesses/body-x20.wv` |
 | Power distribution (relay board + fuse block) | [power-distribution.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/power-distribution.html) | `harnesses/power-distribution.wv` |
 | Pierburg CWA400 electric water pump | [ewp-controller.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ewp-controller.html) | `harnesses/ewp-controller.wv` |
