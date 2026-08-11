@@ -9,11 +9,13 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # TODOs — data needed before this diagram is build-ready:
 #
-# TODO: MaxxECU CMC main connector pin assignments
-#       The CMC connector carries all INJ/IGN/TRIGGER/HOME/CLT/IAT/TPS/GPO1
-#       outputs but MaxxECU does not publish pin-level CMC assignments publicly.
-#       Source: download the Race wiring PDF from maxxecu.com/downloads
-#       (requires account). Update ECU_CMC connector below with real pin numbers.
+# DONE: MaxxECU CMC main connector pin assignments
+#       The full 48-pin Molex CMC pinout IS publicly available at:
+#       maxxecu.com/webhelp/wirings-maxxecu_pinout.html
+#       ECU_CMC connector below is updated with real pin positions (A1-M4 → 1-48).
+#       Row layout: A1-A4=1-4, B1-B4=5-8, C1-C4=9-12, D1-D4=13-16, E1-E4=17-20,
+#       F1-F4=21-24, G1-G4=25-28, H1-H4=29-32, J1-J4=33-36, K1-K4=37-40,
+#       L1-L4=41-44, M1-M4=45-48.
 #
 # TODO: Injector firing order — which MaxxECU INJ output maps to which cylinder
 #       M52 firing order: 1-5-3-6-2-4. Verify INJ 1-6 assignment in MaxxTune
@@ -38,21 +40,21 @@
 #       Research MaxxECU community for current preferred method before install.
 #       Document bypass connections here once method is confirmed.
 #
-# TODO: Idle air control valve (IDLE_VALVE) GPO 4 + GPO 5 pinout
-#       The M52 ICV is a dual-coil stepper driven by GPO 4 and GPO 5.
-#       GPO 4 and GPO 5 are on the MaxxECU CMC connector (not the 16-pin aux).
-#       Confirm CMC pin numbers from downloaded pinout PDF.
+# DONE: Idle air control valve (IDLE_VALVE) GPO 4 + GPO 5 CMC pins
+#       GPO 4 = E4 = CMC pin 20 (ICV coil A).
+#       GPO 5 = A1 = CMC pin 1  (ICV coil B).
+#       Both hardwired within terminated harness to ICV connector (not on 16-pin breakout).
 #
-# TODO: GPO 1 (boost solenoid) CMC pin number
-#       Boost solenoid wired via Superseal 2-pin in harness :: GPO 1 on CMC.
-#       Confirm CMC pin from downloaded PDF.
+# DONE: GPO 1 (boost solenoid) CMC pin = B4 = CMC pin 8.
+#       +12V for solenoid comes from coil/inj rail (ECU_12PIN[1]).
+#       GPO 1 = low-side switch from CMC pin 8.
 #
-# TODO: Firewall bulkhead connector (Deutsch AS47 or AS79)
-#       Planned installation during Phase 1 chassis prep.
-#       Cabin side: ECU CMC connector, fuse block, relay board :: bulkhead permanently.
-#       M52 harness terminates at mating plug; 07K harness also terminates at mating plug.
-#       Add a separate body-bulkhead.wv diagram once connector part numbers confirmed.
-#       Source: RaceSpec Online (racespeconline.com) — AS series 47-way (~$80-120).
+# DONE: Firewall bulkhead connector — 79-way decided (Deutsch AS79 / Souriau 8STA).
+#       ~59 pins used/reserved; ~20 true spares for expansion.
+#       Cabin side permanent: MaxxECU, relay board, fuse block, 8HP powerhold relay.
+#       M52 engine harness terminates at engine-side mating plug (plug-and-play swap to 07K).
+#       Full pin assignment: harnesses/firewall-bulkhead.wv
+#       Source: RaceSpec Online (racespeconline.com) — AS79 ~$120-180.
 #
 # TODO: Wire gauges throughout
 #       12-pin power wires (12V coils, ECU power, engine GND) require minimum 14 AWG.
@@ -134,12 +136,13 @@ connectors:
 
   CAM_HALL:
     type: "BMW 12141726590"
-    subtype: "M52 VANOS cam Hall sensor (swapped connector)"
+    subtype: "M52 cam Hall sensor — non-VANOS connector type, no +12V supply needed"
     pincount: 3
-    pinlabels: ["+12V", Signal, "Sensor GND"]
+    pinlabels: [Signal, "Sensor GND", Shield]
     notes: >
-      VANOS head requires sensor swap to BMW PN 12141726590 (fits non-VANOS harness connector).
-      Alternative: cut harness connector and add VANOS-type plug + switched 12V.
+      BMW PN 12141726590 is the non-VANOS type used by the MaxxECU M50 terminated harness.
+      Swap from the OEM VANOS sensor to this part for plug-and-play fit. No +12V wire needed.
+      Connector: Signal=pin1, Sensor GND=pin2, Shield=pin3.
 
   CLT:
     type: "Bosch JPT 2-way"
@@ -295,15 +298,17 @@ connectors:
   # ── This-build additions ─────────────────────────────────────────────────────
 
   DCT_SHIFTER:
-    type: "DCT Shifter paddle harness"
-    subtype: "DCT Shifter E36 (4-wire)"
-    pincount: 4
-    pinlabels: ["+12V switched", GND, "UP signal", "DOWN signal"]
+    type: "DCT Shifter mechanical sequential"
+    subtype: "DCT Shifter E36 (3-wire, no +12V supply needed)"
+    pincount: 3
+    pinlabels: ["UP (Black)", "DOWN (Blue)", "GND (Brown)"]
     notes: >
-      UP :: MaxxECU DIN 2 (Transmission UP shift).
-      DOWN :: MaxxECU DIN 1 (Transmission DOWN shift).
+      Source: dctshifter.com/pages/installation — 3-wire only (no +12V).
+      UP (Black) :: MaxxECU DIN 2 (Transmission UP shift).
+      DOWN (Blue) :: MaxxECU DIN 1 (Transmission DOWN shift).
+      GND (Brown) :: Sensor GND or chassis GND.
       MTune: Advanced :: 8HP :: Shifter type :: 8HP SEQ shifter.
-      Hold UP = launch control / transbrake.
+      Hold UP = launch control. Cabin-to-cabin connection; does NOT cross firewall bulkhead.
 
   FLEX_FUEL:
     type: "3-pin inline"
@@ -371,42 +376,68 @@ connectors:
     pincount: 1
     pinlabels: ["+12V IGN"]
 
-  # ── MaxxECU CMC main connector (STUB — pin numbers TBD) ────────────────────
-  # TODO: Replace pin numbers with actual CMC assignments from maxxecu.com/downloads PDF
+  # ── MaxxECU CMC main connector (48-pin Molex CMC) ────────────────────────────
+  # Source: maxxecu.com/webhelp/wirings-maxxecu_pinout.html (publicly available)
+  # Sequential numbering: A1=1, A2=2, A3=3, A4=4, B1=5 ... M4=48
   ECU_CMC:
-    type: "Cinch CMC (MaxxECU Race main)"
-    subtype: "STUB — pin numbers not yet confirmed"
-    pincount: 26
+    type: "Molex CMC 48-pin (MaxxECU Race / V1 / PRO)"
+    subtype: "Source: maxxecu.com/webhelp/wirings-maxxecu_pinout.html"
+    pincount: 48
     pinlabels:
-      - "TRIGGER+"
-      - "TRIGGER-"
-      - "TRIGGER_SHIELD"
-      - "HOME_SIG"
-      - "HOME_GND"
-      - "HOME_12V"
-      - "CLT_SIG"
-      - "IAT_SIG"
-      - "SENSOR_GND"
-      - "5V_OUT"
-      - "TPS_SIG"
-      - "12V_SWITCHED"
-      - "GPO1_BOOST"
-      - "INJ1"
-      - "INJ2"
-      - "INJ3"
-      - "INJ4"
-      - "INJ5"
-      - "INJ6"
-      - "IGN1"
-      - "IGN2"
-      - "IGN3"
-      - "IGN4"
-      - "IGN5"
-      - "IGN6"
-      - "GPO4_GPO5_ICV"
+      - "A1: GPO 5 (ICV coil B)"          # 1
+      - "A2: IGN 1"                        # 2
+      - "A3: IGN 2"                        # 3
+      - "A4: GPO 8 / TACHO"               # 4
+      - "B1: GPO 6 (FAN)"                 # 5
+      - "B2: IGN 3"                        # 6
+      - "B3: IGN 4"                        # 7
+      - "B4: GPO 1 (Boost)"               # 8
+      - "C1: GPO 7 / DIN3 (Flex fuel)"    # 9
+      - "C2: IGN 5"                        # 10
+      - "C3: IGN 6"                        # 11
+      - "C4: GPO 2 (Fuel pump)"           # 12
+      - "D1: WBO2 Heater-"                # 13
+      - "D2: IGN 7 (N/A 6-cyl)"          # 14
+      - "D3: IGN 8 (N/A 6-cyl)"          # 15
+      - "D4: GPO 3 (VANOS)"               # 16
+      - "E1: CAN H"                        # 17
+      - "E2: CAN L"                        # 18
+      - "E3: GND Shield"                  # 19
+      - "E4: GPO 4 (ICV coil A)"          # 20
+      - "F1: CLT"                          # 21
+      - "F2: IAT"                          # 22
+      - "F3: WBO2 VREF"                   # 23
+      - "F4: WBO2 VS"                     # 24
+      - "G1: +5V sensor supply"           # 25
+      - "G2: TPS / AIN"                   # 26
+      - "G3: WBO2 IP"                     # 27
+      - "G4: WBO2 RCAL"                   # 28
+      - "H1: Sensor GND"                  # 29
+      - "H2: Trigger GND (VR-)"          # 30
+      - "H3: TRIGGER (crank VR+)"        # 31
+      - "H4: HOME (cam Hall)"             # 32
+      - "J1: AIN 1 (temp - PST-F1 temp)" # 33
+      - "J2: AIN 2 (temp - spare)"       # 34
+      - "J3: AIN 3 (0-5V - PST-F1 pres)" # 35
+      - "J4: AIN 4 (0-5V - MAP)"         # 36
+      - "K1: INJ 1"                        # 37
+      - "K2: INJ 2"                        # 38
+      - "K3: DIN / VR 1"                  # 39
+      - "K4: DIN / VR 2"                  # 40
+      - "L1: INJ 8 (N/A 6-cyl)"          # 41
+      - "L2: INJ 7 (N/A 6-cyl)"          # 42
+      - "L3: INJ 6"                        # 43
+      - "L4: Engine GND"                  # 44
+      - "M1: INJ 3"                        # 45
+      - "M2: INJ 4"                        # 46
+      - "M3: INJ 5"                        # 47
+      - "M4: +12V ECU power"              # 48
     notes: >-
-      STUB ONLY. Actual Cinch CMC pin numbers unknown — download Race wiring PDF
-      from maxxecu.com/downloads to fill in. Pin labels here are logical names only.
+      Full 48-pin pinout from maxxecu.com/webhelp/wirings-maxxecu_pinout.html.
+      The terminated M50 harness exposes a 12-pin power breakout (ECU_12PIN) and
+      16-pin aux breakout (ECU_16PIN) for field connections. Most CMC pins are
+      hardwired within the terminated harness; only the breakout connectors are
+      accessible in the engine bay.
 
 
 cables:
@@ -439,10 +470,10 @@ cables:
 
   W_CAM:
     wirecount: 3
-    colors: [WH, BK, RD]
-    wirelabels: [Signal, "Sensor GND", "+12V"]
+    colors: [WH, BK, GY]
+    wirelabels: [Signal, "Sensor GND", Shield]
     length: 0.8 m
-    notes: "BMW 12141726590 sensor — non-VANOS connector on harness side."
+    notes: "BMW 12141726590 (non-VANOS type) — 3-wire: signal, GND, shield. No +12V supply."
 
   W_CLT:
     wirecount: 2
@@ -476,11 +507,11 @@ cables:
     length: 2.0 m
     notes: "Twisted pair. 120ohm at far end if bus run over 1 m."
 
-  # DCT Shifter
+  # DCT Shifter — 3-wire only, no +12V (source: dctshifter.com/pages/installation)
   W_SHIFTER:
-    wirecount: 4
-    colors: [RD, BK, GN, YE]
-    wirelabels: ["+12V IGN", GND, "UP (DIN 2)", "DOWN (DIN 1)"]
+    wirecount: 3
+    colors: [BK, BU, BN]
+    wirelabels: ["UP (DIN 2)", "DOWN (DIN 1)", GND]
     length: 1.5 m
 
   # Flex fuel
@@ -549,29 +580,35 @@ connections:
     - ECU_12PIN: [2]
 
   # ── Crank trigger ────────────────────────────────────────────────────────────
+  # CRANK_VR: Signal+=H3(31), VR-=H2(30), Shield=E3(19)
   - - CRANK_VR: [1, 2, 3]
     - W_CRANK: [1, 2, 3]
-    - ECU_CMC: [1, 2, 3]
+    - ECU_CMC: [31, 30, 19]
 
   # ── Cam / HOME trigger ───────────────────────────────────────────────────────
+  # CAM_HALL (BMW 12141726590): Signal=H4(32), GND=H1(29), Shield=E3(19)
+  # Shield shares E3 drain with crank shield — both terminate at CMC pin 19.
   - - CAM_HALL: [1, 2, 3]
     - W_CAM: [1, 2, 3]
-    - ECU_CMC: [4, 5, 6]
+    - ECU_CMC: [32, 29, 19]
 
   # ── CLT ─────────────────────────────────────────────────────────────────────
+  # CLT: Signal=F1(21), GND=H1(29 shared sensor GND)
   - - CLT: [1, 2]
     - W_CLT: [1, 2]
-    - ECU_CMC: [7, 9]
+    - ECU_CMC: [21, 29]
 
   # ── IAT ─────────────────────────────────────────────────────────────────────
+  # IAT: Signal=F2(22), GND=H1(29 shared sensor GND)
   - - IAT: [1, 2]
     - W_IAT: [1, 2]
-    - ECU_CMC: [8, 9]
+    - ECU_CMC: [22, 29]
 
   # ── TPS ─────────────────────────────────────────────────────────────────────
+  # TPS: +5V=G1(25), Signal=G2(26), GND=H1(29 shared sensor GND)
   - - TPS: [1, 2, 3]
     - W_TPS: [1, 2, 3]
-    - ECU_CMC: [10, 11, 9]
+    - ECU_CMC: [25, 26, 29]
 
   # ── VANOS solenoid ───────────────────────────────────────────────────────────
   - - VANOS_SOL: [1, 2]
@@ -591,10 +628,11 @@ connections:
     - W_CAN_GAUGES: [1, 2]
     - GAUGES_CAN: [1, 2]
 
-  # ── DCT Shifter ──────────────────────────────────────────────────────────────
-  - - DCT_SHIFTER: [1, 2, 3, 4]
-    - W_SHIFTER: [1, 2, 3, 4]
-    - ECU_16PIN: [1, 2, 15, 16]
+  # ── DCT Shifter — 3-wire (UP/DOWN/GND), cabin-to-cabin, no bulkhead crossing ──
+  # UP(BK)=DIN2=ECU_16PIN[15], DOWN(BU)=DIN1=ECU_16PIN[16], GND=ECU_16PIN[2]
+  - - DCT_SHIFTER: [1, 2, 3]
+    - W_SHIFTER: [1, 2, 3]
+    - ECU_16PIN: [15, 16, 2]
 
   # ── Flex fuel sensor ─────────────────────────────────────────────────────────
   - - FLEX_FUEL: [1, 2, 3]
@@ -607,9 +645,14 @@ connections:
     - ECU_16PIN: [1, 2, 12, 14]
 
   # ── Boost solenoid ───────────────────────────────────────────────────────────
-  - - BOOST_SOL: [1, 2]
-    - W_BOOST: [1, 2]
-    - ECU_CMC: [12, 13]
+  # +12V comes from engine harness coil/inj rail (ECU_12PIN[1]), not ECU_CMC.
+  # GPO1=B4=CMC pin 8.
+  - - ECU_12PIN: [1]
+    - W_BOOST: [1]
+    - BOOST_SOL: [1]
+  - - BOOST_SOL: [2]
+    - W_BOOST: [2]
+    - ECU_CMC: [8]
 
   # ── Fan relay trigger ─────────────────────────────────────────────────────────
   - - FAN_RELAY: [1, 2]
