@@ -372,3 +372,22 @@ Only items not already included with their respective purchased components (e.g.
 | 1 | Bosch JPT 3-way | M52 crank VR trigger | M52 harness |
 | 1 | BMW `12141726590` 3-pin | M52 VANOS cam Hall sensor | M52 harness |
 | 1 | Superseal 2-way | Turbosmart boost solenoid | M52 harness |
+
+---
+
+## Harness Build Tools
+
+One-time tooling purchase — covers all connector families in this build.
+
+| Tool | Model | Price | Connector Family / Use |
+|------|-------|-------|------------------------|
+| Micro-pin ratcheting crimper | **Knipex 97 52 68** | ~$90 | VAG sensor connectors (3B0973703G, 1J0973702), COP pigtails (4B0973724), ECU pin contacts — most-used tool on this build. Covers 0.08–6mm². |
+| Open-barrel / non-insulated crimper | **IWISS IWS-2820M** | ~$40 | General harness open-barrel contacts, ring terminals, relay socket contacts, 14–28 AWG range. |
+| Deutsch AS contact crimper | **Deutsch WT-0460-8-0800** | ~$150–180 | Deutsch AS bulkhead — size 20 contacts (22–18 AWG). No substitute: wrong die geometry produces a cold crimp that passes visual inspection but fails under vibration. |
+| Ferrule crimper | **IWISS IWS-10** | ~$25 | Stranded wire ends into screw-clamp terminals (ECU power/ground, DIN rail fuse block). Covers 0.5–10mm² ferrules. |
+| Deutsch contact extraction | **Deutsch 1680-73-01** | ~$15 | AS bulkhead size 20 contact removal — push in, releases retention lock cleanly. Do not use a screwdriver. |
+| VW/Bosch connector de-pinning picks | **Lisle 57750** | ~$20 | Sensor pigtails (3B0973703G, 1J0973702, 1J0973712), COP connectors — push-to-release housings. |
+
+> **Total: ~$340–375.** Covers the Deutsch AS bulkhead, all VAG sensor / coil / injector pigtails, and general harness work.
+> If using Souriau 8STA for the bulkhead instead of Deutsch AS, confirm the correct positioner for Souriau contacts at purchase — Souriau uses compatible tooling but a different positioner.
+> **MaxxECU CMC connector:** Use the extraction tool specified in the MaxxECU RACE installation manual (typically a small TE Connectivity pick). A 0.8mm flat pick gets most CMC positions — confirm before use.
