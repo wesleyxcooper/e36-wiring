@@ -271,13 +271,16 @@ connectors:
 
   CRANK_VR:
     type: "VW 07K crank VR sensor connector"
-    subtype: "60-2 missing tooth VR — same MaxxECU trigger type N-1 as M52"
+    subtype: "60-2 missing tooth passive VR — MaxxECU VR input (N-1 trigger type)"
     pincount: 3
     pinlabels: [Signal+, Signal-, Shield]
     notes: >
-      TODO: Confirm exact VW connector body type at install (Bosch Kombi-F 3-pin or
-      similar). ME7.1.1 harness ref: Conn B pin 82. Same 60-2 trigger as M52 — only
-      crank angle offset calibration differs in MTune.
+      OE# 3B0973703G — same connector body as CAM_HALL but DIFFERENT pinout.
+      Crank: Signal+/Signal-/Shield (passive VR). Cam: +5V/GND/Signal (active Hall).
+      LABEL PIGTAILS AT CRIMP TIME — swapped pigtails produce no-start with no
+      obvious failure indicator. MTune: VR input, trigger N-1 / 60-2 pattern, same
+      type as M52 crank. Only crank angle offset may differ — confirm in MTune
+      Trigger Setup before first crank. ME7.1.1 harness ref: Conn B pin 82.
 
   CAM_HALL:
     type: "VW 07K cam Hall sensor connector"
