@@ -1,0 +1,716 @@
+# maxxecu-07k.wv
+# MaxxECU Race <-> VW 07K (CBUA/BGP 2.5L inline-5) Engine Harness (Phase 3)
+#
+# Same MaxxECU RACE ECU as M52 phase — zero ECU cost at swap.
+# Firewall bulkhead: engine mating plug swaps (M52 out, 07K in). Cabin side mostly
+# permanent — ONE addition: e-pedal harness (E46 module → bulkhead pins 72-77).
+# Source: ME7.1.1 pinout — https://drive.google.com/file/d/15RPWyYPLHGEMMQZIlUgpoo77T-CxjyMP/
+#         MaxxECU pinout: maxxecu.com/webhelp/wirings-maxxecu_pinout.html
+#         MaxxECU e-throttle: maxxecu.com/webhelp/settings-ethrottle.html
+#
+# KEY DIFFERENCES FROM M52 (harness rebuild required — engine mating plug swap):
+#   + 5-cylinder: INJ 1-5, IGN 1-5. INJ 6 / IGN 6 cavity-plugged.
+#   + DBW throttle body (07K native, ~65mm) replaces cable TPS.
+#     Motor+/Motor- use GPO 3/4 freed from M52 VANOS/ICV.
+#     TPS1/TPS2 route through expansion bulkhead pins 65-67.
+#   + VW cam Hall sensor (+5V type): different connector body; same bulkhead pin 25.
+#   + VW crank VR 60-2: same trigger type as M52, different connector body.
+#     MaxxECU trigger type N-1 unchanged — only crank angle offset needs recalibrate.
+#   + Bosch EV14 injectors (ID1050x x5): M50 harness ships with EV1 pigtails —
+#     replace with EV14 pigtail ends at engine-side harness build.
+#   + 2x Bosch flat knock sensors: route through expansion pins 69/70/71.
+#   + NO VANOS solenoid. NO ICV. GPO 3/4/5 freed (GPO 3+4 → ETh Motor+/-).
+#   + PST-F1: same wiring, new mount (iABED M10x1.0 port) — no wiring change.
+#   + WBO2 LSU 4.9: same wiring, new bung in 07K top-mount exhaust manifold.
+#   + CABIN-SIDE ADDITION: BMW E46 DBW accelerator pedal installed; 6-wire shielded
+#     run from pedal module → bulkhead cabin face pins 72-77 (APS GND1/GND2,
+#     VCC1/VCC2, APS1/APS2 signals) → MaxxECU CMC APS inputs (engine side).
+#     All other cabin wiring unchanged. See harnesses/epedal-bmw-e46.wv.
+#   + OEM ME7.1.1 engine connector reference:
+#     Crank VR: ME7 pin 82  |  Cam Hall: pin 86  |  CLT: pin 93  |  MAP: pin 101
+#     INJ 1-5: pins 96/97/112/88/89  |  IGN 1-5: pins 102/103/111/94/95
+#     Knock: pins 106/107  |  DBW TB: pins 84(Mot+)/92(Mot-)/117(TPS1)/118(TPS2)
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# TODOs (verify at engine-side harness build):
+#
+# TODO: VW 07K crank sensor connector body type (Conn B region; 60-2 VR sensor).
+#       Confirm 3-pin vs 2-pin and exact VW connector family.
+#
+# TODO: VW 07K cam Hall sensor connector body (rear of head).
+#       Confirm 3-pin type and +5V vs +12V supply spec.
+#
+# TODO: VW 07K CLT connector body — confirm vs Bosch JPT 2-way compatibility.
+#
+# TODO: VW 07K DBW throttle body connector body and motor wire polarity.
+#       Confirm TPS1/TPS2 pin assignment at TB connector.
+#       Verify ETh motor wire polarity at TB before wiring (swap if TB runs backwards).
+#
+# TODO: MaxxECU ETh1 GPO assignment — confirm GPO 3 + GPO 4 as Motor+/Motor-
+#       in MTune :: Throttle :: E-Throttle wizard before committing wiring.
+#
+# TODO: Injector firing order — 07K order is 1-2-4-5-3.
+#       Document INJ channel-to-cylinder mapping in MTune :: Engine :: Injectors.
+#
+# TODO: Ignition firing order — same 1-2-4-5-3 as fuel.
+#       Document IGN channel-to-coil mapping in MTune :: Engine :: Ignition.
+#
+# TODO: Wire bung for WBO2 in 07K top-mount exhaust manifold (custom fab).
+#       Confirm bung position upstream of turbo, min 6in from collector.
+#
+# TODO: EWS2 bypass not needed — 07K has no factory immobilizer in MaxxECU context.
+#       Confirm any remaining OBD/CAN interference from retained body harness.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+connectors:
+
+  # ── MaxxECU Race auxiliary connectors (IDENTICAL TO M52 — no changes) ──────
+
+  ECU_16PIN:
+    type: "MaxxECU M50 terminated harness — 16-pin aux breakout"
+    subtype: "REV2. Source: maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html"
+    pincount: 16
+    pinlabels:
+      - "+5V OUT"           # 1
+      - "Sensor GND"        # 2
+      - "INJ 7 (N/A)"       # 3
+      - "GPO 8 / TACHO"     # 4
+      - "GPO 7 / DIN 3"     # 5  — Flex fuel (if retained)
+      - "GPO 6 (FAN)"       # 6
+      - "GPO 3 (ETh Mot+)"  # 7  — 07K: e-throttle motor+ (freed from VANOS)
+      - "GPO 2 (Fuel pump)" # 8
+      - "CAN L"             # 9
+      - "CAN H"             # 10
+      - "AIN 4 (MAP)"       # 11
+      - "AIN 3 (PST pres)"  # 12
+      - "AIN 2 (spare)"     # 13
+      - "AIN 1 (PST temp)"  # 14
+      - "DIN 2 (UP)"        # 15
+      - "DIN 1 (DOWN)"      # 16
+
+  ECU_12PIN:
+    type: "MaxxECU M50 terminated harness — 12-pin power/chassis breakout"
+    subtype: "REV2"
+    pincount: 12
+    pinlabels:
+      - "+12V coils/injectors (pin 1)"     # 1
+      - "Coil/inj relay trigger (pin 2)"   # 2
+      - "Fuel pump relay trigger (pin 3)"  # 3
+      - "Chassis GND (pin 4)"              # 4
+      - "Engine GND (pin 5)"              # 5
+      - "Starter input / CAS (pin 6)"     # 6
+      - "+12V ECU power (pin 7)"          # 7
+      - "+12V ignition switched (pin 8)"  # 8
+      - "Coolant fan relay trigger (pin 9)" # 9
+      - "Alternator D+ (pin 10)"          # 10
+      - "AC enable (pin 11)"              # 11
+      - "Alternator +12V (pin 12)"        # 12
+
+  # ── MaxxECU CMC main connector — SAME AS M52, updated GPO notes ─────────────
+  # Source: maxxecu.com/webhelp/wirings-maxxecu_pinout.html
+  # GPO 3 (D4/pin 16): freed from VANOS → ETh Motor+ (07K)
+  # GPO 4 (E4/pin 20): freed from ICV A → ETh Motor- (07K)
+  # GPO 5 (A1/pin 1):  freed from ICV B → spare / future actuator
+  ECU_CMC:
+    type: "Molex CMC 48-pin (MaxxECU Race / V1 / PRO)"
+    subtype: "Source: maxxecu.com/webhelp/wirings-maxxecu_pinout.html"
+    pincount: 48
+    pinlabels:
+      - "A1: GPO 5 (spare — ICV freed)" # 1
+      - "A2: IGN 1"                      # 2
+      - "A3: IGN 2"                      # 3
+      - "A4: GPO 8 / TACHO"             # 4
+      - "B1: GPO 6 (FAN)"               # 5
+      - "B2: IGN 3"                      # 6
+      - "B3: IGN 4"                      # 7
+      - "B4: GPO 1 (Boost)"             # 8
+      - "C1: GPO 7 / DIN3 (Flex)"       # 9
+      - "C2: IGN 5"                      # 10
+      - "C3: IGN 6 (unused 07K)"        # 11
+      - "C4: GPO 2 (Fuel pump)"         # 12
+      - "D1: WBO2 Heater-"              # 13
+      - "D2: IGN 7 (unused)"            # 14
+      - "D3: IGN 8 (unused)"            # 15
+      - "D4: GPO 3 (ETh Motor+)"        # 16  — freed from VANOS
+      - "E1: CAN H"                      # 17
+      - "E2: CAN L"                      # 18
+      - "E3: GND Shield"                # 19
+      - "E4: GPO 4 (ETh Motor-)"        # 20  — freed from ICV A
+      - "F1: CLT"                        # 21
+      - "F2: IAT"                        # 22
+      - "F3: WBO2 VREF"                  # 23
+      - "F4: WBO2 VS"                    # 24
+      - "G1: +5V sensor supply"         # 25
+      - "G2: TPS1 / AIN (DBW TB)"       # 26  — M52 TPS → 07K DBW TPS1
+      - "G3: WBO2 IP"                    # 27
+      - "G4: WBO2 RCAL"                  # 28
+      - "H1: Sensor GND"                # 29
+      - "H2: Trigger GND (VR-)"        # 30
+      - "H3: TRIGGER (crank VR+)"      # 31
+      - "H4: HOME (cam Hall)"           # 32
+      - "J1: AIN 1 (PST-F1 temp)"      # 33
+      - "J2: AIN 2 (DBW TPS2)"         # 34  — was spare; 07K DBW TPS2
+      - "J3: AIN 3 (PST-F1 pres)"      # 35
+      - "J4: AIN 4 (MAP)"              # 36
+      - "K1: INJ 1"                      # 37
+      - "K2: INJ 2"                      # 38
+      - "K3: DIN/VR 1 (Knock 1)"        # 39  — 07K: knock sensor 1
+      - "K4: DIN/VR 2 (Knock 2)"        # 40  — 07K: knock sensor 2
+      - "L1: INJ 8 (unused)"            # 41
+      - "L2: INJ 7 (unused 07K)"        # 42
+      - "L3: INJ 6 (unused 07K)"        # 43
+      - "L4: Engine GND"                # 44
+      - "M1: INJ 3"                      # 45
+      - "M2: INJ 4"                      # 46
+      - "M3: INJ 5"                      # 47
+      - "M4: +12V ECU power"            # 48
+
+  # ── Engine-side mating plug (07K — replaces M52 mating plug at bulkhead) ────
+
+  BULKHEAD_ENGINE_07K:
+    type: "Deutsch AS79 / Souriau 8STA 79-way jam nut plug"
+    subtype: "Engine side — 07K Phase 3 harness. Unplugs M52 plug, inserts this plug."
+    pincount: 79
+    pinlabels:
+      # ── Group A: Power (same as M52) ──────────────────────────────────────────
+      - "+12V Coils/Inj → engine harness common rail"  # 1
+      - "+12V 8HP Main → TCU pin 13 (constant)"        # 2
+      - "+12V 8HP Wakeup → TCU pin 9 (IGN)"            # 3
+      - "+12V Fan → fan motor"                         # 4
+      - "+12V Condenser fan"                           # 5
+      - "+12V EWP → CWA400 pin 3"                      # 6
+      - "+12V AC → AC inverter"                        # 7
+      - "Engine GND → cylinder head stud"              # 8
+      - "8HP TCU GND → chassis GND"                    # 9
+      # ── Group B: Ignition (5-cyl; pin 15 cavity-plugged) ───────────────────────
+      - "IGN 1 → coil 1"       # 10
+      - "IGN 2 → coil 2"       # 11
+      - "IGN 3 → coil 3"       # 12
+      - "IGN 4 → coil 4"       # 13
+      - "IGN 5 → coil 5"       # 14
+      - "(cavity plug — IGN 6 unused on 07K)"  # 15
+      # ── Group C: Injectors (5-cyl; pin 21 cavity-plugged) ─────────────────────
+      - "INJ 1 → injector 1"   # 16
+      - "INJ 2 → injector 2"   # 17
+      - "INJ 3 → injector 3"   # 18
+      - "INJ 4 → injector 4"   # 19
+      - "INJ 5 → injector 5"   # 20
+      - "(cavity plug — INJ 6 unused on 07K)"  # 21
+      # ── Group D: Crank / Cam triggers (same pins; different connector bodies) ──
+      - "Crank VR+ → 07K crank sensor (VR 60-2)"   # 22
+      - "Crank VR- → 07K crank sensor (VR 60-2)"   # 23
+      - "Crank shield → sensor shell"               # 24
+      - "Cam Hall signal → 07K cam sensor (+5V Hall)"  # 25
+      - "(spare — 07K cam needs no +12V)"           # 26
+      # ── Group E: Sensor signals / CLT / IAT (same pins; different connectors) ──
+      - "Sensor GND → CLT/IAT/TPS/MAP/PST-F1/Cam"  # 27
+      - "CLT → 07K coolant temp sensor"             # 28
+      - "IAT → 07K intake air temp sensor"          # 29
+      - "+5V → MAP / PST-F1 / DBW TB TPS / Cam"    # 30
+      - "DBW TPS1 signal → AIN (07K; was M52 TPS)"  # 31  [07K: DBW TPS1 via G2/CMC pin 26]
+      - "MAP signal → MAP sensor"                    # 32
+      - "PST-F1 pressure → sensor pin 3"             # 33
+      - "PST-F1 temp → sensor pin 4"                # 34
+      - "Flex fuel → Continental sensor"             # 35
+      - "Flex fuel +12V"                            # 36
+      # ── Group F: WBO2 (LSU 4.9; new bung in 07K manifold) ───────────────────
+      - "WBO2 VS → LSU 4.9 pin 2"                   # 37
+      - "WBO2 VREF → LSU 4.9 pin 1"                 # 38
+      - "WBO2 IP → LSU 4.9 pin 6"                   # 39
+      - "WBO2 RCAL → LSU 4.9 pin 5"                 # 40
+      - "WBO2 Heater- → LSU 4.9 pin 3"              # 41
+      # ── Group G: GPO actuators ────────────────────────────────────────────────
+      - "GPO 1 → boost solenoid"                    # 42
+      - "GPO 3 → DBW TB Motor+ (07K; freed from VANOS)"  # 43
+      - "GPO 4 → DBW TB Motor- (07K; freed from ICV A)"  # 44
+      - "(spare — GPO 5 freed from ICV B)"           # 45
+      - "EWP PWM → CWA400 pin 1 (680 Hz)"           # 46
+      # ── Group H: CAN bus ──────────────────────────────────────────────────────
+      - "CAN H (22 AWG TP)"                          # 47
+      - "CAN L (22 AWG TP)"                          # 48
+      # ── Group J: Misc ──────────────────────────────────────────────────────────
+      - "Starter trigger"                            # 49
+      - "Alternator D+"                              # 50
+      - "AIN 2 (DBW TPS2 — 07K; was spare M52)"     # 51  [07K: DBW TPS2 via J2/CMC pin 34]
+      - "AC enable"                                  # 52
+      - "Chassis GND engine bay"                    # 53
+      # ── Group N: Expansion — 07K active pins ─────────────────────────────────
+      - "(expansion stub — INJ 7 alt routing)"       # 54
+      - "(expansion stub — IGN 7 alt routing)"       # 55
+      - "(expansion stub — DIN4 / VR3)"             # 56
+      - "(expansion stub — DIN5 / VR4)"             # 57
+      - "(expansion stub — AIN 6)"                   # 58
+      - "(expansion stub — GPO 8 / TACHO)"          # 59
+      - "(expansion stub — +5V supply 2)"           # 60
+      - "(expansion stub — Sensor GND 2)"           # 61
+      - "(expansion stub — +12V switched spare)"    # 62
+      - "(expansion stub — 07K cam alt)"            # 63
+      - "(expansion stub — 07K crank alt)"          # 64
+      - "DBW TPS1 signal (07K expansion alt)"        # 65  [see pin 31 for primary routing]
+      - "DBW TPS1 +5V (07K)"                        # 66
+      - "DBW TPS1 GND (07K)"                        # 67
+      - "(expansion stub — MAP2 / boost ref)"        # 68
+      - "Knock sensor 1 signal"                     # 69
+      - "Knock sensor 2 signal"                     # 70
+      - "Knock GND"                                  # 71
+      # ── Pins 72-77: APS e-pedal pass-through (07K Phase 3 addition) ──────────────────────
+      # Cabin side receives 6-wire run from E46 pedal at Phase 3 installation.
+      # Engine side (these labels) wires to MaxxECU CMC APS inputs (AIN TBD).
+      - "APS GND 1 (E46 pedal pin 1 → MaxxECU SGND)"    # 72
+      - "APS GND 2 (E46 pedal pin 2 → MaxxECU SGND)"    # 73
+      - "APS VCC2 (+5V circ 2 → MaxxECU +5V supply)"    # 74
+      - "APS1 signal (pedal pin 4 → MaxxECU APS1 AIN)"  # 75  [AIN TBD — assign in MTune]
+      - "APS VCC1 (+5V circ 1 → MaxxECU +5V supply)"    # 76
+      - "APS2 signal (pedal pin 6 → MaxxECU APS2 AIN)"  # 77  [AIN TBD — assign in MTune]
+      # ── Pins 78-79: True spares ───────────────────────────────────────────────────────
+      - "SPARE"  # 78
+      - "SPARE"  # 79
+
+  # ── 07K engine sensors / actuators ─────────────────────────────────────────
+
+  CRANK_VR:
+    type: "VW 07K crank VR sensor connector"
+    subtype: "60-2 missing tooth VR — same MaxxECU trigger type N-1 as M52"
+    pincount: 3
+    pinlabels: [Signal+, Signal-, Shield]
+    notes: >
+      TODO: Confirm exact VW connector body type at install (Bosch Kombi-F 3-pin or
+      similar). ME7.1.1 harness ref: Conn B pin 82. Same 60-2 trigger as M52 — only
+      crank angle offset calibration differs in MTune.
+
+  CAM_HALL:
+    type: "VW 07K cam Hall sensor connector"
+    subtype: "Hall effect, rear of head — +5V supply type (not +12V)"
+    pincount: 3
+    pinlabels: ["+5V", "Sensor GND", Signal]
+    notes: >
+      TODO: Confirm exact VW connector body type at install.
+      ME7.1.1 harness ref: pin 86. +5V supply shared with MAP/TPS/PST-F1 (bulkhead pin 30).
+      Signal → HOME input (CMC H4 = pin 32). Same bulkhead pin 25 as M52 cam.
+
+  CLT:
+    type: "VW 07K coolant temp sensor 2-pin"
+    subtype: "NTC thermistor — engine block port"
+    pincount: 2
+    pinlabels: [Signal, "Sensor GND"]
+    notes: "ME7.1.1 ref: pin 93. TODO: confirm VW connector body vs Bosch JPT 2-way compatibility."
+
+  IAT:
+    type: "VW 07K intake air temp sensor 2-pin"
+    subtype: "NTC thermistor — airbox or intake pipe"
+    pincount: 2
+    pinlabels: [Signal, "Sensor GND"]
+    notes: "Mount in intake pipe downstream of intercooler. TODO: confirm connector body at install."
+
+  MAP:
+    type: "Bosch MAP sensor 3-pin"
+    subtype: "3-bar for turbo application (GM 12592525 or equivalent)"
+    pincount: 3
+    pinlabels: ["+5V", Signal, GND]
+    notes: >
+      Same sensor as M52 phase, upgrade to 3-bar if still on stock 1-bar.
+      Route vacuum hose to BBG intake manifold (post-throttle body) for boost-corrected MAP.
+
+  DBW_TB:
+    type: "VW 07K DBW throttle body 6-pin"
+    subtype: "Stock ~65mm bore. Upgrade to VR6 03H133062 74mm for 600+ whp."
+    pincount: 6
+    pinlabels:
+      - "TPS1 signal (0-5V)"  # 1
+      - "TPS2 signal (0-5V)"  # 2
+      - "+5V sensor supply"   # 3
+      - "Sensor GND"          # 4
+      - "Motor+"              # 5
+      - "Motor-"              # 6
+    notes: >
+      TODO: Confirm VW TB connector body and motor wire polarity at install.
+      ME7.1.1 ref: Motor+=pin84, Motor-=pin92, TPS1=pin117, TPS2=pin118.
+      MaxxECU ETh1: GPO 3 (CMC D4=pin16) → Motor+, GPO 4 (CMC E4=pin20) → Motor-.
+      IMPORTANT: verify motor polarity with volt meter before wiring — swap Motor+/-
+      if throttle runs in wrong direction during e-throttle wizard calibration.
+      TPS1 → CMC G2 (pin 26) / bulkhead pin 31. TPS2 → CMC J2 (pin 34) / bulkhead pin 51.
+      Calibrate in MTune :: Throttle :: E-Throttle wizard.
+
+  KNOCK_1:
+    type: "Bosch flat knock sensor 1-pin (M8 bolt mount)"
+    subtype: "Cylinder bank front — 07K block"
+    pincount: 1
+    pinlabels: ["KS1 signal"]
+    notes: >
+      GND via M8 mounting bolt to block — no separate GND wire.
+      ME7.1.1 ref: pin 106. MaxxECU: CMC K3 (DIN/VR1, pin 39).
+      Bulkhead expansion pin 69.
+
+  KNOCK_2:
+    type: "Bosch flat knock sensor 1-pin (M8 bolt mount)"
+    subtype: "Cylinder bank rear — 07K block"
+    pincount: 1
+    pinlabels: ["KS2 signal"]
+    notes: >
+      GND via M8 mounting bolt. ME7.1.1 ref: pin 107.
+      MaxxECU: CMC K4 (DIN/VR2, pin 40). Bulkhead expansion pin 70.
+
+  # ── Ignition (5-cyl — same VAG 4-way COP as M52; S54 COPs retained) ─────────
+
+  IGN_1:
+    type: "VAG 4-way COP"
+    subtype: "Coil 1 — cyl 1 (07K firing order: 1-2-4-5-3)"
+    pincount: 4
+    pinlabels: ["+12V", GND, Signal, Shield]
+
+  IGN_2:
+    type: "VAG 4-way COP"
+    subtype: "Coil 2 — cyl 2"
+    pincount: 4
+    pinlabels: ["+12V", GND, Signal, Shield]
+
+  IGN_3:
+    type: "VAG 4-way COP"
+    subtype: "Coil 3 — cyl 3"
+    pincount: 4
+    pinlabels: ["+12V", GND, Signal, Shield]
+
+  IGN_4:
+    type: "VAG 4-way COP"
+    subtype: "Coil 4 — cyl 4"
+    pincount: 4
+    pinlabels: ["+12V", GND, Signal, Shield]
+
+  IGN_5:
+    type: "VAG 4-way COP"
+    subtype: "Coil 5 — cyl 5"
+    pincount: 4
+    pinlabels: ["+12V", GND, Signal, Shield]
+
+  # ── Fuel injectors (EV14; M50 harness has EV1 pigtails — swap at build) ────
+
+  INJ_1:
+    type: "Bosch EV14 2-pin (USCAR)"
+    subtype: "Injector 1 (ID1050x)"
+    pincount: 2
+    pinlabels: ["+12V", "INJ 1"]
+    notes: "MaxxECU M50 harness ships with EV1 connector ends — replace with EV14 pigtails for 07K."
+
+  INJ_2:
+    type: "Bosch EV14 2-pin (USCAR)"
+    subtype: "Injector 2 (ID1050x)"
+    pincount: 2
+    pinlabels: ["+12V", "INJ 2"]
+
+  INJ_3:
+    type: "Bosch EV14 2-pin (USCAR)"
+    subtype: "Injector 3 (ID1050x)"
+    pincount: 2
+    pinlabels: ["+12V", "INJ 3"]
+
+  INJ_4:
+    type: "Bosch EV14 2-pin (USCAR)"
+    subtype: "Injector 4 (ID1050x)"
+    pincount: 2
+    pinlabels: ["+12V", "INJ 4"]
+
+  INJ_5:
+    type: "Bosch EV14 2-pin (USCAR)"
+    subtype: "Injector 5 (ID1050x)"
+    pincount: 2
+    pinlabels: ["+12V", "INJ 5"]
+
+  # ── Shared / unchanged sensors ────────────────────────────────────────────────
+
+  PST_F1:
+    type: "Bosch PST-F1 4-pin"
+    subtype: "Dual oil temp+pressure — iABED M10x1.0 port on 07K oil housing"
+    pincount: 4
+    pinlabels: ["+5V", GND, "Pressure (0-5V)", "Temp (NTC)"]
+    notes: >
+      Same wiring as M52 phase — zero connector or cable changes.
+      Mount: iABED 07K longitudinal oil housing M10x1.0 built-in port.
+      Pressure → AIN 3 (0-5V, 0-10 bar). Temp → AIN 1 (NTC).
+
+  WIDEBAND:
+    type: "Bosch LSU 4.9 6-way"
+    subtype: "Wideband lambda sensor"
+    pincount: 6
+    pinlabels: ["IP", "VS", "APE", "Trim", "Hs+", "Hs-"]
+    notes: >
+      Same harness wiring as M52. Bung: weld 18mm x1.5 in 07K custom top-mount
+      exhaust manifold, min 6in from collector, upstream of turbo.
+      Sensor: Bosch 0 258 017 025 (LSU 4.9).
+
+  BOOST_SOL:
+    type: "Superseal 2-way"
+    subtype: "Turbosmart boost solenoid (2-port PWM)"
+    pincount: 2
+    pinlabels: ["+12V", "GPO 1 signal"]
+    notes: "Same wiring as M52. GPO 1 (CMC B4/pin 8). +12V from coil/inj rail."
+
+  FLEX_FUEL:
+    type: "Continental 3-pin"
+    subtype: "Flex fuel composition sensor — retain from M52 if present"
+    pincount: 3
+    pinlabels: ["+12V", GND, Signal]
+    notes: "Same wiring as M52 if flex sensor is present. GPO 7/DIN 3 (CMC C1/pin 9)."
+
+
+cables:
+
+  # ── Crank / Cam ───────────────────────────────────────────────────────────────
+  W_CRANK:
+    wirecount: 3
+    colors: [WH, BK, GY]
+    wirelabels: [Signal+, Signal-, Shield]
+    length: 1.0 m
+    notes: "Shielded twisted pair. Shield terminates at sensor GND (CMC H1/pin 29)."
+
+  W_CAM:
+    wirecount: 3
+    colors: [RD, BK, WH]
+    wirelabels: ["+5V", "Sensor GND", Signal]
+    length: 0.8 m
+    notes: "+5V from shared sensor rail (CMC G1/pin 25 → bulkhead pin 30)."
+
+  # ── Temperature / pressure sensors ────────────────────────────────────────────
+  W_CLT:
+    wirecount: 2
+    colors: [WH, BK]
+    wirelabels: [Signal, GND]
+    length: 0.5 m
+
+  W_IAT:
+    wirecount: 2
+    colors: [WH, BK]
+    wirelabels: [Signal, GND]
+    length: 0.5 m
+
+  W_MAP:
+    wirecount: 3
+    colors: [RD, WH, BK]
+    wirelabels: ["+5V", Signal, GND]
+    length: 0.5 m
+
+  W_PST_F1:
+    wirecount: 4
+    colors: [RD, BK, GN, YE]
+    wirelabels: ["+5V", GND, "Pressure (AIN 3)", "Temp (AIN 1)"]
+    length: 0.6 m
+    notes: "Same cable as M52 build — no change."
+
+  # ── DBW throttle body ────────────────────────────────────────────────────────
+  W_DBW_TPS:
+    wirecount: 4
+    colors: [RD, BK, WH, GN]
+    wirelabels: ["+5V", GND, "TPS1 signal", "TPS2 signal"]
+    length: 0.5 m
+
+  W_DBW_MOTOR:
+    wirecount: 2
+    colors: [OR, VT]
+    wirelabels: ["Motor+ (ETh GPO3)", "Motor- (ETh GPO4)"]
+    length: 0.5 m
+    notes: "Heavier gauge — 20 AWG minimum (3A H-bridge output). Verify polarity before final assembly."
+
+  # ── Knock sensors ─────────────────────────────────────────────────────────────
+  W_KNOCK_1:
+    wirecount: 1
+    colors: [WH]
+    wirelabels: ["KS1 signal"]
+    length: 0.4 m
+    notes: "GND via M8 mounting bolt — no GND wire. Shield/GND at expansion pin 71."
+
+  W_KNOCK_2:
+    wirecount: 1
+    colors: [WH]
+    wirelabels: ["KS2 signal"]
+    length: 0.4 m
+
+  # ── Ignition coils (5-cyl) ────────────────────────────────────────────────────
+  W_IGN_1:
+    wirecount: 4
+    colors: [RD, BK, WH, GY]
+    wirelabels: ["+12V", GND, Signal, Shield]
+    length: 0.5 m
+
+  W_IGN_2:
+    wirecount: 4
+    colors: [RD, BK, WH, GY]
+    wirelabels: ["+12V", GND, Signal, Shield]
+    length: 0.5 m
+
+  W_IGN_3:
+    wirecount: 4
+    colors: [RD, BK, WH, GY]
+    wirelabels: ["+12V", GND, Signal, Shield]
+    length: 0.5 m
+
+  W_IGN_4:
+    wirecount: 4
+    colors: [RD, BK, WH, GY]
+    wirelabels: ["+12V", GND, Signal, Shield]
+    length: 0.5 m
+
+  W_IGN_5:
+    wirecount: 4
+    colors: [RD, BK, WH, GY]
+    wirelabels: ["+12V", GND, Signal, Shield]
+    length: 0.5 m
+
+  # ── Injectors (EV14; 5-cyl) ───────────────────────────────────────────────────
+  W_INJ_1:
+    wirecount: 2
+    colors: [RD, GN]
+    wirelabels: ["+12V", "INJ 1"]
+    length: 0.4 m
+
+  W_INJ_2:
+    wirecount: 2
+    colors: [RD, GN]
+    wirelabels: ["+12V", "INJ 2"]
+    length: 0.4 m
+
+  W_INJ_3:
+    wirecount: 2
+    colors: [RD, GN]
+    wirelabels: ["+12V", "INJ 3"]
+    length: 0.4 m
+
+  W_INJ_4:
+    wirecount: 2
+    colors: [RD, GN]
+    wirelabels: ["+12V", "INJ 4"]
+    length: 0.4 m
+
+  W_INJ_5:
+    wirecount: 2
+    colors: [RD, GN]
+    wirelabels: ["+12V", "INJ 5"]
+    length: 0.4 m
+
+  # ── Wideband / Boost ──────────────────────────────────────────────────────────
+  W_WBO2:
+    wirecount: 5
+    colors: [WH, WH, WH, WH, BK]
+    wirelabels: ["WBO2 VS", "WBO2 VREF", "WBO2 IP", "WBO2 RCAL", "WBO2 Htr-"]
+    length: 1.5 m
+    notes: "Same wiring as M52. Heater+ (LSU 4.9 pin 4) splices to local +12V coil rail."
+
+  W_BOOST:
+    wirecount: 2
+    colors: [RD, GN]
+    wirelabels: ["+12V", "GPO 1"]
+    length: 0.5 m
+
+
+connections:
+
+  # ── Crank trigger ─────────────────────────────────────────────────────────────
+  # TRIGGER+ = H3/CMC pin 31, TRIGGER- = H2/CMC pin 30, Shield = E3/CMC pin 19
+  - - CRANK_VR: [1, 2, 3]
+    - W_CRANK: [1, 2, 3]
+    - ECU_CMC: [31, 30, 19]
+
+  # ── Cam / HOME trigger ─────────────────────────────────────────────────────────
+  # Signal = H4/CMC pin 32, GND = H1/CMC pin 29, +5V = G1/CMC pin 25
+  - - CAM_HALL: [3, 2, 1]
+    - W_CAM: [3, 2, 1]
+    - ECU_CMC: [32, 29, 25]
+
+  # ── CLT ───────────────────────────────────────────────────────────────────────
+  - - CLT: [1, 2]
+    - W_CLT: [1, 2]
+    - ECU_CMC: [21, 29]
+
+  # ── IAT ───────────────────────────────────────────────────────────────────────
+  - - IAT: [1, 2]
+    - W_IAT: [1, 2]
+    - ECU_CMC: [22, 29]
+
+  # ── MAP ───────────────────────────────────────────────────────────────────────
+  - - MAP: [1, 2, 3]
+    - W_MAP: [1, 2, 3]
+    - ECU_CMC: [25, 36, 29]
+
+  # ── DBW throttle body — TPS signals ──────────────────────────────────────────
+  # TPS1 signal = G2/CMC pin 26 (was M52 cable TPS); TPS2 = J2/CMC pin 34
+  - - DBW_TB: [3, 4, 1, 2]
+    - W_DBW_TPS: [1, 2, 3, 4]
+    - ECU_CMC: [25, 29, 26, 34]
+
+  # ── DBW throttle body — motor (H-bridge via GPO 3 + GPO 4) ──────────────────
+  # Motor+ = GPO 3 = CMC D4 = pin 16; Motor- = GPO 4 = CMC E4 = pin 20
+  - - DBW_TB: [5, 6]
+    - W_DBW_MOTOR: [1, 2]
+    - ECU_CMC: [16, 20]
+
+  # ── Knock sensors (via expansion bulkhead pins 69/70/71 → CMC K3/K4) ─────────
+  - - KNOCK_1: [1]
+    - W_KNOCK_1: [1]
+    - ECU_CMC: [39]
+
+  - - KNOCK_2: [1]
+    - W_KNOCK_2: [1]
+    - ECU_CMC: [40]
+
+  # ── Ignition coils ────────────────────────────────────────────────────────────
+  # +12V from ECU_12PIN[1] (coil/inj rail), GND to chassis, signal from CMC IGN outputs
+  # Firing order: 1-2-4-5-3 → IGN 1-5 = CMC pins 2/3/6/7/10
+  - - IGN_1: [1, 2, 3, 4]
+    - W_IGN_1: [1, 2, 3, 4]
+    - ECU_CMC: [48, 44, 2, 19]
+
+  - - IGN_2: [1, 2, 3, 4]
+    - W_IGN_2: [1, 2, 3, 4]
+    - ECU_CMC: [48, 44, 3, 19]
+
+  - - IGN_3: [1, 2, 3, 4]
+    - W_IGN_3: [1, 2, 3, 4]
+    - ECU_CMC: [48, 44, 6, 19]
+
+  - - IGN_4: [1, 2, 3, 4]
+    - W_IGN_4: [1, 2, 3, 4]
+    - ECU_CMC: [48, 44, 7, 19]
+
+  - - IGN_5: [1, 2, 3, 4]
+    - W_IGN_5: [1, 2, 3, 4]
+    - ECU_CMC: [48, 44, 10, 19]
+
+  # ── Injectors ──────────────────────────────────────────────────────────────────
+  # +12V from CMC pin 48 (shared); INJ signals = CMC K1/K2/M1/M2/M3 = pins 37/38/45/46/47
+  - - INJ_1: [1, 2]
+    - W_INJ_1: [1, 2]
+    - ECU_CMC: [48, 37]
+
+  - - INJ_2: [1, 2]
+    - W_INJ_2: [1, 2]
+    - ECU_CMC: [48, 38]
+
+  - - INJ_3: [1, 2]
+    - W_INJ_3: [1, 2]
+    - ECU_CMC: [48, 45]
+
+  - - INJ_4: [1, 2]
+    - W_INJ_4: [1, 2]
+    - ECU_CMC: [48, 46]
+
+  - - INJ_5: [1, 2]
+    - W_INJ_5: [1, 2]
+    - ECU_CMC: [48, 47]
+
+  # ── PST-F1 oil sensor ─────────────────────────────────────────────────────────
+  - - PST_F1: [1, 2, 3, 4]
+    - W_PST_F1: [1, 2, 3, 4]
+    - ECU_CMC: [25, 29, 35, 33]
+
+  # ── Wideband O2 (LSU 4.9) ─────────────────────────────────────────────────────
+  - - WIDEBAND: [2, 1, 6, 5, 6]
+    - W_WBO2: [1, 2, 3, 4, 5]
+    - ECU_CMC: [24, 23, 27, 28, 13]
+
+  # ── Boost solenoid ────────────────────────────────────────────────────────────
+  - - ECU_12PIN: [1]
+    - W_BOOST: [1]
+    - BOOST_SOL: [1]
+
+  - - BOOST_SOL: [2]
+    - W_BOOST: [2]
+    - ECU_CMC: [8]

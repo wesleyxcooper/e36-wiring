@@ -14,8 +14,8 @@ metadata:
 #   [ ] Confirm RHD E36 pedal box bracket fitment (Strom / Garagistic / Drift HQ)
 #       -- LHD brackets may need carpet trim at transmission tunnel edge in RHD
 #       -- If bracket won't fit, switch to harnesses/epedal-hella-6pv.wv instead
-#   [ ] Assign final bulkhead pin numbers for APS1/APS2/VCC1/VCC2/GND1/GND2
-#       (marked TBD below -- reserve 6 adjacent pins in the same contact-size zone)
+#   [x] Assign bulkhead pin numbers for APS1/APS2/VCC1/VCC2/GND1/GND2
+#       Assigned: pins 72 (GND1), 73 (GND2), 74 (VCC2), 75 (APS1), 76 (VCC1), 77 (APS2)
 #   [ ] Confirm MaxxECU AIN pin numbers for APS1 and APS2
 #   [ ] Source and crimp BMW E46 pedal OEM connector + terminals
 #       (54-way Molex MX150L series or pigtail from donor harness)
@@ -51,37 +51,40 @@ connectors:
 
   BULKHEAD_CABIN:
     type: "Deutsch Autosport AS-series firewall bulkhead -- CABIN SIDE"
-    subtype: "Size 20 contacts -- 6 pins reserved for e-pedal (pins TBD)"
+    subtype: "Size 20 contacts -- pins 72-77 assigned to e-pedal APS signals"
     pincount: 6
     pinlabels:
-      - "TBD-A (APS GND 1 pass-through)"
-      - "TBD-B (APS GND 2 pass-through)"
-      - "TBD-C (VCC 2 pass-through)"
-      - "TBD-D (APS1 signal pass-through)"
-      - "TBD-E (VCC 1 pass-through)"
-      - "TBD-F (APS2 signal pass-through)"
+      - "Pin 72 (APS GND 1 pass-through)"
+      - "Pin 73 (APS GND 2 pass-through)"
+      - "Pin 74 (VCC 2 pass-through)"
+      - "Pin 75 (APS1 signal pass-through)"
+      - "Pin 76 (VCC 1 pass-through)"
+      - "Pin 77 (APS2 signal pass-through)"
     notes: >-
-      Panel-mount receptacle, cabin side. Exact pin numbers TBD -- assign 6
-      adjacent pins in same contact-size zone during firewall-bulkhead.wv authoring.
+      Panel-mount receptacle, cabin side. Pins 72-77 are cavity-plugged in Phase 1
+      (M52 has no DBW pedal) and wired at Phase 3 (07K swap). The cabin-side cable
+      run (E46 pedal -> bulkhead face) is the ONE cabin-side harness addition at swap.
       Size 20 contacts rated 7.5A continuous -- more than sufficient for 20mA.
       Use Size 20 sockets (cable side) with 22-24 AWG range crimp tooling.
       Bulkhead backshell: Raychem DR-25 over strain relief on cabin side.
 
   BULKHEAD_ENGINE:
     type: "Deutsch Autosport AS-series firewall bulkhead -- ENGINE SIDE"
-    subtype: "Size 20 contacts -- 6 pins reserved for e-pedal (pins TBD)"
+    subtype: "Size 20 contacts -- pins 72-77 assigned to e-pedal APS signals"
     pincount: 6
     pinlabels:
-      - "TBD-A (APS GND 1 pass-through)"
-      - "TBD-B (APS GND 2 pass-through)"
-      - "TBD-C (VCC 2 pass-through)"
-      - "TBD-D (APS1 signal pass-through)"
-      - "TBD-E (VCC 1 pass-through)"
-      - "TBD-F (APS2 signal pass-through)"
+      - "Pin 72 (APS GND 1 -> MaxxECU SGND)"
+      - "Pin 73 (APS GND 2 -> MaxxECU SGND)"
+      - "Pin 74 (VCC 2 -> MaxxECU +5V sensor supply)"
+      - "Pin 75 (APS1 signal -> MaxxECU APS1 AIN)"
+      - "Pin 76 (VCC 1 -> MaxxECU +5V sensor supply)"
+      - "Pin 77 (APS2 signal -> MaxxECU APS2 AIN)"
     notes: >-
-      Mating plug, engine side. Part of the 07K engine harness plug --
-      same connector mated here as maxxecu-07k.wv. Unplug this plug to
-      swap back to M52 harness (Phase 1) without cabin wiring changes.
+      Part of the 07K engine harness plug (maxxecu-07k.wv BULKHEAD_ENGINE_07K).
+      Cavity-plugged on M52 engine-side plug -- M52 swap does not require
+      touching these pins. Engine side of 72-77 wires to MaxxECU CMC APS inputs.
+      AIN channel numbers for APS1/APS2 TBD -- assign in MTune and document
+      in maxxecu-07k.wv once confirmed.
 
   MAXXECU_APS:
     type: "MaxxECU RACE -- Analog Inputs + Sensor Supply + Sensor GND"

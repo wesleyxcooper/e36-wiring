@@ -132,18 +132,26 @@ connectors:
       - "EXP: Knock sensor 1"                  # 69
       - "EXP: Knock sensor 2"                  # 70
       - "EXP: Knock GND"                       # 71
-      # ── Pins 72–79: True spares (cavity plugs) ───────────────────────────
-      - "SPARE"   # 72
-      - "SPARE"   # 73
-      - "SPARE"   # 74
-      - "SPARE"   # 75
-      - "SPARE"   # 76
-      - "SPARE"   # 77
+      # ── Pins 72–77: E-pedal APS (added Phase 3, 07K swap) ──────────────────
+      # These 6 pins are cavity-plugged in Phase 1 (M52) and wired at Phase 3
+      # when the BMW E46 DBW accelerator pedal is installed. The cabin-side
+      # cable run (pedal → bulkhead) is the ONE cabin-side addition at 07K swap.
+      - "APS GND 1 (E46 pedal pin 1 → MaxxECU SGND)"   # 72  Phase 3
+      - "APS GND 2 (E46 pedal pin 2 → MaxxECU SGND)"   # 73  Phase 3
+      - "APS VCC2 (+5V circ 2, pedal pin 3)"            # 74  Phase 3
+      - "APS1 signal (pedal pin 4 → MaxxECU APS1 AIN)" # 75  Phase 3
+      - "APS VCC1 (+5V circ 1, pedal pin 5)"            # 76  Phase 3
+      - "APS2 signal (pedal pin 6 → MaxxECU APS2 AIN)" # 77  Phase 3
+      # ── Pins 78–79: True spares (cavity plugs) ────────────────────────────────
       - "SPARE"   # 78
       - "SPARE"   # 79
     notes: >-
       Cabin side is permanent. Engine-side mating plug (Deutsch AS79 jam nut plug) is
       per-harness: M52 harness Phase 1, 07K harness Phase 3 (same pin numbers → plug-and-play swap).
+      EXCEPTION — pins 72-77 (APS e-pedal): cavity-plugged in Phase 1; the cabin-side
+      cable run from the E46 pedal module to the bulkhead face is the ONE cabin-side
+      harness addition performed at the M52 → 07K swap. Engine-side of 72-77 wires
+      into the 07K mating plug (to MaxxECU APS1/APS2 CMC pins).
       AS79 contact sizes: Size 12 (23A) for power/GND, Size 20 (7.5A) for signals.
       Souriau 8STA Size 8 contacts (45A) available for AC relay output pin 7 if needed.
       120Ω CAN terminator: one end at MaxxECU (cabin side); one end at 8HP TCU (engine bay).
@@ -170,13 +178,13 @@ connectors:
       - "IGN 3 → coil 3"                               # 12
       - "IGN 4 → coil 4"                               # 13
       - "IGN 5 → coil 5"                               # 14
-      - "IGN 6 → coil 6"                               # 15
+      - "IGN 6 → coil 6"                               # 15  (07K: cavity plug)
       - "INJ 1 → injector 1"                           # 16
       - "INJ 2 → injector 2"                           # 17
       - "INJ 3 → injector 3"                           # 18
       - "INJ 4 → injector 4"                           # 19
       - "INJ 5 → injector 5"                           # 20
-      - "INJ 6 → injector 6"                           # 21
+      - "INJ 6 → injector 6"                           # 21  (07K: cavity plug)
       - "Crank VR+ → M52 crank sensor pin 1"           # 22
       - "Crank VR- → M52 crank sensor pin 2"           # 23
       - "Crank shield → sensor shell"                  # 24
@@ -237,8 +245,11 @@ connectors:
       - "SPARE — cavity plug"  # 79
     notes: >-
       M52 Phase 1 engine-side mating plug. Stubs on pins 54-71 are sealed with
-      Deutsch cavity plugs. Pin assignments 1-53 are IDENTICAL between M52 and
-      07K harnesses — only the far-end connectors change at engine swap.
+      Deutsch cavity plugs. Pins 72-77 are also cavity-plugged on M52 — they
+      become APS1/APS2 e-pedal pass-through on the 07K mating plug (Phase 3).
+      Pin assignments 1-53 are identical between M52 and 07K harnesses; the
+      cabin-side cable (pedal run, pins 72-77) is the ONE cabin-side addition
+      at the swap. See maxxecu-07k.wv and epedal-bmw-e46.wv for full routing.
 
 
 cables:

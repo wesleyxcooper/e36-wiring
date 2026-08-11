@@ -54,7 +54,7 @@ Posung PD2-18012AJA (18cc, 3.65 kW / 12,454 BTU, Three-phase PMSM) + included 3-
 | File | Description | Phase |
 |---|---|---|
 | `harnesses/maxxecu-m52.wv` | MaxxECU Race ↔ M52 engine harness (Phase 1) | 1 |
-| `harnesses/maxxecu-07k.wv` | MaxxECU Race ↔ 07K engine harness (Phase 3) | 3 |
+| `harnesses/maxxecu-07k.wv` | MaxxECU Race ↔ VW 07K 5-cyl harness: DBW TB, EV14 injectors, 2x knock, VW sensors; GPO 3/4 freed for ETh motor; single-plug bulkhead swap from M52 | 3 |
 | `harnesses/ewp-controller.wv` | Pierburg CWA400 (PWM version) + MaxxECU RACE GPO control | 3 |
 | `harnesses/fuel-pump-hanger.wv` | Radium 20-1170 hanger + Walbro F90000267 + DC SSR + MaxxECU PWM GPO | 1 |
 | `harnesses/ac-compressor.wv` | Alibaba PD2-18012AJA 12V scroll compressor + included PWM controller + 100A relay + MaxxECU DIN idle-up | 2 |
