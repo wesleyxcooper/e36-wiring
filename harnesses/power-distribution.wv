@@ -108,24 +108,28 @@ connectors:
   # ── Fuse block ─────────────────────────────────────────────────────────────
   FUSE_BLOCK:
     type: "Mini blade fuse block"
-    subtype: "8-position -- TODO: source block"
-    pincount: 8
+    subtype: "10-position -- TODO: source block"
+    pincount: 10
     pinlabels:
       - "F1: ECU logic (10A)"
       - "F2: Coil+Inj relay coil (5A)"
-      - "F3: Fan relay coil (5A)"
-      - "F4: Fuel pump relay coil (5A)"
+      - "F3: Radiator fan relay coil (5A)"
+      - "F4: Fuel pump SSR ctrl (5A)"
       - "F5: Coil+Inj load feed (20A)"
-      - "F6: Fan load feed (20A)"
-      - "F7: Fuel pump load feed (15A)"
+      - "F6: Radiator fan load feed (20A)"
+      - "F7: Fuel pump load feed (25A)"
       - "F8: Spare / accessories (10A)"
+      - "F9: EWP relay coil (5A)"
+      - "F10: AC relay coil (5A)"
     notes: >-
-      Pins 1-4 powered by IGN-switched +12V (relay coil circuits).
+      Pins 1-4, 9-10 powered by IGN-switched +12V (relay coil circuits).
       Pins 5-7 powered by battery +12V via main fuse (relay load circuits).
-      Relays switch the load circuits -- the fuses here protect the wires,
-      not the loads. Size fuse slightly above max load current.
+      Relays switch the load circuits -- the fuses here protect the wires.
+      F9 (EWP coil): 18 AWG to ewp-controller.wv MAIN_RELAY pin 86.
+      F10 (AC coil): 18 AWG to ac-compressor.wv AC_RELAY pin 86.
+      F4 (Fuel pump SSR ctrl): 18 AWG to fuel-pump-hanger.wv SSR Ctrl(+).
       TODO: confirm fuse block part. Options: Blue Sea ST Blade (5025),
-      Bussmann 15600, or a pre-made relay+fuse combo block.
+      Bussmann 15600, or a pre-made relay+fuse combo block (10-pos).
 
   # ── Relay board ────────────────────────────────────────────────────────────
   # Standard Bosch ISO mini relay (5-pin):
@@ -198,24 +202,48 @@ connectors:
       TODO: Phase 2 upgrade -- SPAL PWM fan wired direct from GPO 6,
       relay no longer needed. Check SPAL PWM wiring instructions.
 
-  RELAY_FUEL_PUMP:
+  FUEL_PUMP_SSR:
+    type: "Crydom D1D40 DC solid-state relay (SSR)"
+    subtype: "3-32V ctrl / 40A load -- replaces mechanical relay for PWM control"
+    pincount: 4
+    pinlabels:
+      - "Ctrl+ (from fuse F4 IGN +12V)"
+      - "Ctrl- (MaxxECU GPO 2 -- low-side sink)"
+      - "Load+ (from fused BATT+ to pump positive)"
+      - "Load- (to pump positive -- switched output)"
+    notes: >-
+      DC SSR replaces mechanical relay -- enables PWM speed control of Walbro
+      F90000267 via MaxxECU GPO. See harnesses/fuel-pump-hanger.wv for full
+      Radium 20-1170 hanger pinout and hanger connector details.
+      Ctrl+ from fuse F4 (IGN-switched). Ctrl- from MaxxECU GPO 2 (pin 3).
+      Load side: 8 AWG from fused BATT+, output to pump positive stud.
+      Do NOT use with a mechanical relay -- SSR only. Fuse F7 updated to 25A
+      (Walbro F90000267 max draw is ~20A at 13.5V under max load).
+      Mount SSR to metal bracket for heat sinking -- dissipates ~1W/A at load.
+
+  # ── Condenser fan relay (AC system) ────────────────────────────────────────
+  RELAY_CONDENSER_FAN:
     type: "Bosch ISO mini relay"
     subtype: "12V coil / 30A contacts"
-    pincount: 5
+    pincount: 4
     pinlabels:
-      - "85 (coil-)"
-      - "86 (coil+)"
-      - "30 (batt+)"
-      - "87 (NO load out)"
-      - "87a (NC -- unused)"
+      - "85 (coil- :: chassis GND)"
+      - "86 (coil+ :: AC relay coil tap)"
+      - "30 (batt+ :: fused from BATT_POS)"
+      - "87 (NO load out :: condenser fan motor +)"
     notes: >-
-      Fuel pump relay.
-      Coil: 86 from IGN +12V (F4), 85 from MaxxECU GPO 2 (12-pin pin 3).
-      Load: 30 from fused batt+ (F7), 87 to fuel pump positive.
-      Pump negative to chassis GND.
-      MaxxECU pulls 85 to GND to energize pump on engine run.
-      TODO: confirm pump model (OEM, Walbro 255, AEM 340).
-      TODO: confirm wire gauge -- Walbro 255 draws 8A :: 14 AWG is fine.
+      Condenser fan relay for AC system. Required -- AC compressor inverter
+      controller will not enable without condenser fan present.
+      Coil pin 86: tapped from AC relay coil wire (after AC switch) so
+      condenser fan turns on simultaneously with compressor.
+      Coil pin 85: chassis GND.
+      Load: dedicated fused BATT+ run (inline 20A fuse, 12 AWG).
+      Output to condenser fan motor +. Fan motor GND to chassis.
+      If radiator and condenser share one dual-purpose fan: wire this relay
+      output in parallel with RELAY_FAN output -- verify fan can handle
+      combined thermal load before doing so.
+      TODO: confirm condenser fan model (SPAL or equivalent slimline).
+      TODO: confirm whether radiator fan and condenser fan are the same unit.
 
   # ── Load stubs ─────────────────────────────────────────────────────────────
   ECU_POWER_STUBS:
@@ -240,18 +268,16 @@ connectors:
       Common choice: SPAL 30102049 (12-inch puller, 15A).
       For PWM: SPAL 30102057 + wire GPO 6 direct (no relay needed).
 
-  FUEL_PUMP_MOTOR:
-    type: "Fuel pump"
-    subtype: "TODO: in-tank or external -- 2-pin"
+  CONDENSER_FAN:
+    type: "Condenser fan motor"
+    subtype: "TODO: SPAL slimline or equivalent -- 2-pin"
     pincount: 2
-    pinlabels: ["+12V", "GND"]
+    pinlabels: ["+12V (from relay 87)", "GND"]
     notes: >-
-      TODO: confirm pump model and connector type.
-      OEM E36 Bosch pump is in-tank with 4-pin connector (includes sender).
-      Walbro 255 (E85 compatible) uses a separate 2-pin connector for pump.
-      AEM 340 similar.
-      If keeping OEM in-tank unit: only the pump +12V and GND matter for
-      this relay circuit. Fuel sender wires go to instrument cluster.
+      AC condenser fan. Mounts in front of or behind AC condenser.
+      Must run whenever AC compressor is active.
+      TODO: confirm model. SPAL 30102049 (12-inch) or slimline equivalent.
+      GND to chassis ground stud. +12V from RELAY_CONDENSER_FAN pin 87.
 
   # ── ECU GPO cross-references (from maxxecu-m52.wv) ────────────────────────
   # These are not physical connectors on the power board -- they represent
@@ -266,13 +292,58 @@ connectors:
       Defined in maxxecu-m52.wv W_FAN cable.
 
   ECU_GPO_PUMP:
-    type: "MaxxECU GPO 2 trigger"
+    type: "MaxxECU GPO 2 trigger (PWM)"
     subtype: "12-pin pin 3 -- see maxxecu-m52.wv"
     pincount: 1
-    pinlabels: ["GPO 2 (pump trigger)"]
+    pinlabels: ["GPO 2 PWM (SSR Ctrl-"]
     notes: >-
-      Low-side switch output. Pulls relay pin 85 to GND when pump is commanded.
-      Defined in maxxecu-m52.wv W_FUELPUMP cable.
+      PWM low-side switch output. Controls Crydom D1D40 SSR Ctrl- for
+      variable-speed fuel pump (Walbro F90000267 via Radium 20-1170 hanger).
+      65% idle / 100% WOT+boost. Defined in maxxecu-m52.wv W_FUELPUMP cable.
+      See harnesses/fuel-pump-hanger.wv for full SSR and hanger wiring.
+
+  # ── External harness stubs (cross-reference only) ────────────────────────────
+  EWP_RELAY_COIL_STUB:
+    type: "Stub: EWP relay coil pin 86"
+    subtype: "See harnesses/ewp-controller.wv MAIN_RELAY -- this is the far end of W_EWP_RELAY_86"
+    pincount: 1
+    pinlabels: ["86 (coil+ in ewp-controller.wv)"]
+    notes: >-
+      Physical wire terminates at MAIN_RELAY pin 86 in ewp-controller.wv.
+      18 AWG, red. Fuse F9 (5A) protects this coil feed.
+
+  AC_RELAY_COIL_STUB:
+    type: "Stub: AC relay coil pin 86"
+    subtype: "See harnesses/ac-compressor.wv AC_RELAY -- this is the far end of W_AC_RELAY_86"
+    pincount: 1
+    pinlabels: ["86 (coil+ in ac-compressor.wv)"]
+    notes: >-
+      Physical wire terminates at AC_RELAY pin 86 in ac-compressor.wv.
+      18 AWG, red. Fuse F10 (5A) protects this coil feed.
+
+  RADIUM_HANGER_STUB:
+    type: "Stub: Radium 20-1170 hanger pump stud"
+    subtype: "See harnesses/fuel-pump-hanger.wv -- SSR Load- output"
+    pincount: 1
+    pinlabels: ["Pump+ stud (Radium hanger)"]
+    notes: >-
+      SSR Load- (switched output) connects to pump positive stud on
+      Radium 20-1170 hanger. See fuel-pump-hanger.wv for full hanger
+      connector wiring, sender, and return.
+
+  # ── AC system cross-reference (from ac-compressor.wv) ──────────────────────
+  AC_SWITCH_TAP:
+    type: "AC enable signal tap -- from ac-compressor.wv AC_SWITCH pin 2"
+    subtype: "Junction at AC switch output -- see ac-compressor.wv"
+    pincount: 1
+    pinlabels: ["AC switch output (+12V IGN when AC on)"]
+    notes: >-
+      This wire runs from the AC cabin switch output (after the switch,
+      before relay coil) to RELAY_CONDENSER_FAN coil pin 86.
+      When AC switch is on: energizes both the AC main relay coil (in
+      ac-compressor.wv) AND the condenser fan relay coil here.
+      Ensures condenser fan runs whenever compressor runs.
+      Cross-reference ac-compressor.wv AC_SWITCH and AC_RELAY.
 
 
 # ── Cables ─────────────────────────────────────────────────────────────────────
@@ -325,11 +396,53 @@ cables:
     wirelabels: ["+12V IGN (86)"]
     notes: "Fuse F3 :: RELAY_FAN pin 86. 18 AWG."
 
-  W_PUMP_RELAY_86:
+  W_PUMP_SSR_CTRL_POS:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V IGN (SSR Ctrl+)"]
+    notes: "Fuse F4 :: FUEL_PUMP_SSR Ctrl+. 18 AWG. IGN-switched supply for SSR control circuit."
+
+  W_EWP_RELAY_86:
     wirecount: 1
     colors: [RD]
     wirelabels: ["+12V IGN (86)"]
-    notes: "Fuse F4 :: RELAY_FUEL_PUMP pin 86. 18 AWG."
+    notes: "Fuse F9 :: EWP relay coil pin 86 (in ewp-controller.wv MAIN_RELAY). 18 AWG."
+
+  W_AC_RELAY_86:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V IGN (86)"]
+    notes: "Fuse F10 :: AC relay coil pin 86 (in ac-compressor.wv AC_RELAY). 18 AWG."
+
+  W_CONDENSER_FAN_RELAY_86:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["AC switch tap (86)"]
+    notes: "AC_SWITCH_TAP :: RELAY_CONDENSER_FAN pin 86. 18 AWG. Same signal as AC main relay coil."
+
+  W_CONDENSER_FAN_LOAD:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["fan +12V (87)"]
+    notes: "Inline 20A fuse from BATT+ :: RELAY_CONDENSER_FAN pin 30. 12 AWG."
+
+  W_CONDENSER_FAN_OUT:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["condenser fan +12V"]
+    notes: "RELAY_CONDENSER_FAN pin 87 :: CONDENSER_FAN pin 1. 12 AWG."
+
+  W_CONDENSER_FAN_GND:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: ["condenser fan GND"]
+    notes: "CONDENSER_FAN pin 2 :: chassis GND. 12 AWG."
+
+  W_CONDENSER_FAN_RELAY_85:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: ["coil GND (85)"]
+    notes: "RELAY_CONDENSER_FAN pin 85 :: chassis GND. 18 AWG."
 
   # ── Relay coil pin 85 GND (for ECU main and coil/inj -- straight to chassis GND)
   # Fan and pump relay pin 85 comes from ECU GPO (defined below).
@@ -408,11 +521,7 @@ cables:
     wirelabels: ["pump +12V (87)"]
     notes: "RELAY_FUEL_PUMP pin 87 :: FUEL_PUMP_MOTOR pin 1. 14 AWG."
 
-  W_PUMP_GND:
-    wirecount: 1
-    colors: [BK]
-    wirelabels: ["pump GND"]
-    notes: "FUEL_PUMP_MOTOR pin 2 :: chassis GND. 14 AWG. Return current path."
+  # W_PUMP_GND removed -- pump GND is handled within fuel-pump-hanger.wv
 
 
 # ── Connections ─────────────────────────────────────────────────────────────────
@@ -453,8 +562,16 @@ connections:
     - RELAY_FAN: [2]
 
   - - FUSE_BLOCK: [4]
-    - W_PUMP_RELAY_86: [1]
-    - RELAY_FUEL_PUMP: [2]
+    - W_PUMP_SSR_CTRL_POS: [1]
+    - FUEL_PUMP_SSR: [1]
+
+  - - FUSE_BLOCK: [9]
+    - W_EWP_RELAY_86: [1]
+    - EWP_RELAY_COIL_STUB: [1]
+
+  - - FUSE_BLOCK: [10]
+    - W_AC_RELAY_86: [1]
+    - AC_RELAY_COIL_STUB: [1]
 
   # ── Relay coil pin 85 GND (ECU main and coil/inj go straight to GND) ─────────
   - - CHASSIS_GND: [1]
@@ -472,7 +589,7 @@ connections:
 
   - - ECU_GPO_PUMP: [1]
     - W_GPO2_PUMP_TRIGGER: [1]
-    - RELAY_FUEL_PUMP: [1]
+    - FUEL_PUMP_SSR: [2]
 
   # ── Relay load inputs (fused batt+ to relay pin 30) ──────────────────────────
   - - FUSE_BLOCK: [5]
@@ -485,7 +602,7 @@ connections:
 
   - - FUSE_BLOCK: [7]
     - W_PUMP_LOAD_FEED: [1]
-    - RELAY_FUEL_PUMP: [3]
+    - FUEL_PUMP_SSR: [3]
 
   # ── Relay outputs to loads ────────────────────────────────────────────────────
   - - RELAY_ECU_MAIN: [4]
@@ -504,10 +621,27 @@ connections:
     - W_FAN_GND: [1]
     - FAN_MOTOR: [2]
 
-  - - RELAY_FUEL_PUMP: [4]
+  - - FUEL_PUMP_SSR: [4]
     - W_PUMP_POS: [1]
-    - FUEL_PUMP_MOTOR: [1]
+    - RADIUM_HANGER_STUB: [1]
+
+  # ── Condenser fan relay connections ──────────────────────────────────────────────────
+  - - BATT_POS: [1]
+    - W_CONDENSER_FAN_LOAD: [1]
+    - RELAY_CONDENSER_FAN: [3]
+
+  - - AC_SWITCH_TAP: [1]
+    - W_CONDENSER_FAN_RELAY_86: [1]
+    - RELAY_CONDENSER_FAN: [2]
 
   - - CHASSIS_GND: [1]
-    - W_PUMP_GND: [1]
-    - FUEL_PUMP_MOTOR: [2]
+    - W_CONDENSER_FAN_RELAY_85: [1]
+    - RELAY_CONDENSER_FAN: [1]
+
+  - - RELAY_CONDENSER_FAN: [4]
+    - W_CONDENSER_FAN_OUT: [1]
+    - CONDENSER_FAN: [1]
+
+  - - CHASSIS_GND: [1]
+    - W_CONDENSER_FAN_GND: [1]
+    - CONDENSER_FAN: [2]
