@@ -60,36 +60,17 @@ Posung PD2-18012AJA (18cc, 3.65 kW / 12,454 BTU, Three-phase PMSM) + included 3-
 | `harnesses/ac-compressor.wv` | Alibaba PD2-18012AJA 12V scroll compressor + included PWM controller + 100A relay + MaxxECU DIN idle-up | 2 |
 | `harnesses/8hp-can.wv` | MaxxECU ↔ 8HP70 CAN harness | 1 |
 | `harnesses/gauge-s-can.wv` | MaxxECU ↔ Gauge.S cluster CAN | 1 |
-| `harnesses/firewall-bulkhead.wv` | Deutsch AS47/AS79 firewall bulkhead connector (**TODO — not yet authored**) | 1 |
+| `harnesses/firewall-bulkhead.wv` | Deutsch AS79 firewall bulkhead — 79-way, ~59 pins assigned; cabin side permanent, engine plug swaps M52↔07K | 1 |
 | `harnesses/epedal-bmw-e46.wv` | BMW E46 accelerator pedal (35426786282) → bulkhead → MaxxECU APS1/APS2 (**primary option**) | 3 |
 | `harnesses/epedal-hella-6pv.wv` | Hella 6PV010946-141 accelerator pedal → bulkhead → MaxxECU APS1/APS2 (**RHD fallback**) | 3 |
 | `harnesses/body-x20.wv` | E36 X20 body connector interface (MaxxECU outputs → dash/instruments) | 1 |
 | `harnesses/dct-shifter.wv` | DCT Shifter paddle → MaxxECU DIN wiring | 1 |
 | `harnesses/pst-f1-sensor.wv` | Bosch PST-F1 oil temp/pressure → Gauge.S analog inputs | 1 |
 
-## Open TODOs
-
-### `harnesses/firewall-bulkhead.wv` — Firewall bulkhead connector pinout
-
-The firewall bulkhead (Deutsch Autosport AS series or Souriau 8STA, 47-way or 79-way) is the single connector that separates the cabin-side wiring from the engine harness. Defining its pinout in WireViz is the connective tissue between `maxxecu-m52.wv` and `power-distribution.wv`, and is what enables the M52 → 07K engine swap to be a single unplug operation with zero cabin wiring changes.
-
-**Work to do:**
-- Extract all engine-crossing signals from `maxxecu-m52.wv` and `power-distribution.wv`
-- Assign each signal to a numbered pin in the bulkhead shell, grouped by type (sensors, actuators, power, grounds, CAN)
-- Apply contact sizing from the enhancements doc (Size 20 / sensors, Size 16 / injectors+solenoids, Size 12 / power feeds)
-- Stub unknowns (shared ground strategy, final wire gauges, pin count choice 47 vs 79)
-- Verify total pin count fits chosen shell size
-- Replicate the same pinout assignment in the future `maxxecu-07k.wv` so both harnesses mate identically
-
-> **Reference:** Connector options, contact sizing table, cost breakdown, and the two-swap rationale are documented in the private project planning doc — access must be requested from the author:
-> https://docs.google.com/document/d/1RNRvGEeiQ2WlrQ-GTXO0aizO8udv_5p_oNJf_OOMEbc/edit?usp=sharing
-
----
-
 ## Key interfaces
 
 - **MaxxECU Race connector:** CMC (Cinch Modular Connector) multi-pin — see `connectors/maxxecu-cmc.wv`
-- **Firewall bulkhead:** Deutsch Autosport AS series 47-way (expand to 79-way if needed) — permanent cabin side; engine harnesses mate at the plug
+- **Firewall bulkhead:** Deutsch Autosport AS79 (79-way) — permanent cabin side; M52 and 07K engine harnesses each mate at a mating plug for single-connector swaps. Pin assignment: `harnesses/firewall-bulkhead.wv`
 - **E36 X20:** Chassis-to-engine-bay interface — MaxxECU RPM/temp/pressure signals to OEM instrument cluster
 - **8HP CAN:** MaxxECU GEN1 8HP CAN harness (native control — no TurboLamik)
 - **Gauge.S CAN:** 500kbps, MaxxECU Default 1.3 output protocol
