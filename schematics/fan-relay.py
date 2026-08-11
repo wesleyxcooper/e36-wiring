@@ -8,6 +8,13 @@ The schematic shows HOW the circuit works (current flow, switching logic).
 The WireViz file (power-distribution.wv) shows WHERE each wire terminates.
 You need both to build and troubleshoot the circuit.
 
+NOTE: One shared fan serves both the radiator and the AC condenser.
+RELAY_FAN (this relay) is controlled by MaxxECU GPO 6 for coolant temp.
+RELAY_CONDENSER_FAN (power-distribution.wv) is controlled by the AC switch
+output and runs whenever the compressor is active.
+Both relay outputs (RELAY_FAN pin 87 + RELAY_CONDENSER_FAN pin 87) wire
+in parallel to the same fan motor -- the fan runs whenever either relay fires.
+
 Standard Bosch ISO mini relay pin numbers (printed on the relay body):
   85  coil negative  — MaxxECU GPO 6 pulls this to GND to activate relay
   86  coil positive  — IGN +12V (key-on), fused at 5A
