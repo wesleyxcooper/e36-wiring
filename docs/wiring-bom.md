@@ -1,7 +1,7 @@
 # Wiring BOM — Consolidated by System
 
 Aggregated from all WireViz harness source files.
-Source harnesses: `maxxecu-m52.wv` · `power-distribution.wv` · `epedal-bmw-e46.wv` · `epedal-hella-6pv.wv` · `fuel-pump-hanger.wv` · `ewp-controller.wv` · `body-x20.wv`
+Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv` · `power-distribution.wv` · `epedal-bmw-e46.wv` · `epedal-hella-6pv.wv` · `fuel-pump-hanger.wv` · `ewp-controller.wv` · `body-x20.wv` · `8hp-can.wv` · `gauge-s-can.wv` · `dct-shifter.wv` · `pst-f1-sensor.wv`
 
 > **⚠️ TODO** = placeholder in source `.wv` — gauge, model, or pin not yet confirmed. Buy only after resolving.
 > **🔁 shared** = appears in multiple harnesses, buy once.
@@ -96,8 +96,8 @@ Source harnesses: `maxxecu-m52.wv` · `power-distribution.wv` · `epedal-bmw-e46
 |-----|------|-------|
 | 1 | **BMW E46 Accelerator Pedal Module** | PN `35426786282` (manual) / `35426786281` (auto) — used, ~$80–120. See `docs/dbw-pinouts.md` for sourcing table. |
 | — | *OR* **Hella 6PV010946-141** | RHD fallback — standalone floor-mount, no OEM pedal box, ~$80–120 new |
-| 1 | Deutsch Autosport AS-series bulkhead — **cabin side** | Size 20 contacts, 6 pins reserved for e-pedal (pins TBD) |
-| 1 | Deutsch Autosport AS-series bulkhead — **engine side** | Size 20 contacts, 6 pins reserved for e-pedal (pins TBD) |
+| 1 | Deutsch Autosport AS-series bulkhead — **cabin side** | Size 20 contacts, **pins 72-77** reserved for e-pedal (GND1/GND2/VCC2/APS1/VCC1/APS2) |
+| 1 | Deutsch Autosport AS-series bulkhead — **engine side** | Size 20 contacts, **pins 72-77** — engine side of same pass-through, wires to MaxxECU APS AIN |
 | 1 | MaxxECU RACE CMC — APS analog inputs | 6-pin CMC section — AIN, 5V SENS OUT, SGND — pins TBD |
 
 ### Cables
@@ -213,6 +213,94 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 ---
 
+## System 7 — VW 07K Engine Harness (Phase 3)
+
+*Source: `maxxecu-07k.wv`*
+
+> Phase 3 engine harness — replaces M52 engine-side mating plug. MaxxECU ECU, 12-pin, and 16-pin connectors carry over unchanged.
+
+### Connectors
+
+| Qty | Item | Notes |
+|-----|------|-------|
+| 1 | Deutsch AS79 jam nut plug — engine side (07K) | Replaces M52 mating plug at bulkhead; same pin-numbering |
+| 5 | Bosch EV14 / USCAR injector pigtail, 2-pin | Replace M50 harness EV1 ends with EV14 (ID1050x). PN `0 280 156 127` pigtail or equivalent |
+| 5 | VAG 4-way COP connector | IGN 1-5 ignition coils (07K firing order 1-2-4-5-3) |
+| 1 | VW 07K crank VR sensor, 3-pin | ⚠️ TODO: confirm exact body (Bosch Kombi-F or similar) at install |
+| 1 | VW 07K cam Hall sensor, 3-pin | ⚠️ TODO: confirm exact body at install (+5V type — different from M52 +12V) |
+| 1 | VW 07K CLT sensor connector | ⚠️ TODO: confirm connector body at install |
+| 1 | VW 07K IAT sensor connector | ⚠️ TODO: confirm connector body at install |
+| 1 | VW 07K DBW throttle body connector | ⚠️ TODO: confirm 6-pin body (Motor+/Motor−/TPS1+TPS2 +5V/GND) at install |
+| 2 | Bosch flat knock sensor connector, 1-pin | KS1 + KS2 (Bosch flat-type, M8 mount) — signal only; GND via mounting bolt |
+| 1 | Bosch LSU 4.9 6-way connector | WBO2 — same as M52 harness (new bung in 07K manifold) |
+| 1 | Bosch PST-F1 4-pin | 🔁 Same as M52 — new mount on 07K oil housing iABED M10×1.0 port |
+| 1 | Superseal 2-way | 🔁 Same boost solenoid as M52 |
+| 1 | 3-pin inline | 🔁 Same Continental flex fuel sensor as M52 |
+
+### Cables (additions over M52)
+
+| Run | Color(s) | Gauge | Length | Shielded | Notes |
+|-----|----------|-------|--------|----------|-------|
+| DBW TB Motor +/− | OG, VT | 20 AWG | 0.5 m ea | No | H-bridge output — 20 AWG min (3A). Verify polarity before crimping. |
+| DBW TB TPS 4-wire | RD, BK, WH, GN | 22 AWG | 0.5 m | Preferred | +5V, GND, TPS1, TPS2 signals |
+| Knock sensor 1 signal | WH | 22 AWG | 0.4 m | Preferred | KS1 signal wire; shield drain at ECU end |
+| Knock sensor 2 signal | WH | 22 AWG | 0.6 m | Preferred | KS2 signal wire |
+| Knock GND | BK | 22 AWG | 0.5 m | No | Shared knock GND (via bulkhead pin 71) |
+
+---
+
+## System 8 — Firewall Bulkhead
+
+*Source: `firewall-bulkhead.wv`*
+
+> Deutsch Autosport AS79 79-way firewall pass-through. Cabin side is permanent. M52 and 07K each have their own engine-side mating plug.
+
+### Connectors
+
+| Qty | Item | Notes |
+|-----|------|-------|
+| 1 | Deutsch Autosport AS79 panel-mount receptacle | Cabin side — permanent installation |
+| 1 | Deutsch AS79 jam nut plug — M52 engine side | Phase 1 mating plug; ~59 pins assigned, remainder cavity-plugged |
+| 1 | Deutsch AS79 jam nut plug — 07K engine side | Phase 3 mating plug; same pin numbers as M52 for pins 1-53 + adds pins 72-77 (APS) |
+| — | Deutsch AS79 size-20 contacts (sockets) | Cabin side contacts — source with AS79 housing kit |
+| — | Deutsch AS79 size-20 contacts (pins) | Engine-side mating plug contacts |
+| — | Deutsch AS79 cavity plugs | Seal unused pins on both sides — required for IP67 rating |
+
+---
+
+## System 9 — CAN Harnesses, DCT Shifter, PST-F1
+
+### 9A — ZF 8HP70 TCU CAN (`8hp-can.wv`)
+
+| Qty | Item | Notes |
+|-----|------|-------|
+| 1 | MaxxECU 8HP GEN1 CAN harness | Ships from MaxxECU — covers TCU power/GND/CAN. Bulkhead pins 2/3/9/47/48 |
+
+> Harness sourced as a unit from MaxxECU — no individual cable spec needed.
+
+### 9B — Gauge.S CAN (`gauge-s-can.wv`)
+
+| Run | Color | Gauge | Length | Shielded | Notes |
+|-----|-------|-------|--------|----------|-------|
+| MaxxECU CAN 1 → Gauge.S, CAN H | YE | 22 AWG | ~0.5 m | Preferred — STP | 500 kbps, Default 1.3 protocol. Cabin-to-cabin, no bulkhead crossing. |
+| MaxxECU CAN 1 → Gauge.S, CAN L | GN | 22 AWG | ~0.5 m | Preferred — STP | Twisted pair with CAN H above. |
+
+### 9C — DCT Shifter Paddle (`dct-shifter.wv`)
+
+| Run | Color | Gauge | Length | Shielded | Notes |
+|-----|-------|-------|--------|----------|-------|
+| UP signal | BK | 22 AWG | 1.5 m | No | Paddle UP → MaxxECU DIN 2 |
+| DOWN signal | BU | 22 AWG | 1.5 m | No | Paddle DOWN → MaxxECU DIN 1 |
+| GND | BN | 22 AWG | 1.5 m | No | Common GND — sensor GND |
+
+> Wire colors match DCT Shifter OEM harness convention. Route away from ignition primaries.
+
+### 9D — Bosch PST-F1 Sensor (`pst-f1-sensor.wv`)
+
+> Same wiring as M52 phase — connector, gauge, and routing unchanged. New mounting location: iABED M10×1.0 port on 07K oil housing. No new wire purchases required for Phase 3.
+
+---
+
 ## TODOs / Open Items
 
 | Item | Blocker |
@@ -225,8 +313,11 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | Mini blade fuse block model | 8-position, source specific unit |
 | SPAL fan model + connector | Fan not yet selected |
 | Body-x20 wire colors and gauge | Colors visible in SVG diagram — gauge TBD |
-| Firewall bulkhead full pinout | `harnesses/firewall-bulkhead.wv` not yet authored — see README Open TODOs |
-| 07K engine harness | `maxxecu-07k.wv` exists but outputs not generated — Phase 3 |
+| ~~Firewall bulkhead full pinout~~ | ✅ Done — `harnesses/firewall-bulkhead.wv` authored, outputs generated |
+| ~~07K engine harness outputs~~ | ✅ Done — `maxxecu-07k.wv` authored, HTML/SVG generated |
+| 07K VW connector bodies | TODO at install — crank VR, cam Hall, CLT, DBW TB connector types unconfirmed (see maxxecu-07k.wv TODOs) |
+| 07K DBW TB motor polarity | TODO — verify with volt meter before final crimp |
+| MaxxECU AIN assignment for APS1/APS2 | TODO — assign in MTune, update epedal-bmw-e46.wv and maxxecu-07k.wv |
 
 ---
 
