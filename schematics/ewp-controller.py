@@ -52,76 +52,61 @@ import os
 
 OUT = os.path.join(os.path.dirname(__file__), "ewp-controller.svg")
 
-with schemdraw.Drawing(show=False) as d:
-    d.config(fontsize=10.5)
+with schemdraw.Drawing(figsize=(13, 8), show=False) as d:
+    d.config(fontsize=9)
 
-    # ── Place relay in center of diagram ──────────────────────────────────────
-    # elm.Relay draws coil (left) + switch contact (right) with dotted coupling link.
-    # in1/in2 = coil terminals (86/85), a/b = contact terminals (30/87)
-    relay = d.add(elm.Relay(switch='spst').at((4.5, 0)).label("MAIN_RELAY\n40A (Bosch 0 332 002 150)\nISO mini relay", loc="top"))
+    # ── Relay center ──────────────────────────────────────────────────────────
+    relay = d.add(elm.Relay(switch='spst').at((4.5, 0)).label(
+        "MAIN_RELAY\n40A Bosch ISO mini", loc="top"))
 
-    # ── COIL CIRCUIT: IGN +12V -> pin 86 -> coil -> pin 85 -> GND ────────────
-    # Left from relay.in1 (coil+, pin 86) -> IGN switched +12V source
+    # ── Coil circuit (left): IGN +12V -> 86 -> coil -> 85 -> GND ─────────────
     d.add(elm.Line().left().at(relay.in1).length(2.0))
-    ign_node = d.add(elm.Dot())
     d.add(elm.Line().up().length(0.6))
-    d.add(elm.Label().label("IGN +12V\n(key-on switched relay)", loc="right"))
+    d.add(elm.Label().label("IGN +12V / F9 (5A)", loc="right"))
 
-    # Left from relay.in2 (coil-, pin 85) -> chassis GND
     d.add(elm.Line().left().at(relay.in2).length(2.0))
     d.add(elm.Ground())
 
-    # Coil pin labels
-    d.add(elm.Label().at(relay.in1).label("  86", loc="right"))
-    d.add(elm.Label().at(relay.in2).label("  85", loc="right"))
+    d.add(elm.Label().at(relay.in1).label("86 ", loc="left"))
+    d.add(elm.Label().at(relay.in2).label("85 ", loc="left"))
 
-    # ── LOAD CIRCUIT: BATT+ -> 40A fuse -> relay pin 30 -> 87 -> CWA400 ──────
-    # Up from relay.a (contact input, pin 30) -> 40A fuse -> BATT+
+    # ── Load circuit (top): BATT+ -> 40A fuse -> relay 30 -> 87 -> CWA400 ────
     d.add(elm.Line().up().at(relay.a).length(1.5))
     d.add(elm.Line().left().length(0.6))
-    d.add(elm.Fuse().left().label("F_CWA_PWR -- 40A\n(fuse within 12\" of batt)", loc="top"))
+    d.add(elm.Fuse().left().label("F_CWA 40A", loc="top"))
     d.add(elm.Line().left().length(0.5))
     batt_node = d.add(elm.Dot())
     d.add(elm.Line().left().length(1.2))
-    d.add(elm.Battery().up().reverse().label("12V BATT", loc="right"))
-    d.add(elm.Label().label("  10 AWG", loc="right"))
+    d.add(elm.Battery().up().reverse().label("12V BATT / 10 AWG", loc="right"))
 
-    # Battery negative rail (drop down from batt_node to GND)
     d.add(elm.Line().down().at(batt_node.end).length(3.8))
     d.add(elm.Ground())
 
-    # Right from relay.b (contact output, pin 87) -> CWA400 Pin 3 -> motor -> GND
+    # ── Load output (right): relay 87 -> CWA400 Pin 3 -> motor -> GND ────────
     d.add(elm.Line().right().at(relay.b).length(0.5))
-    d.add(elm.Label().label("Pin 3 (+12V)\n10 AWG", loc="top"))
-    d.add(elm.Motor().right().label("CWA400\n150 LPM @ 0.85 bar\n(Pierburg 7.07223.10.0)", loc="top"))
+    d.add(elm.Motor().right().label(
+        "CWA400 (Pierburg 7.07223.10.0)\nPin 3 +12V / Pin 4 GND / 10 AWG", loc="top"))
     d.add(elm.Line().right().length(0.3))
     d.add(elm.Ground())
-    d.add(elm.Label().at(relay.b).label("  Pin 4 (GND) -- 10 AWG", loc="bottom"))
 
-    # Contact pin labels
-    d.add(elm.Label().at(relay.a).label("  30", loc="left"))
-    d.add(elm.Label().at(relay.b).label("  87", loc="left"))
+    d.add(elm.Label().at(relay.a).label("30 ", loc="left"))
+    d.add(elm.Label().at(relay.b).label("87 ", loc="left"))
 
-    # ── PWM SIGNAL: MaxxECU GPO -> 680 Hz -> CWA400 Pin 1 ───────────────────
-    # Separate signal circuit drawn below the relay section
-    pwm_y = -2.0
-    d.add(elm.Line().at((1.5, pwm_y)).right().length(5.5))
-    pwm_end = d.add(elm.Dot())
+    # ── PWM signal: MaxxECU GPO -> CWA400 Pin 1 (680 Hz) ────────────────────
+    pwm_y = -2.2
+    d.add(elm.Line().at((2.0, pwm_y)).right().length(5.0))
     d.add(elm.Label().label(
-        "  CWA400 Pin 1 (PWM signal in)\n"
-        "  680 Hz | 13-85% = speed ctrl | 86-97% = full speed\n"
-        "  Pin 2 (BSD): leave floating",
-        loc="right"
-    ))
-    d.add(elm.Label().at((1.5, pwm_y)).label("MaxxECU GPO\n22 AWG shielded\n(drain at ECU end only)", loc="left"))
+        "CWA400 Pin 1 (PWM in)\n680 Hz | 13-85% speed | 86-97% full\nPin 2 BSD: leave floating",
+        loc="right"))
+    d.add(elm.Label().at((2.0, pwm_y)).label(
+        "MaxxECU GPO\n22 AWG shielded\n(drain at ECU end)", loc="left"))
 
-    # ── Explanation note at bottom ────────────────────────────────────────────
-    d.add(elm.Label().at((5.5, -4.2)).label(
-        "Wake pulse: MaxxECU outputs >=3ms uninterrupted high on GPO at key-on before transitioning to CLT duty map\n"
-        "Post-shutdown: MaxxECU power hold relay keeps ECU alive -- commands pump via GPO until CLT < 70C\n"
-        "VERSION: PWM only (pre-March 2024) -- NOT compatible with LIN version (Pierburg 7.03665.66.0 / BMW 11517604027)",
-        loc="center"
-    ))
+    # ── Key note (bottom) ─────────────────────────────────────────────────────
+    d.add(elm.Label().at((5.0, -4.5)).label(
+        "Post-shutdown: MaxxECU power-hold keeps ECU alive -- GPO commands pump until CLT < 70C\n"
+        "Wake pulse: >=3 ms high at key-on before CLT duty map\n"
+        "VERSION: PWM only (pre-Mar 2024) -- NOT the LIN version (Pierburg 7.03665.66.0)",
+        loc="center"))
 
     d.save(OUT)
 

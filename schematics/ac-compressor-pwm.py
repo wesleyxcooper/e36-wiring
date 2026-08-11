@@ -77,109 +77,85 @@ import os
 
 OUT = os.path.join(os.path.dirname(__file__), "ac-compressor-pwm.svg")
 
-with schemdraw.Drawing(show=False) as d:
-    d.config(fontsize=10.5)
+with schemdraw.Drawing(figsize=(14, 10), show=False) as d:
+    d.config(fontsize=9)
 
-    # ── Place relay in center of diagram ──────────────────────────────────────
+    # ── AC relay (top section) ───────────────────────────────────────────────────
     relay = d.add(elm.Relay(switch='spst').at((4.5, 0)).label(
-        "AC_RELAY\n100A (Bosch ISO mini)\nCoil: 86/85  Contact: 30/87",
-        loc="top"
-    ))
+        "AC_RELAY / 100A Bosch ISO", loc="top"))
 
-    # ── COIL CIRCUIT: IGN +12V -> AC button -> pin 86 -> coil -> pin 85 -> GND
+    # Coil: IGN +12V -> AC switch -> ac_tap junction -> pin 86 -> coil -> 85 -> GND
     d.add(elm.Line().left().at(relay.in1).length(1.5))
-    ac_tap = d.add(elm.Dot())  # junction: coil + MaxxECU DIN tap
+    ac_tap = d.add(elm.Dot())  # junction: fan relay coil tap + MaxxECU DIN
     d.add(elm.Line().left().length(0.8))
-    d.add(elm.Switch().left().label("AC switch\n(cabin)", loc="top"))
+    d.add(elm.Switch().left().label("AC switch", loc="top"))
     d.add(elm.Line().left().length(0.5))
     d.add(elm.Line().up().length(0.6))
-    d.add(elm.Label().label("IGN +12V\n(key-on)", loc="right"))
+    d.add(elm.Label().label("IGN +12V / F10 (5A)", loc="right"))
 
-    # MaxxECU DIN tap from coil-positive side (after AC button, before relay coil)
-    d.add(elm.Line().down().at(ac_tap.end).length(1.5))
-    d.add(elm.Label().label(
-        "MaxxECU DIN\n(AC enable signal)\n-> configure idle-up ~150-200 RPM",
-        loc="right"
-    ))
-
-    # Coil negative to GND
     d.add(elm.Line().left().at(relay.in2).length(2.0))
     d.add(elm.Ground())
 
-    # Pin labels
-    d.add(elm.Label().at(relay.in1).label("  86", loc="right"))
-    d.add(elm.Label().at(relay.in2).label("  85", loc="right"))
+    d.add(elm.Label().at(relay.in1).label("86 ", loc="left"))
+    d.add(elm.Label().at(relay.in2).label("85 ", loc="left"))
 
-    # ── LOAD CIRCUIT: BATT+ -> 100A fuse -> relay 30 -> 87 -> PWM ctrl -> motor
-    # Up from relay contact input (pin 30) -> fuse -> battery
+    # MaxxECU DIN tap (down from ac_tap junction -- long drop to clear relay body)
+    d.add(elm.Line().down().at(ac_tap.end).length(2.5))
+    d.add(elm.Label().label(
+        "MaxxECU DIN (AC enable)\nidle-up ~150-200 RPM", loc="left"))
+
+    # Load: BATT+ -> 100A fuse -> relay 30 -> 87 -> inverter -> motor
     d.add(elm.Line().up().at(relay.a).length(1.5))
     d.add(elm.Line().left().length(0.6))
-    d.add(elm.Fuse().left().label("F_AC_PWR -- 100A\n(within 12\" of battery)", loc="top"))
+    d.add(elm.Fuse().left().label("F_AC 100A / within 12\" batt", loc="top"))
     d.add(elm.Line().left().length(0.5))
     batt_node = d.add(elm.Dot())
     d.add(elm.Line().left().length(1.2))
-    d.add(elm.Battery().up().reverse().label("12V BATT\n(0 AWG OFC to trunk)", loc="right"))
+    d.add(elm.Battery().up().reverse().label("12V BATT / 8 AWG OFC", loc="right"))
 
-    # Battery negative
     d.add(elm.Line().down().at(batt_node.end).length(3.8))
     d.add(elm.Ground())
 
-    # Right from relay contact output (pin 87) -> PWM controller -> compressor motor
     d.add(elm.Line().right().at(relay.b).length(0.5))
-    pwm_in = d.add(elm.Dot())
-    d.add(elm.Label().label(
-        "PWM CTRL (included kit)\nduty + freq knobs\n8 AWG OFC in/out",
-        loc="top"
-    ))
-    d.add(elm.Line().right().length(0.5))
     d.add(elm.Motor().right().label(
-        "PD2-18012AJA 3-phase PMSM\n18cc, 3.65 kW / 12,454 BTU\n~45% duty = ~3,000 RPM (start here)",
-        loc="top"
-    ))
+        "PD2-18012AJA 3-ph PMSM\n12,454 BTU | 8 AWG OFC | 45% duty start", loc="top"))
     d.add(elm.Line().right().length(0.3))
     d.add(elm.Ground())
-    d.add(elm.Label().at(relay.b).label(
-        "  3-phase inverter out (U/V/W orange pigtails) -- NOT simple DC", loc="bottom"
-    ))
 
-    # Contact pin labels
-    d.add(elm.Label().at(relay.a).label("  30", loc="left"))
-    d.add(elm.Label().at(relay.b).label("  87", loc="left"))
+    d.add(elm.Label().at(relay.a).label("30 ", loc="left"))
+    d.add(elm.Label().at(relay.b).label("87 ", loc="left"))
 
-    # ── Condenser fan relay (tapped from AC switch output) ──────────────────────────
-    # AC switch output (ac_tap junction) also triggers condenser fan relay coil
-    d.add(elm.Line().down().at(ac_tap.end).length(2.5))
-    cfan_junction = d.add(elm.Dot())
-    d.add(elm.Line().down().length(0.8))
+    # ── Condenser fan relay (bottom section -- separate, no overlap) ──────────
+    fan_relay = d.add(elm.Relay(switch='spst').at((4.5, -4.5)).label(
+        "RELAY_CONDENSER_FAN / 30A", loc="top"))
+
+    # Fan relay coil: same AC switch output signal as ac_tap
+    d.add(elm.Line().left().at(fan_relay.in1).length(2.0))
     d.add(elm.Label().label(
-        "MaxxECU DIN\n(AC enable -> idle-up ~150-200 RPM)",
-        loc="right"
-    ))
-
-    # Condenser fan relay coil
-    d.add(elm.Line().right().at(cfan_junction.end).length(1.5))
-    fan_relay_coil_pos = d.add(elm.Dot())
-    d.add(elm.Label().label("RELAY_CONDENSER_FAN 86", loc="top"))
-    d.add(elm.Line().right().length(1.0))
-    d.add(elm.Relay(switch='spst').right().label(
-        "Condenser fan relay\n(Bosch ISO mini 30A)\n-- same relay as RELAY_CONDENSER_FAN",
-        loc="top"
-    ))
-    # Fan relay coil GND
-    d.add(elm.Line().down().at(fan_relay_coil_pos.end).length(1.2))
+        "AC switch output tap\n(same signal as AC_RELAY 86)", loc="left"))
+    d.add(elm.Line().left().at(fan_relay.in2).length(2.0))
     d.add(elm.Ground())
-    d.add(elm.Label().label("85 (GND)", loc="right"))
+    d.add(elm.Label().at(fan_relay.in1).label("86 ", loc="left"))
+    d.add(elm.Label().at(fan_relay.in2).label("85 ", loc="left"))
 
-    # ── Explanation note at bottom ──────────────────────────────────────────────────
-    d.add(elm.Label().at((6.0, -5.5)).label(
-        "Duty cycle: start 45% (~3,000 RPM) -> 51-54 degF vent at 90 degF ambient\n"
-        "At 95% (~6,000 RPM): max cooling but near-stall idle dip -- do not start here\n"
-        "Motor: Three-phase PMSM -- inverter outputs U/V/W, NOT a simple DC motor\n"
-        "Condenser fan relay coil tapped from AC switch output -- fires with compressor\n"
-        "Fan: one shared unit for radiator + condenser (output parallel with RELAY_FAN)\n"
-        "Oil: POE 68 ONLY -- flush all PAG before commissioning, replace receiver/drier",
-        loc="center"
-    ))
+    # Fan relay load: BATT+ via inline 20A -> relay 30 -> 87 -> fan motor
+    d.add(elm.Line().up().at(fan_relay.a).length(1.0))
+    d.add(elm.Label().label("BATT+ / 20A inline / 12 AWG", loc="right"))
+    d.add(elm.Label().at(fan_relay.a).label("30 ", loc="left"))
+
+    d.add(elm.Line().right().at(fan_relay.b).length(0.5))
+    d.add(elm.Motor().right().label(
+        "Shared fan (radiator + condenser)\n|| with RELAY_FAN output", loc="top"))
+    d.add(elm.Line().right().length(0.3))
+    d.add(elm.Ground())
+    d.add(elm.Label().at(fan_relay.b).label("87 ", loc="left"))
+
+    # ── Key notes (bottom) ─────────────────────────────────────────────────
+    d.add(elm.Label().at((5.5, -8.5)).label(
+        "Duty: 45% start (~3,000 RPM) -> 51-54 degF vent / 90 degF  |  95%+ = near-stall idle dip\n"
+        "Motor: 3-phase PMSM -- inverter outputs U/V/W orange pigtails, NOT simple DC\n"
+        "Oil: POE 68 ONLY -- flush all PAG, replace receiver/drier before commissioning",
+        loc="center"))
 
     d.save(OUT)
 
