@@ -265,13 +265,13 @@ connectors:
   # ── Wideband O2 ─────────────────────────────────────────────────────────────
 
   WIDEBAND:
-    type: "Bosch LSU 4.2 6-way"
+    type: "Bosch LSU 4.9 6-way"
     subtype: "Wideband lambda sensor"
     pincount: 6
     pinlabels: ["IP", "VS", "APE", "Trim", "Hs+", "Hs-"]
     notes: >
-      MaxxECU M50 harness includes built-in wideband controller and LSU 4.2 connector.
-      Sensor: Modern Racing LSU 4.2. Bung: 18mmx1.5 welded in exhaust.
+      MaxxECU M50 terminated harness includes built-in wideband controller and LSU 4.9 connector.
+      Sensor: Bosch 0 258 017 025 (LSU 4.9). Bung: 18mm×1.5 welded in exhaust.
       Carries to 07K phase — re-weld bung in new exhaust header.
 
   # ── Boost ────────────────────────────────────────────────────────────────────

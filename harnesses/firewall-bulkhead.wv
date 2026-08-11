@@ -76,7 +76,7 @@ connectors:
       - "Trigger GND / Crank VR- (CMC H2)" # 23 Size 20  22 AWG  DEDICATED GND
       - "Crank shield (drain)"             # 24 Size 20  22 AWG
       - "HOME / Cam Hall signal (CMC H4)"  # 25 Size 20  22 AWG
-      - "Cam Hall +12V"                    # 26 Size 20  22 AWG
+      - "(spare — BMW 12141726590 needs no +12V)"  # 26
       # ── GROUP F: General engine sensors ──────────────────────────────────
       - "Sensor GND shared (CLT/IAT/TPS/MAP/PST-F1/Cam)" # 27 Size 20  22 AWG
       - "CLT signal (CMC F1)"              # 28 Size 20  22 AWG
@@ -88,7 +88,7 @@ connectors:
       - "PST-F1 temp → AIN 1 (CMC J1)"    # 34 Size 20  22 AWG
       - "Flex fuel signal → DIN3 (CMC C1)" # 35 Size 20  22 AWG
       - "Flex fuel +12V"                   # 36 Size 20  22 AWG
-      # ── GROUP G: Wideband O2 (CMC → LSU 4.2) ────────────────────────────
+      # ── GROUP G: Wideband O2 (CMC → LSU 4.9) ──────────────────────────────
       - "WBO2 VS (CMC F4)"                 # 37 Size 20  22 AWG
       - "WBO2 VREF (CMC F3)"               # 38 Size 20  22 AWG
       - "WBO2 IP (CMC G3)"                 # 39 Size 20  22 AWG
@@ -181,7 +181,7 @@ connectors:
       - "Crank VR- → M52 crank sensor pin 2"           # 23
       - "Crank shield → sensor shell"                  # 24
       - "Cam Hall signal → BMW 12141726590 pin 2"      # 25
-      - "Cam Hall +12V → BMW 12141726590 pin 1"        # 26
+      - "(spare — cavity plug; BMW 12141726590 no +12V)"  # 26
       - "Sensor GND → CLT/IAT/TPS/MAP/PST-F1 GND"     # 27
       - "CLT → Bosch JPT 2-way pin 1"                  # 28
       - "IAT → OEM M52 pin 1"                          # 29
@@ -192,11 +192,11 @@ connectors:
       - "PST-F1 temp → sensor pin 4"                   # 34
       - "Flex fuel → Continental sensor signal"         # 35
       - "Flex fuel +12V → Continental sensor +12V"     # 36
-      - "WBO2 VS → LSU 4.2 pin 2"                      # 37
-      - "WBO2 VREF → LSU 4.2 pin 1"                    # 38
-      - "WBO2 IP → LSU 4.2 pin 6"                      # 39
-      - "WBO2 RCAL → LSU 4.2 pin 5"                    # 40
-      - "WBO2 Heater- → LSU 4.2 pin 3"                 # 41
+      - "WBO2 VS → LSU 4.9 pin 2"                      # 37
+      - "WBO2 VREF → LSU 4.9 pin 1"                    # 38
+      - "WBO2 IP → LSU 4.9 pin 6"                      # 39
+      - "WBO2 RCAL → LSU 4.9 pin 5"                    # 40
+      - "WBO2 Heater- → LSU 4.9 pin 3"                 # 41
       - "GPO 1 → boost solenoid Superseal pin 2"       # 42
       - "GPO 3 → VANOS solenoid pin 2"                 # 43
       - "GPO 4 → ICV coil A (JPT 3-way pin 2)"         # 44
@@ -271,7 +271,7 @@ cables:
       - BK   # 23 Crank VR-
       - GY   # 24 Crank shield
       - WH   # 25 Cam Hall signal
-      - RD   # 26 Cam Hall +12V
+      - GY   # 26 (spare)
       - BK   # 27 Sensor GND shared
       - WH   # 28 CLT
       - WH   # 29 IAT
@@ -325,7 +325,7 @@ cables:
       - "Crank VR-"
       - "Crank shld"
       - "Cam signal"
-      - "Cam +12V"
+      - "(spare)"
       - "Sensor GND"
       - "CLT"
       - "IAT"
@@ -357,7 +357,7 @@ cables:
       CAN H/L (pins 47-48) must be twisted pair, 120ohm termination at MaxxECU end (cabin)
       and at 8HP TCU end (engine bay). DCTShifter and Gauge.S tap cabin-side CAN bus
       before the bulkhead — no additional bulkhead pins required for either device.
-      WBO2 Heater+ (LSU 4.2 pin 4) connects to engine bay +12V coil/inj rail (pin 1)
+      WBO2 Heater+ (LSU 4.9 pin 4) connects to engine bay +12V coil/inj rail (pin 1)
       via local splice — no separate bulkhead pin needed.
       Crank VR+/VR-/Shield (pins 22-24) should be shielded twisted pair; shield terminates
       at cabin-side sensor GND (CMC H1), floating at engine-side.

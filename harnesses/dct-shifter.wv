@@ -1,0 +1,58 @@
+# dct-shifter.wv
+# DCT Shifter Paddle → MaxxECU DIN 1 / DIN 2
+# Source: dctshifter.com/pages/installation
+#
+# Cabin-to-cabin. No firewall bulkhead crossing.
+# Compatible Phase 1 → Phase 3 (shifter paddle unchanged through engine swap).
+
+connectors:
+
+  DCT_PADDLE:
+    type: "DCT Shifter E36 paddle"
+    subtype: "Mechanical sequential shifter — 3-wire NO push switches"
+    pincount: 3
+    pinlabels: ["UP (Black)", "DOWN (Blue)", "GND (Brown)"]
+    notes: >
+      Source: dctshifter.com/pages/installation
+      Passive momentary switches — no +12V supply needed.
+      UP: closes UP pin to GND on upshift pull.
+      DOWN: closes DOWN pin to GND on downshift pull.
+      Hold UP >= 1 s activates launch control / transbrake.
+      MTune: Advanced :: 8HP :: Shifter type :: 8HP SEQ shifter.
+
+  ECU_16PIN:
+    type: "MaxxECU M50 terminated harness — 16-pin aux breakout"
+    subtype: "REV2. Source: maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html"
+    pincount: 16
+    pinlabels:
+      - "+5V OUT"         # 1
+      - "Sensor GND"      # 2
+      - "INJ 7 (N/A M52)" # 3
+      - "GPO 8 / TACHO"   # 4
+      - "GPO 7 / DIN 3"   # 5
+      - "GPO 6"           # 6
+      - "GPO 3"           # 7
+      - "GPO 2"           # 8
+      - "CAN L"           # 9
+      - "CAN H"           # 10
+      - "AIN 4"           # 11
+      - "AIN 3"           # 12
+      - "AIN 2"           # 13
+      - "AIN 1"           # 14
+      - "DIN 2"           # 15
+      - "DIN 1"           # 16
+
+cables:
+
+  W_SHIFTER:
+    wirecount: 3
+    colors: [BK, BU, BN]
+    wirelabels: ["UP (DIN 2)", "DOWN (DIN 1)", GND]
+    length: 1.5 m
+    notes: "Unshielded. Route away from ignition wires. Wire colors match DCT Shifter OEM harness."
+
+connections:
+
+  - - DCT_PADDLE: [1, 2, 3]
+    - W_SHIFTER: [1, 2, 3]
+    - ECU_16PIN: [15, 16, 2]

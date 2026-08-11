@@ -1,0 +1,96 @@
+# pst-f1-sensor.wv
+# Bosch PST-F1 dual oil temp+pressure sensor → MaxxECU AIN
+# Signals cross firewall via bulkhead pins 27, 30, 33, 34.
+#
+# Mount: M52 VANOS banjo bolt path (M14x1.5 → M10x1.0 adapter → PST-F1).
+# Phase 3: moves to iABED 07K oil housing M10x1.0 port — no wiring changes needed.
+#
+# MaxxECU channels:
+#   Pressure: AIN 3 (0-5V, calibrate 0-10 bar / 0-145 psi)
+#   Temp:     AIN 1 (NTC, calibrate -40 to +140 C)
+
+connectors:
+
+  PST_F1:
+    type: "Bosch PST-F1 4-pin"
+    subtype: "Dual oil temp + pressure sensor"
+    pincount: 4
+    pinlabels: ["+5V", GND, "Pressure (0-5V)", "Temp (NTC)"]
+    notes: >
+      Bosch PST-F1 4-pin. Mount adapter: M14x1.5 female → M10x1.0 male.
+      Pressure output: 0.5V = 0 bar, 4.5V = 10 bar (linear 0-5V).
+      Temp output: NTC thermistor — calibrate in MTune against resistance table.
+      Phase 3: moves to 07K iABED oil housing (M10x1.0 port) unchanged.
+
+  # Bulkhead passthrough — engine side to cabin side
+  # Full 79-pin diagram: harnesses/firewall-bulkhead.wv
+  BULKHEAD_ENGINE:
+    type: "Deutsch AS79 bulkhead — engine side (PST-F1 pins)"
+    subtype: "Pins 27/30/33/34 of 79-way engine mating plug"
+    pincount: 4
+    pinlabels:
+      - "Sensor GND (pin 27)"        # 1
+      - "+5V sensor (pin 30)"         # 2
+      - "PST-F1 pressure (pin 33)"   # 3
+      - "PST-F1 temp (pin 34)"       # 4
+
+  BULKHEAD_CABIN:
+    type: "Deutsch AS79 bulkhead — cabin side (PST-F1 pins)"
+    subtype: "Pins 27/30/33/34 of 79-way cabin flange receptacle"
+    pincount: 4
+    pinlabels:
+      - "Sensor GND (pin 27)"        # 1
+      - "+5V sensor (pin 30)"         # 2
+      - "PST-F1 pressure (pin 33)"   # 3
+      - "PST-F1 temp (pin 34)"       # 4
+
+  ECU_16PIN:
+    type: "MaxxECU M50 terminated harness — 16-pin aux breakout"
+    subtype: "REV2. Source: maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html"
+    pincount: 16
+    pinlabels:
+      - "+5V OUT"         # 1
+      - "Sensor GND"      # 2
+      - "INJ 7 (N/A M52)" # 3
+      - "GPO 8 / TACHO"   # 4
+      - "GPO 7 / DIN 3"   # 5
+      - "GPO 6"           # 6
+      - "GPO 3"           # 7
+      - "GPO 2"           # 8
+      - "CAN L"           # 9
+      - "CAN H"           # 10
+      - "AIN 4"           # 11
+      - "AIN 3"           # 12
+      - "AIN 2"           # 13
+      - "AIN 1"           # 14
+      - "DIN 2"           # 15
+      - "DIN 1"           # 16
+
+cables:
+
+  W_PST_F1:
+    wirecount: 4
+    colors: [BK, RD, GN, YE]
+    wirelabels: [GND, "+5V", "Pressure (AIN 3)", "Temp (AIN 1)"]
+    length: 0.6 m
+    notes: "Engine-side sensor to bulkhead engine plug. Keep away from ignition/coil wires."
+
+  W_PST_F1_CABIN:
+    wirecount: 4
+    colors: [BK, RD, GN, YE]
+    wirelabels: [GND, "+5V", "Pressure (AIN 3)", "Temp (AIN 1)"]
+    length: 0.4 m
+    notes: "Bulkhead cabin plug to MaxxECU 16-pin aux breakout."
+
+connections:
+
+  # Engine side: sensor to bulkhead engine plug
+  - - PST_F1: [1, 2, 3, 4]
+    - W_PST_F1: [2, 1, 3, 4]
+    - BULKHEAD_ENGINE: [2, 1, 3, 4]
+
+  # Cabin side: bulkhead cabin plug to MaxxECU 16-pin
+  # ECU_16PIN: pin 1=+5V, pin 2=SensorGND, pin 12=AIN3, pin 14=AIN1
+  - - BULKHEAD_CABIN: [2, 1, 3, 4]
+    - W_PST_F1_CABIN: [2, 1, 3, 4]
+    - ECU_16PIN: [1, 2, 12, 14]

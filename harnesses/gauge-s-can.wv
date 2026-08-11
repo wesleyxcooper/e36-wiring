@@ -1,0 +1,94 @@
+# gauge-s-can.wv
+# MaxxECU → Gauge.S E36 cluster CAN harness
+# Protocol: MaxxECU Default 1.3 CAN output, 500 kbps
+#
+# Cabin-to-cabin. No firewall bulkhead crossing.
+# CAN tap shares cabin-side bus with 8HP TCU (see maxxecu-m52.wv CAN_BUS_JUNCTION).
+# Compatible Phase 1 → Phase 3 (cluster and MaxxECU unchanged through engine swap).
+#
+# Termination: MaxxECU has built-in 120Ω at its CAN 1 port (near end).
+# Verify whether Gauge.S has internal 120Ω; if not, add external terminator at Gauge.S pins.
+
+connectors:
+
+  ECU_16PIN:
+    type: "MaxxECU M50 terminated harness — 16-pin aux breakout"
+    subtype: "REV2. Source: maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html"
+    pincount: 16
+    pinlabels:
+      - "+5V OUT"         # 1
+      - "Sensor GND"      # 2
+      - "INJ 7 (N/A M52)" # 3
+      - "GPO 8 / TACHO"   # 4
+      - "GPO 7 / DIN 3"   # 5
+      - "GPO 6"           # 6
+      - "GPO 3"           # 7
+      - "GPO 2"           # 8
+      - "CAN L"           # 9
+      - "CAN H"           # 10
+      - "AIN 4"           # 11
+      - "AIN 3"           # 12
+      - "AIN 2"           # 13
+      - "AIN 1"           # 14
+      - "DIN 2"           # 15
+      - "DIN 1"           # 16
+    notes: "CAN H/L shared with 8HP CAN — see CAN_BUS_JUNCTION in maxxecu-m52.wv."
+
+  GAUGE_S:
+    type: "Gauge.S E36 PNP cluster"
+    subtype: "Verify connector pinout from Gauge.S E36 documentation"
+    pincount: 4
+    pinlabels: ["+12V", GND, "CAN H", "CAN L"]
+    notes: >
+      Receives MaxxECU Default 1.3 CAN output at 500 kbps.
+      MTune: CAN :: Default CAN output :: MaxxECU Default 1.3.
+      Config file: maxxecu.json (gauge-s-maxxecu repo).
+      Verify Gauge.S internal 120Ω termination; add external if absent.
+      Power: fused ignition-switched +12V (1A fuse sufficient).
+
+  IGN_12V:
+    type: "Spade / ring terminal"
+    subtype: "Ignition-switched +12V — cabin fuse block"
+    pincount: 1
+    pinlabels: ["+12V IGN"]
+
+  CABIN_GND:
+    type: "Ring terminal"
+    subtype: "Cabin chassis GND"
+    pincount: 1
+    pinlabels: [GND]
+
+cables:
+
+  W_CAN_GAUGES:
+    wirecount: 2
+    colors: [WH, BU]
+    wirelabels: ["CAN H", "CAN L"]
+    length: 1.0 m
+    notes: "Twisted pair, 22 AWG. Tap from cabin-side CAN junction shared with 8HP."
+
+  W_GAUGES_PWR:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V IGN"]
+    length: 0.5 m
+
+  W_GAUGES_GND:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: [GND]
+    length: 0.5 m
+
+connections:
+
+  - - ECU_16PIN: [10, 9]
+    - W_CAN_GAUGES: [1, 2]
+    - GAUGE_S: [3, 4]
+
+  - - IGN_12V: [1]
+    - W_GAUGES_PWR: [1]
+    - GAUGE_S: [1]
+
+  - - CABIN_GND: [1]
+    - W_GAUGES_GND: [1]
+    - GAUGE_S: [2]

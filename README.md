@@ -58,14 +58,14 @@ Posung PD2-18012AJA (18cc, 3.65 kW / 12,454 BTU, Three-phase PMSM) + included 3-
 | `harnesses/ewp-controller.wv` | Pierburg CWA400 (PWM version) + MaxxECU RACE GPO control | 3 |
 | `harnesses/fuel-pump-hanger.wv` | Radium 20-1170 hanger + Walbro F90000267 + DC SSR + MaxxECU PWM GPO | 1 |
 | `harnesses/ac-compressor.wv` | Alibaba PD2-18012AJA 12V scroll compressor + included PWM controller + 100A relay + MaxxECU DIN idle-up | 2 |
-| `harnesses/8hp-can.wv` | MaxxECU ↔ 8HP70 CAN harness | 1 |
-| `harnesses/gauge-s-can.wv` | MaxxECU ↔ Gauge.S cluster CAN | 1 |
+| `harnesses/8hp-can.wv` | MaxxECU CAN + power wiring → ZF 8HP70 TCU (through bulkhead pins 2/3/9/47/48) | 1 |
+| `harnesses/gauge-s-can.wv` | MaxxECU CAN 1 → Gauge.S E36 cluster (cabin-to-cabin, 500 kbps, Default 1.3) | 1 |
 | `harnesses/firewall-bulkhead.wv` | Deutsch AS79 firewall bulkhead — 79-way, ~59 pins assigned; cabin side permanent, engine plug swaps M52↔07K | 1 |
 | `harnesses/epedal-bmw-e46.wv` | BMW E46 accelerator pedal (35426786282) → bulkhead → MaxxECU APS1/APS2 (**primary option**) | 3 |
 | `harnesses/epedal-hella-6pv.wv` | Hella 6PV010946-141 accelerator pedal → bulkhead → MaxxECU APS1/APS2 (**RHD fallback**) | 3 |
 | `harnesses/body-x20.wv` | E36 X20 body connector interface (MaxxECU outputs → dash/instruments) | 1 |
-| `harnesses/dct-shifter.wv` | DCT Shifter paddle → MaxxECU DIN wiring | 1 |
-| `harnesses/pst-f1-sensor.wv` | Bosch PST-F1 oil temp/pressure → Gauge.S analog inputs | 1 |
+| `harnesses/dct-shifter.wv` | DCT Shifter paddle → MaxxECU DIN 1/DIN 2 (cabin-to-cabin, 3-wire, no bulkhead) | 1 |
+| `harnesses/pst-f1-sensor.wv` | Bosch PST-F1 oil temp+pressure → MaxxECU AIN 1/AIN 3 (through bulkhead pins 27/30/33/34) | 1 |
 
 ## Key interfaces
 
