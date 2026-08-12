@@ -1,7 +1,7 @@
 # Wiring BOM — Consolidated by System
 
 Aggregated from all WireViz harness source files.
-Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv` · `power-distribution.wv` · `epedal-bmw-e46.wv` · `epedal-hella-6pv.wv` · `fuel-pump-hanger.wv` · `ewp-controller.wv` · `body-x20.wv` · `8hp-can.wv` · `gauge-s-can.wv` · `dct-shifter.wv` · `pst-f1-sensor.wv`
+Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv` · `power-distribution.wv` · `epedal-bmw-e46.wv` · `epedal-hella-6pv.wv` · `fuel-pump-hanger.wv` · `ewp-controller.wv` · `body-x20.wv` · `8hp-can.wv` · `gauge-s-can.wv` · `dct-shifter.wv` · `pst-f1-sensor.wv` · `atf-temp-sensor.wv` *(optional)*
 
 > **⚠️ TODO** = placeholder in source `.wv` — gauge, model, or pin not yet confirmed. Buy only after resolving.
 > **🔁 shared** = appears in multiple harnesses, buy once.
@@ -298,6 +298,25 @@ These connectors/termination points appear in multiple harness BOMs — source o
 ### 9D — Bosch PST-F1 Sensor (`pst-f1-sensor.wv`)
 
 > Same wiring as M52 phase — connector, gauge, and routing unchanged. New mounting location: iABED M10×1.0 port on 07K oil housing. No new wire purchases required for Phase 3.
+
+### 9E — ATF Temperature Sensor *(optional — logging / MaxxECU cold-shift protection)*
+
+> **Necessity:** Low. The TCH-102-T2 mechanical thermostat handles overcooling protection automatically with no ECU input. This sensor adds ATF temp to MaxxECU real-time data for logging, shift-map conditioning (cold ATF protection), and verifying cooler sizing. Most 8HP swap builds run without it. Add if you want the data; omit if simplifying.
+
+| Qty | Item | PN / Source | Price |
+|-----|------|-------------|-------|
+| 1 | **Vibrant 16488** inline -8AN male→female union adapter with 1/8 NPT sensor port | [KamiSpeed](https://www.kamispeed.com/products/vibrant-8an-male-to-8an-female-union-adapter-fitting-w-1-8in-npt-port) — universal | ~$20 |
+| 1 | **MaxxECU 1/8 NPT NTC temp sensor** (ID: 1280) — CLT/water/oil type | [MaxxECU store](https://www.maxxecu.com/store/engine-control-or-electronics/sensors/temperature/temperature-sensor-1-8-npt-clt-water-or-oil) | $48.39 |
+| 1 | 2-way DTM socket housing (sensor connector) | MaxxECU store | $5.53 |
+
+**Install location:** Vibrant 16488 installed in the **return line** (Setrab cooler → TCH-102-T2 → trans). Measures post-cooled ATF temp entering the transmission — more representative of actual operating temp than pre-cooler.
+
+| Run | Color | Gauge | Length | Shielded | Notes |
+|-----|-------|-------|--------|----------|-------|
+| ATF sensor signal | WH | 22 AWG | ~2.5 m | Preferred | Sensor → MaxxECU AIN (TEMPERATURE) pin — 2.5k internal pullup, no external resistor needed |
+| ATF sensor GND | BK | 22 AWG | ~2.5 m | (shared with above shield) | Sensor → MaxxECU Sensor GND — non-polarity sensitive sensor, either wire can be GND |
+
+**MTune:** Analog Inputs → type = `TEMPERATURE` → calibrate to NTC curve: `-20°C = 15,462 Ω`, `130°C = 89 Ω` → assign function as extra temperature channel.
 
 ---
 
