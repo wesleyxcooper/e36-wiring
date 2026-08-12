@@ -1,0 +1,95 @@
+# atf-temp-sensor.wv
+# MaxxECU 1/8 NPT NTC temp sensor → MaxxECU AIN 2 (CMC J2)
+# Signal crosses firewall via bulkhead pin 51 (AIN 2 spare temp).
+#
+# OPTIONAL — mechanical thermostat (TCH-102-T2) handles overcooling
+# protection without ECU input. This sensor adds ATF temp to MaxxECU
+# real-time data for logging and cold-shift map conditioning only.
+#
+# Hardware:
+#   Sensor:  MaxxECU 1/8 NPT NTC temp (ID 1280) — $48.39
+#            maxxecu.com/store/.../temperature-sensor-1-8-npt-clt-water-or-oil
+#   Adapter: Vibrant 16488 inline -8AN M→F union with 1/8 NPT port — ~$20
+#            Install in return line (Setrab cooler to TCH-102-T2 to trans)
+#   Connector: 2-way DTM socket housing (MaxxECU store) — $5.53
+#
+# MaxxECU channel:
+#   AIN 2 (CMC J2): configure as TEMPERATURE type in MTune (2.5k pullup)
+#   NTC calibration: -20 deg C = 15,462 ohm, 130 deg C = 89 ohm
+#
+# Install note: 2-wire NTC, non-polarity sensitive.
+
+connectors:
+
+  ATF_SENSOR:
+    type: "MaxxECU 1/8 NPT NTC temp sensor ID 1280 + 2-way DTM"
+    subtype: "CLT/water/oil NTC — threaded into Vibrant 16488 adapter in ATF return line"
+    pincount: 2
+    pinlabels: ["Signal", "GND"]
+    notes: >
+      Non-polarity sensitive — either wire can be signal or GND.
+      Sensor installed in Vibrant 16488 inline -8AN adapter, return line
+      (post-Setrab cooler, before TCH-102-T2 entry back to trans).
+      Thread sealant on 1/8 NPT threads; do not apply to AN threads.
+
+  BULKHEAD_ENGINE:
+    type: "Deutsch AS79 bulkhead — engine side (ATF temp pin)"
+    subtype: "Pin 51 of 79-way engine mating plug"
+    pincount: 2
+    pinlabels:
+      - "Sensor GND (pin 27)"       # shared sensor GND — same group K
+      - "AIN 2 spare temp (pin 51)"
+
+  BULKHEAD_CABIN:
+    type: "Deutsch AS79 bulkhead — cabin side (ATF temp pin)"
+    subtype: "Pin 51 of 79-way cabin flange receptacle"
+    pincount: 2
+    pinlabels:
+      - "Sensor GND (pin 27)"
+      - "AIN 2 spare temp (pin 51)"
+
+  ECU_CMC:
+    type: "MaxxECU RACE — Cinch CMC main connector"
+    subtype: "AIN 2 (J2) temperature input — 2.5k internal pullup"
+    pincount: 2
+    pinlabels:
+      - "Sensor GND"
+      - "AIN 2 / J2 (TEMPERATURE type)"
+    notes: >
+      MTune: Analog Inputs -- AIN 2 -- type = TEMPERATURE (enables 2.5k pullup).
+      Calibrate to NTC curve: -20 deg C = 15,462 ohm, 130 deg C = 89 ohm.
+      Assign function as extra temperature channel or Engine Oil Temperature.
+      Do not configure as 0-5V -- requires internal pullup for NTC.
+
+cables:
+
+  W_ATF_TEMP_ENGINE:
+    wirecount: 2
+    colors: [BK, WH]
+    wirelabels: ["Sensor GND", "AIN 2 signal"]
+    length: 2.5 m
+    shield: true
+    notes: >
+      Sensor in transmission tunnel to bulkhead engine plug.
+      Shielded preferred -- noisy environment (near drivetrain, ignition).
+      Drain shield at bulkhead/ECU end only.
+      Route along transmission tunnel away from coil primary wires.
+
+  W_ATF_TEMP_CABIN:
+    wirecount: 2
+    colors: [BK, WH]
+    wirelabels: ["Sensor GND", "AIN 2 signal"]
+    length: 0.4 m
+    notes: "Bulkhead cabin plug to MaxxECU CMC. Short cabin-side run."
+
+connections:
+
+  # Tunnel: sensor → bulkhead engine plug
+  - - ATF_SENSOR: [1, 2]
+    - W_ATF_TEMP_ENGINE: [2, 1]
+    - BULKHEAD_ENGINE: [2, 1]
+
+  # Cabin: bulkhead cabin plug → MaxxECU CMC
+  - - BULKHEAD_CABIN: [2, 1]
+    - W_ATF_TEMP_CABIN: [2, 1]
+    - ECU_CMC: [2, 1]
