@@ -170,14 +170,18 @@ connectors:
     subtype: "M52 VANOS intake solenoid"
     pincount: 2
     pinlabels: ["+12V", GND]
-    notes: "PWM via GPO 3. Disable in tune at 07K swap."
+    notes: >-
+      PWM via GPO 3. Disable in tune at 07K swap.
+      Flyback diode: 1N4007 at connector, cathode (banded end) to +12V pin, anode to GND pin.
 
   IDLE_VALVE:
     type: "Bosch JPT 3-way"
     subtype: "M52 idle air control valve"
     pincount: 3
     pinlabels: [GND, "Coil A", "Coil B"]
-    notes: "Dual-coil stepper-style ICV. GPO 4 and GPO 5."
+    notes: >-
+      Dual-coil stepper-style ICV. GPO 4 and GPO 5.
+      Flyback diodes: 1N4007 across each coil at connector, cathode toward +12V supply, anode toward GPO pin.
 
   # ── Fueling ─────────────────────────────────────────────────────────────────
 
@@ -286,6 +290,7 @@ connectors:
     notes: >-
       MaxxECU GPO 1 :: PWM duty control. Budget alt: Bosch N75 0280142431.
       Solenoid: https://www.turbosmart.com/product/eb2-ebs-spare-3-port-solenoid-kit/
+      Flyback diode: 1N4007 at connector, cathode (banded end) to +12V pin, anode to GPO signal pin.
 
   # ── Cooling ─────────────────────────────────────────────────────────────────
 

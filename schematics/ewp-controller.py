@@ -17,12 +17,12 @@ CWA400 connector pinout (Kostal 2+2):
 
 Standard Bosch ISO mini relay pin numbers:
   85  coil negative  -- chassis GND
-  86  coil positive  -- IGN +12V (key-on)
+  86  coil positive  -- BATT+ (always-on, fuse F9 5A -- MUST be BATT+ for post-shutdown cooling)
   30  common         -- BATT+ (always-on), fused at 40A
   87  normally open  -- output to CWA400 Pin 3 when relay is ON
 
 How this circuit works:
-  1. Key on -> IGN relay energizes -> relay coil pin 86 gets +12V
+  1. BATT+ always present on relay coil pin 86 (via fuse F9 -- NOT IGN switched)
   2. Coil pin 85 is at GND -> coil circuit complete -> relay energizes
   3. Relay contact closes -> pin 30 connects to pin 87 -> CWA400 Pin 3 gets +12V
   4. MaxxECU boots -> sends >=3ms high pulse on GPO -> CWA400 wakes from standby
@@ -59,10 +59,10 @@ with schemdraw.Drawing(figsize=(13, 8), show=False) as d:
     relay = d.add(elm.Relay(switch='spst').at((4.5, 0)).label(
         "MAIN_RELAY\n40A Bosch ISO mini", loc="top"))
 
-    # ── Coil circuit (left): IGN +12V -> 86 -> coil -> 85 -> GND ─────────────
+    # ── Coil circuit (left): BATT+ -> 86 -> coil -> 85 -> GND (relay always energized) ─
     d.add(elm.Line().left().at(relay.in1).length(2.0))
     d.add(elm.Line().up().length(0.6))
-    d.add(elm.Label().label("IGN +12V / F9 (5A)", loc="right"))
+    d.add(elm.Label().label("BATT+ / F9 (5A)\n(not IGN -- post-shutdown cooling)", loc="right"))
 
     d.add(elm.Line().left().at(relay.in2).length(2.0))
     d.add(elm.Ground())

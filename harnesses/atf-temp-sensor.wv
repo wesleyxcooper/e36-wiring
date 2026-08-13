@@ -6,6 +6,12 @@
 # protection without ECU input. This sensor adds ATF temp to MaxxECU
 # real-time data for logging and cold-shift map conditioning only.
 #
+# NOTE — Phase 3 (07K swap) pin conflict:
+#   Bulkhead pin 51 (AIN 2) is reassigned to DBW TPS2 in maxxecu-07k.wv.
+#   If retaining ATF temp sensor at Phase 3, reassign to a free AIN and
+#   a free expansion bulkhead pin (e.g., pin 58 / expansion stub AIN 6).
+#   Update both this file and maxxecu-07k.wv at Phase 3 harness build.
+#
 # Hardware:
 #   Sensor:  MaxxECU 1/8 NPT NTC temp (ID 1280) — $48.39
 #            maxxecu.com/store/.../temperature-sensor-1-8-npt-clt-water-or-oil

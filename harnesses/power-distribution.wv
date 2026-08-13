@@ -123,10 +123,12 @@ connectors:
       - "F9: EWP relay coil (5A)"
       - "F10: AC relay coil (5A)"
     notes: >-
-      Pins 1-4, 9-10 powered by IGN-switched +12V (relay coil circuits).
+      Pins 1-4, 10 powered by IGN-switched +12V (relay coil circuits).
       Pins 5-7 powered by battery +12V via main fuse (relay load circuits).
+      Pin 9 powered by battery +12V (EWP coil -- must be BATT+ for post-shutdown cooling).
       Relays switch the load circuits -- the fuses here protect the wires.
-      F9 (EWP coil): 18 AWG to ewp-controller.wv MAIN_RELAY pin 86.
+      F9 (EWP coil): 18 AWG to ewp-controller.wv MAIN_RELAY pin 86. BATT+ so MaxxECU
+      power-hold relay can keep pump running after key-off until CLT < 70 deg C.
       F10 (AC coil): 18 AWG to ac-compressor.wv AC_RELAY pin 86.
       F4 (Fuel pump SSR ctrl): 18 AWG to fuel-pump-hanger.wv SSR Ctrl(+).
       TODO: confirm fuse block part. Options: Blue Sea ST Blade (5025),
@@ -142,6 +144,11 @@ connectors:
   #
   # MaxxECU GPOs are low-side switches (they pull to GND).
   # So: 86 = +12V IGN (constant), 85 = ECU GPO (switches to GND).
+  #
+  # Flyback suppression: mount 1N4007 diode across each relay coil at the relay socket.
+  #   Cathode (banded end) → pin 86 (+12V side)
+  #   Anode → pin 85 (GND/GPO side)
+  # Bosch 0 332 002 150 has no built-in suppression (type 1). External diode required.
 
   RELAY_ECU_MAIN:
     type: "Bosch ISO mini relay"
@@ -162,6 +169,7 @@ connectors:
       whether this external relay is required. See maxxecu.com/webhelp
       section on power supply wiring.
       Part: Bosch 0332019150 or Tyco V23134 or equivalent.
+      Flyback: 1N4007 across coil at relay socket (cathode to pin 86, anode to pin 85).
 
   RELAY_COIL_INJ:
     type: "Bosch ISO mini relay"
@@ -182,6 +190,7 @@ connectors:
       or by a dedicated ECU relay output. MaxxECU Race has a relay
       drive output -- check wiring PDF.
       Wire gauge: 12 AWG on load side.
+      Flyback: 1N4007 across coil at relay socket (cathode to pin 86, anode to pin 85).
 
   RELAY_FAN:
     type: "Bosch ISO mini relay"
@@ -202,6 +211,7 @@ connectors:
       TODO: confirm SPAL fan model and current draw.
       TODO: Phase 2 upgrade -- SPAL PWM fan wired direct from GPO 6,
       relay no longer needed. Check SPAL PWM wiring instructions.
+      Flyback: 1N4007 across coil at relay socket (cathode to pin 86, anode to pin 85).
 
   FUEL_PUMP_SSR:
     type: "Crydom D1D40 DC solid-state relay (SSR)"
@@ -240,6 +250,7 @@ connectors:
       Coil pin 85: chassis GND.
       Load: dedicated fused BATT+ run (inline 20A fuse, 12 AWG).
       Output to condenser fan motor +. Fan motor GND to chassis.
+      Flyback: 1N4007 across coil at relay socket (cathode to pin 86, anode to pin 85).
       If radiator and condenser share one dual-purpose fan: wire this relay
       output in parallel with RELAY_FAN output -- verify fan can handle
       combined thermal load before doing so.
@@ -311,7 +322,9 @@ connectors:
     pinlabels: ["86 (coil+ in ewp-controller.wv)"]
     notes: >-
       Physical wire terminates at MAIN_RELAY pin 86 in ewp-controller.wv.
-      18 AWG, red. Fuse F9 (5A) protects this coil feed.
+      18 AWG, red. Fuse F9 (5A, BATT+) protects this coil feed.
+      BATT+ source (not IGN) required -- MaxxECU power-hold keeps ECU alive post key-off
+      and commands EWP via GPO until CLT < 70 deg C. IGN-switched would cut pump immediately.
 
   AC_RELAY_COIL_STUB:
     type: "Stub: AC relay coil pin 86"
@@ -406,8 +419,8 @@ cables:
   W_EWP_RELAY_86:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["+12V IGN (86)"]
-    notes: "Fuse F9 :: EWP relay coil pin 86 (in ewp-controller.wv MAIN_RELAY). 18 AWG."
+    wirelabels: ["+12V BATT (86)"]
+    notes: "Fuse F9 (BATT+) :: EWP relay coil pin 86 (in ewp-controller.wv MAIN_RELAY). 18 AWG. BATT+ enables post-shutdown cooling via MaxxECU power-hold."
 
   W_AC_RELAY_86:
     wirecount: 1
@@ -470,7 +483,7 @@ cables:
     wirecount: 1
     colors: [GN]
     wirelabels: ["GPO 2 (85)"]
-    notes: "MaxxECU 12-pin pin 3 :: RELAY_FUEL_PUMP pin 85. 18 AWG. Low-side switch."
+    notes: "MaxxECU 12-pin pin 3 :: FUEL_PUMP_SSR Ctrl-. 18 AWG. Low-side PWM switch."
 
   # ── Relay load feeds (fused batt+ to relay pin 30) ──────────────────────────
   W_COIL_INJ_LOAD_FEED:
@@ -489,7 +502,7 @@ cables:
     wirecount: 1
     colors: [RD]
     wirelabels: ["batt+ (30)"]
-    notes: "Fuse F7 (15A) :: RELAY_FUEL_PUMP pin 30. 14 AWG."
+    notes: "Fuse F7 (25A) :: FUEL_PUMP_SSR Load+. 12 AWG. (F90000267 draws 14.1A max -- 8 AWG oversized from old pump spec)"
 
   # ── Relay outputs to loads (relay pin 87 :: load positive) ─────────────────
   W_ECU_MAIN_RELAY_OUT:
@@ -519,8 +532,8 @@ cables:
   W_PUMP_POS:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["pump +12V (87)"]
-    notes: "RELAY_FUEL_PUMP pin 87 :: FUEL_PUMP_MOTOR pin 1. 14 AWG."
+    wirelabels: ["pump +12V (SSR out)"]
+    notes: "FUEL_PUMP_SSR Load- (switched output) :: RADIUM_HANGER_STUB (pump+). 12 AWG. (F90000267 14.1A max)"
 
   # W_PUMP_GND removed -- pump GND is handled within fuel-pump-hanger.wv
 

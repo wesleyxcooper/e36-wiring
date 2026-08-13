@@ -53,13 +53,16 @@ connectors:
     pinlabels:
       - "Pin 30 (BATT+ in)"
       - "Pin 87 (switched +12V out to pump)"
-      - "Pin 86 (coil +12V -- IGN switched)"
+      - "Pin 86 (coil +12V -- BATT+ always-on for post-shutdown cooling)"
       - "Pin 85 (coil GND)"
     notes: >-
-      Relay coil (pin 86) driven from MaxxECU relay output or IGN bus relay.
-      Relay coil (pin 85) to chassis GND.
-      Relay output (pin 87) to pump Pin 3 via 10 AWG.
-      Relay input (pin 30) from fused BATT+ via 10 AWG.
+      Relay coil (pin 86): BATT+ via fuse F9 (5A) in power-distribution.wv.
+      BATT+ (not IGN) required -- MaxxECU power-hold keeps ECU alive after key-off
+      and commands pump until CLT < 70C. IGN would cut the pump immediately at key-off.
+      Relay coil (pin 85): chassis GND.
+      Relay output (pin 87): to pump Pin 3 via 10 AWG.
+      Relay input (pin 30): from fused BATT+ 40A via 10 AWG.
+      Flyback: 1N4007 across coil at relay socket (cathode to pin 86, anode to pin 85).
 
   MAXXECU_GPO:
     type: "MaxxECU RACE -- PWM General Purpose Output"
@@ -157,7 +160,7 @@ cables:
     colors: [GN, BK]
     wirecount: 2
     notes: >-
-      Wire 1 GREEN: relay coil pin 86 -- switched +12V IGN source.
+      Wire 1 GREEN: relay coil pin 86 -- BATT+ via fuse F9 (5A, power-distribution.wv).
       Wire 2 BLACK: relay coil pin 85 -- chassis GND.
       18 AWG sufficient for relay coil (low current).
 
@@ -184,7 +187,7 @@ connections:
     - MAXXECU_GPO: [1]
     - CABLE_PWM: [1]
     - CWA400_PUMP: [1]
-  # Relay coil: IGN switched +12V → pin 86, GND → pin 85
+  # Relay coil: BATT+ (F9 5A) -> pin 86, GND -> pin 85
   -
     - MAIN_RELAY: [3, 4]
     - CABLE_RELAY_COIL: [1, 2]

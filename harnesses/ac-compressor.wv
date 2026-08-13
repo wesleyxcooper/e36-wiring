@@ -67,6 +67,7 @@ connectors:
       Relay input pin 30 from 100A fused BATT+.
       AC enable tap: junction at relay coil 86 wire (after AC switch,
       before relay coil) runs to MaxxECU DIN for idle-up signal.
+      Flyback: 1N4007 across coil at relay socket (cathode to pin 86, anode to pin 85).
 
   AC_SWITCH:
     type: "Cabin AC on/off switch"

@@ -52,7 +52,7 @@ connectors:
       - "+12V 8HP Wakeup (IGN switched)"   # 3  Size 20  18 AWG
       - "+12V Fan relay out"               # 4  Size 12  12 AWG
       - "+12V Condenser fan relay out"     # 5  Size 12  12 AWG
-      - "+12V EWP relay out"               # 6  Size 12  10 AWG
+      - "+12V EWP relay out"               # 6  Size 8   10 AWG  (CWA400 36.3A max -- Size 12 23A insufficient)
       - "+12V AC relay out"                # 7  Size 12  8 AWG
       # ── GROUP B: Grounds ────────────────────────────────────────────────
       - "Engine GND (cyl head stud)"       # 8  Size 12  14 AWG  DO NOT OMIT
@@ -152,8 +152,9 @@ connectors:
       cable run from the E46 pedal module to the bulkhead face is the ONE cabin-side
       harness addition performed at the M52 → 07K swap. Engine-side of 72-77 wires
       into the 07K mating plug (to MaxxECU APS1/APS2 CMC pins).
-      AS79 contact sizes: Size 12 (23A) for power/GND, Size 20 (7.5A) for signals.
-      Souriau 8STA Size 8 contacts (45A) available for AC relay output pin 7 if needed.
+      AS79 contact sizes: Size 12 (23A) for most power/GND pins, Size 20 (7.5A) for signals.
+      Pin 6 (EWP +12V): Size 8 (45A) -- CWA400 draws 36.3A max, exceeds Size 12 23A rating.
+      Souriau 8STA Size 8 contacts (45A) also available for pin 7 (AC relay out) if needed.
       120Ω CAN terminator: one end at MaxxECU (cabin side); one end at 8HP TCU (engine bay).
       120Ω at firewall bulkhead pins 47/48 ONLY if 8HP is stub-terminated here (not recommended).
 
