@@ -63,7 +63,7 @@ connectors:
     notes: >-
       Panel-mount receptacle, cabin side. Pins 72-77 are cavity-plugged in Phase 1
       (M52 has no DBW pedal) and wired at Phase 3 (07K swap). The cabin-side cable
-      run (E46 pedal -> bulkhead face) is the ONE cabin-side harness addition at swap.
+      run (E46 pedal :: bulkhead face) is the ONE cabin-side harness addition at swap.
       Size 20 contacts rated 7.5A continuous -- more than sufficient for 20mA.
       Use Size 20 sockets (cable side) with 22-24 AWG range crimp tooling.
       Bulkhead backshell: Raychem DR-25 over strain relief on cabin side.
@@ -73,12 +73,12 @@ connectors:
     subtype: "Size 20 contacts -- pins 72-77 assigned to e-pedal APS signals"
     pincount: 6
     pinlabels:
-      - "Pin 72 (APS GND 1 -> MaxxECU SGND)"
-      - "Pin 73 (APS GND 2 -> MaxxECU SGND)"
-      - "Pin 74 (VCC 2 -> MaxxECU +5V sensor supply)"
-      - "Pin 75 (APS1 signal -> MaxxECU APS1 AIN)"
-      - "Pin 76 (VCC 1 -> MaxxECU +5V sensor supply)"
-      - "Pin 77 (APS2 signal -> MaxxECU APS2 AIN)"
+      - "Pin 72 (APS GND 1 :: MaxxECU SGND)"
+      - "Pin 73 (APS GND 2 :: MaxxECU SGND)"
+      - "Pin 74 (VCC 2 :: MaxxECU +5V sensor supply)"
+      - "Pin 75 (APS1 signal :: MaxxECU APS1 AIN)"
+      - "Pin 76 (VCC 1 :: MaxxECU +5V sensor supply)"
+      - "Pin 77 (APS2 signal :: MaxxECU APS2 AIN)"
     notes: >-
       Part of the 07K engine harness plug (maxxecu-07k.wv BULKHEAD_ENGINE_07K).
       Cavity-plugged on M52 engine-side plug -- M52 swap does not require

@@ -128,7 +128,7 @@ connectors:
       Pin 9 powered by battery +12V (EWP coil -- must be BATT+ for post-shutdown cooling).
       Relays switch the load circuits -- the fuses here protect the wires.
       F9 (EWP coil): 18 AWG to ewp-controller.wv MAIN_RELAY pin 86. BATT+ so MaxxECU
-      power-hold relay can keep pump running after key-off until CLT < 70 deg C.
+      power-hold relay can keep pump running after key-off until CLT below 70 deg C.
       F10 (AC coil): 18 AWG to ac-compressor.wv AC_RELAY pin 86.
       F4 (Fuel pump SSR ctrl): 18 AWG to fuel-pump-hanger.wv SSR Ctrl(+).
       TODO: confirm fuse block part. Options: Blue Sea ST Blade (5025),
@@ -324,7 +324,7 @@ connectors:
       Physical wire terminates at MAIN_RELAY pin 86 in ewp-controller.wv.
       18 AWG, red. Fuse F9 (5A, BATT+) protects this coil feed.
       BATT+ source (not IGN) required -- MaxxECU power-hold keeps ECU alive post key-off
-      and commands EWP via GPO until CLT < 70 deg C. IGN-switched would cut pump immediately.
+      and commands EWP via GPO until CLT below 70 deg C. IGN-switched would cut pump immediately.
 
   AC_RELAY_COIL_STUB:
     type: "Stub: AC relay coil pin 86"

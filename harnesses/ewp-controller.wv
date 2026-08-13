@@ -58,7 +58,7 @@ connectors:
     notes: >-
       Relay coil (pin 86): BATT+ via fuse F9 (5A) in power-distribution.wv.
       BATT+ (not IGN) required -- MaxxECU power-hold keeps ECU alive after key-off
-      and commands pump until CLT < 70C. IGN would cut the pump immediately at key-off.
+      and commands pump until CLT below 70C. IGN would cut the pump immediately at key-off.
       Relay coil (pin 85): chassis GND.
       Relay output (pin 87): to pump Pin 3 via 10 AWG.
       Relay input (pin 30): from fused BATT+ 40A via 10 AWG.

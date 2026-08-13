@@ -11,29 +11,29 @@
 <!-- CRANK_VR -->
 <g id="node1" class="node">
 <title>CRANK_VR</title>
-<polygon fill="#ffffff" stroke="black" points="2210.75,-4350.5 952.5,-4350.5 952.5,-4208 2210.75,-4208 2210.75,-4350.5"/>
-<polygon fill="none" stroke="black" points="952.5,-4326.75 952.5,-4350.5 2210.75,-4350.5 2210.75,-4326.75 952.5,-4326.75"/>
+<polygon fill="#ffffff" stroke="black" points="2981.38,-4350.5 181.88,-4350.5 181.88,-4208 2981.38,-4208 2981.38,-4350.5"/>
+<polygon fill="none" stroke="black" points="181.88,-4326.75 181.88,-4350.5 2981.38,-4350.5 2981.38,-4326.75 181.88,-4326.75"/>
 <text xml:space="preserve" text-anchor="start" x="1544.88" y="-4333.75" font-family="arial" font-size="14.00">CRANK_VR</text>
-<polygon fill="none" stroke="black" points="952.5,-4303 952.5,-4326.75 1373.17,-4326.75 1373.17,-4303 952.5,-4303"/>
-<text xml:space="preserve" text-anchor="start" x="1054.46" y="-4310" font-family="arial" font-size="14.00">VW 07K crank VR sensor connector</text>
-<polygon fill="none" stroke="black" points="1373.17,-4303 1373.17,-4326.75 1976.83,-4326.75 1976.83,-4303 1373.17,-4303"/>
-<text xml:space="preserve" text-anchor="start" x="1475.12" y="-4310" font-family="arial" font-size="14.00">60&#45;2 missing tooth VR — same MaxxECU trigger type N&#45;1 as M52</text>
-<polygon fill="none" stroke="black" points="1976.83,-4303 1976.83,-4326.75 2210.75,-4326.75 2210.75,-4303 1976.83,-4303"/>
-<text xml:space="preserve" text-anchor="start" x="2078.79" y="-4310" font-family="arial" font-size="14.00">3&#45;pin</text>
-<polygon fill="none" stroke="black" points="952.5,-4279.25 952.5,-4303 1600.75,-4303 1600.75,-4279.25 952.5,-4279.25"/>
-<text xml:space="preserve" text-anchor="start" x="1253.75" y="-4286.25" font-family="arial" font-size="14.00">Signal+</text>
-<polygon fill="none" stroke="black" points="1600.75,-4279.25 1600.75,-4303 2210.75,-4303 2210.75,-4279.25 1600.75,-4279.25"/>
-<text xml:space="preserve" text-anchor="start" x="1902" y="-4286.25" font-family="arial" font-size="14.00">1</text>
-<polygon fill="none" stroke="black" points="952.5,-4255.5 952.5,-4279.25 1600.75,-4279.25 1600.75,-4255.5 952.5,-4255.5"/>
-<text xml:space="preserve" text-anchor="start" x="1255.62" y="-4262.5" font-family="arial" font-size="14.00">Signal&#45;</text>
-<polygon fill="none" stroke="black" points="1600.75,-4255.5 1600.75,-4279.25 2210.75,-4279.25 2210.75,-4255.5 1600.75,-4255.5"/>
-<text xml:space="preserve" text-anchor="start" x="1902" y="-4262.5" font-family="arial" font-size="14.00">2</text>
-<polygon fill="none" stroke="black" points="952.5,-4231.75 952.5,-4255.5 1600.75,-4255.5 1600.75,-4231.75 952.5,-4231.75"/>
-<text xml:space="preserve" text-anchor="start" x="1257.88" y="-4238.75" font-family="arial" font-size="14.00">Shield</text>
-<polygon fill="none" stroke="black" points="1600.75,-4231.75 1600.75,-4255.5 2210.75,-4255.5 2210.75,-4231.75 1600.75,-4231.75"/>
-<text xml:space="preserve" text-anchor="start" x="1902" y="-4238.75" font-family="arial" font-size="14.00">3</text>
-<polygon fill="none" stroke="black" points="952.5,-4208 952.5,-4231.75 2210.75,-4231.75 2210.75,-4208 952.5,-4208"/>
-<text xml:space="preserve" text-anchor="start" x="956.5" y="-4215" font-family="arial" font-size="14.00">TODO: Confirm exact VW connector body type at install (Bosch Kombi&#45;F 3&#45;pin or similar). ME7.1.1 harness ref: Conn B pin 82. Same 60&#45;2 trigger as M52 — only crank angle offset calibration differs in MTune.</text>
+<polygon fill="none" stroke="black" points="181.88,-4303 181.88,-4326.75 1107.04,-4326.75 1107.04,-4303 181.88,-4303"/>
+<text xml:space="preserve" text-anchor="start" x="536.08" y="-4310" font-family="arial" font-size="14.00">VW 07K crank VR sensor connector</text>
+<polygon fill="none" stroke="black" points="1107.04,-4303 1107.04,-4326.75 2242.96,-4326.75 2242.96,-4303 1107.04,-4303"/>
+<text xml:space="preserve" text-anchor="start" x="1461.25" y="-4310" font-family="arial" font-size="14.00">60&#45;2 missing tooth passive VR — MaxxECU VR input (N&#45;1 trigger type)</text>
+<polygon fill="none" stroke="black" points="2242.96,-4303 2242.96,-4326.75 2981.38,-4326.75 2981.38,-4303 2242.96,-4303"/>
+<text xml:space="preserve" text-anchor="start" x="2597.17" y="-4310" font-family="arial" font-size="14.00">3&#45;pin</text>
+<polygon fill="none" stroke="black" points="181.88,-4279.25 181.88,-4303 1600.75,-4303 1600.75,-4279.25 181.88,-4279.25"/>
+<text xml:space="preserve" text-anchor="start" x="868.44" y="-4286.25" font-family="arial" font-size="14.00">Signal+</text>
+<polygon fill="none" stroke="black" points="1600.75,-4279.25 1600.75,-4303 2981.38,-4303 2981.38,-4279.25 1600.75,-4279.25"/>
+<text xml:space="preserve" text-anchor="start" x="2287.31" y="-4286.25" font-family="arial" font-size="14.00">1</text>
+<polygon fill="none" stroke="black" points="181.88,-4255.5 181.88,-4279.25 1600.75,-4279.25 1600.75,-4255.5 181.88,-4255.5"/>
+<text xml:space="preserve" text-anchor="start" x="870.31" y="-4262.5" font-family="arial" font-size="14.00">Signal&#45;</text>
+<polygon fill="none" stroke="black" points="1600.75,-4255.5 1600.75,-4279.25 2981.38,-4279.25 2981.38,-4255.5 1600.75,-4255.5"/>
+<text xml:space="preserve" text-anchor="start" x="2287.31" y="-4262.5" font-family="arial" font-size="14.00">2</text>
+<polygon fill="none" stroke="black" points="181.88,-4231.75 181.88,-4255.5 1600.75,-4255.5 1600.75,-4231.75 181.88,-4231.75"/>
+<text xml:space="preserve" text-anchor="start" x="872.56" y="-4238.75" font-family="arial" font-size="14.00">Shield</text>
+<polygon fill="none" stroke="black" points="1600.75,-4231.75 1600.75,-4255.5 2981.38,-4255.5 2981.38,-4231.75 1600.75,-4231.75"/>
+<text xml:space="preserve" text-anchor="start" x="2287.31" y="-4238.75" font-family="arial" font-size="14.00">3</text>
+<polygon fill="none" stroke="black" points="181.88,-4208 181.88,-4231.75 2981.38,-4231.75 2981.38,-4208 181.88,-4208"/>
+<text xml:space="preserve" text-anchor="start" x="185.88" y="-4215" font-family="arial" font-size="14.00">OE# 3B0973703G — same connector body as CAM_HALL but DIFFERENT pinout. Crank: Signal+/Signal&#45;/Shield (passive VR). Cam: +5V/GND/Signal (active Hall). LABEL PIGTAILS AT CRIMP TIME — swapped pigtails produce no&#45;start with no obvious failure indicator. MTune: VR input, trigger N&#45;1 / 60&#45;2 pattern, same type as M52 crank. Only crank angle offset may differ — confirm in MTune Trigger Setup before first crank. ME7.1.1 harness ref: Conn B pin 82.</text>
 </g>
 <!-- W_CRANK -->
 <g id="node24" class="node">
@@ -71,23 +71,23 @@
 <!-- CRANK_VR&#45;&#45;W_CRANK -->
 <g id="edge1" class="edge">
 <title>CRANK_VR:e&#45;&#45;W_CRANK:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2211.75,-4289.13C2714.55,-4289.13 2840.24,-4290.25 3343,-4290.25"/>
-<path fill="none" stroke="#ffffff" stroke-width="2" d="M2211.75,-4291.12C2714.53,-4291.13 2840.22,-4292.25 3343,-4292.25"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2211.75,-4293.12C2714.51,-4293.12 2840.2,-4294.25 3343,-4294.25"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2982.38,-4289.13C3142.71,-4289.13 3182.78,-4290.25 3343,-4290.25"/>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M2982.38,-4291.12C3142.65,-4291.12 3182.72,-4292.25 3343,-4292.25"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2982.38,-4293.12C3142.6,-4293.12 3182.67,-4294.25 3343,-4294.25"/>
 </g>
 <!-- CRANK_VR&#45;&#45;W_CRANK -->
 <g id="edge3" class="edge">
 <title>CRANK_VR:e&#45;&#45;W_CRANK:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2211.75,-4265.38C2714.51,-4265.38 2840.21,-4264.5 3343,-4264.5"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2211.75,-4267.38C2714.53,-4267.38 2840.22,-4266.5 3343,-4266.5"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2211.75,-4269.37C2714.54,-4269.37 2840.24,-4268.5 3343,-4268.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2982.38,-4265.38C3142.61,-4265.38 3182.68,-4264.5 3343,-4264.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2982.38,-4267.38C3142.65,-4267.38 3182.72,-4266.5 3343,-4266.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2982.38,-4269.37C3142.7,-4269.37 3182.77,-4268.5 3343,-4268.5"/>
 </g>
 <!-- CRANK_VR&#45;&#45;W_CRANK -->
 <g id="edge5" class="edge">
 <title>CRANK_VR:e&#45;&#45;W_CRANK:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2211.75,-4241.63C2714.48,-4241.63 2840.17,-4238.75 3343,-4238.75"/>
-<path fill="none" stroke="#999999" stroke-width="2" d="M2211.75,-4243.62C2714.53,-4243.62 2840.22,-4240.75 3343,-4240.75"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2211.75,-4245.62C2714.58,-4245.62 2840.27,-4242.75 3343,-4242.75"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2982.38,-4241.63C3142.51,-4241.63 3182.57,-4238.76 3343,-4238.75"/>
+<path fill="none" stroke="#999999" stroke-width="2" d="M2982.38,-4243.62C3142.66,-4243.62 3182.72,-4240.75 3343,-4240.75"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2982.38,-4245.62C3142.8,-4245.62 3182.86,-4242.74 3343,-4242.75"/>
 </g>
 <!-- ECU_CMC -->
 <g id="node2" class="node">
@@ -1288,25 +1288,25 @@
 <!-- INJ_1 -->
 <g id="node15" class="node">
 <title>INJ_1</title>
-<polygon fill="#ffffff" stroke="black" points="1865.38,-1647.62 1297.88,-1647.62 1297.88,-1528.88 1865.38,-1528.88 1865.38,-1647.62"/>
-<polygon fill="none" stroke="black" points="1297.88,-1623.88 1297.88,-1647.62 1865.38,-1647.62 1865.38,-1623.88 1297.88,-1623.88"/>
+<polygon fill="#ffffff" stroke="black" points="2040.5,-1647.62 1122.75,-1647.62 1122.75,-1528.88 2040.5,-1528.88 2040.5,-1647.62"/>
+<polygon fill="none" stroke="black" points="1122.75,-1623.88 1122.75,-1647.62 2040.5,-1647.62 2040.5,-1623.88 1122.75,-1623.88"/>
 <text xml:space="preserve" text-anchor="start" x="1564" y="-1630.88" font-family="arial" font-size="14.00">INJ_1</text>
-<polygon fill="none" stroke="black" points="1297.88,-1600.12 1297.88,-1623.88 1549.54,-1623.88 1549.54,-1600.12 1297.88,-1600.12"/>
-<text xml:space="preserve" text-anchor="start" x="1339.71" y="-1607.12" font-family="arial" font-size="14.00">Bosch EV14 2&#45;pin (USCAR)</text>
-<polygon fill="none" stroke="black" points="1549.54,-1600.12 1549.54,-1623.88 1751.71,-1623.88 1751.71,-1600.12 1549.54,-1600.12"/>
+<polygon fill="none" stroke="black" points="1122.75,-1600.12 1122.75,-1623.88 1491.17,-1623.88 1491.17,-1600.12 1122.75,-1600.12"/>
+<text xml:space="preserve" text-anchor="start" x="1222.96" y="-1607.12" font-family="arial" font-size="14.00">Bosch EV14 2&#45;pin (USCAR)</text>
+<polygon fill="none" stroke="black" points="1491.17,-1600.12 1491.17,-1623.88 1810.08,-1623.88 1810.08,-1600.12 1491.17,-1600.12"/>
 <text xml:space="preserve" text-anchor="start" x="1591.38" y="-1607.12" font-family="arial" font-size="14.00">Injector 1 (ID1050x)</text>
-<polygon fill="none" stroke="black" points="1751.71,-1600.12 1751.71,-1623.88 1865.38,-1623.88 1865.38,-1600.12 1751.71,-1600.12"/>
-<text xml:space="preserve" text-anchor="start" x="1793.54" y="-1607.12" font-family="arial" font-size="14.00">2&#45;pin</text>
-<polygon fill="none" stroke="black" points="1297.88,-1576.38 1297.88,-1600.12 1594,-1600.12 1594,-1576.38 1297.88,-1576.38"/>
-<text xml:space="preserve" text-anchor="start" x="1429.81" y="-1583.38" font-family="arial" font-size="14.00">+12V</text>
-<polygon fill="none" stroke="black" points="1594,-1576.38 1594,-1600.12 1865.38,-1600.12 1865.38,-1576.38 1594,-1576.38"/>
-<text xml:space="preserve" text-anchor="start" x="1725.94" y="-1583.38" font-family="arial" font-size="14.00">1</text>
-<polygon fill="none" stroke="black" points="1297.88,-1552.62 1297.88,-1576.38 1594,-1576.38 1594,-1552.62 1297.88,-1552.62"/>
-<text xml:space="preserve" text-anchor="start" x="1430.19" y="-1559.62" font-family="arial" font-size="14.00">INJ 1</text>
-<polygon fill="none" stroke="black" points="1594,-1552.62 1594,-1576.38 1865.38,-1576.38 1865.38,-1552.62 1594,-1552.62"/>
-<text xml:space="preserve" text-anchor="start" x="1725.94" y="-1559.62" font-family="arial" font-size="14.00">2</text>
-<polygon fill="none" stroke="black" points="1297.88,-1528.88 1297.88,-1552.62 1865.38,-1552.62 1865.38,-1528.88 1297.88,-1528.88"/>
-<text xml:space="preserve" text-anchor="start" x="1301.88" y="-1535.88" font-family="arial" font-size="14.00">MaxxECU M50 harness ships with EV1 connector ends — replace with EV14 pigtails for 07K.</text>
+<polygon fill="none" stroke="black" points="1810.08,-1600.12 1810.08,-1623.88 2040.5,-1623.88 2040.5,-1600.12 1810.08,-1600.12"/>
+<text xml:space="preserve" text-anchor="start" x="1910.29" y="-1607.12" font-family="arial" font-size="14.00">2&#45;pin</text>
+<polygon fill="none" stroke="black" points="1122.75,-1576.38 1122.75,-1600.12 1594,-1600.12 1594,-1576.38 1122.75,-1576.38"/>
+<text xml:space="preserve" text-anchor="start" x="1342.25" y="-1583.38" font-family="arial" font-size="14.00">+12V</text>
+<polygon fill="none" stroke="black" points="1594,-1576.38 1594,-1600.12 2040.5,-1600.12 2040.5,-1576.38 1594,-1576.38"/>
+<text xml:space="preserve" text-anchor="start" x="1813.5" y="-1583.38" font-family="arial" font-size="14.00">1</text>
+<polygon fill="none" stroke="black" points="1122.75,-1552.62 1122.75,-1576.38 1594,-1576.38 1594,-1552.62 1122.75,-1552.62"/>
+<text xml:space="preserve" text-anchor="start" x="1342.62" y="-1559.62" font-family="arial" font-size="14.00">INJ 1</text>
+<polygon fill="none" stroke="black" points="1594,-1552.62 1594,-1576.38 2040.5,-1576.38 2040.5,-1552.62 1594,-1552.62"/>
+<text xml:space="preserve" text-anchor="start" x="1813.5" y="-1559.62" font-family="arial" font-size="14.00">2</text>
+<polygon fill="none" stroke="black" points="1122.75,-1528.88 1122.75,-1552.62 2040.5,-1552.62 2040.5,-1528.88 1122.75,-1528.88"/>
+<text xml:space="preserve" text-anchor="start" x="1126.75" y="-1535.88" font-family="arial" font-size="14.00">MaxxECU M50 harness ships with EV1 connector ends — replace with EV14 pigtails for 07K. Product: http://injectordynamics.com/injectors/id1050&#45;xds/</text>
 </g>
 <!-- W_INJ_1 -->
 <g id="node38" class="node">
@@ -1336,16 +1336,16 @@
 <!-- INJ_1&#45;&#45;W_INJ_1 -->
 <g id="edge83" class="edge">
 <title>INJ_1:e&#45;&#45;W_INJ_1:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M1866.38,-1586.25C2544.99,-1586.25 2714.64,-1586.5 3393.25,-1586.5"/>
-<path fill="none" stroke="#ff0000" stroke-width="2" d="M1866.38,-1588.25C2544.99,-1588.25 2714.64,-1588.5 3393.25,-1588.5"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M1866.38,-1590.25C2544.98,-1590.25 2714.64,-1590.5 3393.25,-1590.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2041.5,-1586.25C2642.28,-1586.25 2792.48,-1586.5 3393.25,-1586.5"/>
+<path fill="none" stroke="#ff0000" stroke-width="2" d="M2041.5,-1588.25C2642.28,-1588.25 2792.47,-1588.5 3393.25,-1588.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2041.5,-1590.25C2642.27,-1590.25 2792.47,-1590.5 3393.25,-1590.5"/>
 </g>
 <!-- INJ_1&#45;&#45;W_INJ_1 -->
 <g id="edge85" class="edge">
 <title>INJ_1:e&#45;&#45;W_INJ_1:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M1866.38,-1562.5C2544.97,-1562.5 2714.62,-1560.75 3393.25,-1560.75"/>
-<path fill="none" stroke="#00ff00" stroke-width="2" d="M1866.38,-1564.5C2544.99,-1564.5 2714.64,-1562.75 3393.25,-1562.75"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M1866.38,-1566.5C2545.01,-1566.5 2714.66,-1564.75 3393.25,-1564.75"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2041.5,-1562.5C2642.25,-1562.5 2792.45,-1560.75 3393.25,-1560.75"/>
+<path fill="none" stroke="#00ff00" stroke-width="2" d="M2041.5,-1564.5C2642.28,-1564.5 2792.47,-1562.75 3393.25,-1562.75"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2041.5,-1566.5C2642.3,-1566.5 2792.5,-1564.75 3393.25,-1564.75"/>
 </g>
 <!-- INJ_2 -->
 <g id="node16" class="node">
@@ -1688,41 +1688,41 @@
 <!-- WIDEBAND -->
 <g id="node21" class="node">
 <title>WIDEBAND</title>
-<polygon fill="#ffffff" stroke="black" points="2127.88,-613.12 1035.38,-613.12 1035.38,-399.38 2127.88,-399.38 2127.88,-613.12"/>
-<polygon fill="none" stroke="black" points="1035.38,-589.38 1035.38,-613.12 2127.88,-613.12 2127.88,-589.38 1035.38,-589.38"/>
+<polygon fill="#ffffff" stroke="black" points="2410.25,-613.12 753,-613.12 753,-399.38 2410.25,-399.38 2410.25,-613.12"/>
+<polygon fill="none" stroke="black" points="753,-589.38 753,-613.12 2410.25,-613.12 2410.25,-589.38 753,-589.38"/>
 <text xml:space="preserve" text-anchor="start" x="1544.88" y="-596.38" font-family="arial" font-size="14.00">WIDEBAND</text>
-<polygon fill="none" stroke="black" points="1035.38,-565.62 1035.38,-589.38 1424.54,-589.38 1424.54,-565.62 1035.38,-565.62"/>
-<text xml:space="preserve" text-anchor="start" x="1165.08" y="-572.62" font-family="arial" font-size="14.00">Bosch LSU 4.9 6&#45;way</text>
-<polygon fill="none" stroke="black" points="1424.54,-565.62 1424.54,-589.38 1838.46,-589.38 1838.46,-565.62 1424.54,-565.62"/>
+<polygon fill="none" stroke="black" points="753,-565.62 753,-589.38 1330.42,-589.38 1330.42,-565.62 753,-565.62"/>
+<text xml:space="preserve" text-anchor="start" x="976.83" y="-572.62" font-family="arial" font-size="14.00">Bosch LSU 4.9 6&#45;way</text>
+<polygon fill="none" stroke="black" points="1330.42,-565.62 1330.42,-589.38 1932.58,-589.38 1932.58,-565.62 1330.42,-565.62"/>
 <text xml:space="preserve" text-anchor="start" x="1554.25" y="-572.62" font-family="arial" font-size="14.00">Wideband lambda sensor</text>
-<polygon fill="none" stroke="black" points="1838.46,-565.62 1838.46,-589.38 2127.88,-589.38 2127.88,-565.62 1838.46,-565.62"/>
-<text xml:space="preserve" text-anchor="start" x="1968.17" y="-572.62" font-family="arial" font-size="14.00">6&#45;pin</text>
-<polygon fill="none" stroke="black" points="1035.38,-541.88 1035.38,-565.62 1591.75,-565.62 1591.75,-541.88 1035.38,-541.88"/>
-<text xml:space="preserve" text-anchor="start" x="1307.19" y="-548.88" font-family="arial" font-size="14.00">IP</text>
-<polygon fill="none" stroke="black" points="1591.75,-541.88 1591.75,-565.62 2127.88,-565.62 2127.88,-541.88 1591.75,-541.88"/>
-<text xml:space="preserve" text-anchor="start" x="1856.06" y="-548.88" font-family="arial" font-size="14.00">1</text>
-<polygon fill="none" stroke="black" points="1035.38,-518.12 1035.38,-541.88 1591.75,-541.88 1591.75,-518.12 1035.38,-518.12"/>
-<text xml:space="preserve" text-anchor="start" x="1304.56" y="-525.12" font-family="arial" font-size="14.00">VS</text>
-<polygon fill="none" stroke="black" points="1591.75,-518.12 1591.75,-541.88 2127.88,-541.88 2127.88,-518.12 1591.75,-518.12"/>
-<text xml:space="preserve" text-anchor="start" x="1856.06" y="-525.12" font-family="arial" font-size="14.00">2</text>
-<polygon fill="none" stroke="black" points="1035.38,-494.38 1035.38,-518.12 1591.75,-518.12 1591.75,-494.38 1035.38,-494.38"/>
-<text xml:space="preserve" text-anchor="start" x="1300.06" y="-501.38" font-family="arial" font-size="14.00">APE</text>
-<polygon fill="none" stroke="black" points="1591.75,-494.38 1591.75,-518.12 2127.88,-518.12 2127.88,-494.38 1591.75,-494.38"/>
-<text xml:space="preserve" text-anchor="start" x="1856.06" y="-501.38" font-family="arial" font-size="14.00">3</text>
-<polygon fill="none" stroke="black" points="1035.38,-470.62 1035.38,-494.38 1591.75,-494.38 1591.75,-470.62 1035.38,-470.62"/>
-<text xml:space="preserve" text-anchor="start" x="1299.69" y="-477.62" font-family="arial" font-size="14.00">Trim</text>
-<polygon fill="none" stroke="black" points="1591.75,-470.62 1591.75,-494.38 2127.88,-494.38 2127.88,-470.62 1591.75,-470.62"/>
-<text xml:space="preserve" text-anchor="start" x="1856.06" y="-477.62" font-family="arial" font-size="14.00">4</text>
-<polygon fill="none" stroke="black" points="1035.38,-446.88 1035.38,-470.62 1591.75,-470.62 1591.75,-446.88 1035.38,-446.88"/>
-<text xml:space="preserve" text-anchor="start" x="1301.19" y="-453.88" font-family="arial" font-size="14.00">Hs+</text>
-<polygon fill="none" stroke="black" points="1591.75,-446.88 1591.75,-470.62 2127.88,-470.62 2127.88,-446.88 1591.75,-446.88"/>
-<text xml:space="preserve" text-anchor="start" x="1856.06" y="-453.88" font-family="arial" font-size="14.00">5</text>
-<polygon fill="none" stroke="black" points="1035.38,-423.12 1035.38,-446.88 1591.75,-446.88 1591.75,-423.12 1035.38,-423.12"/>
-<text xml:space="preserve" text-anchor="start" x="1303.06" y="-430.12" font-family="arial" font-size="14.00">Hs&#45;</text>
-<polygon fill="none" stroke="black" points="1591.75,-423.12 1591.75,-446.88 2127.88,-446.88 2127.88,-423.12 1591.75,-423.12"/>
-<text xml:space="preserve" text-anchor="start" x="1856.06" y="-430.12" font-family="arial" font-size="14.00">6</text>
-<polygon fill="none" stroke="black" points="1035.38,-399.38 1035.38,-423.12 2127.88,-423.12 2127.88,-399.38 1035.38,-399.38"/>
-<text xml:space="preserve" text-anchor="start" x="1039.38" y="-406.38" font-family="arial" font-size="14.00">Same harness wiring as M52. Bung: weld 18mm x1.5 in 07K custom top&#45;mount exhaust manifold, min 6in from collector, upstream of turbo. Sensor: Bosch 0 258 017 025 (LSU 4.9).</text>
+<polygon fill="none" stroke="black" points="1932.58,-565.62 1932.58,-589.38 2410.25,-589.38 2410.25,-565.62 1932.58,-565.62"/>
+<text xml:space="preserve" text-anchor="start" x="2156.42" y="-572.62" font-family="arial" font-size="14.00">6&#45;pin</text>
+<polygon fill="none" stroke="black" points="753,-541.88 753,-565.62 1591.75,-565.62 1591.75,-541.88 753,-541.88"/>
+<text xml:space="preserve" text-anchor="start" x="1166" y="-548.88" font-family="arial" font-size="14.00">IP</text>
+<polygon fill="none" stroke="black" points="1591.75,-541.88 1591.75,-565.62 2410.25,-565.62 2410.25,-541.88 1591.75,-541.88"/>
+<text xml:space="preserve" text-anchor="start" x="1997.25" y="-548.88" font-family="arial" font-size="14.00">1</text>
+<polygon fill="none" stroke="black" points="753,-518.12 753,-541.88 1591.75,-541.88 1591.75,-518.12 753,-518.12"/>
+<text xml:space="preserve" text-anchor="start" x="1163.38" y="-525.12" font-family="arial" font-size="14.00">VS</text>
+<polygon fill="none" stroke="black" points="1591.75,-518.12 1591.75,-541.88 2410.25,-541.88 2410.25,-518.12 1591.75,-518.12"/>
+<text xml:space="preserve" text-anchor="start" x="1997.25" y="-525.12" font-family="arial" font-size="14.00">2</text>
+<polygon fill="none" stroke="black" points="753,-494.38 753,-518.12 1591.75,-518.12 1591.75,-494.38 753,-494.38"/>
+<text xml:space="preserve" text-anchor="start" x="1158.88" y="-501.38" font-family="arial" font-size="14.00">APE</text>
+<polygon fill="none" stroke="black" points="1591.75,-494.38 1591.75,-518.12 2410.25,-518.12 2410.25,-494.38 1591.75,-494.38"/>
+<text xml:space="preserve" text-anchor="start" x="1997.25" y="-501.38" font-family="arial" font-size="14.00">3</text>
+<polygon fill="none" stroke="black" points="753,-470.62 753,-494.38 1591.75,-494.38 1591.75,-470.62 753,-470.62"/>
+<text xml:space="preserve" text-anchor="start" x="1158.5" y="-477.62" font-family="arial" font-size="14.00">Trim</text>
+<polygon fill="none" stroke="black" points="1591.75,-470.62 1591.75,-494.38 2410.25,-494.38 2410.25,-470.62 1591.75,-470.62"/>
+<text xml:space="preserve" text-anchor="start" x="1997.25" y="-477.62" font-family="arial" font-size="14.00">4</text>
+<polygon fill="none" stroke="black" points="753,-446.88 753,-470.62 1591.75,-470.62 1591.75,-446.88 753,-446.88"/>
+<text xml:space="preserve" text-anchor="start" x="1160" y="-453.88" font-family="arial" font-size="14.00">Hs+</text>
+<polygon fill="none" stroke="black" points="1591.75,-446.88 1591.75,-470.62 2410.25,-470.62 2410.25,-446.88 1591.75,-446.88"/>
+<text xml:space="preserve" text-anchor="start" x="1997.25" y="-453.88" font-family="arial" font-size="14.00">5</text>
+<polygon fill="none" stroke="black" points="753,-423.12 753,-446.88 1591.75,-446.88 1591.75,-423.12 753,-423.12"/>
+<text xml:space="preserve" text-anchor="start" x="1161.88" y="-430.12" font-family="arial" font-size="14.00">Hs&#45;</text>
+<polygon fill="none" stroke="black" points="1591.75,-423.12 1591.75,-446.88 2410.25,-446.88 2410.25,-423.12 1591.75,-423.12"/>
+<text xml:space="preserve" text-anchor="start" x="1997.25" y="-430.12" font-family="arial" font-size="14.00">6</text>
+<polygon fill="none" stroke="black" points="753,-399.38 753,-423.12 2410.25,-423.12 2410.25,-399.38 753,-399.38"/>
+<text xml:space="preserve" text-anchor="start" x="757" y="-406.38" font-family="arial" font-size="14.00">Same harness wiring as M52. Bung: weld 18mm x1.5 in 07K custom top&#45;mount exhaust manifold, min 6in from collector, upstream of turbo. Sensor: Bosch 0 258 017 025 (LSU 4.9). Product: https://www.bosch&#45;motorsport.com/products/sensors/lambda/lambda&#45;sensor&#45;lsu&#45;4&#45;9/</text>
 </g>
 <!-- W_WBO2 -->
 <g id="node44" class="node">
@@ -1772,37 +1772,37 @@
 <!-- WIDEBAND&#45;&#45;W_WBO2 -->
 <g id="edge111" class="edge">
 <title>WIDEBAND:e&#45;&#45;W_WBO2:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2128.88,-528C2676.41,-528 2813.26,-534 3360.62,-534"/>
-<path fill="none" stroke="#ffffff" stroke-width="2" d="M2128.88,-530C2676.33,-530 2813.17,-536 3360.62,-536"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2128.88,-532C2676.24,-532 2813.09,-538 3360.62,-538"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2411.25,-528C2833.32,-528 2938.79,-534 3360.62,-534"/>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M2411.25,-530C2833.2,-530 2938.67,-536 3360.62,-536"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2411.25,-532C2833.09,-532 2938.56,-538 3360.62,-538"/>
 </g>
 <!-- WIDEBAND&#45;&#45;W_WBO2 -->
 <g id="edge113" class="edge">
 <title>WIDEBAND:e&#45;&#45;W_WBO2:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2128.88,-551.75C2676.05,-551.84 2812.23,-508.34 3360.62,-508.25"/>
-<path fill="none" stroke="#ffffff" stroke-width="2" d="M2128.88,-553.75C2676.66,-553.75 2812.84,-510.25 3360.62,-510.25"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2128.88,-555.75C2677.27,-555.66 2813.45,-512.16 3360.62,-512.25"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2411.25,-551.75C2832.87,-551.9 2937.47,-508.4 3360.62,-508.25"/>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M2411.25,-553.75C2833.64,-553.75 2938.24,-510.25 3360.62,-510.25"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2411.25,-555.75C2834.41,-555.6 2939.01,-512.1 3360.62,-512.25"/>
 </g>
 <!-- WIDEBAND&#45;&#45;W_WBO2 -->
 <g id="edge115" class="edge">
 <title>WIDEBAND:e&#45;&#45;W_WBO2:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2128.88,-433C2677.45,-433.12 2813.42,-482.62 3360.62,-482.5"/>
-<path fill="none" stroke="#ffffff" stroke-width="2" d="M2128.88,-435C2676.76,-435 2812.74,-484.5 3360.62,-484.5"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2128.88,-437C2676.08,-436.88 2812.05,-486.38 3360.62,-486.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2411.25,-433C2834.62,-433.19 2938.96,-482.69 3360.62,-482.5"/>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M2411.25,-435C2833.77,-435 2938.11,-484.5 3360.62,-484.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2411.25,-437C2832.91,-436.81 2937.25,-486.31 3360.62,-486.5"/>
 </g>
 <!-- WIDEBAND&#45;&#45;W_WBO2 -->
 <g id="edge117" class="edge">
 <title>WIDEBAND:e&#45;&#45;W_WBO2:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2128.88,-456.75C2676.32,-456.75 2813.18,-456.75 3360.62,-456.75"/>
-<path fill="none" stroke="#ffffff" stroke-width="2" d="M2128.88,-458.75C2676.32,-458.75 2813.18,-458.75 3360.62,-458.75"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2128.88,-460.75C2676.32,-460.75 2813.18,-460.75 3360.62,-460.75"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2411.25,-456.75C2833.19,-456.75 2938.68,-456.75 3360.62,-456.75"/>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M2411.25,-458.75C2833.19,-458.75 2938.68,-458.75 3360.62,-458.75"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2411.25,-460.75C2833.19,-460.75 2938.68,-460.75 3360.62,-460.75"/>
 </g>
 <!-- WIDEBAND&#45;&#45;W_WBO2 -->
 <g id="edge119" class="edge">
 <title>WIDEBAND:e&#45;&#45;W_WBO2:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2128.88,-433C2676.29,-433 2813.15,-431 3360.62,-431"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2128.88,-435C2676.32,-435 2813.18,-433 3360.62,-433"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2128.88,-437C2676.35,-437 2813.21,-435 3360.62,-435"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2411.25,-433C2833.16,-433 2938.64,-431 3360.62,-431"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2411.25,-435C2833.2,-435 2938.68,-433 3360.62,-433"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2411.25,-437C2833.23,-437 2938.72,-435 3360.62,-435"/>
 </g>
 <!-- ECU_12PIN -->
 <g id="node22" class="node">
