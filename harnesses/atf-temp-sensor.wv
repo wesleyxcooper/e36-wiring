@@ -55,7 +55,7 @@ connectors:
       - "AIN 2 spare temp (pin 51)"
 
   ECU_CMC:
-    type: "MaxxECU RACE — Cinch CMC main connector"
+    type: "MaxxECU RACE — Molex CMC 48-pin (C1)"
     subtype: "AIN 2 (J2) temperature input — 2.5k internal pullup"
     pincount: 2
     pinlabels:

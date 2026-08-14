@@ -85,7 +85,7 @@ MaxxECU 1/8 NPT NTC sensor (ID 1280) threaded into Vibrant 16488 inline -8AN ada
 
 ## Key interfaces
 
-- **MaxxECU Race connector:** CMC (Cinch Modular Connector) multi-pin — see `connectors/maxxecu-cmc.wv`
+- **MaxxECU Race connector:** Molex CMC — C1 (48-pin, connector 1) used in M52/07K harnesses; C2 (32-pin, connector 2) carries EGT, knock 2, AIN 5/6, motor 1/2 outputs — not currently wired. Crimp tools: Molex 63811-9200 (small/20 AWG), 63811-8900 (big/0.5–1mm²). Source: [maxxecu.com pinout](https://www.maxxecu.com/webhelp/wirings-maxxecu_pinout.html)
 - **Firewall bulkhead:** Deutsch Autosport AS79 (79-way) — permanent cabin side; M52 and 07K engine harnesses each mate at a mating plug for single-connector swaps. Pin assignment: `harnesses/firewall-bulkhead.wv`
 - **E36 X20:** Chassis-to-engine-bay interface — MaxxECU RPM/temp/pressure signals to OEM instrument cluster
 - **8HP CAN:** MaxxECU GEN1 8HP CAN harness (native control — no TurboLamik)
@@ -103,6 +103,8 @@ MaxxECU 1/8 NPT NTC sensor (ID 1280) threaded into Vibrant 16488 inline -8AN ada
 - **[`docs/dbw-pinouts.md`](docs/dbw-pinouts.md)** — E46 pedal (bench-verified), Hella fallback pedal, 07K TB pinouts, TB upgrade table, bulkhead pin allocation for DBW
 - **[`docs/etb-pid-tuning.md`](docs/etb-pid-tuning.md)** — E-throttle PID tuning: pre-conditions, MTune calibration sequence, PID auto-tune, scope evaluation, symptom table, safety monitoring, TB upgrade re-tune notes
 - **[`docs/wiring-bom.md`](docs/wiring-bom.md)** — Consolidated BOM for purchasing: organized by system (power, engine mgmt, e-pedal, fuel, EWP, body); per-run wire color / gauge / length / shielded flag; consolidated wire-to-buy table by gauge+color with 20% slack; connector-to-buy table with part numbers; cross-harness shared items; open TODO list
+- **[`docs/loom-routing.md`](docs/loom-routing.md)** — Physical loom routing reference: engine bay trunk + sub-loom breakout points, cabin loom, tunnel/rear fuel run, sleeving spec by zone, breakout discipline. **Fill in during form-board layout / trial-fit session.**
+- **[`docs/harness-build.md`](docs/harness-build.md)** — Harness assembly discipline: pin count by connector family (~200–230 total), tool-to-connector matrix, per-family depin procedures (Molex/Deutsch/VW-PTS), 3B0973703G cam/crank label warning, crimp-verify-seat workflow, bench test sequence before sleeving.
 
 ## Setup
 

@@ -20,6 +20,8 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 | 1 | Battery positive terminal | Ring terminal, trunk/engine bay |
 | 1 | Battery negative terminal | Ring terminal |
 | 1 | Chassis ground stud, M8 | Engine bay |
+| 2–3 | **Amphenol Radlok 8mm — M8×1.25 Male** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-male/), ~$15 CAD ea — thread into cylinder head and engine block GND strap bosses. Replaces ring terminal + bolt — tool-free press-lock disconnect. Speeds up M52→07K swap. Secure cable within 3 cm; inspect annually. |
+| 1 | **Amphenol Radlok 8mm — M8×1.25 Female** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-female/), ~$22 CAD — threads onto M8 B+ stud of 07K alternator (`07K 903 023 A`). Cable-end Radlok socket on charge wire → tool-free disconnect at alternator removal. |
 | 4 | Bosch ISO mini relay, 12V coil / 30A contacts | `0 332 002 150` or equiv — ECU main, coil/inj, fan, fuel pump |
 | 1 | Mini blade fuse block, 8-position | ⚠️ TODO: source specific block |
 | 1 | Inline ANL or MAXI fuse holder | ⚠️ TODO: size — likely 60–80A main fuse |
@@ -51,9 +53,8 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 
 | Qty | Item | Notes |
 |-----|------|-------|
-| 1 | Cinch CMC 26-pin (MaxxECU Race main) | `ECU_CMC` — pin assignment stub, not yet confirmed |
-| 1 | Cinch 12-pin power/chassis | `ECU_12PIN` |
-| 1 | Cinch 16-pin auxiliary | `ECU_16PIN` |
+| 1 | **Molex 48-pin C1** — MaxxECU RACE/STREET/SPORT/PRO connector 1 | [MaxxECU store ID 925](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-street-or-sport-or-race-or-pro-connector-1-48-pin-molex), $33.41 — **REQUIRED** (all current harnesses). Special Molex crimp tool required (63811-9200 primary). Pin assignments in `maxxecu-m52.wv` / `maxxecu-07k.wv`. |
+| 1 | **Molex 32-pin C2** — MaxxECU RACE connector 2 | [MaxxECU store ID 1982](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-mini-or-race-c2-or-pro-c4-32-pin-molex), $32.25 — **OPTIONAL / DEFER**: C2 carries EGT 1–8 (A–D rows), knock 2, AIN 5–6, GPO 15/16, and DBW motor 1/2 H-bridge outputs. None of these are used in Phase 1/3 harnesses as currently designed. Purchase only if adding EGT probes or need the extra AIN/GPO capacity. Same crimp tools as C1. |
 | 1 | Bosch JPT 3-way | M52 60-2 VR crank trigger |
 | 1 | BMW `12141726590` 3-pin | M52 VANOS cam Hall sensor |
 | 1 | Bosch JPT 2-way | M52 coolant temp NTC |
@@ -326,7 +327,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 |------|---------|
 | All `power-distribution.wv` cable gauges and lengths | Physical routing not yet measured |
 | All `maxxecu-m52.wv` cable gauges | WV stubs — need actual wire spec |
-| MaxxECU CMC pin assignment | `ECU_CMC` in `maxxecu-m52.wv` is a stub — confirm before building |
+| MaxxECU C1/C2 Molex pin assignment | C1 (48-pin) + C2 (32-pin) confirmed as Molex harness connectors; specific pin assignments in `maxxecu-m52.wv` still stubs — confirm from [MaxxECU RACE pinout doc](https://www.maxxecu.com/webhelp/wirings-maxxecu_pinout.html) before building |
 | GPO pin assignments (fan, pump, EWP, fuel pump PWM) | MaxxECU pin map not yet finalized |
 | Main fuse size | Depends on total current calc — likely 60–80A ANL |
 | Mini blade fuse block model | 8-position, source specific unit |
@@ -386,7 +387,8 @@ Only items not already included with their respective purchased components (e.g.
 | 1 | BMW E36 X20 25-pin connector (engine side) | OEM | Body |
 | 1 | Gauge.S E36 PNP cluster connector, 6-pin | Ships with Gauge.S unit | Body |
 | 1 | Deutsch Autosport AS-series bulkhead shell + contacts | Cabin side + engine side mating pair — Size 20 contacts for all signal pins | E-pedal / all engine crossing |
-| — | Cinch CMC connector set | MaxxECU CMC — ships with ECU; backshell + contacts from MaxxECU or Cinch direct | M52 harness |
+| 1 | MaxxECU RACE C1, 48-pin Molex harness connector | [MaxxECU store ID 925](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-street-or-sport-or-race-or-pro-connector-1-48-pin-molex), $33.41 — **does NOT ship with ECU**; special Molex crimp tool required | M52 harness |
+| 1 | MaxxECU RACE C2, 32-pin Molex harness connector | [MaxxECU store ID 1982](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-mini-or-race-c2-or-pro-c4-32-pin-molex), $32.25 — same Molex crimp tool as C1 | M52 harness |
 | 1 | Bosch JPT 2-way (×2) | M52 CLT + VANOS solenoid | M52 harness |
 | 1 | Bosch JPT 3-way | M52 crank VR trigger | M52 harness |
 | 1 | BMW `12141726590` 3-pin | M52 VANOS cam Hall sensor | M52 harness |
@@ -396,7 +398,7 @@ Only items not already included with their respective purchased components (e.g.
 
 ## Harness Build Tools
 
-One-time tooling purchase — covers all connector families in this build.
+One-time tooling purchase — covers all connector families in this build. See [`docs/harness-build.md`](harness-build.md) for the full pinning/depinning workflow, connector family warnings, and bench test procedure before install.
 
 | Tool | Model | Price | Connector Family / Use |
 |------|-------|-------|------------------------|
@@ -406,7 +408,10 @@ One-time tooling purchase — covers all connector families in this build.
 | Ferrule crimper | **IWISS IWS-10** | ~$25 | Stranded wire ends into screw-clamp terminals (ECU power/ground, DIN rail fuse block). Covers 0.5–10mm² ferrules. |
 | Deutsch contact extraction | **Deutsch 1680-73-01** | ~$15 | AS bulkhead size 20 contact removal — push in, releases retention lock cleanly. Do not use a screwdriver. |
 | VW/Bosch connector de-pinning picks | **Lisle 57750** | ~$20 | Sensor pigtails (3B0973703G, 1J0973702, 1J0973712), COP connectors — push-to-release housings. |
+| **Molex CMC crimp — small** | **63811-9200** | ~$200–250 | MaxxECU C1/C2 small terminals (643221029, 0.75mm²/~20 AWG) — 40 of 48 C1 pins and 24 of 32 C2 pins are this size. **Primary tool for ECU connector wiring.** Source: Digikey, Mouser. |
+| **Molex CMC crimp — big (0.5–1mm²)** | **63811-8900** | ~$200–250 | MaxxECU C1/C2 big terminals (643231029) — 7 on C1, 8 on C2. Used for heavier signal and power wires (18–20 AWG). Source: Digikey, Mouser. |
+| **Molex CMC crimp — big (1–2mm²)** | **63811-9000** | ~$200–250 | MaxxECU C1 big terminals (643231039) — 1 pin on C1 only (engine GND/ECU power, 14–16 AWG). Optional if routing large wires through C1. Source: Digikey, Mouser. |
 
-> **Total: ~$340–375.** Covers the Deutsch AS bulkhead, all VAG sensor / coil / injector pigtails, and general harness work.
+> **Total: ~$340–375** (excluding Molex crimp tools). Covers the Deutsch AS bulkhead, all VAG sensor / coil / injector pigtails, and general harness work.
 > If using Souriau 8STA for the bulkhead instead of Deutsch AS, confirm the correct positioner for Souriau contacts at purchase — Souriau uses compatible tooling but a different positioner.
-> **MaxxECU CMC connector:** Use the extraction tool specified in the MaxxECU RACE installation manual (typically a small TE Connectivity pick). A 0.8mm flat pick gets most CMC positions — confirm before use.
+> **MaxxECU Molex C1/C2 connectors:** Molex crimp tool PNs confirmed from [MaxxECU RACE pinout webhelp](https://www.maxxecu.com/webhelp/wirings-maxxecu_pinout.html). The small tool (63811-9200) is the primary purchase — covers ~85% of C1 and ~75% of C2 pins. The big tools are expensive (~$200+ each); consider outsourcing the handful of large-terminal pins if budget is a concern. For extraction/repair: Molex removal tool 638132400 (small) or 638132300 (big).
