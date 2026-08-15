@@ -1,0 +1,283 @@
+# eps-column.wv
+# EPowerSteering.com BMW e36 Electric Power Steering Kit (KIT-33)
+# Source: https://epowersteering.com/purchase/product/bmw-e36/
+# Pinout/labels cross-referenced from vendor's published install PDFs for the
+# same Steering ECU + "Basic EPS Controller" hardware family, since no e36-specific
+# PDF is published (only BMW e30 is listed under Resources -- same controller family):
+#   - http://epowersteering.com/pdf/BMWE30Kit.pdf
+#   - http://epowersteering.com/pdf/BasicEPSController.pdf
+#
+# IMPORTANT -- corrects an inaccurate assumption in the project plan:
+# This kit has NO vehicle-speed input and NO ECU/CAN interface of any kind.
+# Assist level is a fixed, driver-set value from a manual Adjustment Knob
+# potentiometer -- it does not vary with road speed. There is nothing for
+# MaxxECU to wire into here. The "Automatic EPS Controller" variant sold by
+# the same vendor (force-sensitive, torque-sensor based -- see
+# AutomaticEPSController.pdf) is a DIFFERENT product for different GM
+# columns (Saturn Vue / Chevy Equinox) and is not what ships in KIT-33.
+# If true speed-sensitive assist is wanted, that would require sourcing a
+# different EPS system entirely (e.g. a factory EPS column + aftermarket
+# controller that accepts a VSS/CAN input) -- not in scope for this kit.
+
+metadata:
+  project: E36 Restomod -- RHD Column-Assist Electric Power Steering
+  description: >-
+    EPowerSteering.com BMW e36 kit (KIT-33). Column-assist EPS -- replaces the
+    mechanical steering column with a motorized unit; the existing hydraulic
+    (or Z3) rack stays in place and functions as a manual rack. Standalone
+    system, no MaxxECU/CAN interface. Cross-reference project plan Power
+    Steering row (rhd e36.md) and Condor Speed Shop RHD steering shaft
+    (below the firewall, unaffected by this column-side conversion).
+
+# ── TODO list ──────────────────────────────────────────────────────────────────
+#
+#   [ ] CRITICAL -- confirm Tilt vs Non-Tilt column option before ordering.
+#       This is a core-exchange product: EPowerSteering rebuilds whichever
+#       column you send them. Physically check the car for a tilt release
+#       lever under the column shroud before selecting the order option --
+#       do not assume. If the car turns out to have a tilt column and a
+#       non-tilt column is still preferred, the tilt hardware (mounting
+#       block, adjustment lever, dowel/locking pins -- see Pelican Parts
+#       E36-Tilt.htm) can be removed and replaced with the non-tilt mounting
+#       block from a donor column before shipping the core -- non-tilt is
+#       the mechanically simpler/original configuration, not an add-on.
+#   [ ] Confirm column tube OD at steering wheel end -- 1.87" or 1.75"
+#       (vendor explicitly calls this out as a common mismatch point)
+#   [ ] Confirm this is the "Basic EPS Controller" family (manual Adjustment
+#       Knob) and not a different controller variant -- verify with vendor
+#       at order time, since no e36-specific PDF is published
+#   [ ] Confirm IGN-switched 10A source for EPS Controller -- either a spare
+#       position on FUSE_BLOCK in power-distribution.wv, or the fuse-tap
+#       lead supplied with the kit on an existing under-dash IGN circuit
+#   [ ] Confirm 60A Maxi fuse mounting point near battery -- coordinate with
+#       MAIN_FUSE in power-distribution.wv (separate fuse, do not combine)
+#   [ ] Confirm Steering ECU mounting location -- vendor recommends bare
+#       metal (heat sink) but not fully enclosed/weatherproofed
+#   [ ] Confirm Adjustment Knob mounting location -- RHD dash layout differs
+#       from vendor's LHD reference photos; needs to be reachable while
+#       driving from the right seat
+#   [ ] Motor Assembly <-> Steering ECU sensor/power plugs ship pre-terminated
+#       from the vendor (kit is billed as no-fabrication-required) -- pinout
+#       not published. Do not attempt to re-pin; mate factory plugs as-is.
+#   [ ] Calibration Potentiometer (round hole under Steering ECU cover
+#       sticker) -- left/right steering effort balance trim. Extremely
+#       sensitive, small adjustments only. Separate from the driver-facing
+#       Adjustment Knob.
+
+# ── Connectors ─────────────────────────────────────────────────────────────────
+
+connectors:
+
+  BATT_POS:
+    type: "Battery positive terminal"
+    subtype: "12V AGM"
+    pincount: 1
+    pinlabels: ["+12V BATT (always-on)"]
+    notes: >-
+      Dedicated 60A Maxi fuse (supplied with kit) within a few inches of the
+      battery terminal, separate from MAIN_FUSE in power-distribution.wv.
+      10 AWG minimum per vendor spec.
+
+  CHASSIS_GND:
+    type: "Chassis ground stud (body metal)"
+    pincount: 1
+    pinlabels: ["GND"]
+    notes: >-
+      Vendor recommends the closest chassis ground point to the Steering ECU
+      mounting location, sanded to bare metal for good contact. 10 AWG
+      minimum for the ECU power ground; 18-20 AWG acceptable for the EPS
+      Controller signal ground (separate run, see CABLE_CTRL_GND).
+
+  STEERING_ECU:
+    type: "EPowerSteering Steering ECU (KIT-33)"
+    subtype: "Mount to bare metal as heat sink -- do not fully enclose"
+    pincount: 6
+    pinlabels:
+      - "Receptacle B -- pink (EPS Controller link)"
+      - "Receptacle B -- purple (EPS Controller link)"
+      - "Receptacle C -- +12V (power)"
+      - "Receptacle C -- GND (power)"
+      - "Receptacle D/E -- motor bundle 1 (blue + grey plugs)"
+      - "Receptacle D/E -- motor bundle 2 (blue + grey plugs)"
+    notes: >-
+      Receptacle C: red to +12V battery (60A Maxi fuse), black to GND.
+      10 AWG or larger per vendor spec.
+      Receptacles D (blue, motor power) and E (grey 4-pin, motor
+      position/torque sensor) are vendor pre-terminated to MOTOR_ASSEMBLY as
+      a bundled umbilical -- no user pinout, just mate the factory plugs.
+      Modeled here as 2 logical pins since the internal pin count is not
+      published.
+      Calibration potentiometer under the round cover hole (left/right
+      effort balance) -- separate from the driver Adjustment Knob.
+      Single relay click on IGN-on is normal; a double-click indicates a
+      wiring or connection fault.
+
+  EPS_CONTROLLER:
+    type: "EPowerSteering EPS Controller (Basic family)"
+    subtype: "Small inline box -- sets fixed assist level via Adjustment Knob"
+    pincount: 6
+    pinlabels:
+      - "Red (+12V IGN switched)"
+      - "Black (GND)"
+      - "Plug A -- pink (to Steering ECU receptacle B)"
+      - "Plug A -- purple (to Steering ECU receptacle B)"
+      - "Yellow (to Adjustment Knob)"
+      - "Gray (to Adjustment Knob)"
+    notes: >-
+      No vehicle-speed or CAN input exists on this controller -- assist
+      level is fixed by the Adjustment Knob position only, not by road
+      speed. Red wire: IGN-switched +12V via 10A Mini ATM fuse (supplied).
+      Black wire: nearest chassis ground. Mount where accessible for
+      wiring but does not need to be driver-visible.
+
+  ADJUSTMENT_KNOB:
+    type: "EPowerSteering Adjustment Knob (potentiometer)"
+    subtype: "Driver-reachable dash mount"
+    pincount: 2
+    pinlabels: ["Yellow", "Gray"]
+    notes: >-
+      Fully counter-clockwise = no assist. Fully clockwise = maximum assist.
+      Mount within reach of the driver -- for this RHD car, place on the
+      right-hand side of the dash/console (vendor reference photos assume
+      LHD placement on the left). Calibrate per vendor Basic System
+      Verification procedure: knob full CCW, IGN on (single relay click),
+      wait ~10s for relay to click off (no assist), then slowly turn CW
+      until relay clicks back on -- that is minimum assist. Continue CW to
+      taste.
+
+  MOTOR_ASSEMBLY:
+    type: "EPowerSteering column-mounted EPS motor (KIT-33, non-tilt or tilt per order)"
+    subtype: "Bolts to repurposed steering column, replaces mechanical column internals"
+    pincount: 2
+    pinlabels:
+      - "Blue plug (power -- to Steering ECU receptacle D)"
+      - "Grey 4-pin plug (position/torque sensor -- to Steering ECU)"
+    notes: >-
+      Pre-terminated at the factory as part of the core-exchange rebuild --
+      no user pinout published or required. Just mate the factory plugs.
+      Column mounts under the dash in place of the stock column; output
+      shaft couples to the existing lower steering shaft / Condor Speed
+      Shop slim RHD shaft (see project plan Steering Shaft row).
+
+  IGN_12V_TAP:
+    type: "Stub -- IGN-switched +12V source, see power-distribution.wv"
+    subtype: "Either FUSE_BLOCK spare position or kit-supplied fuse-tap lead"
+    pincount: 1
+    pinlabels: ["+12V IGN"]
+    notes: >-
+      10A Mini ATM fuse (supplied with kit) protects this feed specifically
+      for the EPS Controller -- independent of the 60A Maxi fuse on the
+      Steering ECU's main battery feed. TODO: confirm which fuse block
+      position or existing IGN circuit this taps into.
+
+# ── Cables ─────────────────────────────────────────────────────────────────────
+
+cables:
+
+  CABLE_ECU_PWR_POS:
+    gauge: "10 AWG"
+    length: "1.5 m"
+    colors: [RD]
+    wirecount: 1
+    notes: >-
+      Battery +12V (via 60A Maxi fuse) to Steering ECU receptacle C
+      (black power plug). 10 AWG minimum per vendor spec. Route from engine
+      bay battery location through firewall to under-dash ECU mount.
+
+  CABLE_ECU_PWR_GND:
+    gauge: "10 AWG"
+    length: "1.5 m"
+    colors: [BK]
+    wirecount: 1
+    notes: >-
+      GND to Steering ECU receptacle C (black power plug). 10 AWG minimum
+      per vendor spec.
+
+  CABLE_CTRL_LINK:
+    gauge: "20 AWG"
+    length: "1.0 m"
+    colors: [PK, VT]
+    wirecount: 2
+    notes: >-
+      Plug A (pink/purple pair) -- EPS Controller to Steering ECU
+      receptacle B. Pre-terminated on both ends by the vendor; this run
+      only applies if extending the supplied cable length.
+
+  CABLE_CTRL_PWR:
+    gauge: "18 AWG"
+    length: "1.0 m"
+    colors: [RD]
+    wirecount: 1
+    notes: >-
+      EPS Controller red wire to IGN-switched +12V via 10A Mini ATM fuse
+      (supplied with kit). Independent circuit from the Steering ECU's
+      60A main power feed.
+
+  CABLE_CTRL_GND:
+    gauge: "18 AWG"
+    length: "0.5 m"
+    colors: [BK]
+    wirecount: 1
+    notes: "EPS Controller black wire to nearest chassis ground point."
+
+  CABLE_KNOB:
+    gauge: "22 AWG"
+    length: "2.0 m"
+    colors: [YE, GY]
+    wirecount: 2
+    notes: >-
+      Adjustment Knob (yellow + gray) to EPS Controller (yellow + gray).
+      Route from dash-mounted knob to controller box location. Low current
+      signal pair -- no special shielding required.
+
+  CABLE_MOTOR_LINK:
+    gauge: "18 AWG"
+    length: "0.3 m"
+    colors: [BU, GY]
+    wirecount: 2
+    notes: >-
+      Blue power plug + grey 4-pin sensor plug bundled together as a single
+      vendor-supplied umbilical between the Motor Assembly (on the column,
+      under the dash) and the Steering ECU. Pre-terminated -- no
+      fabrication or re-pinning, just mate the factory connectors.
+      Gauge shown is nominal/placeholder only -- actual conductors are
+      factory-terminated and not user-serviceable.
+
+# ── Connections ────────────────────────────────────────────────────────────────
+
+connections:
+  # Battery +12V (60A Maxi fused) -> Steering ECU receptacle C
+  -
+    - BATT_POS: [1]
+    - CABLE_ECU_PWR_POS: [1]
+    - STEERING_ECU: [3]
+  # GND -> Steering ECU receptacle C
+  -
+    - CHASSIS_GND: [1]
+    - CABLE_ECU_PWR_GND: [1]
+    - STEERING_ECU: [4]
+  # EPS Controller <-> Steering ECU receptacle B (plug A, pink/purple)
+  -
+    - EPS_CONTROLLER: [3, 4]
+    - CABLE_CTRL_LINK: [1, 2]
+    - STEERING_ECU: [1, 2]
+  # IGN 12V (10A ATM fused) -> EPS Controller red wire
+  -
+    - IGN_12V_TAP: [1]
+    - CABLE_CTRL_PWR: [1]
+    - EPS_CONTROLLER: [1]
+  # EPS Controller black wire -> chassis GND
+  -
+    - EPS_CONTROLLER: [2]
+    - CABLE_CTRL_GND: [1]
+    - CHASSIS_GND: [1]
+  # Adjustment Knob <-> EPS Controller (yellow + gray)
+  -
+    - ADJUSTMENT_KNOB: [1, 2]
+    - CABLE_KNOB: [1, 2]
+    - EPS_CONTROLLER: [5, 6]
+  # Motor Assembly (power + sensor) -> Steering ECU receptacles D/E (pre-terminated umbilical)
+  -
+    - MOTOR_ASSEMBLY: [1, 2]
+    - CABLE_MOTOR_LINK: [1, 2]
+    - STEERING_ECU: [5, 6]
