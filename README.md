@@ -8,6 +8,26 @@ git-diffable, outputs SVG/PNG/HTML/BOM automatically.
 
 > **Project plan:** System-level build decisions, parts sourcing, mechanical specs, and phase sequencing live in [`E36_9000RPM_Project_Plan_Verified.md`](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md). This repo is the authoritative source for pin assignments, wire colors, connector part numbers, and harness routing — the project plan defers to the `.wv` files for all electrical detail.
 
+## Document Conventions
+
+**Engine lateral sides — always use exhaust/intake, never left/right or driver/passenger.**
+
+Left/right and driver/passenger are LHD-centric and ambiguous in an RHD build. All references in this repo use:
+
+| Term | Meaning |
+| :--- | :--- |
+| **Exhaust side** | Long side of 07K block with exhaust ports and primary OEM mount bosses |
+| **Intake side** | Long side of 07K block with intake ports and oil filter housing |
+
+**RHD E36 orientation (longitudinal, timing chain forward):**
+
+| Car direction | 07K side |
+| :--- | :--- |
+| Driver side (right) | **Exhaust side** — SPA manifold, turbo, downpipe, engine stand adapter |
+| Passenger side (left) | **Intake side** — iABED housing, intake manifold |
+
+This applies to all harness routing notes, connector location descriptions, and loom routing docs in this repo.
+
 ## Diagrams
 
 Click any link to view the interactive diagram with full BOM in your browser — no code checkout needed.
