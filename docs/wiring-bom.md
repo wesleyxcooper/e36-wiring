@@ -338,6 +338,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | 07K VW connector bodies | TODO at install — crank VR, cam Hall, CLT, DBW TB connector types unconfirmed (see maxxecu-07k.wv TODOs) |
 | 07K DBW TB motor polarity | TODO — verify with volt meter before final crimp |
 | MaxxECU AIN assignment for APS1/APS2 | TODO — assign in MTune, update epedal-bmw-e46.wv and maxxecu-07k.wv |
+| M52 wideband O2 (LSU 4.2) harness unmodeled | `maxxecu-m52.wv` has ECU_CMC pins reserved for WBO2 but no WIDEBAND connector, W_WBO2 cable, or connections block — must be authored (with `shield: true`) before Phase 1 harness build. Do not copy the 07K LSU 4.9 pinout verbatim — LSU 4.2 pin numbering needs independent confirmation. |
 
 ---
 
@@ -362,8 +363,32 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | 24 AWG | GN (green) | 1.2 m (×1 conductor) | 1.5 m | E-pedal APS1 signal |
 | 24 AWG | YE (yellow) | 1.2 m (×1 conductor) | 1.5 m | E-pedal APS2 signal |
 
-> **Shielded runs:** E-pedal cable (2 × 6-conductor shielded, 24 AWG), EWP PWM (22 AWG shielded preferred), fuel pump SSR ctrl− (22 AWG shielded preferred), Gauge.S CAN (shielded twisted pair preferred).
-> Single-end drain only on all shielded runs — drain at MaxxECU / ECU side.
+> **Shielded runs — full list, consolidated from all systems (previous version of this note only covered Systems 3–5):**
+>
+> **Required (signal-critical, always shield):**
+> | Run | System | Notes |
+> |-----|--------|-------|
+> | Crank VR sensor (Signal+/Signal−/Shield) | M52 (Sys 2) + 07K (Sys 7) | Passive VR signal — most noise-sensitive wire in the harness. `.wv` source models shield explicitly (`CRANK_VR:3:Shield`), drains at ECU CMC pin 19 (E3). |
+> | Cam Hall sensor (+5V/GND/Signal + shield) | M52 (Sys 2) + 07K (Sys 7) | Shares E3 drain point with crank shield. |
+> | E-pedal cable, both legs (cabin + engine side) | E-pedal (Sys 3) | 6-conductor shielded, 24 AWG. Single-end drain at MaxxECU end only. |
+> | Wideband O2 (WBO2) — VS/VREF/IP/RCAL | 07K (Sys 7) | ⚠️ **Fixed in this pass** — `maxxecu-07k.wv` W_WBO2 previously had no shield attribute despite being low-level analog signal near the turbo/exhaust bung; now `shield: true`. **M52 (Sys 2) WBO2 harness is a larger gap — entirely unmodeled in `maxxecu-m52.wv`** (no connector, cable, or connections block, only reserved ECU_CMC pin labels). See TODO block at top of `maxxecu-m52.wv` — must be authored (with shield) before Phase 1 harness build. |
+> | CAN bus — 8HP TCU, Gauge.S cluster, and general CAN per Sys 2 note | 8HP CAN (Sys 9A) + Gauge.S CAN (Sys 9B) + Sys 2 | Twisted pair shielded (STP) throughout. MaxxECU 8HP GEN1 harness ships pre-shielded from MaxxECU. |
+>
+> **Recommended ("Preferred" in per-system tables — shield if practical, not a hard requirement):**
+> | Run | System |
+> |-----|--------|
+> | Knock sensor 1 + 2 signal wires | 07K (Sys 7) |
+> | DBW TB TPS 4-wire | 07K (Sys 7) |
+> | EWP PWM control (MaxxECU GPO → CWA400 Pin 1) | EWP (Sys 5) |
+> | Fuel pump SSR ctrl− (MaxxECU GPO → SSR) | Fuel pump (Sys 4) |
+> | ATF temp sensor signal *(optional system)* | Sys 9E |
+>
+> **Explicitly NOT shielded (confirm this is still correct, don't shield by default):**
+> | Run | System | Why not |
+> |-----|--------|---------|
+> | DCT shifter UP/DOWN/GND | Sys 9C | Momentary GND-closure signal, not analog — but `E36_DIY_Build_Checklist.md` says *"use shielded wire if routing near the engine harness loom"* while this table says flat "No" for all three wires. **Reconcile at physical routing stage** — if the final route runs alongside the engine harness trunk, shield it; if it stays in the cabin loom away from injector/coil wires, unshielded is fine per the checklist's own conditional. |
+>
+> Single-end drain only on all shielded runs — drain at MaxxECU / ECU side, never both ends (avoids ground loops).
 
 ---
 

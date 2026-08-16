@@ -598,7 +598,12 @@ cables:
     colors: [WH, WH, WH, WH, BK]
     wirelabels: ["WBO2 VS", "WBO2 VREF", "WBO2 IP", "WBO2 RCAL", "WBO2 Htr-"]
     length: 1.5 m
-    notes: "Same wiring as M52. Heater+ (LSU 4.9 pin 4) splices to local +12V coil rail."
+    shield: true
+    notes: >-
+      Same wiring as M52. Heater+ (LSU 4.9 pin 4) splices to local +12V coil rail.
+      Shielded -- VS/VREF/IP/RCAL are low-level analog signals highly
+      susceptible to injector/coil noise, especially with this run's proximity
+      to the turbo/exhaust bung. Single-end drain at ECU end only.
 
   W_BOOST:
     wirecount: 2

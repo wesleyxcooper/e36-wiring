@@ -72,6 +72,19 @@
 #       MaxxECU M50 harness includes MAP sensor with vacuum hose.
 #       Confirm MAP sensor connector type, hose routing to intake manifold.
 #       Tee into intake manifold vacuum port before throttle body.
+#
+# TODO: Wideband O2 (LSU 4.2) harness is UNMODELED — bigger gap than a missing
+#       shield flag. ECU_CMC pin labels reserve D1/F3/F4/G3/G4 for WBO2
+#       (Heater-/VREF/VS/IP/RCAL), but there is no WIDEBAND connector, no
+#       W_WBO2 cable, and no connections block here — unlike maxxecu-07k.wv,
+#       which has all three. Author this properly before Phase 1 harness build:
+#       (1) add a WIDEBAND connector (Bosch LSU 4.2 6-way, not 4.9 — confirm
+#           pin numbering differs from the LSU 4.9 block in maxxecu-07k.wv
+#           before copying it verbatim), (2) add W_WBO2 cable with shield: true
+#           (VS/VREF/IP/RCAL are low-level analog, noise-sensitive — same
+#           reasoning as the 07K version), (3) wire the connections block to
+#           the reserved ECU_CMC pins above. Do not assume LSU 4.2 and 4.9
+#           share a pinout — verify against the Bosch LSU 4.2 datasheet.
 # ─────────────────────────────────────────────────────────────────────────────
 #
 # This build adds to the base harness:
