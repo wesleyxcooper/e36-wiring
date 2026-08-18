@@ -39,9 +39,12 @@ hard-to-trace shorts and intermittent sensor faults.
 | Molex ratcheting crimper (big 0.5–1.0 mm²) | 63811-8900 | MaxxECU C1/C2 large-gauge pins |
 | Molex ratcheting crimper (big 1–2 mm²) | 63811-9000 | MaxxECU C1/C2 large-gauge pins |
 | Micro-pin ratcheting crimper | Knipex 97 52 68 | All VAG sensor pigtails, COP, EV14, NTC |
-| Deutsch AS crimper | Deutsch WT-0460-8-0800 | Firewall bulkhead size 20 contacts |
-| Open-barrel crimper | IWISS IWS-2820M | Ring terminals, relay contacts, general open-barrel |
+| **TNE solid barrel crimper** | Daniels DMC TL-10 handle + die set (or AMP CET-1 + MH860 die) | **Firewall bulkhead Deutsch AS size-20 solid barrel contacts.** No cheap substitute — wrong die produces cold crimps that pass pull-test but fail under vibration. "Don't buy the cheap alternatives — you will ruin your connector." Source: StreetCarJoe Race Car Wiring Pt.1. |
+| Deutsch AS crimper positioner | Deutsch WT-0460-8-0800 | Pairs with TNE tool for AS79 size-20 contacts |
+| Open-barrel crimper | IWISS IWS-2820M | Ring terminals, relay contacts, general non-insulated open-barrel splices. Use non-insulated + adhesive-lined heat shrink — never pre-insulated crimps. |
 | Ferrule crimper | IWISS IWS-10 | Screw-clamp terminals (ECU power/GND strands) |
+| Flush cutters | Milwaukee 48-22-6106 or equiv | In-car wire trimming, flush cuts near connector bodies. Buy before starting any connector work. Source: StreetCarJoe Race Car Wiring Pt.1. |
+| Rivnut tool | Astro Pneumatic 1442 or equiv manual tool | M4/M6 rivnuts for relay board and ECU bracket mounting to thin sheetmetal / carbon panels (no backside access needed). Source: StreetCarJoe Race Car Wiring Pt.3. |
 | **Depin — Molex small terminals** | 638132400 | C1/C2 small-pin extraction |
 | **Depin — Molex big terminals** | 638132300 | C1/C2 large-pin extraction |
 | **Depin — VW/Bosch PTS connectors** | Lisle 57750 | All VAG push-to-seat pigtails (sensor, COP, injector) |
@@ -111,6 +114,65 @@ Follow this order on every connector. Do not deviate for speed.
 **Molex C1/C2 (PN 638132400 / 638132300):**
 1. Use the designated removal tool from the front face
 2. Follow the MaxxECU webhelp extraction procedure exactly — the Molex housing has a secondary locking wedge that must be partially withdrawn first before individual contacts can be extracted
+
+---
+
+## Power & Ground Rules
+
+These rules cover EFI grounding on a dual-duty street/drift E36 with MaxxECU.
+Sources: MaxxECU GEN2 RACE quick-start guide (maxxecu.com/files/Documentation/Manuals/...),
+MaxxECU webhelp error code 19, HP Academy EFI Wiring Fundamentals, ShopECU grounding guide.
+
+### Battery Cutoff Switch — Optional for This Build
+A cutoff switch is **not required** on a dual-duty street car with a working ignition key.
+Install one only if your HPDE org or track mandates it, or if you plan wheel-to-wheel racing.
+(Grassroots drift tandems typically do not require a cutoff switch.)
+
+**If you do install one:** it must be 4-post (Moroso 74108 or equiv), NOT 2-post.
+A 2-post switch only disconnects the battery; with an alternator present the engine
+continues running because the alternator keeps producing current. The 4-post type
+routes the alternator through the switch so both are disconnected simultaneously.
+
+### Ground Strategy — What MaxxECU Actually Requires
+Per the MaxxECU GEN2 RACE quick-start guide:
+
+> "Battery negative (−) must connect to the chassis or cylinder head.
+> Engine must be grounded to the chassis.
+> **ECU engine ground must connect to the cylinder head.**"
+
+In practice for this build:
+1. **Battery negative → chassis stud** (engine bay M8 stud): relay board, body electrics,
+   fan/pump motor returns. Keep the factory cable or run a new 4 AWG if needed.
+2. **Engine block → chassis bonding strap**: keep the M52 factory strap. This is the
+   starter and alternator current return path. Verify it is clean — no paint under the lug,
+   star washer, tight nut. This is the most commonly overlooked step after a repaint.
+3. **MaxxECU ENGINE GND pin → cylinder head**: this is a signal-level wire in the engine
+   harness, not a heavy power cable. It is MaxxECU’s own mandatory requirement.
+
+**Optional (not required):** run a second 4 AWG cable directly from battery negative to the
+engine block — belt-and-suspenders for a pure race build where factory bonding straps are
+removed. Not needed on this build while factory straps are retained and clean.
+
+### ECU Sensor Grounds — The One Rule You Cannot Break
+MaxxECU sensor GND pins are **not** chassis ground and **not** engine block ground.
+They connect only to sensors whose analog signal returns to the ECU. Wiring a sensor
+GND pin to chassis or engine block is the most common MaxxECU install mistake and
+triggers MTune error 19: *"Sensor GND is somehow wired to engine ground. <-- big no no."*
+Source: maxxecu.com/webhelp/information-error_codes-19.html
+
+Keep ECU power ground returns separate from high-current devices (fuel pump, fans, starter).
+Do not stack multiple systems on the same ground lug as the ECU.
+
+### Coil Pack Secondary Ground
+Each bank of coils needs a secondary ground to the cylinder head (one ground strap per bank).
+This is separate from the main coil power/GND supply wire. The coil will run without it,
+but with elevated secondary voltage noise. Do not share with any sensor ground path.
+
+### One-to-Many 5V Reference Distribution
+When multiple sensors share the MaxxECU 5V SENS OUT: use a **non-insulated 1→4 crimp
+junction** (one wire in, 4 wires out). Crimp, heat-shrink, done. Keeps star topology on
+the 5V rail, avoids daisy-chain voltage drop sensor-to-sensor.
+Applies to: TPS, MAP sensor, APS (e-pedal), and any 0–5V ratiometric sensor.
 
 ---
 

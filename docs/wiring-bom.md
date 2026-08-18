@@ -18,8 +18,10 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 | Qty | Item | Notes |
 |-----|------|-------|
 | 1 | Battery positive terminal | Ring terminal, trunk/engine bay |
-| 1 | Battery negative terminal | Ring terminal |
-| 1 | Chassis ground stud, M8 | Engine bay |
+| 1 | Battery negative terminal | Ring terminal — **needs TWO leads**: chassis stud + engine block direct |
+| 1 | Chassis ground stud, M8 | Engine bay — body/relay returns only; NOT the primary ECU/engine GND |
+| 1 | Engine block ground stud, M8 | Dedicated battery-direct GND to engine block — **separate from chassis stud** |
+| 1 | **4-post battery cutoff switch — Moroso 74108** (or Longacre equiv) | **Required** — 2-post switches will not shut off an alternator-equipped car; the alternator keeps the engine running after the battery is disconnected. Moroso 74108 routes alternator through the switch so both battery and alternator disconnect simultaneously. Mount driver-accessible (or external HPDE pull-cable). Approx $60–80 at Summit Racing / Jegs. Source: StreetCarJoe Race Car Wiring Pt.2 |
 | 2–3 | **Amphenol Radlok 8mm — M8×1.25 Male** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-male/), ~$15 CAD ea — thread into cylinder head and engine block GND strap bosses. Replaces ring terminal + bolt — tool-free press-lock disconnect. Speeds up M52→07K swap. Secure cable within 3 cm; inspect annually. |
 | 1 | **Amphenol Radlok 8mm — M8×1.25 Female** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-female/), ~$22 CAD — threads onto M8 B+ stud of 07K alternator (`07K 903 023 A`). Cable-end Radlok socket on charge wire → tool-free disconnect at alternator removal. |
 | 4 | Bosch ISO mini relay, 12V coil / 30A contacts | `0 332 002 150` or equiv — ECU main, coil/inj, fan, fuel pump |
@@ -35,8 +37,11 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 
 | Run | Color | Gauge | Est. Length | Notes |
 |-----|-------|-------|-------------|-------|
-| BATT_POS_MAIN | RD | ≥4 AWG | TBD | Battery + → main ANL/MAXI fuse → relay board |
-| BATT_NEG_MAIN | BK | ≥4 AWG | TBD | Battery − → chassis ground stud M8 |
+| BATT_POS → 4-post cutoff switch | RD | 4 AWG welding cable | TBD | Battery + → cutoff switch batt-in post |
+| Cutoff switch output → ANL fuse | RD | 4 AWG welding cable | short | Cutoff output → main fuse (within 18 in) |
+| ANL fuse → fuse block | RD | 8 AWG | TBD | Fused batt+ to relay board fuse block |
+| BATT_NEG → chassis stud | BK | 4 AWG welding cable | TBD | Battery − → chassis ground stud M8 — relay board / body returns |
+| BATT_NEG → engine block (direct) | BK | 4 AWG welding cable | TBD | **Separate 4 AWG cable direct from battery negative to engine block** — critical for eliminating ground offset; do NOT share with chassis lead |
 | Relay coil feeds × 4 | GN | 18 AWG | TBD | IGN switched +12V → relay pin 86 |
 | ECU / coil / inj relay outputs | RD | 12–14 AWG | TBD | Relay pin 87 → downstream loads |
 | Fan load feed | RD | 12 AWG | TBD | Relay 87 → SPAL fan |
@@ -406,6 +411,8 @@ Only items not already included with their respective purchased components (e.g.
 | 1 | Inline 25A AGC fuse + holder | Standard AGC glass fuse holder | Fuel pump |
 | 1 | Inline 40A fuse + holder | ANL or MAXI blade fuse holder | EWP |
 | 1 | Main ANL/MAXI fuse + holder | 60–80A ⚠️ size TBD | Power dist |
+| 1 | **4-post battery cutoff switch — Moroso 74108** (or Longacre equiv) | **Optional** — not required on a dual-duty street/drift car with a working ignition key. Install only if your HPDE org or track rules require it. If installed: must be 4-post (NOT 2-post) — a 2-post switch will not shut off the engine on an alternator-equipped car. ~$60–80 at Summit Racing / Jegs. | Power dist |
+| 1 | Engine block ground stud (M8 bolt + lug) | Dedicated M8 bolt or welded stud on engine block for direct 4 AWG battery-negative ground cable. Separate from chassis stud. | Power dist |
 | 1 | Mini blade fuse block, 8-position | ⚠️ TODO: source specific unit | Power dist |
 | 4 | Bosch ISO mini relay socket / base | Matches relay above | Power dist |
 | 1 | BMW E36 X20 25-pin connector (cabin) | OEM or aftermarket — source from E36 donor or Molex catalog | Body |
@@ -427,16 +434,33 @@ One-time tooling purchase — covers all connector families in this build. See [
 
 | Tool | Model | Price | Connector Family / Use |
 |------|-------|-------|------------------------|
+| Flush cutters | **Milwaukee 48-22-6106** or angled flush cutters | ~$15 | Essential for in-car wire trimming — angled jaw cuts flush to connector body, gets into tight spaces. Used constantly. Source: StreetCarJoe Race Car Wiring Pt.1. |
+| Wire stripper | **Southwire 45578001** (adjustable-tension auto-strip) | ~$30 | 22–10 AWG, adjustable tension. Adjustable tension avoids nicking strands on thin-sheathed Teflon wire. |
 | Micro-pin ratcheting crimper | **Knipex 97 52 68** | ~$90 | VAG sensor connectors (3B0973703G, 1J0973702), COP pigtails (4B0973724), ECU pin contacts — most-used tool on this build. Covers 0.08–6mm². |
-| Open-barrel / non-insulated crimper | **IWISS IWS-2820M** | ~$40 | General harness open-barrel contacts, ring terminals, relay socket contacts, 14–28 AWG range. |
-| Deutsch AS contact crimper | **Deutsch WT-0460-8-0800** | ~$150–180 | Deutsch AS bulkhead — size 20 contacts (22–18 AWG). No substitute: wrong die geometry produces a cold crimp that passes visual inspection but fails under vibration. |
+| Open-barrel / non-insulated crimper | **IWISS IWS-2820M** | ~$40 | General harness open-barrel contacts, ring terminals, relay socket contacts, butt splices, 14–28 AWG range. **In the engine bay and anywhere exposed to moisture/vibration: use non-insulated barrel + adhesive-lined heat shrink** (adhesive liner seals against capillary wicking that insulated connectors allow). Interior/cabin: pre-insulated nylon-sleeve crimps are acceptable if done with the correct ratcheting tool. Source: StreetCarJoe Race Car Wiring Pt.1. |
+| **TNE solid barrel crimper** | **Daniels DMC TL-10** handle + die set (or AMP CET-1 + MH860 die) | ~$400–600 | **Required for Deutsch AS79 solid barrel size-20 contacts** (firewall bulkhead). No cheap substitute: wrong die geometry produces cold crimps that pass initial pull-test but fail under vibration. "Don't buy the cheap alternatives — you will ruin your connector." Source: StreetCarJoe Race Car Wiring Pt.1. |
+| Deutsch AS contact crimper positioner | **Deutsch WT-0460-8-0800** | ~$150–180 | Pairs with TNE/DMC tool for AS bulkhead size 20 contacts (22–18 AWG). |
 | Ferrule crimper | **IWISS IWS-10** | ~$25 | Stranded wire ends into screw-clamp terminals (ECU power/ground, DIN rail fuse block). Covers 0.5–10mm² ferrules. |
 | Deutsch contact extraction | **Deutsch 1680-73-01** | ~$15 | AS bulkhead size 20 contact removal — push in, releases retention lock cleanly. Do not use a screwdriver. |
 | VW/Bosch connector de-pinning picks | **Lisle 57750** | ~$20 | Sensor pigtails (3B0973703G, 1J0973702, 1J0973712), COP connectors — push-to-release housings. |
+| Rivnut tool + rivnut assortment | **Astro Pneumatic 1442** (manual rivnut setter) + M4/M6 zinc rivnut kit | ~$30–50 | Installs threaded inserts into thin sheetmetal or carbon panels without backside access. Required for relay board and ECU bracket mounting. Source: StreetCarJoe Race Car Wiring Pt.3. |
 | **Molex CMC crimp — small** | **63811-9200** | ~$200–250 | MaxxECU C1/C2 small terminals (643221029, 0.75mm²/~20 AWG) — 40 of 48 C1 pins and 24 of 32 C2 pins are this size. **Primary tool for ECU connector wiring.** Source: Digikey, Mouser. |
 | **Molex CMC crimp — big (0.5–1mm²)** | **63811-8900** | ~$200–250 | MaxxECU C1/C2 big terminals (643231029) — 7 on C1, 8 on C2. Used for heavier signal and power wires (18–20 AWG). Source: Digikey, Mouser. |
 | **Molex CMC crimp — big (1–2mm²)** | **63811-9000** | ~$200–250 | MaxxECU C1 big terminals (643231039) — 1 pin on C1 only (engine GND/ECU power, 14–16 AWG). Optional if routing large wires through C1. Source: Digikey, Mouser. |
 
-> **Total: ~$340–375** (excluding Molex crimp tools). Covers the Deutsch AS bulkhead, all VAG sensor / coil / injector pigtails, and general harness work.
+### Hardware — Harness Support
+
+| Qty | Item | Notes |
+|-----|------|-------|
+| 1 bag | Non-insulated butt splices — 22–16 AWG assorted | Uninsulated crimp barrel + adhesive-lined heat shrink over top. Do NOT use pre-insulated butt splices. |
+| 1 bag | **One-to-many (1→4) non-insulated crimp junctions** | Branches one input wire to 4 outputs. Use for 5V SENS OUT distribution from MaxxECU to multiple sensors (TPS, MAP, APS, etc.) from a single ECU pin. Keeps star topology. Source: StreetCarJoe Race Car Wiring Pt.1. |
+| 1 roll | Adhesive-lined heat shrink 3:1 — assorted (1/4", 3/8", 1/2") | Required over every non-insulated crimp. Adhesive liner is essential — non-adhesive slides and leaves the crimp exposed. |
+| 1 roll | **Tesa 51608 Fleece Harness Tape** (or 3M 1300E equiv) | Cloth harness tape for binding loom and holding sleeving ends closed. Use at all breakout points and sleeve terminations. More durable than PVC electrical tape. Source: StreetCarJoe Race Car Wiring Pt.2. |
+| 1 bag | Adhesive-backed zip tie anchor mounts (cable saddle clips) | Stick to panel backs for routing harness without drilling. Key for relay board rear face, dash inner panel, anywhere drilling is impractical. Source: StreetCarJoe Race Car Wiring Pt.3. |
+| 1 roll | Alex Tech / Techflex split loom — 1/4" + 3/8" + 1/2" assorted | Split loom for cabin and engine bay runs. Tesa tape on both ends holds sleeve closed. |
+| 1 set | P-clamps — 1/4", 3/8", 1/2", 5/8" | Secure main power cables every 12 inches minimum. |
+| 1 bag | M4 / M6 rivnuts (steel or zinc) — assorted | Used with rivnut tool for relay board and ECU bracket mounting. |
+
+> **Total non-Molex tools: ~$385–495** (including flush cutters, wire stripper, Knipex, IWISS, TNE positioner, Lisle, rivnut tool). Add ~$400–600 for the TNE/DMC solid barrel crimper. Total with TNE: **~$785–1,095** one-time purchase.
 > If using Souriau 8STA for the bulkhead instead of Deutsch AS, confirm the correct positioner for Souriau contacts at purchase — Souriau uses compatible tooling but a different positioner.
 > **MaxxECU Molex C1/C2 connectors:** Molex crimp tool PNs confirmed from [MaxxECU RACE pinout webhelp](https://www.maxxecu.com/webhelp/wirings-maxxecu_pinout.html). The small tool (63811-9200) is the primary purchase — covers ~85% of C1 and ~75% of C2 pins. The big tools are expensive (~$200+ each); consider outsourcing the handful of large-terminal pins if budget is a concern. For extraction/repair: Molex removal tool 638132400 (small) or 638132300 (big).

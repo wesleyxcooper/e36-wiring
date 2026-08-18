@@ -19,15 +19,40 @@ metadata:
 #        4 AWG :: main battery cable to fuse block
 #   [ ] Confirm fuse sizes after confirming all load current draws
 #
-#   BATTERY:
+#   BATTERY / CUTOFF SWITCH:
 #   [ ] Confirm battery location (stock E36 = driver footwell OR engine bay)
 #   [ ] If trunk or footwell: run 4 AWG battery cable + separate ground
 #   [ ] Add fusible link or ANL fuse within 18 inches of battery positive
+#   [ ] **CUTOFF SWITCH MUST BE 4-POST (e.g. Moroso 74108)** -- NOT a 2-post switch.
+#       A standard 2-post switch only disconnects the battery; with an alternator present
+#       the car will not actually shut off because the alternator keeps producing current.
+#       The Moroso 74108 4-post loops the alternator through the switch:
+#         Posts 1/2 (bottom) = Battery IN + Alternator IN
+#         Posts 3/4 (top)    = Output to loads + Alternator charge loop back to battery
+#       When switch is OFF: both battery AND alternator are disconnected simultaneously.
+#       Source: StreetCarJoe Race Car Wiring Series Pt.2 (youtube.com/watch?v=PNyScqftGQw)
 #
-#   GROUND STRATEGY:
-#   [ ] Main battery negative :: chassis stud (engine bay)
-#   [ ] Separate engine block ground strap (M52 cylinder head :: chassis)
-#   [ ] E36 has known ground issues -- run new straps, do not rely on OEM
+#   GROUND STRATEGY -- TWO SEPARATE LEADS OFF BATTERY NEGATIVE:
+#   [x] Lead 1: Battery negative → chassis stud (engine bay) -- 4 AWG welding cable
+#   [x] Lead 2: Battery negative → engine block directly -- 4 AWG welding cable (DEDICATED)
+#       *** Do NOT rely on engine→chassis→battery chain. Run a direct cable from battery
+#           negative terminal all the way up to the engine block. This eliminates the
+#           vast majority of race-car electrical issues. Keep the chassis lead as well --
+#           you want both, not one or the other. ***
+#       Source: StreetCarJoe Race Car Wiring Series Pt.2 (youtube.com/watch?v=PNyScqftGQw)
+#   [ ] Separate cylinder head ground strap (head → chassis or head → battery) -- for
+#       coil packs: each bank of coils needs a secondary ground to the cylinder head
+#       (in addition to the main coil power/GND running directly to the battery).
+#   [ ] E36 has known ground issues -- run all new straps, do not rely on OEM
+#
+#   ECU AND COIL POWER/GROUND -- MUST GO DIRECTLY TO BATTERY TERMINALS:
+#   [ ] MaxxECU main power (relay output) and ECU GND must connect to battery
+#       terminals (or ANL fuse stud close to battery), NOT to a distribution block
+#       or chassis star point. Using a shared distro block causes ground offsets
+#       that manifest as sensor drift and ignition noise.
+#       Source: StreetCarJoe Race Car Wiring Series Pt.2 (youtube.com/watch?v=PNyScqftGQw)
+#   [ ] Coil pack power and GND: same rule -- run directly to battery. Do not share
+#       with body electrical distribution. Coil secondary grounds go to cylinder head.
 #
 #   FUEL PUMP:
 #   [ ] Confirm pump model (OEM Bosch vs Walbro 255 vs AEM 320)
@@ -58,24 +83,69 @@ connectors:
       TODO: confirm battery location and cable run length.
       E36 stock location is driver-side footwell -- long cable run.
       Many builds relocate battery to engine bay or trunk for weight.
+      Positive goes to CUTOFF_4POST battery-in post first.
 
   BATT_NEG:
     type: "Battery negative terminal"
     subtype: "12V lead-acid or AGM"
-    pincount: 1
-    pinlabels: ["BATT GND"]
+    pincount: 2
+    pinlabels: ["BATT GND → chassis stud", "BATT GND → engine block (direct)"]
     notes: >-
-      Negative goes directly to chassis stud.
-      Do NOT run battery negative through the cabin.
+      TWO separate leads from battery negative terminal:
+      Pin 1: 4 AWG welding cable → chassis stud (engine bay) -- W_BATT_NEG_CHASSIS
+      Pin 2: 4 AWG welding cable → engine block directly -- W_BATT_NEG_ENGINE (dedicated run)
+      Do NOT rely on engine-block-to-chassis strap to complete the battery ground path.
+      Run both leads. Ring lug both ends. Welding cable preferred (EWCS 4 AWG or equiv).
+
+  # ── 4-post battery cutoff switch ────────────────────────────────────────────
+  CUTOFF_4POST:
+    type: "4-post battery cutoff switch -- Moroso 74108 or equiv"
+    subtype: "Required for alternator-equipped builds -- 2-post switch insufficient"
+    pincount: 4
+    pinlabels:
+      - "Batt IN (from BATT_POS)"
+      - "Alt IN (from alternator B+)"
+      - "Output (to main ANL fuse → loads)"
+      - "Alt charge loop (charges battery via alt when switch ON)"
+    notes: >-
+      MUST be a 4-post switch, NOT a 2-post. On an alternator-equipped car a 2-post
+      cutoff only disconnects the battery; the alternator continues to power the car
+      and the engine will not shut off. The Moroso 74108 4-post simultaneously
+      disconnects battery AND alternator when switched OFF -- the only safe approach.
+      How it works (Moroso 74108):
+        ON:  Battery IN + Alt IN both connected to Output. Alt charge loop closes =
+             alternator charges battery normally. Car runs from battery + alternator.
+        OFF: All four posts open. Battery and alternator both disconnected.
+             Car dies immediately. Safe for use as kill switch.
+      Mount in accessible location (driver reach or HPDE-required external pull).
+      Reference: StreetCarJoe Race Car Wiring Series Pt.3 (youtube.com/watch?v=l59_-01VgEc)
+      and Pt.2 (youtube.com/watch?v=PNyScqftGQw)
+      Part: Moroso 74108 (standard), or Longacre or equivalent 4-post racing cutoff.
+
+  # ── Engine block ground (direct from battery negative) ──────────────────────
+  ENGINE_BLOCK_GND:
+    type: "Engine block ground stud"
+    subtype: "M8 bolt -- existing block boss or welded stud"
+    pincount: 1
+    pinlabels: ["ENGINE BLOCK GND"]
+    notes: >-
+      Direct 4 AWG welding cable from battery negative terminal to engine block.
+      This is a SEPARATE lead from the chassis ground -- do NOT merge these.
+      Run both: battery→chassis AND battery→engine block (two cables, both 4 AWG).
+      Ring lug both ends. Clean ground contact (no paint under lug).
+      This eliminates the majority of race-car electrical noise/ground-offset issues.
+      Separate from the M52 head-to-chassis strap (which stays in place for EMC).
+      Reference: StreetCarJoe Race Car Wiring Series Pt.2 (youtube.com/watch?v=PNyScqftGQw)
 
   # ── Main fuse (close to battery) ───────────────────────────────────────────
   MAIN_FUSE:
     type: "Inline ANL or MAXI fuse holder"
     subtype: "TODO: size -- likely 60-80A"
     pincount: 2
-    pinlabels: ["In (from BATT+)", "Out (to fuse block)"]
+    pinlabels: ["In (from CUTOFF_4POST output)", "Out (to fuse block)"]
     notes: >-
-      Must be mounted within 18 inches of battery positive terminal.
+      Must be mounted within 18 inches of battery positive terminal / cutoff switch output.
+      Power path: BATT_POS → CUTOFF_4POST → MAIN_FUSE → FUSE_BLOCK.
       Protects entire power distribution loom from dead short.
       TODO: size after summing all fused circuit loads with 20% headroom.
       Blue Sea 5191 (MRBF) or equivalent.
@@ -88,10 +158,13 @@ connectors:
     pincount: 1
     pinlabels: ["GND"]
     notes: >-
-      All negative returns terminate here.
+      Primary battery negative lead terminates here. Relay board GND, body electrics,
+      and fan/pump returns terminate here.
       E36 engine bay ground stud is on the strut tower or firewall.
       TODO: confirm exact stud location for this car.
-      Add engine block-to-chassis ground strap (16 AWG min) separately.
+      Keep M52 factory engine block-to-chassis bonding strap -- it provides the
+      starter/alternator current return path from engine back to battery via chassis.
+      Verify it is clean (no paint under lug, star washer, tight nut).
 
   # ── Ignition-switched +12V source ─────────────────────────────────────────
   IGN_12V_SOURCE:
@@ -268,6 +341,14 @@ connectors:
       Pin 1: coil and injector supply -- from RELAY_COIL_INJ output.
       Pin 7: ECU logic supply -- from RELAY_ECU_MAIN output.
       See maxxecu-m52.wv for full 12-pin connector wiring.
+      *** GROUND CRITICAL: MaxxECU GND pins (power GND and sensor GND) must run
+          directly to battery negative terminal -- not to chassis star point.
+          Using a chassis intermediate ground causes ground offsets that manifest
+          as sensor drift and ignition noise at high RPM.
+          Reference: StreetCarJoe Race Car Wiring Series Pt.2 (youtu.be/PNyScqftGQw) ***
+      *** COIL SECONDARY GROUND: Ignition coil packs need a secondary GND to the
+          cylinder head (one per coil bank) in addition to the main coil power/GND
+          running to the battery. Do not skip or merge with sensor ground path. ***
 
   FAN_MOTOR:
     type: "Radiator fan motor"
@@ -365,17 +446,41 @@ connectors:
 cables:
 
   # ── Main power path ─────────────────────────────────────────────────────────
+  W_BATT_POS_TO_CUTOFF:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V batt → cutoff"]
+    notes: "4 AWG welding cable (EWCS). Red. Battery positive terminal → CUTOFF_4POST batt-in post. Ring lug both ends. Keep run short -- cutoff should be near battery."
+
+  W_CUTOFF_TO_ANL:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V cutoff out → ANL"]
+    notes: "4 AWG welding cable. Red. CUTOFF_4POST output post → MAIN_FUSE input. ANL fuse within 18 in of cutoff switch output. Ring lug both ends."
+
   W_BATT_POS_MAIN:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["+12V batt"]
-    notes: "TODO: 4 AWG or 2 AWG depending on cable run length. Red. Ring lug both ends."
+    wirelabels: ["+12V fused batt"]
+    notes: "Superseded -- was direct BATT_POS → MAIN_FUSE. Now routed through CUTOFF_4POST. See W_BATT_POS_TO_CUTOFF + W_CUTOFF_TO_ANL."
 
-  W_BATT_NEG_MAIN:
+  W_BATT_NEG_CHASSIS:
     wirecount: 1
     colors: [BK]
-    wirelabels: ["batt GND"]
-    notes: "TODO: same gauge as positive cable. Black. Chassis stud to battery negative."
+    wirelabels: ["batt GND → chassis"]
+    notes: "4 AWG welding cable (EWCS). Black. Battery negative terminal → chassis stud (engine bay). Ring lug both ends. One of TWO ground leads from battery negative."
+
+  W_BATT_NEG_ENGINE:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: ["batt GND → engine block (direct)"]
+    notes: >-
+      4 AWG welding cable (EWCS). Black. Battery negative terminal → engine block
+      ground stud directly. Ring lug both ends. SEPARATE from chassis lead.
+      This is the critical direct-to-battery ground that eliminates ground offset
+      and electrical noise. Do NOT merge with W_BATT_NEG_CHASSIS at either end.
+      Route through cabin or alongside fuel pump run. P-clamp every 12 inches.
+      Reference: StreetCarJoe Race Car Wiring Series Pt.2 (youtu.be/PNyScqftGQw)
 
   W_MAIN_TO_FUSE_BLOCK:
     wirecount: 1
@@ -544,18 +649,29 @@ cables:
 
 connections:
 
-  # ── Main power path ──────────────────────────────────────────────────────────
+  # ── Main power path: BATT+ → 4-post cutoff → ANL fuse → fuse block ──────────
   - - BATT_POS: [1]
-    - W_BATT_POS_MAIN: [1]
+    - W_BATT_POS_TO_CUTOFF: [1]
+    - CUTOFF_4POST: [1]
+
+  - - CUTOFF_4POST: [3]
+    - W_CUTOFF_TO_ANL: [1]
     - MAIN_FUSE: [1]
 
   - - MAIN_FUSE: [2]
     - W_MAIN_TO_FUSE_BLOCK: [1]
     - FUSE_BLOCK: [5]
 
+  # ── Battery negative: two separate leads ─────────────────────────────────────
+  # Lead 1: battery → chassis stud (relay board GND, body returns, fan/pump GND)
   - - BATT_NEG: [1]
-    - W_BATT_NEG_MAIN: [1]
+    - W_BATT_NEG_CHASSIS: [1]
     - CHASSIS_GND: [1]
+
+  # Lead 2: battery → engine block directly (ECU GND, coil GND reference, sensor GND)
+  - - BATT_NEG: [2]
+    - W_BATT_NEG_ENGINE: [1]
+    - ENGINE_BLOCK_GND: [1]
 
   # ── IGN feed to fuse block ───────────────────────────────────────────────────
   - - IGN_12V_SOURCE: [1]
