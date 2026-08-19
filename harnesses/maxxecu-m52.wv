@@ -342,11 +342,17 @@ connectors:
       Hold UP = launch control. Cabin-to-cabin connection; does NOT cross firewall bulkhead.
 
   FLEX_FUEL:
-    type: "3-pin inline"
-    subtype: "Ethanol content sensor (digital)"
+    type: "Continental 3-pin (GM 13577429)"
+    subtype: "Ethanol content / flex fuel sensor — inline on fuel feed"
     pincount: 3
     pinlabels: ["+12V", GND, "Signal (PWM out)"]
-    notes: "Digital PWM signal :: MaxxECU DIN 3 (GPO 7). MaxxECU reads ethanol % natively."
+    notes: >
+      GM 13577429 / Continental SE1004S. Pin A=+12V (system voltage — NOT 5V), Pin B=GND, Pin C=signal.
+      Signal is open-collector; ECU provides internal 5V pull-up on DIN input.
+      Single wire encodes TWO channels: frequency (50–150 Hz) = ethanol content %; pulse width = fuel temperature.
+      MaxxECU reads both natively on DIN 3. MTune: Inputs → Digital inputs → DIN 3 → Function: Flex fuel sensor.
+      Enable flex fuel map in MTune: Advanced → Flex fuel — set base (0% E) and E85 (85% E) maps.
+      +12V must come from switched 12V relay rail — not ECU 5V supply rail.
 
   PST_F1:
     type: "Bosch PST-F1 4-pin"
@@ -798,9 +804,17 @@ connections:
     - ECU_16PIN: [15, 16, 2]
 
   # ── Flex fuel sensor ─────────────────────────────────────────────────────────
-  - - FLEX_FUEL: [1, 2, 3]
-    - W_FLEXFUEL: [1, 2, 3]
-    - ECU_16PIN: [1, 2, 5]
+  # Pin A (+12V) → coil/inj switched 12V rail (ECU_12PIN[1], 20A fused).
+  # ⚠️ NOT ECU_16PIN[1] — that is +5V OUT; Continental 13577429 needs system 12V.
+  # Pin B (GND) → Sensor GND (ECU_16PIN[2]).
+  # Pin C (Signal) → DIN 3 / GPO 7 (ECU_16PIN[5]). ECU provides internal 5V pull-up.
+  - - FLEX_FUEL: [1]
+    - W_FLEXFUEL: [1]
+    - ECU_12PIN: [1]
+
+  - - FLEX_FUEL: [2, 3]
+    - W_FLEXFUEL: [2, 3]
+    - ECU_16PIN: [2, 5]
 
   # ── PST-F1 oil sensor ────────────────────────────────────────────────────────
   - - PST_F1: [1, 2, 3, 4]

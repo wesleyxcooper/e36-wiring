@@ -497,11 +497,15 @@ connectors:
     notes: "Same wiring as M52. GPO 1 (CMC B4/pin 8). +12V from coil/inj rail."
 
   FLEX_FUEL:
-    type: "Continental 3-pin"
-    subtype: "Flex fuel composition sensor — retain from M52 if present"
+    type: "Continental 3-pin (GM 13577429)"
+    subtype: "Flex fuel composition sensor — retain from M52, unchanged"
     pincount: 3
-    pinlabels: ["+12V", GND, Signal]
-    notes: "Same wiring as M52 if flex sensor is present. GPO 7/DIN 3 (CMC C1/pin 9)."
+    pinlabels: ["+12V", GND, "Signal (PWM out)"]
+    notes: >
+      GM 13577429 / Continental SE1004S. Pin A=+12V (system voltage — NOT 5V), Pin B=GND, Pin C=signal.
+      Signal encodes ethanol % (frequency) and fuel temperature (pulse width) on one wire.
+      Inline on fuel feed — position unchanged from M52. Zero wiring changes at Phase 3.
+      +12V from coil/inj relay (ECU_12PIN[1]) — see connection block for correct routing.
 
 
 cables:
@@ -842,6 +846,11 @@ connections:
     - ECU_16PIN: [15, 16, 2]
 
   # ── Flex fuel sensor — unchanged from M52 ────────────────────────────────────
-  - - FLEX_FUEL: [1, 2, 3]
-    - W_FLEXFUEL: [1, 2, 3]
-    - ECU_16PIN: [1, 2, 5]
+  # +12V from coil/inj relay (ECU_12PIN[1], 20A fused) — NOT ECU_16PIN[1] (+5V OUT).
+  - - FLEX_FUEL: [1]
+    - W_FLEXFUEL: [1]
+    - ECU_12PIN: [1]
+
+  - - FLEX_FUEL: [2, 3]
+    - W_FLEXFUEL: [2, 3]
+    - ECU_16PIN: [2, 5]
