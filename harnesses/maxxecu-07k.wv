@@ -34,13 +34,32 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # TODOs (verify at engine-side harness build):
 #
-# TODO: VW 07K crank sensor connector body type (Conn B region; 60-2 VR sensor).
-#       Confirm 3-pin vs 2-pin and exact VW connector family.
+# DONE: VW 07K crank sensor connector body (Conn B; 60-2 VR sensor).
+#       2 active signal wires + shield (3-pin housing) confirmed per BGP wiring diagram.
+#       BGP source: the07k.wiki/upload/f/fd/BGP_Wiring_diagram.pdf
+#       NCA in diagram = "No Connector Adapter" — sensor pigtail wires into ECM
+#       harness directly; sensor body still has a 3-pin housing.
+#       Location: cylinder 5 side — G28 "secured to the control housing cover"
+#       (timing chain compartment cover). Source: charm.li CBTA/BGP component
+#       locations, item 12. Intake vs exhaust face: unverified this session.
+#       Connector family: VW 3-pin oval sensor housing (same body as cam, diff pinout)
+#       — verify OE# 3B0973703G at engine before ordering pigtail.
 #
-# TODO: VW 07K cam Hall sensor connector body (rear of head).
-#       Confirm 3-pin type and +5V vs +12V supply spec.
+# DONE: VW 07K cam Hall sensor supply confirmed +5V.
+#       3-pin confirmed. Supply confirmed +5V from ECM sensor reference rail
+#       (same rail as MAP/TPS) — standard Hall effect, NOT +12V.
+#       BGP source: the07k.wiki/upload/f/fd/BGP_Wiring_diagram.pdf (Diagram 4)
+#       Location (BGP "top front"): intake side, top of head.
+#       Wire to MaxxECU: +5V sensor supply, sensor GND, signal → HOME input.
+#       Connector housing: verify at engine before ordering pigtail.
 #
-# TODO: VW 07K CLT connector body — confirm vs Bosch JPT 2-way compatibility.
+# TODO: VW 07K CLT connector body — 2-pin confirmed (BGP Diagram 4).
+#       BGP source: the07k.wiki/upload/f/fd/BGP_Wiring_diagram.pdf
+#       CBUA source: the07k.wiki/upload/3/38/CBUA-wiring-diagram.pdf
+#       Housing is VW-specific, NOT Bosch JPT 2-way — verify at engine.
+#       Location (BGP "right rear"): cylinder 1 side + exhaust side.
+#       In E36: near the radiator end of the engine, on the exhaust face.
+#       Route pigtail with heat sleeving — adjacent to exhaust manifold face.
 #
 # TODO: VW 07K DBW throttle body connector body and motor wire polarity.
 #       Confirm TPS1/TPS2 pin assignment at TB connector.
@@ -281,10 +300,13 @@ connectors:
       obvious failure indicator. MTune: VR input, trigger N-1 / 60-2 pattern, same
       type as M52 crank. Only crank angle offset may differ — confirm in MTune
       Trigger Setup before first crank. ME7.1.1 harness ref: Conn B pin 82.
+      Location: cylinder 5 side — sensor G28 "secured to the control housing cover"
+      (timing chain compartment cover at cylinder 5 end).
+      Source: charm.li CBTA/BGP component locations, item 12.
 
   CAM_HALL:
     type: "VW 07K cam Hall sensor connector"
-    subtype: "Hall effect, rear of head — +5V supply type (not +12V)"
+    subtype: "Hall effect, intake side top of head — +5V supply type (not +12V)"
     pincount: 3
     pinlabels: ["+5V", "Sensor GND", Signal]
     notes: >
@@ -294,10 +316,14 @@ connectors:
 
   CLT:
     type: "VW 07K coolant temp sensor 2-pin"
-    subtype: "NTC thermistor — engine block port"
+    subtype: "NTC thermistor — cylinder 1 side, exhaust face of block"
     pincount: 2
     pinlabels: [Signal, "Sensor GND"]
-    notes: "ME7.1.1 ref: pin 93. TODO: confirm VW connector body vs Bosch JPT 2-way compatibility."
+    notes: >
+      ME7.1.1 ref: pin 93. TODO: verify VW-specific 2-pin connector housing at engine.
+      BGP source: the07k.wiki/upload/f/fd/BGP_Wiring_diagram.pdf (Diagram 4, "right rear").
+      Location: cylinder 1 side + exhaust side. In E36: front of engine, exhaust face.
+      Route pigtail with heat sleeving (exhaust manifold adjacent).
 
   IAT:
     type: "VW 07K intake air temp sensor 2-pin"
@@ -337,17 +363,19 @@ connectors:
 
   KNOCK_1:
     type: "Bosch flat knock sensor 1-pin (M8 bolt mount)"
-    subtype: "Cylinder bank front — 07K block"
+    subtype: "Exhaust side, lower block — 07K block"
     pincount: 1
     pinlabels: ["KS1 signal"]
     notes: >
       GND via M8 mounting bolt to block — no separate GND wire.
       ME7.1.1 ref: pin 106. MaxxECU: CMC K3 (DIN/VR1, pin 39).
       Bulkhead expansion pin 69.
+      Location: "back side of engine block" = exhaust side (both KS1 and KS2).
+      Source: charm.li CBTA/BGP component locations — "Knock Sensors" section.
 
   KNOCK_2:
     type: "Bosch flat knock sensor 1-pin (M8 bolt mount)"
-    subtype: "Cylinder bank rear — 07K block"
+    subtype: "Exhaust side, lower block — 07K block"
     pincount: 1
     pinlabels: ["KS2 signal"]
     notes: >

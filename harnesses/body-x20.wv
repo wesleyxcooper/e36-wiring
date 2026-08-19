@@ -21,16 +21,25 @@
 #       Verify against the specific car's ETM before wiring.
 #       BMW ETM for 96+ E36: request from bimmerworld or ISTA/GT1 access.
 #
-# TODO: EWS2 bypass signal path through X20
-#       The EWS2 immobilizer communicates via the body harness.
-#       Some EWS delete emulator modules intercept signals at X20 or cluster pins.
-#       Identify which X20 pins carry EWS2 signals and document bypass method.
-#       See also: maxxecu-m52.wv TODO for EWS2 bypass.
+# DONE: EWS2 signal path through X20 — resolved per BMW E36 ETM 6135.0.
+#       ETM source: jonkensy.com (1998 BMW E36 ETM, page 6135.0)
+#       X20 pin 20 (SW): EWS II ↔ DME data bus — leave unconnected.
+#         With MaxxECU replacing DME, this pin carries no signal. Float it.
+#       X20 pin 18 (SW/GE): EWS → starter allow (starter immobilization).
+#         OEM: EWS releases starter via S235 Starter Immobilization Switch.
+#         Bypass: bridge S235 or route +12V IGN directly to starter relay coil
+#         (bypasses EWS gate). Confirm bypass method before Phase 1 start attempt.
+#       X20 pin 7 (SW/VI): Starter Immobilization to OBC — leave as-is or float.
 #
-# TODO: Fuel pump relay wiring via X20 pin 13
-#       OEM DME uses X20 pin 13 (GN/VI) to trigger the fuel pump relay.
-#       With MaxxECU: GPO 2 should drive this pin directly or via an inline relay.
-#       Confirm whether MaxxECU harness uses this pin or an independent relay circuit.
+# DONE: Fuel pump relay via X20 pin 13 — resolved per BMW E36 ETM 0670.2-01.
+#       ETM source: jonkensy.com (1998 BMW E36 ETM, page 0670.2-01)
+#       X20 pin 13 (GN/VI) is a +12V RELAY OUTPUT (switched +12V from FP relay 87)
+#       to the trunk fuel pump — NOT a trigger signal from the DME.
+#       OEM: DME sends a separate signal to trigger the relay coil; X20 pin 13
+#       delivers the relay's load-side output to the pump.
+#       With Radium independent fuel circuit: X20 pin 13 is unused.
+#       Action: cavity-plug X20 engine-side pin 13. MaxxECU GPO 2 triggers
+#       the Radium relay directly (not through X20). See fuel-pump-hanger.wv.
 #
 # TODO: VSS (vehicle speed signal) source with 8HP
 #       X20 pin 14 (SW/WS) carries VSS from the cluster to the body harness.

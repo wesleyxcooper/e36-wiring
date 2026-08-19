@@ -19,12 +19,23 @@ Left/right and driver/passenger are LHD-centric and ambiguous in an RHD build. A
 | **Exhaust side** | Long side of 07K block with exhaust ports and primary OEM mount bosses |
 | **Intake side** | Long side of 07K block with intake ports and oil filter housing |
 
-**RHD E36 orientation (longitudinal, timing chain forward):**
+**Engine longitudinal ends — always use cylinder 1 side / cylinder 5 side, never front/rear.**
 
-| Car direction | 07K side |
+Front/rear is ambiguous: in the OEM VW transverse installation "front" means the intake-facing side (a lateral direction in E36). All references in this repo use:
+
+| Term | Meaning |
+| :--- | :--- |
+| **Cylinder 1 side** | End toward E36 radiator |
+| **Cylinder 5 side** | End toward E36 firewall — timing chain / flywheel end in OEM VW (chain compartment at this end; TDC cyl 5 used for timing adj. — charm.li BGP service manual) |
+
+**RHD E36 orientation summary (longitudinal, cylinder 1 side toward radiator):**
+
+| Car position | 07K axis |
 | :--- | :--- |
 | Driver side (right) | **Exhaust side** — SPA manifold, turbo, downpipe, engine stand adapter |
 | Passenger side (left) | **Intake side** — iABED housing, intake manifold |
+| Toward radiator | **Cylinder 1 side** |
+| Toward firewall | **Cylinder 5 side** — timing chain, crank sensor |
 
 This applies to all harness routing notes, connector location descriptions, and loom routing docs in this repo.
 
