@@ -10,7 +10,7 @@ Reference for connector pinning, depinning, and harness assembly across all e36-
 |-----------|--------|---------------|------|
 | MaxxECU RACE C1 | Molex 48-pin | ~40 (varies by harness) | 63811-9200 (small) · 63811-8900/9000 (big) |
 | MaxxECU RACE C2 | Molex 32-pin | 0 (Phase 1/3) — defer | Same as C1 |
-| Deutsch AS firewall bulkhead | AS series, size 20 | Up to 79 | Deutsch WT-0460-8-0800 |
+| Deutsch AS firewall bulkhead | AS series, size 20 | Up to 79 | Daniels M22520/2-01 + K43 positioner (M22520/2-10) |
 | 07K cam sensor pigtail | 3B0973703G (3-pin VAG) | 3 | Knipex 97 52 68 |
 | 07K crank sensor pigtail | 3B0973703G (3-pin VAG) | 3 | Knipex 97 52 68 |
 | 07K MAP sensor pigtail | 3B0973703G (3-pin VAG) | 3 | Knipex 97 52 68 |
@@ -39,8 +39,8 @@ hard-to-trace shorts and intermittent sensor faults.
 | Molex ratcheting crimper (big 0.5–1.0 mm²) | 63811-8900 | MaxxECU C1/C2 large-gauge pins |
 | Molex ratcheting crimper (big 1–2 mm²) | 63811-9000 | MaxxECU C1/C2 large-gauge pins |
 | Micro-pin ratcheting crimper | Knipex 97 52 68 | All VAG sensor pigtails, COP, EV14, NTC |
-| **TNE solid barrel crimper** | Daniels DMC TL-10 handle + die set (or AMP CET-1 + MH860 die) | **Firewall bulkhead Deutsch AS size-20 solid barrel contacts.** No cheap substitute — wrong die produces cold crimps that pass pull-test but fail under vibration. "Don't buy the cheap alternatives — you will ruin your connector." Source: StreetCarJoe Race Car Wiring Pt.1. |
-| Deutsch AS crimper positioner | Deutsch WT-0460-8-0800 | Pairs with TNE tool for AS79 size-20 contacts |
+| **AS solid barrel crimper** | Daniels M22520/2-01 (AFM8) handle + K43 positioner (M22520/2-10) | **Firewall bulkhead Deutsch AS size-20 solid barrel contacts.** TE-specified mil-spec tool for AS contacts — NOT the HDT-48-00 or clones (those cover DT/DTM/DTP only, different contact geometry). No cheap substitute — wrong die produces cold crimps that pass pull-test but fail under vibration. Best value: Fischer Motorsports "DMC Deutsch Size 20 AS Tool Kit" (~$426, includes handle + both positioners). K43 positioner alone: ~$80–94 surplus (dmctools.com). Source: TE Autosport technical datasheet (1-1773721-9), Fischer Motorsports. |
+| AS crimper positioner | Daniels K43 (M22520/2-10) | Included in Fischer kit above. Locates size-20 AS pin and socket contacts in the M22520/2-01 frame. Single positioner covers both pin and socket. |
 | Open-barrel crimper | IWISS IWS-2820M | Ring terminals, relay contacts, general non-insulated open-barrel splices. Use non-insulated + adhesive-lined heat shrink — never pre-insulated crimps. |
 | Ferrule crimper | IWISS IWS-10 | Screw-clamp terminals (ECU power/GND strands) |
 | Flush cutters | Milwaukee 48-22-6106 or equiv | In-car wire trimming, flush cuts near connector bodies. Buy before starting any connector work. Source: StreetCarJoe Race Car Wiring Pt.1. |
