@@ -1,0 +1,36 @@
+Id	Description	Qty	Unit	Designators
+1	Cable, 1 wires	0.8	m	W_KNOCK_1, W_KNOCK_2
+2	Cable, 2 wires	6.6	m	W_BOOST, W_CAN, W_CAN_8HP, W_CAN_GAUGES, W_CLT, W_DBW_MOTOR, W_IAT, W_INJ_1, W_INJ_2, W_INJ_3, W_INJ_4, W_INJ_5
+3	Cable, 3 wires	5.4	m	W_CAM, W_CLUTCH_POS, W_CRANK, W_FLEXFUEL, W_MAP, W_SHIFTER
+4	Cable, 4 wires	3.6	m	W_DBW_TPS, W_IGN_1, W_IGN_2, W_IGN_3, W_IGN_4, W_IGN_5, W_PST_F1
+5	Cable, 5 wires shielded	1.5	m	W_WBO2
+6	Connector, Bosch EV14 2-pin (USCAR), Injector 1 (ID1050x), 2 pins	1		INJ_1
+7	Connector, Bosch EV14 2-pin (USCAR), Injector 2 (ID1050x), 2 pins	1		INJ_2
+8	Connector, Bosch EV14 2-pin (USCAR), Injector 3 (ID1050x), 2 pins	1		INJ_3
+9	Connector, Bosch EV14 2-pin (USCAR), Injector 4 (ID1050x), 2 pins	1		INJ_4
+10	Connector, Bosch EV14 2-pin (USCAR), Injector 5 (ID1050x), 2 pins	1		INJ_5
+11	Connector, Bosch LSU 4.9 6-way, Wideband lambda sensor, 6 pins	1		WIDEBAND
+12	Connector, Bosch MAP sensor 3-pin, 3-bar for turbo application (GM 12592525 or equivalent), 3 pins	1		MAP
+13	Connector, Bosch PST-F1 4-pin, Dual oil temp+pressure — iABED M10x1.0 port on 07K oil housing, 4 pins	1		PST_F1
+14	Connector, Bosch flat knock sensor 1-pin (M8 bolt mount), Exhaust side, lower block — 07K block, 1 pins	2		KNOCK_1, KNOCK_2
+15	Connector, Continental 3-pin (GM 13577429), Flex fuel composition sensor — retain from M52, unchanged, 3 pins	1		FLEX_FUEL
+16	Connector, DCT Shifter mechanical sequential, DCT Shifter E36 (3-wire, no +12V supply needed), 3 pins	1		DCT_SHIFTER
+17	Connector, Gauge.S cluster CAN, Gauge.S E36 PNP cluster CAN input, 2 pins	1		GAUGES_CAN
+18	Connector, MaxxECU 8HP GEN1 CAN harness, ZF 8HP70 transmission CAN connector, 2 pins	1		HP8_CAN
+19	Connector, MaxxECU M50 terminated harness — 12-pin power/chassis breakout, REV2, 12 pins	1		ECU_12PIN
+20	Connector, MaxxECU M50 terminated harness — 16-pin aux breakout, REV2. Source: maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html, 16 pins	1		ECU_16PIN
+21	Connector, Molex CMC 32-pin (MaxxECU Race C2), Stub — only AIN 5 (G3) used for virtual clutch position, 3 pins	1		ECU_C2
+22	Connector, Molex CMC 48-pin (MaxxECU Race / V1 / PRO), Source: maxxecu.com/webhelp/wirings-maxxecu_pinout.html, 48 pins	1		ECU_CMC
+23	Connector, Rotary position sensor 0-5V — E36 clutch pedal pivot, Carries from Phase 1 M52 unchanged. Same pedal, same sensor, same C2 AIN 5., 3 pins	1		CLUTCH_POS_SENSOR
+24	Connector, Splice / junction, CAN H/L shared bus junction, 4 pins	1		CAN_BUS_JUNCTION
+25	Connector, Superseal 2-way, Turbosmart boost solenoid (2-port PWM), 2 pins	1		BOOST_SOL
+26	Connector, VAG 4-way COP, Coil 1 — cyl 1 (07K firing order: 1-2-4-5-3), 4 pins	1		IGN_1
+27	Connector, VAG 4-way COP, Coil 2 — cyl 2, 4 pins	1		IGN_2
+28	Connector, VAG 4-way COP, Coil 3 — cyl 3, 4 pins	1		IGN_3
+29	Connector, VAG 4-way COP, Coil 4 — cyl 4, 4 pins	1		IGN_4
+30	Connector, VAG 4-way COP, Coil 5 — cyl 5, 4 pins	1		IGN_5
+31	Connector, VW 07K DBW throttle body 6-pin, Stock ~65mm bore. Upgrade to VR6 03H133062 74mm for 600+ whp., 6 pins	1		DBW_TB
+32	Connector, VW 07K cam Hall sensor connector, Hall effect, intake side top of head — +5V supply type (not +12V), 3 pins	1		CAM_HALL
+33	Connector, VW 07K coolant temp sensor 2-pin, NTC thermistor — cylinder 1 side, exhaust face of block, 2 pins	1		CLT
+34	Connector, VW 07K crank VR sensor connector, 60-2 missing tooth passive VR — MaxxECU VR input (N-1 trigger type), 3 pins	1		CRANK_VR
+35	Connector, VW 07K intake air temp sensor 2-pin, NTC thermistor — airbox or intake pipe, 2 pins	1		IAT

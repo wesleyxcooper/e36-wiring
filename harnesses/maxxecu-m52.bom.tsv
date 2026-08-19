@@ -1,0 +1,43 @@
+Id	Description	Qty	Unit	Designators
+1	Cable, 1 wires	1.8	m	W_COIL_PWR, W_ECU_PWR, W_ENGINE_GND, W_FAN, W_FUELPUMP
+2	Cable, 2 wires	7.5	m	W_BOOST, W_CAN, W_CAN_8HP, W_CAN_GAUGES, W_CLT, W_IAT, W_INJ_1, W_INJ_2, W_INJ_3, W_INJ_4, W_INJ_5, W_INJ_6, W_VANOS
+3	Cable, 3 wires	6	m	W_CAM, W_CLUTCH_POS, W_CRANK, W_FLEXFUEL, W_ICV, W_SHIFTER, W_TPS
+4	Cable, 4 wires	3.6	m	W_IGN_1, W_IGN_2, W_IGN_3, W_IGN_4, W_IGN_5, W_IGN_6, W_PST_F1
+5	Cable, 5 wires shielded	1	m	W_WBO2
+6	Connector, BMW 12141726590, M52 cam Hall sensor — non-VANOS connector type, no +12V supply needed, 3 pins	1		CAM_HALL
+7	Connector, Bosch JPT 2-way, Injector 1 (Bosch 440cc EV1), 2 pins	1		INJ_1
+8	Connector, Bosch JPT 2-way, Injector 2, 2 pins	1		INJ_2
+9	Connector, Bosch JPT 2-way, Injector 3, 2 pins	1		INJ_3
+10	Connector, Bosch JPT 2-way, Injector 4, 2 pins	1		INJ_4
+11	Connector, Bosch JPT 2-way, Injector 5, 2 pins	1		INJ_5
+12	Connector, Bosch JPT 2-way, Injector 6, 2 pins	1		INJ_6
+13	Connector, Bosch JPT 2-way, M52 VANOS intake solenoid, 2 pins	1		VANOS_SOL
+14	Connector, Bosch JPT 2-way, M52 coolant temp (NTC), 2 pins	1		CLT
+15	Connector, Bosch JPT 3-way, M52 60-2 VR crank trigger, 3 pins	1		CRANK_VR
+16	Connector, Bosch JPT 3-way, M52 idle air control valve, 3 pins	1		IDLE_VALVE
+17	Connector, Bosch LSU 4.9 6-way, Wideband lambda sensor, 6 pins	1		WIDEBAND
+18	Connector, Bosch PST-F1 4-pin, Dual oil temp+pressure sensor, 4 pins	1		PST_F1
+19	Connector, Cinch 12-pin power/chassis, 12 pins	1		ECU_12PIN
+20	Connector, Cinch 16-pin auxiliary, 16 pins	1		ECU_16PIN
+21	Connector, Continental 3-pin (GM 13577429), Ethanol content / flex fuel sensor — inline on fuel feed, 3 pins	1		FLEX_FUEL
+22	Connector, DCT Shifter mechanical sequential, DCT Shifter E36 (3-wire, no +12V supply needed), 3 pins	1		DCT_SHIFTER
+23	Connector, Gauge.S cluster CAN, Gauge.S E36 PNP cluster CAN input, 2 pins	1		GAUGES_CAN
+24	Connector, MaxxECU 8HP GEN1 CAN harness, ZF 8HP70 transmission CAN connector, 2 pins	1		HP8_CAN
+25	Connector, Molex CMC 32-pin (MaxxECU Race C2), Stub — only AIN 5 (G3) used for virtual clutch position, 3 pins	1		ECU_C2
+26	Connector, Molex CMC 48-pin (MaxxECU Race / V1 / PRO), Source: maxxecu.com/webhelp/wirings-maxxecu_pinout.html, 48 pins	1		ECU_CMC
+27	Connector, OEM M52, Intake air temp (NTC), 2 pins	1		IAT
+28	Connector, OEM M52, Throttle position sensor (0-5V), 3 pins	1		TPS
+29	Connector, Ring terminal, Battery +12V (fused), 1 pins	1		BATT_12V
+30	Connector, Ring terminal, Chassis/battery ground, 1 pins	1		CHASSIS_GND
+31	Connector, Ring terminal, Ignition-switched +12V, 1 pins	1		IGN_12V
+32	Connector, Rotary position sensor 0-5V — E36 clutch pedal pivot, Hall effect or potentiometer; mechanical linkage disconnected at Phase 1, 3 pins	1		CLUTCH_POS_SENSOR
+33	Connector, SPDT relay, SPAL fan relay, 4 pins	1		FAN_RELAY
+34	Connector, SPDT relay, Walbro 255LPH pump relay, 4 pins	1		FUEL_PUMP_RELAY
+35	Connector, Splice / junction, CAN H/L shared bus junction, 4 pins	1		CAN_BUS_JUNCTION
+36	Connector, Superseal 2-way, Turbosmart boost solenoid (2-port PWM), 2 pins	1		BOOST_SOL
+37	Connector, VAG 4-way COP, Coil 1 (BMW S54 COP), 4 pins	1		IGN_1
+38	Connector, VAG 4-way COP, Coil 2, 4 pins	1		IGN_2
+39	Connector, VAG 4-way COP, Coil 3, 4 pins	1		IGN_3
+40	Connector, VAG 4-way COP, Coil 4, 4 pins	1		IGN_4
+41	Connector, VAG 4-way COP, Coil 5, 4 pins	1		IGN_5
+42	Connector, VAG 4-way COP, Coil 6, 4 pins	1		IGN_6

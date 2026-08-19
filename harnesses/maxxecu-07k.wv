@@ -494,7 +494,9 @@ connectors:
     subtype: "Turbosmart boost solenoid (2-port PWM)"
     pincount: 2
     pinlabels: ["+12V", "GPO 1 signal"]
-    notes: "Same wiring as M52. GPO 1 (CMC B4/pin 8). +12V from coil/inj rail."
+    notes: >
+      Same wiring as M52. GPO 1 (CMC B4/pin 8). +12V from coil/inj relay (ECU_12PIN[1]).
+      Flyback diode: 1N4007 at connector, cathode (banded end) to +12V pin, anode to GPO 1 pin.
 
   FLEX_FUEL:
     type: "Continental 3-pin (GM 13577429)"
@@ -757,49 +759,91 @@ connections:
     - ECU_CMC: [40]
 
   # ── Ignition coils ────────────────────────────────────────────────────────────
-  # +12V from ECU_12PIN[1] (coil/inj rail), GND to chassis, signal from CMC IGN outputs
+  # +12V from coil/inj relay (ECU_12PIN[1]) — NOT ECU_CMC[48] (ECU logic power).
+  # GND=L4/CMC44, Shield=E3/CMC19
   # Firing order: 1-2-4-5-3 → IGN 1-5 = CMC pins 2/3/6/7/10
-  - - IGN_1: [1, 2, 3, 4]
-    - W_IGN_1: [1, 2, 3, 4]
-    - ECU_CMC: [48, 44, 2, 19]
+  - - IGN_1: [1]
+    - W_IGN_1: [1]
+    - ECU_12PIN: [1]
 
-  - - IGN_2: [1, 2, 3, 4]
-    - W_IGN_2: [1, 2, 3, 4]
-    - ECU_CMC: [48, 44, 3, 19]
+  - - IGN_1: [2, 3, 4]
+    - W_IGN_1: [2, 3, 4]
+    - ECU_CMC: [44, 2, 19]
 
-  - - IGN_3: [1, 2, 3, 4]
-    - W_IGN_3: [1, 2, 3, 4]
-    - ECU_CMC: [48, 44, 6, 19]
+  - - IGN_2: [1]
+    - W_IGN_2: [1]
+    - ECU_12PIN: [1]
 
-  - - IGN_4: [1, 2, 3, 4]
-    - W_IGN_4: [1, 2, 3, 4]
-    - ECU_CMC: [48, 44, 7, 19]
+  - - IGN_2: [2, 3, 4]
+    - W_IGN_2: [2, 3, 4]
+    - ECU_CMC: [44, 3, 19]
 
-  - - IGN_5: [1, 2, 3, 4]
-    - W_IGN_5: [1, 2, 3, 4]
-    - ECU_CMC: [48, 44, 10, 19]
+  - - IGN_3: [1]
+    - W_IGN_3: [1]
+    - ECU_12PIN: [1]
+
+  - - IGN_3: [2, 3, 4]
+    - W_IGN_3: [2, 3, 4]
+    - ECU_CMC: [44, 6, 19]
+
+  - - IGN_4: [1]
+    - W_IGN_4: [1]
+    - ECU_12PIN: [1]
+
+  - - IGN_4: [2, 3, 4]
+    - W_IGN_4: [2, 3, 4]
+    - ECU_CMC: [44, 7, 19]
+
+  - - IGN_5: [1]
+    - W_IGN_5: [1]
+    - ECU_12PIN: [1]
+
+  - - IGN_5: [2, 3, 4]
+    - W_IGN_5: [2, 3, 4]
+    - ECU_CMC: [44, 10, 19]
 
   # ── Injectors ──────────────────────────────────────────────────────────────────
-  # +12V from CMC pin 48 (shared); INJ signals = CMC K1/K2/M1/M2/M3 = pins 37/38/45/46/47
-  - - INJ_1: [1, 2]
-    - W_INJ_1: [1, 2]
-    - ECU_CMC: [48, 37]
+  # +12V from coil/inj relay (ECU_12PIN[1]) — NOT ECU_CMC[48] (ECU logic power).
+  # INJ signals = CMC K1/K2/M1/M2/M3 = pins 37/38/45/46/47
+  - - INJ_1: [1]
+    - W_INJ_1: [1]
+    - ECU_12PIN: [1]
 
-  - - INJ_2: [1, 2]
-    - W_INJ_2: [1, 2]
-    - ECU_CMC: [48, 38]
+  - - INJ_1: [2]
+    - W_INJ_1: [2]
+    - ECU_CMC: [37]
 
-  - - INJ_3: [1, 2]
-    - W_INJ_3: [1, 2]
-    - ECU_CMC: [48, 45]
+  - - INJ_2: [1]
+    - W_INJ_2: [1]
+    - ECU_12PIN: [1]
 
-  - - INJ_4: [1, 2]
-    - W_INJ_4: [1, 2]
-    - ECU_CMC: [48, 46]
+  - - INJ_2: [2]
+    - W_INJ_2: [2]
+    - ECU_CMC: [38]
 
-  - - INJ_5: [1, 2]
-    - W_INJ_5: [1, 2]
-    - ECU_CMC: [48, 47]
+  - - INJ_3: [1]
+    - W_INJ_3: [1]
+    - ECU_12PIN: [1]
+
+  - - INJ_3: [2]
+    - W_INJ_3: [2]
+    - ECU_CMC: [45]
+
+  - - INJ_4: [1]
+    - W_INJ_4: [1]
+    - ECU_12PIN: [1]
+
+  - - INJ_4: [2]
+    - W_INJ_4: [2]
+    - ECU_CMC: [46]
+
+  - - INJ_5: [1]
+    - W_INJ_5: [1]
+    - ECU_12PIN: [1]
+
+  - - INJ_5: [2]
+    - W_INJ_5: [2]
+    - ECU_CMC: [47]
 
   # ── PST-F1 oil sensor ─────────────────────────────────────────────────────────
   - - PST_F1: [1, 2, 3, 4]

@@ -244,8 +244,16 @@ connectors:
     type: "SPDT relay"
     subtype: "Walbro 255LPH pump relay"
     pincount: 4
-    pinlabels: ["85 Coil GND", "86 Coil +12V trigger", "87 +12V battery", "30 Pump +12V"]
-    notes: "GPO 2 :: pin 86. Pump draws ~8A."
+    pinlabels:
+      - "85 Coil - (GPO 2 low-side)"   # 1 — ECU_12PIN[3] sinks to GND when active
+      - "86 Coil + (+12V OEM IGN)"     # 2 — +12V from OEM IGN relay; not via ECU connector
+      - "87 Pump +12V (contact out)"   # 3
+      - "30 Battery+ (fused)"          # 4
+    notes: >
+      GPO 2 (ECU_12PIN[3]) drives pin 85 as a low-side switch (sinks to GND to energize relay).
+      Pin 86 (+12V) supplied by OEM ignition relay via body harness — pre-existing wiring, unchanged.
+      Pump draws ~8A; relay contact rated ≥10A. Use ISO mini relay or Bosch 0 332 209 150.
+      Flyback diode: 1N4007 across relay coil (cathode to pin 86 / +12V, anode to pin 85 / GPO 2).
 
   # ── Ignition ─────────────────────────────────────────────────────────────────
 
@@ -317,10 +325,17 @@ connectors:
     type: "SPDT relay"
     subtype: "SPAL fan relay"
     pincount: 4
-    pinlabels: ["85 Coil GND", "86 Coil trigger (GPO 6)", "87 +12V battery", "30 Fan +12V"]
+    pinlabels:
+      - "85 Coil - (GPO 6 low-side)"   # 1 — ECU_16PIN[6] sinks to GND when active
+      - "86 Coil + (+12V OEM IGN)"     # 2 — +12V from OEM IGN relay; not via ECU connector
+      - "87 Fan +12V (contact out)"    # 3
+      - "30 Battery+ (fused)"          # 4
     notes: >
-      Stage 1: OEM thermostat switch triggers relay standalone.
-      Stage 2 (MaxxECU): GPO 6 triggers relay in parallel with thermostat switch.
+      GPO 6 (ECU_16PIN[6]) drives pin 85 as a low-side switch (sinks to GND to energize relay).
+      Pin 86 (+12V) supplied by OEM ignition relay via body harness — pre-existing wiring, unchanged.
+      Stage 1: OEM thermostat switch wired to pin 85 in parallel with GPO 6.
+      Stage 2 (MaxxECU): GPO 6 triggers relay coil in parallel with thermostat switch.
+      Flyback diode: 1N4007 across relay coil (cathode to pin 86 / +12V, anode to pin 85 / GPO 6).
       SPAL upgrade: SPAL 30102049 (16-inch puller, ~2070 CFM, single-speed brushed) wired
       to relay output. Direct GPO PWM of brushed fans needs ~20kHz; use SPAL FAN-PWM-V3
       module or source a SPAL VA-series 3-wire PWM fan for true variable speed via GPO.
@@ -646,7 +661,7 @@ cables:
     length: 0.4 m
 
   # Ignition coils — S54 COP, VAG 4-pin. Inside M50 terminated harness.
-  # +12V = M4/CMC48, GND = L4/CMC44, Signal per cyl, Shield = E3/CMC19.
+  # +12V from coil/inj relay (ECU_12PIN[1]), GND = L4/CMC44, Signal per cyl, Shield = E3/CMC19.
   W_IGN_1:
     wirecount: 4
     colors: [RD, BK, WH, GY]
@@ -693,18 +708,18 @@ cables:
     wirelabels: ["+12V", "GPO 1"]
     length: 0.8 m
 
-  # Fan relay
+  # Fan relay — GPO 6 to coil pin 85 (low-side). Pin 86 +12V comes from OEM body harness.
   W_FAN:
-    wirecount: 2
-    colors: [BK, GN]
-    wirelabels: [GND, "GPO 6"]
+    wirecount: 1
+    colors: [GN]
+    wirelabels: ["GPO 6 (coil - low-side)"]
     length: 1.0 m
 
-  # Fuel pump relay trigger
+  # Fuel pump relay — GPO 2 to coil pin 85 (low-side). Pin 86 +12V comes from OEM body harness.
   W_FUELPUMP:
-    wirecount: 2
-    colors: [BK, GN]
-    wirelabels: [GND, "GPO 2"]
+    wirecount: 1
+    colors: [GN]
+    wirelabels: ["GPO 2 (coil - low-side)"]
     length: 0.8 m
 
   # Virtual clutch position sensor — cabin-side, no bulkhead crossing
@@ -780,9 +795,14 @@ connections:
     - ECU_CMC: [25, 26, 29]
 
   # ── VANOS solenoid ───────────────────────────────────────────────────────────
-  - - VANOS_SOL: [1, 2]
-    - W_VANOS: [1, 2]
-    - ECU_16PIN: [1, 7]
+  # +12V from coil/inj relay (ECU_12PIN[1]) — NOT ECU_16PIN[1] (+5V OUT).
+  - - VANOS_SOL: [1]
+    - W_VANOS: [1]
+    - ECU_12PIN: [1]
+
+  - - VANOS_SOL: [2]
+    - W_VANOS: [2]
+    - ECU_16PIN: [7]
 
   # ── CAN bus (shared: 8HP + Gauge.S) ─────────────────────────────────────────
   - - ECU_16PIN: [10, 9]
@@ -832,14 +852,16 @@ connections:
     - ECU_CMC: [8]
 
   # ── Fan relay trigger ─────────────────────────────────────────────────────────
-  - - FAN_RELAY: [1, 2]
-    - W_FAN: [1, 2]
-    - ECU_16PIN: [2, 6]
+  # GPO 6 drives coil pin 85 (low-side switch to GND). Pin 86 (+12V) from OEM body harness.
+  - - FAN_RELAY: [1]
+    - W_FAN: [1]
+    - ECU_16PIN: [6]
 
   # ── Fuel pump relay trigger ───────────────────────────────────────────────────
-  - - FUEL_PUMP_RELAY: [1, 2]
-    - W_FUELPUMP: [1, 2]
-    - ECU_12PIN: [2, 3]
+  # GPO 2 drives coil pin 85 (low-side switch to GND). Pin 86 (+12V) from OEM body harness.
+  - - FUEL_PUMP_RELAY: [1]
+    - W_FUELPUMP: [1]
+    - ECU_12PIN: [3]
 
   # ── Virtual clutch position sensor (cabin-side, no bulkhead crossing) ─────────
   # +5V=ECU_C2[2], Signal=ECU_C2[1] (AIN 5 / C2 pin G3), GND=ECU_C2[3]
@@ -854,58 +876,107 @@ connections:
     - ECU_CMC: [29, 20, 1]
 
   # ── Injectors (M52 inline-6, EV1 Bosch JPT) ──────────────────────────────────
-  # +12V=M4/CMC48; INJ1=K1/CMC37, INJ2=K2/CMC38, INJ3=M1/CMC45
-  # INJ4=M2/CMC46, INJ5=M3/CMC47, INJ6=L3/CMC43
-  - - INJ_1: [1, 2]
-    - W_INJ_1: [1, 2]
-    - ECU_CMC: [48, 37]
+  # +12V from coil/inj relay (ECU_12PIN[1]) — NOT ECU_CMC[48] (ECU logic power).
+  # INJ1=K1/CMC37, INJ2=K2/CMC38, INJ3=M1/CMC45, INJ4=M2/CMC46, INJ5=M3/CMC47, INJ6=L3/CMC43
+  - - INJ_1: [1]
+    - W_INJ_1: [1]
+    - ECU_12PIN: [1]
 
-  - - INJ_2: [1, 2]
-    - W_INJ_2: [1, 2]
-    - ECU_CMC: [48, 38]
+  - - INJ_1: [2]
+    - W_INJ_1: [2]
+    - ECU_CMC: [37]
 
-  - - INJ_3: [1, 2]
-    - W_INJ_3: [1, 2]
-    - ECU_CMC: [48, 45]
+  - - INJ_2: [1]
+    - W_INJ_2: [1]
+    - ECU_12PIN: [1]
 
-  - - INJ_4: [1, 2]
-    - W_INJ_4: [1, 2]
-    - ECU_CMC: [48, 46]
+  - - INJ_2: [2]
+    - W_INJ_2: [2]
+    - ECU_CMC: [38]
 
-  - - INJ_5: [1, 2]
-    - W_INJ_5: [1, 2]
-    - ECU_CMC: [48, 47]
+  - - INJ_3: [1]
+    - W_INJ_3: [1]
+    - ECU_12PIN: [1]
 
-  - - INJ_6: [1, 2]
-    - W_INJ_6: [1, 2]
-    - ECU_CMC: [48, 43]
+  - - INJ_3: [2]
+    - W_INJ_3: [2]
+    - ECU_CMC: [45]
+
+  - - INJ_4: [1]
+    - W_INJ_4: [1]
+    - ECU_12PIN: [1]
+
+  - - INJ_4: [2]
+    - W_INJ_4: [2]
+    - ECU_CMC: [46]
+
+  - - INJ_5: [1]
+    - W_INJ_5: [1]
+    - ECU_12PIN: [1]
+
+  - - INJ_5: [2]
+    - W_INJ_5: [2]
+    - ECU_CMC: [47]
+
+  - - INJ_6: [1]
+    - W_INJ_6: [1]
+    - ECU_12PIN: [1]
+
+  - - INJ_6: [2]
+    - W_INJ_6: [2]
+    - ECU_CMC: [43]
 
   # ── Ignition coils (S54 COP, VAG 4-pin) ──────────────────────────────────────
-  # +12V=M4/CMC48, GND=L4/CMC44, Shield=E3/CMC19
+  # +12V from coil/inj relay (ECU_12PIN[1]) — NOT ECU_CMC[48] (ECU logic power).
+  # GND=L4/CMC44, Shield=E3/CMC19
   # IGN1=A2/CMC2, IGN2=A3/CMC3, IGN3=B2/CMC6, IGN4=B3/CMC7, IGN5=C2/CMC10, IGN6=C3/CMC11
-  - - IGN_1: [1, 2, 3, 4]
-    - W_IGN_1: [1, 2, 3, 4]
-    - ECU_CMC: [48, 44, 2, 19]
+  - - IGN_1: [1]
+    - W_IGN_1: [1]
+    - ECU_12PIN: [1]
 
-  - - IGN_2: [1, 2, 3, 4]
-    - W_IGN_2: [1, 2, 3, 4]
-    - ECU_CMC: [48, 44, 3, 19]
+  - - IGN_1: [2, 3, 4]
+    - W_IGN_1: [2, 3, 4]
+    - ECU_CMC: [44, 2, 19]
 
-  - - IGN_3: [1, 2, 3, 4]
-    - W_IGN_3: [1, 2, 3, 4]
-    - ECU_CMC: [48, 44, 6, 19]
+  - - IGN_2: [1]
+    - W_IGN_2: [1]
+    - ECU_12PIN: [1]
 
-  - - IGN_4: [1, 2, 3, 4]
-    - W_IGN_4: [1, 2, 3, 4]
-    - ECU_CMC: [48, 44, 7, 19]
+  - - IGN_2: [2, 3, 4]
+    - W_IGN_2: [2, 3, 4]
+    - ECU_CMC: [44, 3, 19]
 
-  - - IGN_5: [1, 2, 3, 4]
-    - W_IGN_5: [1, 2, 3, 4]
-    - ECU_CMC: [48, 44, 10, 19]
+  - - IGN_3: [1]
+    - W_IGN_3: [1]
+    - ECU_12PIN: [1]
 
-  - - IGN_6: [1, 2, 3, 4]
-    - W_IGN_6: [1, 2, 3, 4]
-    - ECU_CMC: [48, 44, 11, 19]
+  - - IGN_3: [2, 3, 4]
+    - W_IGN_3: [2, 3, 4]
+    - ECU_CMC: [44, 6, 19]
+
+  - - IGN_4: [1]
+    - W_IGN_4: [1]
+    - ECU_12PIN: [1]
+
+  - - IGN_4: [2, 3, 4]
+    - W_IGN_4: [2, 3, 4]
+    - ECU_CMC: [44, 7, 19]
+
+  - - IGN_5: [1]
+    - W_IGN_5: [1]
+    - ECU_12PIN: [1]
+
+  - - IGN_5: [2, 3, 4]
+    - W_IGN_5: [2, 3, 4]
+    - ECU_CMC: [44, 10, 19]
+
+  - - IGN_6: [1]
+    - W_IGN_6: [1]
+    - ECU_12PIN: [1]
+
+  - - IGN_6: [2, 3, 4]
+    - W_IGN_6: [2, 3, 4]
+    - ECU_CMC: [44, 11, 19]
 
   # ── Wideband O2 (LSU 4.9) ────────────────────────────────────────────────────
   # VS=F4/CMC24, VREF=F3/CMC23, IP=G3/CMC27, RCAL=G4/CMC28, Htr-=D1/CMC13
