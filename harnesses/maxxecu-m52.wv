@@ -315,7 +315,10 @@ connectors:
     notes: >
       Stage 1: OEM thermostat switch triggers relay standalone.
       Stage 2 (MaxxECU): GPO 6 triggers relay in parallel with thermostat switch.
-      SPAL PWM upgrade: swap fan motor to SPAL 30102049 and wire GPO 6 direct PWM.
+      SPAL upgrade: SPAL 30102049 (16-inch puller, ~2070 CFM, single-speed brushed) wired
+      to relay output. Direct GPO PWM of brushed fans needs ~20kHz; use SPAL FAN-PWM-V3
+      module or source a SPAL VA-series 3-wire PWM fan for true variable speed via GPO.
+      PMU16 build: fan relay replaced by PMU16 O3 direct -- see power-distribution.wv.
 
   # ── This-build additions ─────────────────────────────────────────────────────
 

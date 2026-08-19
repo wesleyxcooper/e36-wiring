@@ -22,7 +22,7 @@ metadata:
 #
 #   EWP CURRENT NOTE -- RESOLVED:
 #   [x] CWA400 35.5A vs 25A single-channel limit -- DECISION: parallel O5 + O14.
-#       O5 (PHYS pin 12) + O14 (PHYS pin TBD -- confirm in PMU-16_Pinout_v1.2.pdf)
+#       O5 (PHYS pin 12) + O14 (PHYS pin 14 -- confirmed PMU-16_Pinout_v1.1.pdf)
 #       wired together to CWA400 Pin 3 via 8 AWG. PMU software: configure as parallel pair.
 #       Combined rating 50A -- adequate headroom over 35.5A nominal.
 #       ewp-controller.wv updated: MAIN_RELAY removed, PMU16 O5+O14 wire direct to Pin 3.
@@ -219,7 +219,7 @@ connectors:
       - "O5 25A -- EWP supply parallel A (PHYS pin 12)"
       - "O6 15A -- condenser fan (PHYS pin 11)"
       - "O7 15A -- AC relay coil drive (PHYS pin 10)"
-      - "O14 25A -- EWP supply parallel B (PHYS pin TBD -- see PMU-16_Pinout_v1.2.pdf)"
+      - "O14 25A -- EWP supply parallel B (PHYS pin 14 -- confirmed PMU-16_Pinout_v1.1.pdf)"
     notes: >-
       PDM replaces: relay board (ECU main, coil/inj, fan, EWP, condenser relays),
       blade fuse block, and Crydom D1D40 SSR.
@@ -278,10 +278,17 @@ connectors:
     pinlabels: ["+12V (from PMU16 O3)", "GND"]
     notes: >-
       TODO: confirm SPAL fan model and connector.
-      Common choice: SPAL 30102049 (12-inch puller, 15A single-speed).
-      Phase 2 upgrade: SPAL 30102057 (PWM-capable) -- PMU16 O3 PWMs directly
-        to this fan, enabling variable speed control without any relay or driver.
-        Update output channel assignment in PMU config (frequency, duty table).
+      Common choice: SPAL 30102049 (16-inch puller, ~2070 CFM, ~15A, 2-wire brushed motor).
+      Used by Zionsville Autosport E36 competition cooling kit and multiple turbo E36 builds.
+      Source: m5board.com/threads/spal-electric-fan-install-long.113495
+             + zionsvilleautosport.com/bmw-e36-competition-cooling-kit
+      PMU16 O3 control (O3 is 25A and has PWM capability -- confirmed PMU_Manual.pdf):
+        Option A (recommended start): on/off -- O3 CAN-commanded full-on above CLT setpoint.
+        Option B: direct PWM -- PMU16 O3 outputs 4-400 Hz; brushed motor accepts this for
+          variable speed. Audible hum at partial duty is normal for low-frequency PWM.
+        30102049 is explicitly listed as compatible with SPAL FAN-PWM-V3 module if a
+          standalone temperature-based controller is preferred.
+      Note: 15A outputs (O6-O11) do NOT have PWM capability per PMU16 pinout -- on/off only.
       Fan GND to chassis GND stud (W_FAN_GND).
 
   CONDENSER_FAN:
@@ -302,7 +309,7 @@ connectors:
     pincount: 2
     pinlabels:
       - "EWP +12V supply A (from PMU16 O5 PHYS pin 12)"
-      - "EWP +12V supply B (from PMU16 O14 PHYS pin TBD)"
+      - "EWP +12V supply B (from PMU16 O14 PHYS pin 14)"
     notes: >-
       O5 and O14 wired in parallel to CWA400 Pin 3. Combined 50A rating handles
       CWA400 35.5A nominal draw. Configure as parallel pair in PMU software.
@@ -441,7 +448,7 @@ cables:
     wirecount: 1
     colors: [RD]
     wirelabels: ["O14 → EWP +12V supply (B)"]
-    notes: "8 AWG. Red. PMU16 O14 (PHYS pin TBD, 25A) → EWP_OUTPUT_STUB pin 2. Paralleled with O5 at CWA400 Pin 3. Configure O5+O14 as parallel pair in PMU software."
+    notes: "8 AWG. Red. PMU16 O14 (PHYS pin 14, 25A) → EWP_OUTPUT_STUB pin 2. Paralleled with O5 at CWA400 Pin 3. Configure O5+O14 as parallel pair in PMU software."
 
   W_PMU16_O6_CONDENSER:
     wirecount: 1

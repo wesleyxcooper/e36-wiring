@@ -30,7 +30,7 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 | 1 | **Ecumaster USB-CAN adapter** ([ecumasterusa.com](https://ecumasterusa.com) ~$85) | Required for initial PMU16 programming. One-time setup tool. |
 | 1 | Inline ANL or MAXI fuse holder, **150A** | Channel peaks: ECU 8A + coil/inj 20A + fan 15A + pump 14A + EWP 35.5A + condenser 12A + AC coil 0.2A = 104.8A worst-case all-on. ×1.2 headroom = 125.8A → **150A** (matches PMU16 M6 stud 150A continuous rating). Blue Sea 5191 MRBF 150A or equiv. |
 | 1 | IGN switched 12V source — **X20 pin 21** (GN, green wire) | Confirmed: X20 pin 21 = ignition switch terminal 15 = IGN-switched +12V. Green wire. Feeds PMU16 39-pin pin 7 (+12V SW on/off sense). Fuse at X20 source: 5A. Source: E36 ETM / r3vlimited / megasquirt.325ix.com X20 pinout. |
-| 1 | Radiator fan motor connector, 2-pin | ⚠️ TODO: SPAL fan model — source correct connector end |
+| 1 | **SPAL 30102049** radiator fan, 16" puller, ~$130 | 16-inch puller, ~2070 CFM, ~15A, 2-wire brushed motor. Standard for turbo E36 track/competition builds (Zionsville competition kit, M5board SPAL install thread). PMU16 O3 control modes: **(a) on/off** — O3 fires fully when CLT threshold hit, recommended starting point; **(b) direct PWM** — PMU16 O3 outputs 4–400 Hz PWM (confirmed from PMU_Manual.pdf); brushed motor accepts this natively for variable speed, audible hum at partial duty is normal. 30102049 is explicitly listed as compatible with SPAL FAN-PWM-V3 module if a standalone temp-based controller is preferred instead. Source: PMU16 manual [ecumaster.com/files/PMU/PMU_Manual.pdf](https://www.ecumaster.com/files/PMU/PMU_Manual.pdf) · [a1electric.com SPAL FAN-PWM-V3 compat list](https://www.a1electric.com/spal/specs/FAN-PWM-V3.pdf) · [zionsvilleautosport.com/bmw-e36-competition-cooling-kit](https://www.zionsvilleautosport.com/bmw-e36-competition-cooling-kit/) |
 
 ### Cables
 
@@ -51,7 +51,7 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 | PMU16 O3 → SPAL fan | RD | 12 AWG | TBD | O3 (pin 26, 25A PWM) → fan motor + terminal |
 | PMU16 O4 → fuel pump (PWM) | RD | 12 AWG | TBD | O4 (pin 13, 25A PWM) → Radium hanger pump+ stud. Replaces Crydom SSR. |
 | PMU16 O5 → EWP supply (A) | RD | 8 AWG | TBD | O5 (pin 12, 25A) → CWA400 pin 3 in parallel with O14. Join at pin 3 terminal. |
-| PMU16 O14 → EWP supply (B) | RD | 8 AWG | TBD | O14 (pin TBD, 25A) → CWA400 pin 3 in parallel with O5. 50A combined handles CWA400 35.5A. Configure O5+O14 as parallel pair in PMU software. |
+| PMU16 O14 → EWP supply (B) | RD | 8 AWG | TBD | O14 (pin 14, 25A) → CWA400 pin 3 in parallel with O5. 50A combined handles CWA400 35.5A. Configure O5+O14 as parallel pair in PMU software. |
 | PMU16 O6 → condenser fan | RD | 12 AWG | TBD | O6 (pin 11, 15A) → condenser fan motor + terminal. CAN-commanded when AC on. |
 | PMU16 O7 → AC relay coil 86 | RD | 18 AWG | TBD | O7 (pin 10, 15A) → ac-compressor.wv AC_RELAY pin 86. Low current (~200mA). AC switch feeds MaxxECU DIN directly — MaxxECU CAN-commands O7. |
 
@@ -343,7 +343,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | GPO pin assignments (fan, pump, EWP, fuel pump PWM) | MaxxECU pin map not yet finalized |
 | Main fuse size | Depends on total current calc — likely 60–80A ANL |
 | Mini blade fuse block model | 8-position, source specific unit |
-| SPAL fan model + connector | Fan not yet selected |
+| SPAL 30102049 connector pigtail | 2-pin pigtail for chosen mounting method — confirm on delivery |
 | Body-x20 wire colors and gauge | Colors visible in SVG diagram — gauge TBD |
 | ~~Firewall bulkhead full pinout~~ | ✅ Done — `harnesses/firewall-bulkhead.wv` authored, outputs generated |
 | ~~07K engine harness outputs~~ | ✅ Done — `maxxecu-07k.wv` authored, HTML/SVG generated |

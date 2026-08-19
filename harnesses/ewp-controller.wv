@@ -40,7 +40,7 @@ connectors:
     pincount: 2
     pinlabels:
       - "O5 +12V (PHYS pin 12 -- 25A)"
-      - "O14 +12V (PHYS pin TBD -- 25A)"
+      - "O14 +12V (PHYS pin 14 -- 25A)"
     notes: >-
       O5 and O14 wired in parallel -- join at CWA400 Pin 3 terminal.
       Combined 50A rating handles CWA400 35.5A nominal draw.
