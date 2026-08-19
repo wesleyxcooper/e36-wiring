@@ -2,6 +2,7 @@
 12V Electric AC Compressor circuit schematic
 Alibaba PD2-18012AJA (18cc, 3.65 kW / 12,454 BTU, R134a or R1234yf)
 + included 3-phase inverter/controller + MaxxECU RACE idle compensation
++ Ecumaster PMU16 O7 (relay coil) + PMU16 O6 (condenser fan direct)
 
 This script generates a circuit schematic using schemdraw.
 Run it to produce ac-compressor-pwm.svg in the same directory.
@@ -14,34 +15,36 @@ The included "PWM controller" is a 3-phase inverter/VFD -- NOT a simple DC switc
   Motor wires: U / V / W (3 orange pigtail wires confirmed from Alibaba product photos)
   Phase order: follow controller labeling -- swapping any two phases reverses rotation
 
-Included inverter/controller:
-  DC in +     BATT+ through 100A fuse via relay contact         (8 AWG OFC)
-  DC in -     chassis ground                                    (8 AWG OFC)
-  Phase U     3-phase output to motor                           (8 AWG OFC)
-  Phase V     3-phase output to motor                           (8 AWG OFC)
-  Phase W     3-phase output to motor                           (8 AWG OFC)
-  Duty cycle  manual knob -- ~45% start point (3,000 RPM), 95% = ~6,000 RPM (excessive idle dip)
-  Frequency   manual knob -- set per controller default
-
 AC relay (Bosch ISO mini, 100A rated):
-  85   coil negative   chassis GND
-  86   coil positive   IGN +12V via AC button/cabin switch
   30   common          BATT+ always-on, fused at 100A within 12" of battery
   87   normally open   PWM controller +IN when relay closes
+  86   coil positive   PMU16 O7 output (CAN-commanded by MaxxECU)
+  85   coil negative   chassis GND
+
+AC enable signal path (PMU16 architecture):
+  AC switch pin 2 → MaxxECU DIN (direct, no relay tap)
+  MaxxECU reads AC-on → prepares idle-up → CAN-commands PMU16 O7 → relay coil closes
+  Old path (IGN → AC switch → relay coil 86) removed.
+
+Condenser fan:
+  PMU16 O6 (15A) drives condenser fan motor directly via CAN command.
+  Old RELAY_CONDENSER_FAN (30A relay tapped from AC switch) removed.
+  MaxxECU CAN signals PMU16 O6 whenever AC is active.
 
 MaxxECU idle compensation:
-  AC enable signal    tapped from relay coil (86) side after AC button
-                      -> MaxxECU DIN (digital input, any spare)
+  AC enable signal    AC switch pin 2 → MaxxECU DIN (direct wire, 22 AWG)
   MTune config        AC input type = ON/OFF, idle-up = +150-200 RPM when AC active
   Purpose             prevents idle dip when compressor engages under load
 
 How this circuit works:
-  1. Key on + AC button pressed -> relay coil (86) gets IGN +12V
-  2. Coil (85) at GND -> coil energizes -> relay contact closes (30 to 87)
-  3. BATT+ (through 100A fuse) flows to PWM controller +IN
-  4. PWM controller powers compressor at set duty cycle (~45% start)
-  5. AC enable tap also wires to MaxxECU DIN -> ECU raises idle target by ~150-200 RPM
-  6. AC button off / key off -> relay opens -> compressor stops
+  1. Key on + AC switch pressed -> AC switch pin 2 goes high -> MaxxECU DIN sees +12V
+  2. MaxxECU raises idle target (+150-200 RPM) for idle-up compensation
+  3. MaxxECU sends CAN command to PMU16 -> O7 activates -> relay coil 86 gets +12V
+  4. Coil (85) at GND -> coil energizes -> relay contact closes (30 to 87)
+  5. BATT+ (through 100A fuse) flows to PWM controller +IN
+  6. PMU16 also activates O6 -> condenser fan runs
+  7. PWM controller powers compressor at set duty cycle (~45% start)
+  8. AC switch off -> DIN drops -> MaxxECU removes CAN AC command -> O7 drops -> relay opens
 
 Speed range (Alibaba PD2-18 spec table): 2,000 -- 6,000 RPM
 Duty cycle guidance (from Rawrkee Episode 3, YouTube):
@@ -52,12 +55,6 @@ Duty cycle guidance (from Rawrkee Episode 3, YouTube):
 Cooling performance (Rawrkee, 90 degF ambient):
   Old 20cc unit:  61 degF vent temp
   PD2-18012AJA at 45%:  51-54 degF vent temp  (+7-10 degF improvement)
-
-Condenser fan:
-  One shared fan serves both radiator and AC condenser.
-  Condenser fan relay (RELAY_CONDENSER_FAN in power-distribution.wv) tapped from AC switch
-  output -- fires simultaneously with AC relay coil. Output wired in parallel with
-  RELAY_FAN (radiator fan) output so one fan handles both cooling duties.
 
 Pricing:
   DDP sea freight (recommended):  ~$340-360 all-in  (source: @jfantis YouTube comments, 4+ yr proven)
@@ -80,31 +77,37 @@ OUT = os.path.join(os.path.dirname(__file__), "ac-compressor-pwm.svg")
 with schemdraw.Drawing(figsize=(14, 10), show=False) as d:
     d.config(fontsize=9)
 
-    # ── AC relay (top section) ───────────────────────────────────────────────────
-    relay = d.add(elm.Relay(switch='spst').at((4.5, 0)).label(
+    # ── AC relay (center) ────────────────────────────────────────────────────
+    relay = d.add(elm.Relay(switch='spst').at((5.0, 0)).label(
         "AC_RELAY / 100A Bosch ISO", loc="top"))
 
-    # Coil: IGN +12V -> AC switch -> ac_tap junction -> pin 86 -> coil -> 85 -> GND
+    # ── Coil circuit: PMU16 O7 → pin 86, chassis GND → pin 85 ───────────────
     d.add(elm.Line().left().at(relay.in1).length(1.5))
-    ac_tap = d.add(elm.Dot())  # junction: fan relay coil tap + MaxxECU DIN
-    d.add(elm.Line().left().length(0.8))
-    d.add(elm.Switch().left().label("AC switch", loc="top"))
+    d.add(elm.Switch().left().label(
+        "PMU16 O7\n(MOSFET 15A)\nCAN cmd", loc="top"))
     d.add(elm.Line().left().length(0.5))
     d.add(elm.Line().up().length(0.6))
-    d.add(elm.Label().label("IGN +12V / F10 (5A)", loc="right"))
+    d.add(elm.Label().label("BATT+ (PMU16 M6)\n18 AWG", loc="right"))
 
-    d.add(elm.Line().left().at(relay.in2).length(2.0))
+    d.add(elm.Line().left().at(relay.in2).length(2.8))
     d.add(elm.Ground())
 
     d.add(elm.Label().at(relay.in1).label("86 ", loc="left"))
     d.add(elm.Label().at(relay.in2).label("85 ", loc="left"))
 
-    # MaxxECU DIN tap (down from ac_tap junction -- long drop to clear relay body)
-    d.add(elm.Line().down().at(ac_tap.end).length(2.5))
+    # ── AC switch → MaxxECU DIN (below coil, shows CAN chain) ───────────────
+    d.add(elm.Line().down().at(relay.in1).length(1.0))
+    can_node = d.add(elm.Dot())
+    d.add(elm.Line().left().length(0.8))
+    d.add(elm.Switch().left().label("AC switch\n(cabin)", loc="top"))
+    d.add(elm.Line().left().length(0.5))
+    d.add(elm.Label().label("IGN +12V", loc="left"))
+    d.add(elm.Line().right().at(can_node.end).length(0.3))
     d.add(elm.Label().label(
-        "MaxxECU DIN (AC enable)\nidle-up ~150-200 RPM", loc="left"))
+        "→ MaxxECU DIN\n(AC enable, direct wire)\n→ CAN → PMU16 O7",
+        loc="right"))
 
-    # Load: BATT+ -> 100A fuse -> relay 30 -> 87 -> inverter -> motor
+    # ── Load circuit: BATT+ → 100A fuse → relay 30 → 87 → inverter → motor ──
     d.add(elm.Line().up().at(relay.a).length(1.5))
     d.add(elm.Line().left().length(0.6))
     d.add(elm.Fuse().left().label("F_AC 100A / within 12\" batt", loc="top"))
@@ -125,36 +128,23 @@ with schemdraw.Drawing(figsize=(14, 10), show=False) as d:
     d.add(elm.Label().at(relay.a).label("30 ", loc="left"))
     d.add(elm.Label().at(relay.b).label("87 ", loc="left"))
 
-    # ── Condenser fan relay (bottom section -- separate, no overlap) ──────────
-    fan_relay = d.add(elm.Relay(switch='spst').at((4.5, -4.5)).label(
-        "RELAY_CONDENSER_FAN / 30A", loc="top"))
-
-    # Fan relay coil: same AC switch output signal as ac_tap
-    d.add(elm.Line().left().at(fan_relay.in1).length(2.0))
-    d.add(elm.Label().label(
-        "AC switch output tap\n(same signal as AC_RELAY 86)", loc="left"))
-    d.add(elm.Line().left().at(fan_relay.in2).length(2.0))
-    d.add(elm.Ground())
-    d.add(elm.Label().at(fan_relay.in1).label("86 ", loc="left"))
-    d.add(elm.Label().at(fan_relay.in2).label("85 ", loc="left"))
-
-    # Fan relay load: BATT+ via inline 20A -> relay 30 -> 87 -> fan motor
-    d.add(elm.Line().up().at(fan_relay.a).length(1.0))
-    d.add(elm.Label().label("BATT+ / 20A inline / 12 AWG", loc="right"))
-    d.add(elm.Label().at(fan_relay.a).label("30 ", loc="left"))
-
-    d.add(elm.Line().right().at(fan_relay.b).length(0.5))
+    # ── Condenser fan: PMU16 O6 direct (bottom section) ─────────────────────
+    d.add(elm.Switch().right().at((5.0, -5.0)).label(
+        "PMU16 O6\n(MOSFET 15A)\nCAN cmd when AC on", loc="top"))
+    d.add(elm.Line().right().length(0.5))
     d.add(elm.Motor().right().label(
-        "Shared fan (radiator + condenser)\n|| with RELAY_FAN output", loc="top"))
+        "Condenser fan motor\n(separate from radiator fan)", loc="top"))
     d.add(elm.Line().right().length(0.3))
     d.add(elm.Ground())
-    d.add(elm.Label().at(fan_relay.b).label("87 ", loc="left"))
 
-    # ── Key notes (bottom) ─────────────────────────────────────────────────
-    d.add(elm.Label().at((5.5, -8.5)).label(
+    d.add(elm.Label().at((3.5, -5.0)).label(
+        "BATT+\n(PMU16 M6)\n12 AWG", loc="left"))
+
+    # ── Key notes (bottom) ───────────────────────────────────────────────────
+    d.add(elm.Label().at((6.0, -8.2)).label(
         "Duty: 45% start (~3,000 RPM) -> 51-54 degF vent / 90 degF  |  95%+ = near-stall idle dip\n"
         "Motor: 3-phase PMSM -- inverter outputs U/V/W orange pigtails, NOT simple DC\n"
-        "Oil: POE 68 ONLY -- flush all PAG, replace receiver/drier before commissioning",
+        "PMU16 O7 replaces: IGN→AC switch→relay coil wire | O6 replaces: RELAY_CONDENSER_FAN",
         loc="center"))
 
     d.save(OUT)

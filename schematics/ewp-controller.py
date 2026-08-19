@@ -1,6 +1,6 @@
 """
 CWA400 electric water pump circuit schematic
-Pierburg CWA400 (PWM version) + MaxxECU RACE GPO control
+Pierburg CWA400 (PWM version) + Ecumaster PMU16 O5+O14 parallel + MaxxECU GPO
 
 This script generates a circuit schematic using schemdraw.
 Run it to produce ewp-controller.svg in the same directory.
@@ -12,26 +12,18 @@ You need both to build and troubleshoot the circuit.
 CWA400 connector pinout (Kostal 2+2):
   Pin 1  PWM signal in  (MaxxECU GPO, 22 AWG shielded)
   Pin 2  BSD diagnostic (leave floating -- not used with MaxxECU)
-  Pin 3  +12V power     (from 40A relay, 10 AWG)
+  Pin 3  +12V power     (from PMU16 O5+O14 parallel, 8 AWG each)
   Pin 4  GND            (chassis ground, 10 AWG)
 
-Standard Bosch ISO mini relay pin numbers:
-  85  coil negative  -- chassis GND
-  86  coil positive  -- BATT+ (always-on, fuse F9 5A -- MUST be BATT+ for post-shutdown cooling)
-  30  common         -- BATT+ (always-on), fused at 40A
-  87  normally open  -- output to CWA400 Pin 3 when relay is ON
+Ecumaster PMU16 O5 + O14 (parallel):
+  Both outputs are high-side MOSFET switches, 25A each, combined 50A
+  Configured as a parallel pair in PMU software
+  PMU16 M6 stud is BATT+ always-on -- O5+O14 can activate post key-off
+  Post-shutdown cooling: PMU16 keeps O5+O14 active after key-off until
+    MaxxECU CAN CLT channel drops below 70C OR 3-min fallback timer
+  No separate BATT+ relay or MaxxECU power-hold relay needed
 
-How this circuit works:
-  1. BATT+ always present on relay coil pin 86 (via fuse F9 -- NOT IGN switched)
-  2. Coil pin 85 is at GND -> coil circuit complete -> relay energizes
-  3. Relay contact closes -> pin 30 connects to pin 87 -> CWA400 Pin 3 gets +12V
-  4. MaxxECU boots -> sends >=3ms high pulse on GPO -> CWA400 wakes from standby
-  5. MaxxECU reads CLT -> outputs PWM at 680 Hz on GPO -> CWA400 adjusts speed
-     (duty cycle map: 20% at 60C / 55% at 85C / 97% at 105C)
-  6. Key off -> relay de-energizes -> Pin 3 loses power... BUT:
-  7. MaxxECU power hold relay keeps ECU alive after key-off
-  8. MaxxECU continues commanding pump via GPO until CLT < 70C
-  9. Once CLT < 70C, MaxxECU releases power hold relay -> pump stops
+Replaces: MAIN_RELAY (Bosch 40A) + BATT+ fuse feed + relay coil wires
 
 Version warning:
   PWM version ONLY: Pierburg 7.07223.10.0 / BMW 11515A05704 / 11517563659
@@ -52,60 +44,71 @@ import os
 
 OUT = os.path.join(os.path.dirname(__file__), "ewp-controller.svg")
 
-with schemdraw.Drawing(figsize=(13, 8), show=False) as d:
+with schemdraw.Drawing(figsize=(14, 9), show=False) as d:
     d.config(fontsize=9)
 
-    # ── Relay center ──────────────────────────────────────────────────────────
-    relay = d.add(elm.Relay(switch='spst').at((4.5, 0)).label(
-        "MAIN_RELAY\n40A Bosch ISO mini", loc="top"))
+    # ── PMU16 O5 MOSFET switch (left of center) ─────────────────────────────
+    sw_o5 = d.add(elm.Switch().right().at((3.0, 1.0)).label(
+        "PMU16 O5\n(MOSFET 25A)\nPHYS pin 12", loc="top"))
 
-    # ── Coil circuit (left): BATT+ -> 86 -> coil -> 85 -> GND (relay always energized) ─
-    d.add(elm.Line().left().at(relay.in1).length(2.0))
-    d.add(elm.Line().up().length(0.6))
-    d.add(elm.Label().label("BATT+ / F9 (5A)\n(not IGN -- post-shutdown cooling)", loc="right"))
+    # ── PMU16 O14 MOSFET switch (right of center, parallel) ─────────────────
+    sw_o14 = d.add(elm.Switch().right().at((3.0, -0.8)).label(
+        "PMU16 O14\n(MOSFET 25A)\nPHYS pin TBD", loc="bottom"))
 
-    d.add(elm.Line().left().at(relay.in2).length(2.0))
-    d.add(elm.Ground())
+    # ── CAN control (below both) ─────────────────────────────────────────────
+    d.add(elm.Line().down().at(sw_o5.start).length(0.6))
+    d.add(elm.Label().label(
+        "MaxxECU CAN → PMU16\nO5+O14 parallel enable\n(post-shutdown: active until CLT < 70C)",
+        loc="right"))
 
-    d.add(elm.Label().at(relay.in1).label("86 ", loc="left"))
-    d.add(elm.Label().at(relay.in2).label("85 ", loc="left"))
+    # ── Shared BATT+ feed (left side, feeds both switch inputs) ─────────────
+    d.add(elm.Line().left().at(sw_o5.start).length(0.5))
+    batt_join_top = d.add(elm.Dot())
+    d.add(elm.Line().left().at(sw_o14.start).length(0.5))
+    batt_join_bot = d.add(elm.Dot())
+    # vertical line joining both input nodes
+    d.add(elm.Line().up().at(batt_join_bot.end).toy(batt_join_top.end))
 
-    # ── Load circuit (top): BATT+ -> 40A fuse -> relay 30 -> 87 -> CWA400 ────
-    d.add(elm.Line().up().at(relay.a).length(1.5))
-    d.add(elm.Line().left().length(0.6))
-    d.add(elm.Fuse().left().label("F_CWA 40A", loc="top"))
+    # Battery + fuse feeding the join
+    d.add(elm.Line().left().at(batt_join_top.end).length(0.6))
+    d.add(elm.Fuse().left().label("ANL fuse\n(PMU16 M6 stud)", loc="top"))
     d.add(elm.Line().left().length(0.5))
     batt_node = d.add(elm.Dot())
-    d.add(elm.Line().left().length(1.2))
-    d.add(elm.Battery().up().reverse().label("12V BATT / 10 AWG", loc="right"))
+    d.add(elm.Line().left().length(1.0))
+    d.add(elm.Battery().up().reverse().label("12V BATT+\n(PMU16 M6)\n4 AWG", loc="right"))
 
+    # Battery GND
     d.add(elm.Line().down().at(batt_node.end).length(3.8))
     d.add(elm.Ground())
 
-    # ── Load output (right): relay 87 -> CWA400 Pin 3 -> motor -> GND ────────
-    d.add(elm.Line().right().at(relay.b).length(0.5))
+    # ── Parallel outputs join then go to pump Pin 3 ──────────────────────────
+    d.add(elm.Line().right().at(sw_o5.end).length(0.5))
+    out_top = d.add(elm.Dot())
+    d.add(elm.Line().right().at(sw_o14.end).length(0.5))
+    out_bot = d.add(elm.Dot())
+    # vertical join
+    d.add(elm.Line().up().at(out_bot.end).toy(out_top.end))
+    # combined run to pump
+    d.add(elm.Line().right().at(out_top.end).length(0.5))
     d.add(elm.Motor().right().label(
-        "CWA400 (Pierburg 7.07223.10.0)\nPin 3 +12V / Pin 4 GND / 10 AWG", loc="top"))
+        "CWA400 Pin 3\n(+12V supply)\n8 AWG ea", loc="top"))
+    pump_top = d.add(elm.Dot())
     d.add(elm.Line().right().length(0.3))
     d.add(elm.Ground())
 
-    d.add(elm.Label().at(relay.a).label("30 ", loc="left"))
-    d.add(elm.Label().at(relay.b).label("87 ", loc="left"))
+    # ── PWM signal: MaxxECU GPO → CWA400 Pin 1 ───────────────────────────────
+    d.add(elm.Line().down().at(pump_top.end).length(1.2))
+    pwm_node = d.add(elm.Dot())
+    d.add(elm.Line().left().length(0.5))
+    d.add(elm.Label().label("MaxxECU GPO\n680 Hz PWM\n22 AWG shielded", loc="left"))
+    d.add(elm.Line().right().at(pwm_node.end).length(0.5))
+    d.add(elm.Label().label("CWA400 Pin 1\n(PWM signal in)", loc="right"))
 
-    # ── PWM signal: MaxxECU GPO -> CWA400 Pin 1 (680 Hz) ────────────────────
-    pwm_y = -2.2
-    d.add(elm.Line().at((2.0, pwm_y)).right().length(5.0))
-    d.add(elm.Label().label(
-        "CWA400 Pin 1 (PWM in)\n680 Hz | 13-85% speed | 86-97% full\nPin 2 BSD: leave floating",
-        loc="right"))
-    d.add(elm.Label().at((2.0, pwm_y)).label(
-        "MaxxECU GPO\n22 AWG shielded\n(drain at ECU end)", loc="left"))
-
-    # ── Key note (bottom) ─────────────────────────────────────────────────────
-    d.add(elm.Label().at((5.0, -4.5)).label(
-        "Post-shutdown: MaxxECU power-hold keeps ECU alive -- GPO commands pump until CLT < 70C\n"
-        "Wake pulse: >=3 ms high at key-on before CLT duty map\n"
-        "VERSION: PWM only (pre-Mar 2024) -- NOT the LIN version (Pierburg 7.03665.66.0)",
+    # ── Notes ────────────────────────────────────────────────────────────────
+    d.add(elm.Label().at((5.5, -4.8)).label(
+        "O5+O14 combined: 50A -- adequate for CWA400 35.5A nominal\n"
+        "Configure as parallel pair in PMU software (both same channel group)\n"
+        "Replaces: MAIN_RELAY 40A + BATT+ fuse feed + power-hold relay (3 parts → 0)",
         loc="center"))
 
     d.save(OUT)

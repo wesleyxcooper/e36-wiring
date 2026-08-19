@@ -26,7 +26,7 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 | 1 (optional) | **4-post battery cutoff switch — Moroso 74108** ([Amazon](https://www.amazon.com/Moroso-74108-Battery-Alternator-Disconnect/dp/B01GWD2XUS) ~$101 / [moroso.com](https://www.moroso.com/battery-and-alternator-disconnect-switch74108/) $113) | **Optional** — not required on a dual-duty street/drift car with a working ignition key. Install only if HPDE org or track rules require it. If installed: must be 4-post (NOT 2-post). |
 | 2–3 | **Amphenol Radlok 8mm — M8×1.25 Male** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-male/), ~$15 CAD ea — thread into cylinder head and engine block GND strap bosses. Tool-free press-lock disconnect. Speeds up M52→07K swap. Secure cable within 3 cm; inspect annually. |
 | 1 | **Amphenol Radlok 8mm — M8×1.25 Female** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-female/), ~$22 CAD — threads onto M8 B+ stud of 07K alternator (`07K 903 023 A`). Tool-free disconnect at alternator removal. |
-| 1 | **Ecumaster PMU16** ([ecumasterusa.com](https://ecumasterusa.com/products/ecumaster-pmu16-power-management-unit) ~$500) | 16-output MOSFET PDM. Replaces relay board + fuse block + Crydom SSR. Outputs: O1 ECU logic · O2 coil/inj · O3 fan (PWM) · O4 pump (PWM) · O5 EWP · O6 condenser fan · O7 AC relay coil. Connector: 39-way Sicma/FCI. Power via M6 BATT+ stud. Manual: [ecumaster.com/files/PMU/PMU_Manual.pdf](https://www.ecumaster.com/files/PMU/PMU_Manual.pdf) · Pinout: [PMU-16_Pinout_v1.2.pdf](https://www.ecumaster.com/files/PMU/PMU-16_Pinout_v1.2.pdf) |
+| 1 | **Ecumaster PMU16** ([ecumasterusa.com](https://ecumasterusa.com/products/ecumaster-pmu16-power-management-unit) ~$500) | 16-output MOSFET PDM. Replaces relay board + fuse block + Crydom SSR. Outputs: O1 ECU logic · O2 coil/inj · O3 fan (PWM) · O4 pump (PWM) · O5+O14 EWP parallel (50A combined) · O6 condenser fan · O7 AC relay coil · O8 EPS Controller (Phase 3). Connector: 39-way Sicma/FCI. Power via M6 BATT+ stud. Manual: [ecumaster.com/files/PMU/PMU_Manual.pdf](https://www.ecumaster.com/files/PMU/PMU_Manual.pdf) · Pinout: [PMU-16_Pinout_v1.2.pdf](https://www.ecumaster.com/files/PMU/PMU-16_Pinout_v1.2.pdf) |
 | 1 | **Ecumaster USB-CAN adapter** ([ecumasterusa.com](https://ecumasterusa.com) ~$85) | Required for initial PMU16 programming. One-time setup tool. |
 | 1 | Inline ANL or MAXI fuse holder | ⚠️ TODO: size — est. 80–100A (sum PMU16 channel loads + 20% headroom) |
 | 1 | IGN switched 12V source connector | ⚠️ TODO: confirm X20 pin — feeds PMU16 +12V SW (on/off sense) |
@@ -50,9 +50,10 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 | PMU16 O2 → coil+inj +12V | RD | 12 AWG | TBD | O2 (pin 39, 25A) → MaxxECU 12-pin pin 1 |
 | PMU16 O3 → SPAL fan | RD | 12 AWG | TBD | O3 (pin 26, 25A PWM) → fan motor + terminal |
 | PMU16 O4 → fuel pump (PWM) | RD | 12 AWG | TBD | O4 (pin 13, 25A PWM) → Radium hanger pump+ stud. Replaces Crydom SSR. |
-| PMU16 O5 → EWP supply | RD | 10 AWG | TBD | O5 (pin 12, 25A) → CWA400 pin 3. ⚠️ CWA400 draws 35.5A — may need to parallel O5+O14. See power-distribution.wv TODO. |
-| PMU16 O6 → condenser fan | RD | 12 AWG | TBD | O6 (pin 11, 15A) → condenser fan motor + terminal |
-| PMU16 O7 → AC relay coil | RD | 18 AWG | TBD | O7 (pin 10, 15A) → ac-compressor.wv AC_RELAY coil pin 86. Low current (~200mA). |
+| PMU16 O5 → EWP supply (A) | RD | 8 AWG | TBD | O5 (pin 12, 25A) → CWA400 pin 3 in parallel with O14. Join at pin 3 terminal. |
+| PMU16 O14 → EWP supply (B) | RD | 8 AWG | TBD | O14 (pin TBD, 25A) → CWA400 pin 3 in parallel with O5. 50A combined handles CWA400 35.5A. Configure O5+O14 as parallel pair in PMU software. |
+| PMU16 O6 → condenser fan | RD | 12 AWG | TBD | O6 (pin 11, 15A) → condenser fan motor + terminal. CAN-commanded when AC on. |
+| PMU16 O7 → AC relay coil 86 | RD | 18 AWG | TBD | O7 (pin 10, 15A) → ac-compressor.wv AC_RELAY pin 86. Low current (~200mA). AC switch feeds MaxxECU DIN directly — MaxxECU CAN-commands O7. |
 
 ---
 

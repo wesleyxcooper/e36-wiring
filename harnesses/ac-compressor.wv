@@ -51,6 +51,18 @@ connectors:
       grounding point -- do not daisy-chain high-current motor GND through
       signal ground studs. 8 AWG minimum for motor GND run.
 
+  PMU16_O7_STUB:
+    type: "Stub: PMU16 O7 → AC_RELAY coil pin 86"
+    subtype: "Cross-reference harnesses/power-distribution.wv PMU16 pin 12 (O7)"
+    pincount: 1
+    pinlabels: ["O7 +12V (PHYS pin 10 -- 15A)"]
+    notes: >-
+      PMU16 O7 (15A, PHYS pin 10) drives relay coil pin 86.
+      MaxxECU reads AC switch via DIN and sends CAN command to PMU16 → O7 activates.
+      Gives MaxxECU control over compressor: idle-up before relay closes, CLT lockout.
+      18 AWG sufficient -- relay coil draws ~200mA.
+      See power-distribution.wv for PMU16 upstream wiring.
+
   AC_RELAY:
     type: "100A automotive relay (Bosch ISO mini or equiv)"
     subtype: "Standard 4-pin relay -- coil 85/86, contact 30/87"
@@ -58,15 +70,14 @@ connectors:
     pinlabels:
       - "Pin 30 (BATT+ in, fused 100A)"
       - "Pin 87 (switched +12V out to PWM ctrl)"
-      - "Pin 86 (coil +12V -- IGN via AC switch)"
+      - "Pin 86 (coil +12V -- from PMU16 O7)"
       - "Pin 85 (coil GND)"
     notes: >-
-      Relay coil pin 86 driven from IGN +12V through cabin AC switch.
+      Relay coil pin 86 driven from PMU16 O7 (CAN-commanded by MaxxECU).
+      Old direct-wire (IGN → AC switch → pin 86) removed -- AC switch now to MaxxECU DIN.
       Relay coil pin 85 to chassis GND.
       Relay output pin 87 feeds PWM controller +IN.
       Relay input pin 30 from 100A fused BATT+.
-      AC enable tap: junction at relay coil 86 wire (after AC switch,
-      before relay coil) runs to MaxxECU DIN for idle-up signal.
       Flyback: 1N4007 across coil at relay socket (cathode to pin 86, anode to pin 85).
 
   AC_SWITCH:
@@ -75,11 +86,12 @@ connectors:
     pincount: 2
     pinlabels:
       - "IGN +12V in"
-      - "Switched +12V out (to relay coil pin 86 + MaxxECU DIN tap)"
+      - "Switched +12V out (to MaxxECU DIN -- AC enable signal)"
     notes: >-
-      Existing E36 AC switch can be reused if wired to enable relay coil.
-      Alternatively: standalone rocker switch on dash. Must be IGN-switched
-      (not always-on) so compressor cannot run with key off.
+      AC switch output now feeds MaxxECU DIN directly -- no longer wired to relay coil.
+      MaxxECU reads AC-on signal, prepares idle-up, then CAN-commands PMU16 O7 to
+      close the relay. Must be IGN-switched (not always-on).
+      Existing E36 AC switch can be reused.
 
   MAXXECU_DIN:
     type: "MaxxECU RACE -- Digital Input (AC enable)"
@@ -87,10 +99,10 @@ connectors:
     pincount: 1
     pinlabels: ["AC switch signal in (DIN)"]
     notes: >-
-      Receives switched +12V when AC switch is on and relay coil is energized.
+      Receives IGN-switched +12V directly from AC switch pin 2.
       Configure in MTune: Digital Input type = ON/OFF switch,
       function = AC enable, idle-up = +150-200 RPM when active.
-      This prevents idle dip when compressor load engages.
+      MaxxECU then CAN-commands PMU16 O7 to energize AC relay -- compressor runs.
       Source: @jfantis YouTube comment on Rawrkee Episode 3.
 
   PWM_CONTROLLER:
@@ -177,15 +189,22 @@ cables:
       The 3-phase PMSM motor GND is handled internally by the inverter.
       8 AWG minimum. Ring terminal to chassis ground stud.
 
-  CABLE_RELAY_COIL:
+  CABLE_O7_TO_RELAY:
     gauge: "18 AWG"
-    length: "2.0 m"
-    colors: [GN, BK]
-    wirecount: 2
+    length: "1.5 m"
+    colors: [RD]
+    wirecount: 1
     notes: >-
-      Wire 1 GREEN: AC switch output to relay coil pin 86. IGN-switched +12V.
-      Wire 2 BLACK: relay coil pin 85 to chassis GND.
-      18 AWG sufficient for relay coil (low current).
+      PMU16 O7 to relay coil pin 86. 18 AWG sufficient (relay coil ~200mA).
+      Route from PMU16 39-pin connector through engine bay to relay location.
+
+  CABLE_RELAY_COIL_GND:
+    gauge: "18 AWG"
+    length: "0.3 m"
+    colors: [BK]
+    wirecount: 1
+    notes: >-
+      Relay coil pin 85 to chassis GND. Short stub. 18 AWG sufficient.
 
   CABLE_AC_ENABLE:
     gauge: "22 AWG"
@@ -193,10 +212,11 @@ cables:
     colors: [VT]
     wirecount: 1
     notes: >-
-      AC enable signal: junction at relay coil pin 86 wire (after AC switch)
-      to MaxxECU DIN. Carries IGN +12V when AC switch is on.
+      AC switch pin 2 directly to MaxxECU DIN (AC enable signal).
+      Carries IGN +12V when AC switch is on.
       22 AWG signal wire. Route through firewall grommet to ECU.
       Shielded preferred -- drain at ECU end only.
+      No longer a junction tap from relay coil wire -- runs direct from switch.
 
   CABLE_IGN_TO_SWITCH:
     gauge: "18 AWG"
@@ -205,7 +225,7 @@ cables:
     wirecount: 1
     notes: >-
       IGN +12V to AC cabin switch input.
-      Source from IGN relay output -- key-switched only.
+      Source from IGN switched rail -- key-switched only.
 
 # ── Connections ────────────────────────────────────────────────────────────────
 
@@ -230,21 +250,22 @@ connections:
     - PWM_CONTROLLER: [2]
     - CABLE_MOTOR_GND: [1]
     - CHASSIS_GND: [1]
-  # IGN +12V -> AC switch -> relay coil pin 86 (+ AC enable tap to MaxxECU)
+  # IGN +12V -> AC switch input
   -
     - AC_SWITCH: [1]
     - CABLE_IGN_TO_SWITCH: [1]
-  -
-    - AC_SWITCH: [2]
-    - CABLE_RELAY_COIL: [1]
-    - AC_RELAY: [3]
-  # Relay coil pin 85 -> chassis GND
-  -
-    - AC_RELAY: [4]
-    - CABLE_RELAY_COIL: [2]
-    - CHASSIS_GND: [1]
-  # AC enable signal tap -> MaxxECU DIN (for idle-up)
+  # AC switch output -> MaxxECU DIN (AC enable signal -- direct, no relay tap)
   -
     - AC_SWITCH: [2]
     - CABLE_AC_ENABLE: [1]
     - MAXXECU_DIN: [1]
+  # PMU16 O7 -> relay coil pin 86 (CAN-commanded by MaxxECU)
+  -
+    - PMU16_O7_STUB: [1]
+    - CABLE_O7_TO_RELAY: [1]
+    - AC_RELAY: [3]
+  # Relay coil pin 85 -> chassis GND
+  -
+    - AC_RELAY: [4]
+    - CABLE_RELAY_COIL_GND: [1]
+    - CHASSIS_GND: [1]

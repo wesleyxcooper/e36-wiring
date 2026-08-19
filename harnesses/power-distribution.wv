@@ -20,13 +20,12 @@ metadata:
 #   [ ] Program post-shutdown EWP logic: keep O5 active after key-off until
 #       CLT CAN value from MaxxECU drops below 70 deg C OR 3-min fallback timer
 #
-#   EWP CURRENT NOTE:
-#   [ ] !! Pierburg CWA400 draws up to 35.5A nominal. Single PMU16 output is 25A max.
-#       Options: (a) parallel O5 + O14 for EWP (50A combined -- PMU software supports this)
-#       OR (b) keep a dedicated 40A relay with PMU16 O5 as coil driver (O5 carries
-#       only the relay coil current ~200mA, relay contacts carry 35.5A pump load).
-#       Confirm with ewp-controller.wv actual steady-state draw before choosing.
-#       If paralleling outputs: update connections section to add second output wire.
+#   EWP CURRENT NOTE -- RESOLVED:
+#   [x] CWA400 35.5A vs 25A single-channel limit -- DECISION: parallel O5 + O14.
+#       O5 (PHYS pin 12) + O14 (PHYS pin TBD -- confirm in PMU-16_Pinout_v1.2.pdf)
+#       wired together to CWA400 Pin 3 via 8 AWG. PMU software: configure as parallel pair.
+#       Combined rating 50A -- adequate headroom over 35.5A nominal.
+#       ewp-controller.wv updated: MAIN_RELAY removed, PMU16 O5+O14 wire direct to Pin 3.
 #
 #   BATTERY / CUTOFF SWITCH:
 #   [ ] Confirm battery location (stock E36 = driver footwell OR engine bay)
@@ -62,13 +61,12 @@ metadata:
 #       Source: StreetCarJoe Race Car Wiring Series Pt.2 (youtube.com/watch?v=PNyScqftGQw)
 #
 #   DOWNSTREAM HARNESS UPDATES NEEDED:
-#   [ ] ewp-controller.wv: internal MAIN_RELAY is replaced by PMU16 O5 direct output.
-#       Update to remove relay -- connect PMU16 O5 wire directly to CWA400 pin 3.
-#       (Pending resolution of 35.5A current draw vs 25A O5 limit -- see above.)
+#   [x] ewp-controller.wv: MAIN_RELAY removed. PMU16 O5+O14 parallel feeds CWA400 Pin 3
+#       directly via 8 AWG. Post-shutdown cooling now PMU16-managed (no power-hold relay).
 #   [ ] fuel-pump-hanger.wv: SSR (Crydom D1D40) is replaced by PMU16 O4 PWM output.
 #       Update SSR section -- PMU16 O4 wire goes directly to pump(+) stud on hanger.
-#   [ ] ac-compressor.wv: AC_RELAY coil is now driven by PMU16 O7 output (low current).
-#       Update coil power source reference from fuse block F10 to PMU16 O7.
+#   [x] ac-compressor.wv: AC switch now feeds MaxxECU DIN directly. PMU16 O7 drives
+#       AC_RELAY coil pin 86 via CAN command from MaxxECU. Coil pin 85 to chassis GND.
 
 # ── Connectors ─────────────────────────────────────────────────────────────────
 
@@ -207,7 +205,7 @@ connectors:
   PMU16:
     type: "Ecumaster PMU16 Power Management Unit"
     subtype: "39-way Sicma/FCI + M6 BATT+ stud + GND lug"
-    pincount: 12
+    pincount: 13
     pinlabels:
       - "BATT+ (M6 stud -- to ANL fuse output)"
       - "GND (body lug -- PHYS chassis GND)"
@@ -218,20 +216,22 @@ connectors:
       - "O2 25A -- coil+inj supply (PHYS pin 39)"
       - "O3 25A -- radiator fan PWM (PHYS pin 26)"
       - "O4 25A -- fuel pump PWM (PHYS pin 13)"
-      - "O5 25A -- EWP supply ⚠️ see TODO (PHYS pin 12)"
+      - "O5 25A -- EWP supply parallel A (PHYS pin 12)"
       - "O6 15A -- condenser fan (PHYS pin 11)"
       - "O7 15A -- AC relay coil drive (PHYS pin 10)"
+      - "O14 25A -- EWP supply parallel B (PHYS pin TBD -- see PMU-16_Pinout_v1.2.pdf)"
     notes: >-
       PDM replaces: relay board (ECU main, coil/inj, fan, EWP, condenser relays),
       blade fuse block, and Crydom D1D40 SSR.
       No flyback diodes needed -- MOSFET outputs have integrated protection.
       Per-channel current sensing: all output currents are logged over CAN to MaxxECU.
-      Post-shutdown EWP: O5 programmed to stay active after key-off until
+      Post-shutdown EWP: O5+O14 programmed to stay active after key-off until
         MaxxECU CAN CLT channel drops below 70 deg C or 3-min fallback timer.
         PMU16 M6 stud is BATT+ always (not IGN-switched), enabling this behavior.
-      EWP current warning: CWA400 draws up to 35.5A. O5 is 25A rated.
-        Resolve per TODO block at top of file before building.
-      Spare outputs available for future: O8-O16, plus 16x analog inputs A1-A16.
+      EWP parallel outputs: O5+O14 wired together to CWA400 Pin 3, configured as
+        a parallel pair in PMU software. Combined 50A rating handles CWA400 35.5A.
+      AC relay coil: O7 drives relay pin 86. AC switch feeds MaxxECU DIN (not coil direct).
+      Spare outputs: O8-O13, O15-O16. O8 assigned to EPS Controller (Phase 3).
       CAN1 (PHYS pins 23/35): reserved for PC programming via Ecumaster USB-CAN.
         Do NOT connect CAN1 to MaxxECU -- CAN1 is PC-only on PMU16.
 
@@ -297,20 +297,20 @@ connectors:
 
   # ── External harness stubs ─────────────────────────────────────────────────
   EWP_OUTPUT_STUB:
-    type: "Stub: PMU16 O5 → ewp-controller.wv CWA400 supply"
-    subtype: "See harnesses/ewp-controller.wv -- replaces MAIN_RELAY"
-    pincount: 1
-    pinlabels: ["EWP +12V supply (from PMU16 O5)"]
+    type: "Stub: PMU16 O5+O14 parallel → ewp-controller.wv CWA400 Pin 3 supply"
+    subtype: "See harnesses/ewp-controller.wv -- MAIN_RELAY removed"
+    pincount: 2
+    pinlabels:
+      - "EWP +12V supply A (from PMU16 O5 PHYS pin 12)"
+      - "EWP +12V supply B (from PMU16 O14 PHYS pin TBD)"
     notes: >-
-      PMU16 O5 output drives the EWP directly -- MAIN_RELAY in ewp-controller.wv
-      is replaced. TODO: update ewp-controller.wv to remove internal relay and
-      connect this wire directly to CWA400 Pin 3 (+12V supply input).
-      CWA400 GND (Pin 4) still to chassis GND stud.
-      ⚠️ CWA400 draws up to 35.5A nominal. PMU16 O5 is 25A max.
-         Resolve per TODO block at top of file before building this run.
-      Wire gauge: 10 AWG minimum (35.5A load; use 8 AWG if paralleling outputs).
-      Post-shutdown cooling: PMU16 logic keeps O5 active after key-off per
-        programmed CLT threshold -- no separate power-hold relay needed.
+      O5 and O14 wired in parallel to CWA400 Pin 3. Combined 50A rating handles
+      CWA400 35.5A nominal draw. Configure as parallel pair in PMU software.
+      8 AWG minimum per wire (both runs). Join at CWA400 Pin 3 terminal.
+      MAIN_RELAY in ewp-controller.wv is removed -- these wires go direct to Pin 3.
+      CWA400 GND (Pin 4) to chassis GND stud (see ewp-controller.wv).
+      Post-shutdown cooling: PMU16 O5+O14 stay active after key-off per CLT
+        threshold -- no separate BATT+ relay or power-hold relay needed.
 
   RADIUM_HANGER_STUB:
     type: "Stub: PMU16 O4 → Radium 20-1170 hanger pump stud"
@@ -328,15 +328,16 @@ connectors:
 
   AC_RELAY_COIL_STUB:
     type: "Stub: PMU16 O7 → ac-compressor.wv AC_RELAY coil pin 86"
-    subtype: "See harnesses/ac-compressor.wv AC_RELAY"
+    subtype: "See harnesses/ac-compressor.wv -- AC switch feeds MaxxECU DIN, not relay direct"
     pincount: 1
     pinlabels: ["AC relay coil 86 (from PMU16 O7)"]
     notes: >-
-      PMU16 O7 (15A) drives AC relay coil -- replaces fuse block F10 feed.
-      Very low current (relay coil ~200mA); 18 AWG sufficient.
-      TODO: update ac-compressor.wv to reference PMU16 O7 as coil power source.
-      Condenser fan coil is no longer tapped from AC relay coil wire;
-        PMU16 O6 drives condenser fan directly (separate channel).
+      PMU16 O7 (15A) drives AC relay coil pin 86. Very low current (~200mA); 18 AWG.
+      AC switch (cabin) feeds MaxxECU DIN directly -- MaxxECU reads AC request and
+        sends CAN command to PMU16 → O7 activates → relay coil energizes → compressor runs.
+      This gives MaxxECU full control: idle-up before relay closes, compressor lockout
+        at high CLT, etc. Old direct-wire (IGN → AC switch → relay coil 86) is removed.
+      Condenser fan: PMU16 O6, separate channel, CAN-commanded -- no tap from relay coil.
 
   # ── AC system cross-reference ───────────────────────────────────────────────
   # AC_SWITCH_TAP removed: with PMU16, condenser fan (O6) is activated by
@@ -433,8 +434,14 @@ cables:
   W_PMU16_O5_EWP:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["O5 → EWP +12V supply"]
-    notes: "10 AWG (or 8 AWG if paralleling O5+O14). Red. PMU16 O5 (PHYS pin 12, 25A) → EWP_OUTPUT_STUB. See TODO re: 35.5A CWA400 current vs 25A channel limit."
+    wirelabels: ["O5 → EWP +12V supply (A)"]
+    notes: "8 AWG. Red. PMU16 O5 (PHYS pin 12, 25A) → EWP_OUTPUT_STUB pin 1. Paralleled with O14 at CWA400 Pin 3. Combined 50A handles CWA400 35.5A draw."
+
+  W_PMU16_O14_EWP:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["O14 → EWP +12V supply (B)"]
+    notes: "8 AWG. Red. PMU16 O14 (PHYS pin TBD, 25A) → EWP_OUTPUT_STUB pin 2. Paralleled with O5 at CWA400 Pin 3. Configure O5+O14 as parallel pair in PMU software."
 
   W_PMU16_O6_CONDENSER:
     wirecount: 1
@@ -526,6 +533,10 @@ connections:
   - - PMU16: [10]
     - W_PMU16_O5_EWP: [1]
     - EWP_OUTPUT_STUB: [1]
+
+  - - PMU16: [13]
+    - W_PMU16_O14_EWP: [1]
+    - EWP_OUTPUT_STUB: [2]
 
   - - PMU16: [11]
     - W_PMU16_O6_CONDENSER: [1]

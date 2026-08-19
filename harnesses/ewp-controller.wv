@@ -1,11 +1,14 @@
 metadata:
   project: E36 Restomod -- CWA400 Electric Water Pump Wiring
   description: >-
-    Pierburg CWA400 (PWM version) controlled by MaxxECU RACE via PWM GPO.
+    Pierburg CWA400 (PWM version) powered by Ecumaster PMU16 O5+O14 parallel
+    outputs (50A combined) and controlled by MaxxECU RACE via PWM GPO.
     Phase 3 (07K engine). OEM pump 07K121011B impeller removed, housing stays
     as coolant manifold. No separate pump controller -- MaxxECU is the sole
-    PWM driver. Cross-reference ewp-wiring-reference.md for full specs,
-    part numbers, duty cycle map, and post-shutdown relay config.
+    PWM driver. PMU16 replaces MAIN_RELAY: O5+O14 wire direct to CWA400 Pin 3.
+    Post-shutdown cooling managed by PMU16 (no separate power-hold relay needed).
+    Cross-reference ewp-wiring-reference.md for full specs, part numbers,
+    duty cycle map, and post-shutdown config.
     Confirmed: @wingman703 (07K/8HP build, identical drivetrain).
 
 # ── TODO list ──────────────────────────────────────────────────────────────────
@@ -13,29 +16,38 @@ metadata:
 #   [ ] Verify CWA400 part number on sourced unit -- PWM version only
 #       (Pierburg 7.07223.10.0 / BMW 11515A05704 / 11517563659 / 11517568594)
 #       Do NOT accept Pierburg 7.03665.66.0 or BMW 11517604027 (LIN version)
-#   [ ] Confirm 40A relay location -- engine bay fuse/relay block or dedicated
+#   [ ] Confirm PMU16 O14 physical pin number -- see PMU-16_Pinout_v1.2.pdf
+#       (ecumaster.com/files/PMU/PMU-16_Pinout_v1.2.pdf)
+#   [ ] Configure PMU software: set O5 + O14 as parallel output pair
+#   [ ] Program post-shutdown EWP logic in PMU software:
+#       keep O5+O14 active after key-off until MaxxECU CAN CLT < 70C
+#       OR 3-min fallback timer -- whichever comes first
 #   [ ] Confirm MaxxECU RACE GPO pin assignment for CWA400 PWM signal
-#   [ ] Confirm MaxxECU power hold relay wiring for post-shutdown pump soak
 #   [ ] Set MaxxECU PWM output frequency to 680 Hz in software
 #   [ ] Verify wake pulse config: MaxxECU must send >= 3ms high pulse at
 #       ignition-on before transitioning to CLT duty-cycle map
 #   [ ] Bleeding procedure: tie Pin 1 to +12V (forces emergency run) +
-#       Pin 3 direct to BATT+ before relay install for pre-fire bleed/leak test
+#       Pin 3 direct to BATT+ before PMU16 connection for pre-fire bleed/leak test
 #   [ ] Confirm Kostal 2+2 connector and terminals sourced before Phase 3 build
 
 # ── Connectors ─────────────────────────────────────────────────────────────────
 
 connectors:
 
-  BATT_POS:
-    type: "Battery positive terminal"
-    subtype: "12V AGM"
-    pincount: 1
-    pinlabels: ["+12V BATT (always-on)"]
+  PMU16_EWP_STUB:
+    type: "Stub: PMU16 O5+O14 parallel → CWA400 Pin 3"
+    subtype: "Cross-reference harnesses/power-distribution.wv PMU16 pins 10+13"
+    pincount: 2
+    pinlabels:
+      - "O5 +12V (PHYS pin 12 -- 25A)"
+      - "O14 +12V (PHYS pin TBD -- 25A)"
     notes: >-
-      Inline 40A fuse required within 12 inches of battery terminal.
-      Feeds relay pin 30 only -- NOT connected directly to pump.
-      10 AWG minimum for this run (35.5A pump draw).
+      O5 and O14 wired in parallel -- join at CWA400 Pin 3 terminal.
+      Combined 50A rating handles CWA400 35.5A nominal draw.
+      8 AWG per wire minimum. Configure as parallel pair in PMU software.
+      PMU16 M6 stud is BATT+ always-on -- O5+O14 can activate post key-off
+      for cooling soak without a separate BATT+ relay or power-hold relay.
+      See power-distribution.wv for upstream wiring (BATT+, ANL fuse, PMU16 stud).
 
   CHASSIS_GND:
     type: "Chassis ground stud (body metal)"
@@ -45,24 +57,6 @@ connectors:
       Dedicated ground for pump Pin 4 -- do not share with signal grounds
       or high-current grounds from other loads (fan motor, fuel pump).
       10 AWG minimum. Ring terminal, solid bolt to body metal.
-
-  MAIN_RELAY:
-    type: "40A automotive relay (Bosch 0 332 002 150 or equiv)"
-    subtype: "Standard 4-pin or 5-pin relay"
-    pincount: 4
-    pinlabels:
-      - "Pin 30 (BATT+ in)"
-      - "Pin 87 (switched +12V out to pump)"
-      - "Pin 86 (coil +12V -- BATT+ always-on for post-shutdown cooling)"
-      - "Pin 85 (coil GND)"
-    notes: >-
-      Relay coil (pin 86): BATT+ via fuse F9 (5A) in power-distribution.wv.
-      BATT+ (not IGN) required -- MaxxECU power-hold keeps ECU alive after key-off
-      and commands pump until CLT below 70C. IGN would cut the pump immediately at key-off.
-      Relay coil (pin 85): chassis GND.
-      Relay output (pin 87): to pump Pin 3 via 10 AWG.
-      Relay input (pin 30): from fused BATT+ 40A via 10 AWG.
-      Flyback: 1N4007 across coil at relay socket (cathode to pin 86, anode to pin 85).
 
   MAXXECU_GPO:
     type: "MaxxECU RACE -- PWM General Purpose Output"
@@ -79,18 +73,6 @@ connectors:
       Duty cycle 13-85%: controlled operation (linear min to max speed).
       Duty cycle 86-97%: full speed. 98-100%: emergency run (~5900 RPM).
 
-  MAXXECU_PHOLD:
-    type: "MaxxECU RACE -- Power Hold Relay Output"
-    subtype: "Keeps MaxxECU powered after key-off for post-shutdown pump soak"
-    pincount: 1
-    pinlabels: ["Power hold relay coil trigger"]
-    notes: >-
-      MaxxECU power hold relay: coil energized by MaxxECU output after key-off.
-      Relay pin 87 feeds MaxxECU main 12V supply (keeps ECU alive).
-      MaxxECU continues commanding CWA400 via GPO until CLT drops below setpoint.
-      Configure in MaxxECU: Outputs -- Power Hold Relay, condition = CLT below 70C AND engine-off.
-      Without this relay, MaxxECU shuts off at key-off and pump stops immediately.
-
   CWA400_PUMP:
     type: "Pierburg CWA400 (PWM version) -- Kostal 2+2 connector"
     subtype: "150 LPM @ 0.85 bar -- installed in lower radiator hose"
@@ -98,7 +80,7 @@ connectors:
     pinlabels:
       - "Pin 1 (PWM signal in -- from MaxxECU GPO)"
       - "Pin 2 (BSD diagnostic -- leave floating)"
-      - "Pin 3 (+12V power -- via 40A relay)"
+      - "Pin 3 (+12V power -- from PMU16 O5+O14 parallel)"
       - "Pin 4 (GND)"
     notes: >-
       PWM version ONLY: Pierburg 7.07223.10.0 / BMW 11515A05704 / 11517563659.
@@ -107,7 +89,7 @@ connectors:
       Pins 3-4: SLK 5.8 ELA terminals (22124544900).
       Install inline in lower radiator hose (cold/return side), outlet toward engine.
       Pin 2 (BSD): leave floating -- not used with MaxxECU PWM control.
-      35.5A nominal draw -- 10 AWG minimum on power/ground pins.
+      35.5A nominal draw -- 8 AWG minimum on Pin 3 (PMU16 O5+O14 parallel feeds here).
       Datasheet: https://tecomotive.com/download/datasheets/CWA400_PWM_EN.pdf
       Product: https://www.tecomotive.com/en/products/CWA400_PWM.html
 
@@ -115,24 +97,26 @@ connectors:
 
 cables:
 
-  CABLE_PWR_IN:
-    gauge: "10 AWG"
-    length: "0.5 m"
-    colors: [RD]
-    wirecount: 1
-    notes: >-
-      BATT+ to relay pin 30. Fused 40A within 12 inches of battery.
-      10 AWG minimum (35.5A pump load). Ring terminal at battery, blade or
-      ring terminal at relay pin 30 socket.
-
-  CABLE_PWR_OUT:
-    gauge: "10 AWG"
+  CABLE_PWR_O5:
+    gauge: "8 AWG"
     length: "1.5 m"
     colors: [RD]
     wirecount: 1
     notes: >-
-      Relay pin 87 to CWA400 Pin 3. Switched +12V pump supply.
-      10 AWG minimum. Route through engine bay to pump location.
+      PMU16 O5 to CWA400 Pin 3 (parallel A). 8 AWG minimum.
+      Route from PMU16 through engine bay to pump location.
+      Join to CABLE_PWR_O14 at Pin 3 terminal (parallel junction).
+
+  CABLE_PWR_O14:
+    gauge: "8 AWG"
+    length: "1.5 m"
+    colors: [RD]
+    wirecount: 1
+    notes: >-
+      PMU16 O14 to CWA400 Pin 3 (parallel B). 8 AWG minimum.
+      Route alongside CABLE_PWR_O5 -- keep both runs the same length
+      to balance current sharing between the two parallel outputs.
+      Join to CABLE_PWR_O5 at Pin 3 terminal (parallel junction).
 
   CABLE_GND:
     gauge: "10 AWG"
@@ -154,28 +138,18 @@ cables:
       Keep away from ignition coil wiring and high-current runs where possible.
       Shielded wire preferred for EMC -- drain to chassis GND at ECU end only.
 
-  CABLE_RELAY_COIL:
-    gauge: "18 AWG"
-    length: "1.0 m"
-    colors: [GN, BK]
-    wirecount: 2
-    notes: >-
-      Wire 1 GREEN: relay coil pin 86 -- BATT+ via fuse F9 (5A, power-distribution.wv).
-      Wire 2 BLACK: relay coil pin 85 -- chassis GND.
-      18 AWG sufficient for relay coil (low current).
-
 # ── Connections ────────────────────────────────────────────────────────────────
 
 connections:
-  # BATT+ → relay pin 30 (fused 40A)
+  # PMU16 O5 → CWA400 Pin 3 (+12V parallel A)
   -
-    - BATT_POS: [1]
-    - CABLE_PWR_IN: [1]
-    - MAIN_RELAY: [1]
-  # Relay pin 87 → pump Pin 3 (+12V switched)
+    - PMU16_EWP_STUB: [1]
+    - CABLE_PWR_O5: [1]
+    - CWA400_PUMP: [3]
+  # PMU16 O14 → CWA400 Pin 3 (+12V parallel B)
   -
-    - MAIN_RELAY: [2]
-    - CABLE_PWR_OUT: [1]
+    - PMU16_EWP_STUB: [2]
+    - CABLE_PWR_O14: [1]
     - CWA400_PUMP: [3]
   # Pump Pin 4 → chassis GND
   -
@@ -187,7 +161,3 @@ connections:
     - MAXXECU_GPO: [1]
     - CABLE_PWM: [1]
     - CWA400_PUMP: [1]
-  # Relay coil: BATT+ (F9 5A) -> pin 86, GND -> pin 85
-  -
-    - MAIN_RELAY: [3, 4]
-    - CABLE_RELAY_COIL: [1, 2]
