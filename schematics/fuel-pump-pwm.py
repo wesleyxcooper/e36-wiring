@@ -1,6 +1,6 @@
 """
 Fuel pump PWM control circuit schematic
-Radium Engineering 20-1170 hanger + Walbro F90000267 + MaxxECU RACE GPO + DC SSR
+Radium Engineering 20-1170 hanger + Walbro F90000267 + Ecumaster PMU16 O4 PWM direct
 
 This script generates a circuit schematic using schemdraw.
 Run it to produce fuel-pump-pwm.svg in the same directory.
@@ -15,30 +15,33 @@ F90000267 specs:
   39mm upper body / 50mm lower body (DCSS format -- Radium 20-1170 compatible)
   E85 / gasoline rated
 
-DC SSR (Crydom D1D40 or generic 40A DC-DC SSR):
-  Control input: 3-32V DC, ~10-15mA (opto-isolated)
-  Load:          0-60V DC, 40A continuous, 1kHz max switching
-  SSR ON when:   IGN +12V at Ctrl(+) AND MaxxECU GPO sinks Ctrl(-) to GND
-
-MaxxECU RACE GEN1 GPO (low-drive):
-  Active = sinks output to GND (not a +12V source)
-  Function: PWM fuel pump control (MTune: Outputs -> Output config)
-  Frequency: 100-500 Hz (within Crydom D1D40 switching rating)
+Ecumaster PMU16 Output O4 (PHYS pin 13):
+  High-side MOSFET switch, 25A rated, PWM-capable
+  No separate SSR or relay needed -- PMU16 output drives pump load directly
+  PWM commanded by MaxxECU over CAN (load MaxxECU.canx template in PMU software)
+  Output active when PMU16 receives CAN fuel pump duty command from MaxxECU
 
 Radium 20-1170 hanger terminals:
   Stainless steel stud through top plate -- ring terminals + acorn nuts
-  Pump(+) stud: receives switched 12V from SSR Load(-)
+  Pump(+) stud: receives switched 12V from PMU16 O4 output
   Pump(-) stud: to chassis GND (dedicated stud -- not ECU sensor ground)
 
 How this circuit works:
-  1. Key on -> IGN relay energizes -> IGN +12V reaches SSR Ctrl(+)
-  2. MaxxECU boots -> outputs PWM on GPO -> GPO sinks Ctrl(-) to GND
-  3. Control circuit: IGN +12V -> SSR Ctrl(+) -> internal opto LED -> Ctrl(-) -> GPO -> GND
-  4. Opto triggers internal MOSFET/SCR -> SSR load circuit closes
-  5. BATT+ -> 25A fuse -> SSR Load(+) -> SSR Load(-) -> pump(+) stud -> pump motor
-  6. Pump(-) stud -> chassis GND completes load circuit
-  7. Pump speed proportional to PWM duty cycle (65% idle / 100% WOT)
-  8. Key off -> IGN relay drops -> SSR Ctrl(+) loses 12V -> SSR opens -> pump stops
+  1. Key on -> PMU16 sees IGN +12V on +12V SW pin -> PMU16 activates
+  2. MaxxECU boots -> sends fuel pump PWM duty over CAN to PMU16
+  3. PMU16 O4 MOSFET switches at commanded duty cycle
+  4. BATT+ -> main ANL fuse -> PMU16 M6 stud -> O4 MOSFET -> O4 output
+  5. O4 output -> pump(+) stud -> pump motor -> pump(-) stud -> chassis GND
+  6. Pump speed proportional to CAN-commanded PWM duty
+  7. Key off -> MaxxECU signals PMU16 -> PMU16 deactivates O4 -> pump stops
+
+PMU16 O4 replaces: Crydom D1D40 DC SSR + IGN fuse feed + GPO2 trigger wire
+
+NOTE: fuel-pump-hanger.wv still models the full Crydom D1D40 SSR
+architecture (DC_SSR connector, CABLE_SSR_CTRL_POS/NEG, MAXXECU_GPO
+stub, IGN_12V feed) and needs a rewrite for PMU16 O4 direct output.
+ewp-controller.wv has no SSR — it uses a MAIN_RELAY; that relay will
+eventually be replaced by PMU16 O5, tracked in power-distribution.wv.
 
 Usage:
   pip install schemdraw matplotlib
@@ -57,46 +60,41 @@ OUT = os.path.join(os.path.dirname(__file__), "fuel-pump-pwm.svg")
 with schemdraw.Drawing(figsize=(13, 8), show=False) as d:
     d.config(fontsize=9)
 
-    # ── SSR center (elm.Relay: in1/in2 = Ctrl+/Ctrl-,  a/b = Load+/Load-) ─────
-    ssr = d.add(elm.Relay(switch='spst').at((4.5, 0)).label(
-        "DC SSR (Crydom D1D40)\n40A / 0-60V / 3-32V ctrl", loc="top"))
+    # ── PMU16 O4 MOSFET switch (center) ─────────────────────────────────────
+    # Model as a switch: top = load in (from BATT+), bottom = load out (to pump)
+    # CAN command shown on left as the control signal
+    pmu = d.add(elm.Switch().right().at((4.0, 0)).label(
+        "PMU16 O4\n(MOSFET, 25A, PWM)\nPHYS pin 13", loc="top"))
 
-    # ── Control circuit (left): IGN +12V -> Ctrl(+) / GPO -> Ctrl(-) -> GND ───
-    d.add(elm.Line().left().at(ssr.in1).length(2.0))
-    d.add(elm.Line().up().length(0.6))
-    d.add(elm.Label().label("IGN +12V / F4 (5A) / 22 AWG", loc="right"))
-
-    d.add(elm.Line().left().at(ssr.in2).length(2.0))
-    d.add(elm.Dot())
-    d.add(elm.Line().down().length(0.4))
+    # ── CAN control signal (below) ──────────────────────────────────────────
+    d.add(elm.Line().down().at(pmu.start).length(1.2))
     d.add(elm.Label().label(
-        "MaxxECU GPO (GND-sink)\nPWM 100-500 Hz / 22 AWG shielded", loc="right"))
+        "MaxxECU CAN → PMU16\nPWM duty command\n(replaces GPO2 + SSR ctrl wires)",
+        loc="right"))
 
-
-    # ── Load circuit (top): BATT+ -> 25A fuse -> Load(+) -> Load(-) -> pump ───
-    d.add(elm.Line().up().at(ssr.a).length(1.5))
-    d.add(elm.Line().left().length(0.6))
-    d.add(elm.Fuse().left().label("F_FP 25A / within 12\" batt", loc="top"))
+    # ── Load circuit: BATT+ → ANL fuse → PMU16 M6 stud → O4 → pump ─────────
+    d.add(elm.Line().left().at(pmu.start).length(0.6))
+    d.add(elm.Fuse().left().label("ANL main fuse\n(within 18\" batt)", loc="top"))
     d.add(elm.Line().left().length(0.5))
     batt_node = d.add(elm.Dot())
     d.add(elm.Line().left().length(1.2))
-    d.add(elm.Battery().up().reverse().label("12V BATT / 12 AWG", loc="right"))
+    d.add(elm.Battery().up().reverse().label("12V BATT+\n(PMU16 M6 stud)\n12 AWG", loc="right"))
 
     d.add(elm.Line().down().at(batt_node.end).length(3.8))
     d.add(elm.Ground())
 
-    # ── Load output (right): Load(-) -> pump(+) stud -> motor -> GND ─────────
-    d.add(elm.Line().right().at(ssr.b).length(0.5))
+    # ── Output (right): O4 → pump(+) stud → motor → pump(-) stud → GND ────
+    d.add(elm.Line().right().at(pmu.end).length(0.5))
     d.add(elm.Motor().right().label(
         "Walbro F90000267 (Radium 20-1170)\n465 LPH / E85 / 14.1A max / 12 AWG", loc="top"))
     d.add(elm.Line().right().length(0.3))
     d.add(elm.Ground())
 
-    # ── Duty cycle note (bottom) ─────────────────────────────────────────────
-    d.add(elm.Label().at((5.0, -4.2)).label(
-        "PWM duty: 65% idle | 80% cruise | 90% WOT | 100% under boost\n"
-        "SSR: mount to metal bracket for heat sinking (dissipates ~1 W/A)\n"
-        "Return: 8.5 mm barb (included) or 20-1000-0606 6AN ORB swivel",
+    # ── Duty cycle and PMU16 note (bottom) ──────────────────────────────────
+    d.add(elm.Label().at((5.0, -4.5)).label(
+        "PWM duty via CAN: 65% idle | 80% cruise | 90% WOT | 100% under boost\n"
+        "PMU16 O4 logs actual current per channel -- anomaly detection built in\n"
+        "Replaces: Crydom D1D40 SSR + F4 IGN fuse + GPO2 trigger wire (3 parts → 0)",
         loc="center"))
 
     d.save(OUT)

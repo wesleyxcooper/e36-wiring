@@ -301,21 +301,21 @@
 <!-- IGN_12V_TAP -->
 <g id="node5" class="node">
 <title>IGN_12V_TAP</title>
-<polygon fill="#ffffff" stroke="black" points="2149.25,-717.62 676.5,-717.62 676.5,-622.62 2149.25,-622.62 2149.25,-717.62"/>
-<polygon fill="none" stroke="black" points="676.5,-693.88 676.5,-717.62 2149.25,-717.62 2149.25,-693.88 676.5,-693.88"/>
+<polygon fill="#ffffff" stroke="black" points="2381.38,-717.62 444.38,-717.62 444.38,-622.62 2381.38,-622.62 2381.38,-717.62"/>
+<polygon fill="none" stroke="black" points="444.38,-693.88 444.38,-717.62 2381.38,-717.62 2381.38,-693.88 444.38,-693.88"/>
 <text xml:space="preserve" text-anchor="start" x="1368.25" y="-700.88" font-family="arial" font-size="14.00">IGN_12V_TAP</text>
-<polygon fill="none" stroke="black" points="676.5,-670.12 676.5,-693.88 1272.67,-693.88 1272.67,-670.12 676.5,-670.12"/>
-<text xml:space="preserve" text-anchor="start" x="791.58" y="-677.12" font-family="arial" font-size="14.00">Stub &#45;&#45; IGN&#45;switched +12V source, see power&#45;distribution.wv</text>
-<polygon fill="none" stroke="black" points="1272.67,-670.12 1272.67,-693.88 1889.08,-693.88 1889.08,-670.12 1272.67,-670.12"/>
-<text xml:space="preserve" text-anchor="start" x="1387.75" y="-677.12" font-family="arial" font-size="14.00">Either FUSE_BLOCK spare position or kit&#45;supplied fuse&#45;tap lead</text>
-<polygon fill="none" stroke="black" points="1889.08,-670.12 1889.08,-693.88 2149.25,-693.88 2149.25,-670.12 1889.08,-670.12"/>
-<text xml:space="preserve" text-anchor="start" x="2004.17" y="-677.12" font-family="arial" font-size="14.00">1&#45;pin</text>
-<polygon fill="none" stroke="black" points="676.5,-646.38 676.5,-670.12 1439.5,-670.12 1439.5,-646.38 676.5,-646.38"/>
-<text xml:space="preserve" text-anchor="start" x="1027.62" y="-653.38" font-family="arial" font-size="14.00">+12V IGN</text>
-<polygon fill="none" stroke="black" points="1439.5,-646.38 1439.5,-670.12 2149.25,-670.12 2149.25,-646.38 1439.5,-646.38"/>
-<text xml:space="preserve" text-anchor="start" x="1790.62" y="-653.38" font-family="arial" font-size="14.00">1</text>
-<polygon fill="none" stroke="black" points="676.5,-622.62 676.5,-646.38 2149.25,-646.38 2149.25,-622.62 676.5,-622.62"/>
-<text xml:space="preserve" text-anchor="start" x="680.5" y="-629.62" font-family="arial" font-size="14.00">10A Mini ATM fuse (supplied with kit) protects this feed specifically for the EPS Controller &#45;&#45; independent of the 60A Maxi fuse on the Steering ECU&#39;s main battery feed. TODO: confirm which fuse block position or existing IGN circuit this taps into.</text>
+<polygon fill="none" stroke="black" points="444.38,-670.12 444.38,-693.88 1197.79,-693.88 1197.79,-670.12 444.38,-670.12"/>
+<text xml:space="preserve" text-anchor="start" x="638.08" y="-677.12" font-family="arial" font-size="14.00">Stub &#45;&#45; IGN&#45;switched +12V source, see power&#45;distribution.wv</text>
+<polygon fill="none" stroke="black" points="1197.79,-670.12 1197.79,-693.88 1963.96,-693.88 1963.96,-670.12 1197.79,-670.12"/>
+<text xml:space="preserve" text-anchor="start" x="1391.5" y="-677.12" font-family="arial" font-size="14.00">PMU16 spare output O8 (10A channel) — Phase 3 assignment</text>
+<polygon fill="none" stroke="black" points="1963.96,-670.12 1963.96,-693.88 2381.38,-693.88 2381.38,-670.12 1963.96,-670.12"/>
+<text xml:space="preserve" text-anchor="start" x="2157.67" y="-677.12" font-family="arial" font-size="14.00">1&#45;pin</text>
+<polygon fill="none" stroke="black" points="444.38,-646.38 444.38,-670.12 1439.5,-670.12 1439.5,-646.38 444.38,-646.38"/>
+<text xml:space="preserve" text-anchor="start" x="911.56" y="-653.38" font-family="arial" font-size="14.00">+12V IGN</text>
+<polygon fill="none" stroke="black" points="1439.5,-646.38 1439.5,-670.12 2381.38,-670.12 2381.38,-646.38 1439.5,-646.38"/>
+<text xml:space="preserve" text-anchor="start" x="1906.69" y="-653.38" font-family="arial" font-size="14.00">1</text>
+<polygon fill="none" stroke="black" points="444.38,-622.62 444.38,-646.38 2381.38,-646.38 2381.38,-622.62 444.38,-622.62"/>
+<text xml:space="preserve" text-anchor="start" x="448.38" y="-629.62" font-family="arial" font-size="14.00">10A Mini ATM fuse (supplied with kit) protects this feed specifically for the EPS Controller &#45;&#45; independent of the 60A Maxi fuse on the Steering ECU&#39;s main battery feed. Source: PMU16 O8 (power&#45;distribution.wv spare channel). No fuse block position needed &#45;&#45; PMU16 per&#45;channel digital fusing replaces discrete blade fuse.</text>
 </g>
 <!-- CABLE_CTRL_PWR -->
 <g id="node11" class="node">
@@ -343,9 +343,9 @@
 <!-- IGN_12V_TAP&#45;&#45;CABLE_CTRL_PWR -->
 <g id="edge9" class="edge">
 <title>IGN_12V_TAP:e&#45;&#45;CABLE_CTRL_PWR:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2150.25,-656.25C2547.18,-656.25 2646.41,-655.38 3043.38,-655.38"/>
-<path fill="none" stroke="#ff0000" stroke-width="2" d="M2150.25,-658.25C2547.19,-658.25 2646.43,-657.37 3043.38,-657.37"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2150.25,-660.25C2547.21,-660.25 2646.45,-659.37 3043.38,-659.37"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2382.38,-656.25C2676.13,-656.25 2749.57,-655.38 3043.38,-655.38"/>
+<path fill="none" stroke="#ff0000" stroke-width="2" d="M2382.38,-658.25C2676.15,-658.25 2749.6,-657.38 3043.38,-657.38"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M2382.38,-660.25C2676.18,-660.25 2749.62,-659.37 3043.38,-659.37"/>
 </g>
 <!-- ADJUSTMENT_KNOB -->
 <g id="node6" class="node">
@@ -648,7 +648,7 @@
   </tr>
   <tr>
     <td class="bom_col_id">12</td>
-    <td class="bom_col_description">Connector, Stub -- IGN-switched +12V source, see power-distribution.wv, Either FUSE_BLOCK spare position or kit-supplied fuse-tap lead, 1 pins</td>
+    <td class="bom_col_description">Connector, Stub -- IGN-switched +12V source, see power-distribution.wv, PMU16 spare output O8 (10A channel) — Phase 3 assignment, 1 pins</td>
     <td class="bom_col_qty">1</td>
     <td class="bom_col_unit"></td>
     <td class="bom_col_designators">IGN_12V_TAP</td>

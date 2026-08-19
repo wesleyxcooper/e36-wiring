@@ -55,9 +55,9 @@ Click any link to view the interactive diagram with full BOM in your browser —
 | DCT Shifter paddle → MaxxECU DIN (cabin-to-cabin) | [dct-shifter.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/dct-shifter.html) | `harnesses/dct-shifter.wv` |
 | Bosch PST-F1 oil temp+pressure sensor | [pst-f1-sensor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/pst-f1-sensor.html) | `harnesses/pst-f1-sensor.wv` |
 | E36 X20 body connector / Gauge.S | [body-x20.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/body-x20.html) | `harnesses/body-x20.wv` |
-| Power distribution (relay board + fuse block) | [power-distribution.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/power-distribution.html) | `harnesses/power-distribution.wv` |
+| Power distribution (Ecumaster PMU16 PDM) | [power-distribution.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/power-distribution.html) | `harnesses/power-distribution.wv` |
 | Pierburg CWA400 electric water pump | [ewp-controller.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ewp-controller.html) | `harnesses/ewp-controller.wv` |
-| Radium 20-1170 fuel pump hanger (F90000267 + DC SSR + MaxxECU PWM) | [fuel-pump-hanger.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/fuel-pump-hanger.html) | `harnesses/fuel-pump-hanger.wv` |
+| Radium 20-1170 fuel pump hanger (F90000267 + PMU16 O4 PWM direct) | [fuel-pump-hanger.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/fuel-pump-hanger.html) | `harnesses/fuel-pump-hanger.wv` |
 | PD2-18012AJA 12V electric AC compressor + PWM controller + MaxxECU idle-up | [ac-compressor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ac-compressor.html) | `harnesses/ac-compressor.wv` |
 | ATF temp sensor — MaxxECU NTC 1/8 NPT in Vibrant 16488 inline -8AN adapter *(optional)* | [atf-temp-sensor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/atf-temp-sensor.html) | `harnesses/atf-temp-sensor.wv` |
 | EPowerSteering.com e36 column-assist EPS (Steering ECU, Controller, Adjustment Knob) | [eps-column.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/eps-column.html) | `harnesses/eps-column.wv` |
@@ -70,7 +70,7 @@ Click any link to view the interactive diagram with full BOM in your browser —
 
 ![E36 X20 Body Connector](output/body-x20.svg)
 
-### Power distribution — relay board and fuse block
+### Power distribution — Ecumaster PMU16
 
 ![Power Distribution](output/power-distribution.svg)
 
@@ -82,7 +82,7 @@ Click any link to view the interactive diagram with full BOM in your browser —
 
 ![Fuel Pump Hanger](output/fuel-pump-hanger.svg)
 
-Radium 20-1170 + Walbro F90000267 + Crydom D1D40 DC SSR + MaxxECU RACE PWM GPO. Cross-reference `fuel-pump-hanger-reference.md` and `schematics/fuel-pump-pwm.py`.
+Radium 20-1170 + Walbro F90000267 + PMU16 O4 PWM direct (replaces Crydom D1D40 SSR). Cross-reference `fuel-pump-hanger-reference.md` and `schematics/fuel-pump-pwm.py`.
 
 ### Alibaba PD2-18012AJA 12V electric AC compressor
 

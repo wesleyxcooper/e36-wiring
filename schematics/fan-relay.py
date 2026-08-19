@@ -1,5 +1,5 @@
 """
-Fan relay circuit schematic — RELAY_FAN from power-distribution.wv
+Fan circuit schematic — PMU16 O3 direct PWM output from power-distribution.wv
 
 This script generates a circuit schematic using schemdraw.
 Run it to produce fan-relay.svg in the same directory.
@@ -8,34 +8,29 @@ The schematic shows HOW the circuit works (current flow, switching logic).
 The WireViz file (power-distribution.wv) shows WHERE each wire terminates.
 You need both to build and troubleshoot the circuit.
 
-NOTE: One shared fan serves both the radiator and the AC condenser.
-RELAY_FAN (this relay) is controlled by MaxxECU GPO 6 for coolant temp.
-RELAY_CONDENSER_FAN (power-distribution.wv) is controlled by the AC switch
-output and runs whenever the compressor is active.
-Both relay outputs (RELAY_FAN pin 87 + RELAY_CONDENSER_FAN pin 87) wire
-in parallel to the same fan motor -- the fan runs whenever either relay fires.
+NOTE: The mechanical relay (RELAY_FAN) has been removed from this build.
+The Ecumaster PMU16 output O3 drives the SPAL fan directly with a
+high-side MOSFET switch. PWM speed control is available on O3 for use
+with a PWM-capable SPAL fan (future upgrade -- no rewiring needed).
 
-Standard Bosch ISO mini relay pin numbers (printed on the relay body):
-  85  coil negative  — MaxxECU GPO 6 pulls this to GND to activate relay
-  86  coil positive  — IGN +12V (key-on), fused at 5A
-  30  common         — BATT+ (always-on), fused at 20A
-  87  normally open  — output to fan motor when relay is ON
-  87a normally closed — output when relay is OFF (not used here)
+Ecumaster PMU16 Output O3 (PHYS pin 26):
+  High-side MOSFET switch, 25A rated, PWM-capable
+  Activated by MaxxECU CAN fan control command
+  Phase 2 upgrade: wire SPAL PWM-capable fan to O3 -- enable variable
+    speed control in PMU software (no hardware change needed)
 
-How this relay works:
-  1. Turn the key on → IGN +12V flows through F3 fuse → reaches coil pin 86
-  2. When coolant temp threshold is hit, MaxxECU activates GPO 6
-  3. GPO 6 pulls coil pin 85 to GND → completes the coil circuit → coil energizes
-  4. Magnetic field closes the contact → pin 30 connects to pin 87
-  5. BATT+ flows from F6 fuse → pin 30 → pin 87 → fan motor → GND
-  6. Fan spins. When ECU deactivates GPO 6, coil de-energizes, contact opens, fan stops.
+Condenser fan (O6) is a separate PMU16 output -- activated by
+MaxxECU CAN AC-on signal, not hardwired to the AC switch output.
 
-To create a schematic for a different circuit:
-  - Copy this file and rename it
-  - Change the elements and connections to match your circuit
-  - See https://schemdraw.readthedocs.io for all available elements
-  - Common elements: elm.Relay, elm.Fuse, elm.Motor, elm.Battery,
-                     elm.Switch, elm.Resistor, elm.Capacitor, elm.Diode
+How this circuit works:
+  1. Key on -> PMU16 sees IGN +12V on +12V SW pin -> PMU16 activates
+  2. MaxxECU monitors CLT and sends fan enable/duty CAN command to PMU16
+  3. PMU16 O3 MOSFET closes -> BATT+ flows through O3 to fan motor
+  4. Fan runs. When MaxxECU deactivates, O3 opens, fan stops.
+  5. Phase 2: MaxxECU sends PWM duty command over CAN -> O3 PWMs fan speed
+
+PMU16 O3 replaces: RELAY_FAN (Bosch ISO mini) + F3 coil fuse +
+  F6 load fuse + GPO6 trigger wire (Bosch relay + 4 wires -> 1 output)
 
 Usage:
   pip install schemdraw matplotlib
@@ -46,7 +41,7 @@ Usage:
 import schemdraw
 import schemdraw.elements as elm
 import matplotlib
-matplotlib.use('Agg')  # non-interactive backend — no display window needed
+matplotlib.use('Agg')  # non-interactive backend -- no display window needed
 import os
 
 OUT = os.path.join(os.path.dirname(__file__), "fan-relay.svg")
@@ -54,61 +49,40 @@ OUT = os.path.join(os.path.dirname(__file__), "fan-relay.svg")
 with schemdraw.Drawing(show=False) as d:
     d.config(fontsize=10.5)
 
-    # ── Place the relay in the center of the diagram ─────────────────────────
-    # elm.Relay draws the coil (left side) and the switch contact (right side)
-    # with a dotted link showing they are mechanically coupled.
-    relay = d.add(elm.Relay(switch='spst').at((4, 0)).label("RELAY_FAN\n(Bosch ISO mini)", loc="top"))
+    # ── PMU16 O3 MOSFET switch (center) ─────────────────────────────────────
+    # Model as a switch: left = load in (from BATT+), right = load out (to fan)
+    pmu = d.add(elm.Switch().right().at((4, 0)).label(
+        "PMU16 O3\n(MOSFET, 25A, PWM-capable)\nPHYS pin 26", loc="top"))
 
-    # ── COIL CIRCUIT ─────────────────────────────────────────────────────────
-    # IGN +12V → F3 fuse (5A) → relay pin 86 (coil+)
-    d.add(elm.Line().left().at(relay.in1).length(1.5))
-    d.add(elm.Fuse().left().label("F3 — 5A\n(IGN rail)", loc="top"))
-    d.add(elm.Line().left().length(0.8))
-    ign_node = d.add(elm.Dot())
-    d.add(elm.Line().up().length(0.6))
-    d.add(elm.Label().label("IGN +12V", loc="right"))
+    # ── CAN control signal (below) ──────────────────────────────────────────
+    d.add(elm.Line().down().at(pmu.start).length(1.2))
+    d.add(elm.Label().label(
+        "MaxxECU CAN → PMU16\nfan enable / PWM duty command\n(replaces GPO6 + relay coil wires)",
+        loc="right"))
 
-    # Relay pin 85 (coil-) → MaxxECU GPO 6 switch → GND
-    # The switch symbol represents the ECU's internal transistor (low-side switch)
-    d.add(elm.Line().left().at(relay.in2).length(1.0))
-    d.add(elm.Switch().left().label("MaxxECU\nGPO 6", loc="bottom"))
-    d.add(elm.Line().left().length(0.3))
-    d.add(elm.Ground())
-
-    # Pin labels on relay coil terminals
-    d.add(elm.Label().at(relay.in1).label("  86", loc="right"))
-    d.add(elm.Label().at(relay.in2).label("  85", loc="right"))
-
-    # ── LOAD CIRCUIT ──────────────────────────────────────────────────────────
-    # BATT+ → ANL fuse → F6 fuse (20A) → relay pin 30 → contact → pin 87 → fan → GND
-    d.add(elm.Line().up().at(relay.a).length(1.4))
-    d.add(elm.Line().left().length(0.6))
-    d.add(elm.Fuse().left().label("F6 — 20A\n(batt rail)", loc="top"))
-    d.add(elm.Line().left().length(0.6))
-    batt_top_node = d.add(elm.Dot())
+    # ── Load circuit: BATT+ → ANL fuse → PMU16 M6 stud → O3 → fan ──────────
+    d.add(elm.Line().left().at(pmu.start).length(0.6))
+    d.add(elm.Fuse().left().label("ANL main fuse\n(within 18\" batt)", loc="top"))
+    d.add(elm.Line().left().length(0.5))
+    batt_node = d.add(elm.Dot())
     d.add(elm.Line().left().length(1.2))
-    d.add(elm.Battery().up().reverse().label("12V BATT", loc="right"))
-    batt_pos_top = d.add(elm.Dot())
-    d.add(elm.Label().label("  ← main ANL fuse (close to batt)", loc="right"))
+    d.add(elm.Battery().up().reverse().label("12V BATT+\n(PMU16 M6 stud)\n12 AWG", loc="right"))
 
     # Battery negative → GND
-    d.add(elm.Line().down().at(batt_top_node.end).length(3.6))
+    d.add(elm.Line().down().at(batt_node.end).length(3.6))
     d.add(elm.Ground())
 
-    # Relay contact output: pin 87 → fan motor → GND
-    d.add(elm.Line().right().at(relay.b).length(0.8))
-    d.add(elm.Motor().right().label("SPAL Fan\nMotor", loc="top"))
+    # ── Output (right): O3 → fan motor → GND ────────────────────────────────
+    d.add(elm.Line().right().at(pmu.end).length(0.8))
+    d.add(elm.Motor().right().label("SPAL Fan Motor\n(Phase 2: PWM-capable model)", loc="top"))
     d.add(elm.Line().right().length(0.3))
     d.add(elm.Ground())
 
-    # Pin labels on relay contact
-    d.add(elm.Label().at(relay.a).label("  30", loc="left"))
-    d.add(elm.Label().at(relay.b).label("  87", loc="left"))
-
     # ── Explanation note at bottom ───────────────────────────────────────────
-    d.add(elm.Label().at((4.5, -3.2)).label(
-        "Coil circuit (left):  IGN on + ECU activates GPO 6 → coil energizes\n"
-        "Load circuit (right): Contact closes → BATT+ reaches fan motor",
+    d.add(elm.Label().at((4.5, -3.4)).label(
+        "PMU16 O3 logs actual fan current -- stall detection built in\n"
+        "Replaces: RELAY_FAN (Bosch ISO) + F3 coil fuse + F6 load fuse + GPO6 trigger wire\n"
+        "Condenser fan: separate PMU16 O6 output, CAN-commanded when AC on",
         loc="center"
     ))
 

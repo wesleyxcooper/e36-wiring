@@ -46,9 +46,9 @@ metadata:
 #   [ ] Confirm this is the "Basic EPS Controller" family (manual Adjustment
 #       Knob) and not a different controller variant -- verify with vendor
 #       at order time, since no e36-specific PDF is published
-#   [ ] Confirm IGN-switched 10A source for EPS Controller -- either a spare
-#       position on FUSE_BLOCK in power-distribution.wv, or the fuse-tap
-#       lead supplied with the kit on an existing under-dash IGN circuit
+#   [ ] Confirm IGN-switched 10A source for EPS Controller -- PMU16 spare
+#       output (O8) in power-distribution.wv is the designated source.
+#       Alternatively: kit-supplied fuse-tap lead on an existing IGN circuit.
 #   [ ] Confirm 60A Maxi fuse mounting point near battery -- coordinate with
 #       MAIN_FUSE in power-distribution.wv (separate fuse, do not combine)
 #   [ ] Confirm Steering ECU mounting location -- vendor recommends bare
@@ -161,14 +161,15 @@ connectors:
 
   IGN_12V_TAP:
     type: "Stub -- IGN-switched +12V source, see power-distribution.wv"
-    subtype: "Either FUSE_BLOCK spare position or kit-supplied fuse-tap lead"
+    subtype: "PMU16 spare output O8 (10A channel) — Phase 3 assignment"
     pincount: 1
     pinlabels: ["+12V IGN"]
     notes: >-
       10A Mini ATM fuse (supplied with kit) protects this feed specifically
       for the EPS Controller -- independent of the 60A Maxi fuse on the
-      Steering ECU's main battery feed. TODO: confirm which fuse block
-      position or existing IGN circuit this taps into.
+      Steering ECU's main battery feed. Source: PMU16 O8 (power-distribution.wv
+      spare channel). No fuse block position needed -- PMU16 per-channel
+      digital fusing replaces discrete blade fuse.
 
 # ── Cables ─────────────────────────────────────────────────────────────────────
 

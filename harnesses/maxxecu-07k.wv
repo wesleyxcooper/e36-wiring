@@ -96,9 +96,9 @@ connectors:
       - "INJ 7 (N/A)"       # 3
       - "GPO 8 / TACHO"     # 4
       - "GPO 7 / DIN 3"     # 5  — Flex fuel (if retained)
-      - "GPO 6 (FAN)"       # 6
-      - "GPO 3 (ETh Mot+)"  # 7  — 07K: e-throttle motor+ (freed from VANOS)
-      - "GPO 2 (Fuel pump)" # 8
+      - "GPO 6 (FAN — CAN cmd → PMU16 O3)"       # 6  — no physical relay wire; MaxxECU broadcasts over CAN1
+      - "GPO 3 (ETh Mot+)"                       # 7  — 07K: e-throttle motor+ (freed from VANOS)
+      - "GPO 2 (Fuel pump — CAN cmd → PMU16 O4)" # 8  — no physical relay wire; MaxxECU broadcasts over CAN1
       - "CAN L"             # 9
       - "CAN H"             # 10
       - "AIN 4 (MAP)"       # 11
@@ -114,14 +114,14 @@ connectors:
     pincount: 12
     pinlabels:
       - "+12V coils/injectors (pin 1)"     # 1
-      - "Coil/inj relay trigger (pin 2)"   # 2
-      - "Fuel pump relay trigger (pin 3)"  # 3
+      - "Coil/inj relay trigger (pin 2 — N/C, PMU16 O2)"   # 2  — unconnected; PMU16 O2 supplies coil/inj rail via CAN
+      - "Fuel pump relay trigger (pin 3 — N/C, PMU16 O4)" # 3  — unconnected; PMU16 O4 drives pump via CAN
       - "Chassis GND (pin 4)"              # 4
       - "Engine GND (pin 5)"              # 5
       - "Starter input / CAS (pin 6)"     # 6
       - "+12V ECU power (pin 7)"          # 7
       - "+12V ignition switched (pin 8)"  # 8
-      - "Coolant fan relay trigger (pin 9)" # 9
+      - "Coolant fan relay trigger (pin 9 — N/C, PMU16 O3)" # 9  — unconnected; PMU16 O3 drives fan via CAN
       - "Alternator D+ (pin 10)"          # 10
       - "AC enable (pin 11)"              # 11
       - "Alternator +12V (pin 12)"        # 12
@@ -131,6 +131,10 @@ connectors:
   # GPO 3 (D4/pin 16): freed from VANOS → ETh Motor+ (07K)
   # GPO 4 (E4/pin 20): freed from ICV A → ETh Motor- (07K)
   # GPO 5 (A1/pin 1):  freed from ICV B → spare / future actuator
+  # GPO 2 (C4/pin 12): fan/pump NO LONGER physical relay wires — MaxxECU broadcasts
+  # GPO 6 (B1/pin 5):  fan/pump states over CAN1 → PMU16 maps to O3/O4 outputs.
+  #                    12-pin relay trigger pins 2/3/9 are also unconnected (N/C).
+  #                    PMU software: load MaxxECU.canx template to map CAN channels.
   ECU_CMC:
     type: "Molex CMC 48-pin (MaxxECU Race / V1 / PRO)"
     subtype: "Source: maxxecu.com/webhelp/wirings-maxxecu_pinout.html"
@@ -140,14 +144,14 @@ connectors:
       - "A2: IGN 1"                      # 2
       - "A3: IGN 2"                      # 3
       - "A4: GPO 8 / TACHO"             # 4
-      - "B1: GPO 6 (FAN)"               # 5
+      - "B1: GPO 6 (FAN — CAN cmd → PMU16 O3)"  # 5
       - "B2: IGN 3"                      # 6
       - "B3: IGN 4"                      # 7
       - "B4: GPO 1 (Boost)"             # 8
       - "C1: GPO 7 / DIN3 (Flex)"       # 9
       - "C2: IGN 5"                      # 10
       - "C3: IGN 6 (unused 07K)"        # 11
-      - "C4: GPO 2 (Fuel pump)"         # 12
+      - "C4: GPO 2 (Fuel pump — CAN cmd → PMU16 O4)"  # 12
       - "D1: WBO2 Heater-"              # 13
       - "D2: IGN 7 (unused)"            # 14
       - "D3: IGN 8 (unused)"            # 15

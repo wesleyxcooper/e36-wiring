@@ -339,17 +339,9 @@ connectors:
         PMU16 O6 drives condenser fan directly (separate channel).
 
   # ── AC system cross-reference ───────────────────────────────────────────────
-  AC_SWITCH_TAP:
-    type: "AC enable signal tap -- from ac-compressor.wv AC_SWITCH pin 2"
-    subtype: "Junction at AC switch output -- see ac-compressor.wv"
-    pincount: 1
-    pinlabels: ["AC switch output (+12V IGN when AC on)"]
-    notes: >-
-      With PMU16, this tap may no longer be needed for condenser fan control.
-      PMU16 O6 (condenser fan) can be activated by MaxxECU CAN AC-on signal
-      rather than a hardwired tap from the AC switch output.
-      Cross-reference ac-compressor.wv for AC switch wiring.
-      TODO: decide whether to keep hardwired tap or use CAN logic for condenser fan.
+  # AC_SWITCH_TAP removed: with PMU16, condenser fan (O6) is activated by
+  # MaxxECU CAN AC-on signal -- no hardwired tap from AC switch output needed.
+  # See harnesses/ac-compressor.wv for AC switch wiring and enable signal.
 
 
 # ── Cables ─────────────────────────────────────────────────────────────────────
@@ -409,9 +401,9 @@ cables:
 
   W_CAN2_PMU16:
     wirecount: 2
-    colors: [GY, PU]
+    colors: [GY, VT]
     wirelabels: ["CAN2.H → MaxxECU CAN1H", "CAN2.L → MaxxECU CAN1L"]
-    notes: "22 AWG shielded twisted pair. Grey = CAN H (pin 24), Purple = CAN L (pin 34). Drain at MaxxECU end only (chassis GND at ECU connector body). Do NOT untwist more than 5cm at each end. Route away from coil primaries and injector wires. 120 ohm terminators: enable PMU16 CAN2 software termination + verify MaxxECU CAN1 termination."
+    notes: "22 AWG shielded twisted pair. Grey = CAN H (pin 24), Violet = CAN L (pin 34). Drain at MaxxECU end only (chassis GND at ECU connector body). Do NOT untwist more than 5cm at each end. Route away from coil primaries and injector wires. 120 ohm terminators: enable PMU16 CAN2 software termination + verify MaxxECU CAN1 termination."
 
   # ── PMU16 output wires ───────────────────────────────────────────────────────
   W_PMU16_O1_ECU:
