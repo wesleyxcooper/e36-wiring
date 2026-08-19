@@ -31,6 +31,14 @@ metadata:
 
 # ── TODO list ──────────────────────────────────────────────────────────────────
 #
+#   [ ] Decide: run EPS column alongside existing HPS pump, or delete HPS pump separately.
+#       The EPowerSteering E30/E36 install PDF (epowersteering.com/pdf/BMWE30Kit.pdf) is
+#       completely silent on the hydraulic system -- the kit is column-assist only, with
+#       no mention of pump removal, rack bypass, or belt changes. Both configurations
+#       appear to be in scope: EPS+HPS pump coexisting, or EPS+pump-deleted manual rack.
+#       If deleting the pump, that is a SEPARATE step -- see K2 Industries E36 PS Delete
+#       Kit (k2-industries.com/products/e36-power-steering-delete-kit) which provides
+#       the bypass block + shorter serpentine belt for M52/M50/S50/S52.
 #   [ ] CRITICAL -- confirm Tilt vs Non-Tilt column option before ordering.
 #       This is a core-exchange product: EPowerSteering rebuilds whichever
 #       column you send them. Physically check the car for a tilt release

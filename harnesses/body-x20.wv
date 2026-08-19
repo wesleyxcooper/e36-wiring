@@ -41,48 +41,50 @@
 #       Action: cavity-plug X20 engine-side pin 13. MaxxECU GPO 2 triggers
 #       the Radium relay directly (not through X20). See fuel-pump-hanger.wv.
 #
-# TODO: VSS (vehicle speed signal) source with 8HP
-#       X20 pin 14 (SW/WS) carries VSS from the cluster to the body harness.
-#       With 8HP: MaxxECU gets speed from 8HP CAN natively.
-#       Determine if OEM VSS wire at X20 pin 14 is still used by any body systems
-#       (ABS, cruise control, odometer) or if it can be floated.
-#       If needed: MaxxECU can output a VSS-equivalent signal on a GPO.
+# DONE: VSS (vehicle speed signal) — X20 pin 14 resolved.
+#       X20 pin 14 (SW/WS) was the OEM cluster's VSS OUTPUT to body modules (cruise, OBC).
+#       With Gauge.S: Gauge.S does not output on X20 pin 14. That is fine:
+#         - Cruise control: not used on this build.
+#         - OBC/trip computer: replaced by Gauge.S display.
+#         - ABS: uses its own wheel sensors directly, not X20 pin 14.
+#       → X20 pin 14: FLOAT. No GPO needed.
+#       ⚠️ OPEN: Whether Gauge.S accumulates odometer from MaxxECU CAN speed data is
+#       unconfirmed from Gauge.S wiki. Confirm with Maciej / Gauge.S Discord before
+#       Phase 1 commissioning. MaxxECU broadcasts vehicle speed on Default 1.3 CAN.
+#       If ODO not supported by Gauge.S natively, fallback: MaxxECU VSS GPO output
+#       → X20 pin 14 → body harness passthrough (no cluster to consume it though —
+#       only useful if a separate ODO counter device is added). Best path: confirm first.
 #
-# TODO: Oil pressure input — confirm PST-F1 vs OEM switch path
-#       X20 pin 23 (BR/GN) = OEM oil pressure switch (simple on/off, ~0.5 bar).
-#       With PST-F1: MaxxECU reads actual pressure analog (AIN 3) and can drive
-#       an output to simulate the oil pressure switch signal to the cluster if needed.
-#       Gauge.S cluster reads oil pressure via CAN from MaxxECU — X20 pin 23 not
-#       required for Gauge.S. Confirm whether any other body system uses this signal.
+# DONE: Oil pressure input — resolved.
+#       Gauge.S reads oil pressure via MaxxECU CAN (PST-F1 → MaxxECU AIN 3 → CAN out).
+#       X20 pin 23 (BR/GN) = OEM oil pressure switch: FLOAT. No other body system
+#       on this build depends on pin 23. Leave OEM switch in place; it will never
+#       trigger (PST-F1 replaces it as the primary pressure source).
 #
-# TODO: CLT signal at X20 pins 11/12
-#       OEM: separate CLT sender for cluster (2-wire) vs CLT sensor for DME.
-#       With MaxxECU: MaxxECU reads CLT via its own sensor.
-#       Gauge.S cluster reads CLT via CAN — no separate CLT sender to cluster needed.
-#       Pins 11/12 (BR/GE, BR/VI) can likely be left disconnected.
-#       Verify no other body system depends on these pins.
+# DONE: CLT signal at X20 pins 11/12 — resolved.
+#       Gauge.S reads CLT via MaxxECU CAN. X20 pins 11/12: FLOAT.
+#       No other body system on this build depends on CLT via X20.
 #
 # TODO: Gauge.S CAN routing path
 #       Two CAN wires must reach the cluster location from MaxxECU.
 #       Options:
 #         A) Run independent 2-wire CAN cable through firewall alongside X20 grommet
-#         B) Route through the planned Deutsch AS47 bulkhead connector (preferred)
+#         B) Route through the Deutsch AS79 bulkhead (preferred — see firewall-bulkhead.wv)
 #       Document the actual routing once Phase 1 chassis prep is complete.
-#       See body-bulkhead.wv (TBD) for Deutsch AS connector pinout.
 #
-# TODO: Check Engine light output
-#       X20 pin 8 (GR) = Check Engine / SI indicator.
-#       MaxxECU can drive this via a GPO (active-low or active-high — confirm logic).
-#       Gauge.S cluster may handle MIL indicator via CAN instead.
-#       Confirm which path is used; document GPO assignment if direct wire used.
+# DONE: Check Engine light — resolved.
+#       Gauge.S handles CEL indicator via MaxxECU Default 1.3 CAN (MaxxECU broadcasts
+#       active fault state; Gauge.S displays it on-screen).
+#       X20 pin 8 (GR): FLOAT. No dedicated GPO needed at any phase.
+#       No wire to X20 pin 8. The MAXXECU_CHECK_ENGINE connector below is retained
+#       as a stub in case a direct wire is ever needed, but is not currently wired.
 #
-# TODO: Tachometer signal continuity check
-#       X20 pin 20 (SW) = RPM signal from DME to cluster.
-#       MaxxECU GPO 8 / TACHO outputs tach signal :: drives X20 pin 20.
-#       Gauge.S cluster uses CAN for RPM (not this wire) but other body systems
-#       (e.g., OBC, trip computer) may still depend on X20 pin 20.
-#       Confirm whether X20 pin 20 is still needed with Gauge.S installed.
-#       If yes: keep GPO 8 :: X20 pin 20 wired. If no: can omit.
+# DONE: Tachometer — resolved.
+#       Gauge.S reads RPM via MaxxECU CAN — does NOT require X20 pin 20.
+#       However: GPO 8 / TACHO → X20 pin 20 is retained in case any OTHER body
+#       system (OBC, trip computer) still uses the RPM signal. On this build with
+#       Gauge.S replacing the OBC, X20 pin 20 can be floated. Keep the GPO 8 TACHO
+#       wire stubbed to X20 pin 20 for now — cost is one wire, harm is zero.
 # ─────────────────────────────────────────────────────────────────────────────
 
 connectors:
