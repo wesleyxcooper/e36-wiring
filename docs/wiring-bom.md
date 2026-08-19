@@ -28,8 +28,8 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 | 1 | **Amphenol Radlok 8mm — M8×1.25 Female** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-female/), ~$22 CAD — threads onto M8 B+ stud of 07K alternator (`07K 903 023 A`). Tool-free disconnect at alternator removal. |
 | 1 | **Ecumaster PMU16** ([ecumasterusa.com](https://ecumasterusa.com/products/ecumaster-pmu16-power-management-unit) ~$500) | 16-output MOSFET PDM. Replaces relay board + fuse block + Crydom SSR. Outputs: O1 ECU logic · O2 coil/inj · O3 fan (PWM) · O4 pump (PWM) · O5+O14 EWP parallel (50A combined) · O6 condenser fan · O7 AC relay coil · O8 EPS Controller (Phase 3). Connector: 39-way Sicma/FCI. Power via M6 BATT+ stud. Manual: [ecumaster.com/files/PMU/PMU_Manual.pdf](https://www.ecumaster.com/files/PMU/PMU_Manual.pdf) · Pinout: [PMU-16_Pinout_v1.2.pdf](https://www.ecumaster.com/files/PMU/PMU-16_Pinout_v1.2.pdf) |
 | 1 | **Ecumaster USB-CAN adapter** ([ecumasterusa.com](https://ecumasterusa.com) ~$85) | Required for initial PMU16 programming. One-time setup tool. |
-| 1 | Inline ANL or MAXI fuse holder | ⚠️ TODO: size — est. 80–100A (sum PMU16 channel loads + 20% headroom) |
-| 1 | IGN switched 12V source connector | ⚠️ TODO: confirm X20 pin — feeds PMU16 +12V SW (on/off sense) |
+| 1 | Inline ANL or MAXI fuse holder, **150A** | Channel peaks: ECU 8A + coil/inj 20A + fan 15A + pump 14A + EWP 35.5A + condenser 12A + AC coil 0.2A = 104.8A worst-case all-on. ×1.2 headroom = 125.8A → **150A** (matches PMU16 M6 stud 150A continuous rating). Blue Sea 5191 MRBF 150A or equiv. |
+| 1 | IGN switched 12V source — **X20 pin 21** (GN, green wire) | Confirmed: X20 pin 21 = ignition switch terminal 15 = IGN-switched +12V. Green wire. Feeds PMU16 39-pin pin 7 (+12V SW on/off sense). Fuse at X20 source: 5A. Source: E36 ETM / r3vlimited / megasquirt.325ix.com X20 pinout. |
 | 1 | Radiator fan motor connector, 2-pin | ⚠️ TODO: SPAL fan model — source correct connector end |
 
 ### Cables
