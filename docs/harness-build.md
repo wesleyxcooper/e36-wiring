@@ -44,7 +44,7 @@ hard-to-trace shorts and intermittent sensor faults.
 | Open-barrel crimper | IWISS IWS-2820M | Ring terminals, relay contacts, general non-insulated open-barrel splices. Use non-insulated + adhesive-lined heat shrink — never pre-insulated crimps. |
 | Ferrule crimper | IWISS IWS-10 | Screw-clamp terminals (ECU power/GND strands) |
 | Flush cutters | Milwaukee 48-22-6106 or equiv | In-car wire trimming, flush cuts near connector bodies. Buy before starting any connector work. Source: StreetCarJoe Race Car Wiring Pt.1. |
-| Rivnut tool | Astro Pneumatic 1442 or equiv manual tool | M4/M6 rivnuts for relay board and ECU bracket mounting to thin sheetmetal / carbon panels (no backside access needed). Source: StreetCarJoe Race Car Wiring Pt.3. |
+| Rivnut tool | Astro Pneumatic 1442 or equiv manual tool | M4/M6 rivnuts for PMU16 bracket and ECU bracket mounting to thin sheetmetal / carbon panels (no backside access needed). Source: StreetCarJoe Race Car Wiring Pt.3. |
 | **Depin — Molex small terminals** | 638132400 | C1/C2 small-pin extraction |
 | **Depin — Molex big terminals** | 638132300 | C1/C2 large-pin extraction |
 | **Depin — VW/Bosch PTS connectors** | Lisle 57750 | All VAG push-to-seat pigtails (sensor, COP, injector) |
@@ -141,7 +141,7 @@ Per the MaxxECU GEN2 RACE quick-start guide:
 > **ECU engine ground must connect to the cylinder head.**"
 
 In practice for this build:
-1. **Battery negative → chassis stud** (engine bay M8 stud): relay board, body electrics,
+1. **Battery negative → chassis stud** (engine bay M8 stud): PMU16 GND, body electrics,
    fan/pump motor returns. Keep the factory cable or run a new 4 AWG if needed.
 2. **Engine block → chassis bonding strap**: keep the M52 factory strap. This is the
    starter and alternator current return path. Verify it is clean — no paint under the lug,

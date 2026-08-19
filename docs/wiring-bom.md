@@ -128,28 +128,22 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 
 *Source: `fuel-pump-hanger.wv`*
 
-> Replaces the M52 in-tank Walbro 255 + relay from Phase 1 with the Radium 20-1170 hanger + F90000267 + DC SSR + MaxxECU PWM control. No re-work at Phase 3 07K swap.
+> Replaces the M52 in-tank Walbro 255 + relay from Phase 1 with the Radium 20-1170 hanger + F90000267 driven by PMU16 O4 direct (PWM). No DC SSR — PMU16 O4 (25A, PWM-capable) sources current from its BATT+ stud and runs 12 AWG through the tunnel to the hanger. MaxxECU commands speed via CAN to PMU16. No re-work at Phase 3 07K swap.
 
 ### Connectors
 
 | Qty | Item | Notes |
 |-----|------|-------|
-| 1 | **DC Solid State Relay (DC-DC, 40A)** | Crydom D1D40 preferred (40A, 0–60V load, 3–32V ctrl, opto-isolated, rated to 1 kHz). Generic 40A DC-DC SSR acceptable. Requires heatsink at sustained duty. |
+| 1 | PMU16 O4 output stub (engine bay) | 🔁 Shared with power-distribution.wv — RADIUM_HANGER_STUB. PMU16 O4 (PHYS pin 13, 25A PWM). |
 | 1 | Radium Engineering 20-1170 hanger terminals | Top-plate external studs (pump+ and pump−) — anti-rotation, hermetically sealed. Comes with hanger kit, not sourced separately. |
-| 1 | Battery positive terminal | 🔁 Shared with power distribution |
 | 1 | Chassis ground stud | 🔁 Shared with power distribution |
-| 1 | IGN switched 12V source | 🔁 Shared with power distribution |
-| 1 | MaxxECU RACE GPO (GND-sinking) | 🔁 Shared — GPO pin TBD, same physical CMC connector |
 
 ### Cables
 
 | Run | Color | Gauge | Length | Shielded | Notes |
 |-----|-------|-------|--------|----------|-------|
-| CABLE_PWR_BATT (BATT+ → SSR load+) | RD | 12 AWG | 0.5 m | No | Inline 25A AGC fuse within 30 cm of battery. Ring terminal at battery, blade/ring at SSR. |
-| CABLE_PWR_PUMP (SSR load− → hanger pump+) | RD | 12 AWG | 1.5 m | No | Switched +12V to pump stud. Route through tunnel, clear of exhaust. |
+| CABLE_PWR (PMU16 O4 → hanger pump+) | RD | 12 AWG | 4.0 m | No | Full run engine bay → fuel tank (est. 3.5–4m; measure on car). Route through transmission tunnel. No separate fuse — PMU16 O4 overcurrent protection handles this. |
 | CABLE_GND (hanger pump− → chassis GND) | BK | 12 AWG | 0.5 m | No | Dedicated ground — do not share with ECU sensor GND. Ring terminals both ends. |
-| CABLE_SSR_CTRL_POS (IGN 12V → SSR ctrl+) | GN | 22 AWG | 0.3 m | No | Low current (~15 mA opto draw). Short run fuse block → SSR. |
-| CABLE_SSR_CTRL_NEG (MaxxECU GPO → SSR ctrl−) | VT | 22 AWG | 2.0 m | Preferred | PWM signal (GND-sink, 100–500 Hz). Drain at ECU end only. Keep away from coil primary wires. |
 
 ---
 
@@ -341,8 +335,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | All `maxxecu-m52.wv` cable gauges | WV stubs — need actual wire spec |
 | MaxxECU C1/C2 Molex pin assignment | C1 (48-pin) + C2 (32-pin) confirmed as Molex harness connectors; specific pin assignments in `maxxecu-m52.wv` still stubs — confirm from [MaxxECU RACE pinout doc](https://www.maxxecu.com/webhelp/wirings-maxxecu_pinout.html) before building |
 | GPO pin assignments (fan, pump, EWP, fuel pump PWM) | MaxxECU pin map not yet finalized |
-| Main fuse size | Depends on total current calc — likely 60–80A ANL |
-| Mini blade fuse block model | 8-position, source specific unit |
+| ~~Main fuse size~~ | ✅ **150A ANL** — confirmed from channel peak sum (104.8A × 1.2 headroom = 125.8A → 150A to match PMU16 M6 stud 150A rating). Blue Sea 5191 MRBF 150A or equiv. |
 | SPAL 30102049 connector pigtail | 2-pin pigtail for chosen mounting method — confirm on delivery |
 | Body-x20 wire colors and gauge | Colors visible in SVG diagram — gauge TBD |
 | ~~Firewall bulkhead full pinout~~ | ✅ Done — `harnesses/firewall-bulkhead.wv` authored, outputs generated |
@@ -361,14 +354,10 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 | Gauge | Color | Total Length (specified) | With 20% slack | Systems |
 |-------|-------|--------------------------|----------------|---------|
-| 10 AWG | RD (red) | 2.0 m | 2.5 m | EWP (power in + power out) |
+| 8 AWG | RD (red) | 1.0 m × 2 runs | 1.2 m each | EWP O5 power + EWP O14 power (parallel, joined at CWA400 pin 3) |
 | 10 AWG | BK (black) | 1.5 m | 2.0 m | EWP (ground) |
-| 12 AWG | RD (red) | 2.0 m | 2.5 m | Fuel pump (BATT→SSR + SSR→pump) |
+| 12 AWG | RD (red) | 4.0 m | 5.0 m | Fuel pump (PMU16 O4 → Radium hanger pump+ stud, full tunnel run) |
 | 12 AWG | BK (black) | 0.5 m | 0.7 m | Fuel pump (ground) |
-| 18 AWG | GN (green) | 0.5 m | 0.7 m | EWP relay coil supply |
-| 18 AWG | BK (black) | 0.5 m | 0.7 m | EWP relay coil return |
-| 22 AWG | VT (violet) | 4.0 m | 5.0 m | Fuel pump PWM ctrl (2.0 m) + EWP PWM (2.0 m) |
-| 22 AWG | GN (green) | 0.3 m | 0.4 m | Fuel pump SSR ctrl+ |
 | 22 AWG | YE/GN (CAN) | 2.5 m | 3.0 m | Body/Gauge.S CAN twisted pair — shielded |
 | 24 AWG | BK (black) | 2.4 m (×2 conductors) | 3.0 m | E-pedal GND1 + GND2 both runs |
 | 24 AWG | RD (red) | 2.4 m (×2 conductors) | 3.0 m | E-pedal VCC1 + VCC2 both runs |
@@ -411,17 +400,11 @@ Only items not already included with their respective purchased components (e.g.
 | Qty | Item | PN / Source | System |
 |-----|------|-------------|--------|
 | 1 | BMW E46 Accelerator Pedal Module `35426786282` | eBay used ~$80–120 — see `docs/dbw-pinouts.md` sourcing table | E-pedal |
-| 1 | DC Solid State Relay, 40A DC-DC, opto-isolated | Crydom D1D40 (preferred) or generic 40A DC-DC SSR | Fuel pump |
-| 1 | 40A automotive relay, 4-pin | Bosch `0 332 002 150` or equiv | EWP |
-| 4 | Bosch ISO mini relay, 12V / 30A, 4-pin | Bosch `0 332 002 150` or equiv | Power dist |
 | 1 | Pierburg CWA400 PWM version connector | Kostal 2+2 `10098866` — SLK 2.8 ELA terminals `22124499560` (pins 1–2), SLK 5.8 ELA `22124544900` (pins 3–4) | EWP |
-| 1 | Inline 25A AGC fuse + holder | Standard AGC glass fuse holder | Fuel pump |
-| 1 | Inline 40A fuse + holder | ANL or MAXI blade fuse holder | EWP |
-| 1 | Main ANL/MAXI fuse + holder | 60–80A ⚠️ size TBD | Power dist |
+| 1 | **Main ANL fuse + holder, 150A** | Blue Sea 5191 MRBF 150A or equiv ANL fuse holder. Confirmed: channel peak sum 104.8A × 1.2 = 125.8A → 150A matches PMU16 M6 stud 150A continuous rating. | Power dist |
 | 1 | **4-post battery cutoff switch — Moroso 74108** (or Longacre equiv) | **Optional** — not required on a dual-duty street/drift car with a working ignition key. Install only if your HPDE org or track rules require it. If installed: must be 4-post (NOT 2-post) — a 2-post switch will not shut off the engine on an alternator-equipped car. ~$60–80 at Summit Racing / Jegs. | Power dist |
 | 1 | Engine block ground stud (M8 bolt + lug) | Dedicated M8 bolt or welded stud on engine block for direct 4 AWG battery-negative ground cable. Separate from chassis stud. | Power dist |
-| 1 | Mini blade fuse block, 8-position | ⚠️ TODO: source specific unit | Power dist |
-| 4 | Bosch ISO mini relay socket / base | Matches relay above | Power dist |
+
 | 1 | BMW E36 X20 25-pin connector (cabin) | OEM or aftermarket — source from E36 donor or Molex catalog | Body |
 | 1 | BMW E36 X20 25-pin connector (engine side) | OEM | Body |
 | 1 | Gauge.S E36 PNP cluster connector, 6-pin | Ships with Gauge.S unit | Body |
@@ -450,7 +433,7 @@ One-time tooling purchase — covers all connector families in this build. See [
 | Ferrule crimper | **IWISS IWS-10** | ~$25 | Stranded wire ends into screw-clamp terminals (ECU power/ground, DIN rail fuse block). Covers 0.5–10mm² ferrules. |
 | Deutsch contact extraction | **Deutsch 1680-73-01** | ~$15 | AS bulkhead size 20 contact removal — push in, releases retention lock cleanly. Do not use a screwdriver. |
 | VW/Bosch connector de-pinning picks | **Lisle 57750** | ~$20 | Sensor pigtails (3B0973703G, 1J0973702, 1J0973712), COP connectors — push-to-release housings. |
-| Rivnut tool + rivnut assortment | **Astro Pneumatic 1442** ([Amazon](https://www.amazon.com/Astro-Pneumatic-Tool-1442-Setter/dp/B003TODXQW) ~$71) + M4/M6 zinc rivnut kit | ~$75–90 | Installs threaded inserts into thin sheetmetal or carbon panels without backside access. Required for relay board and ECU bracket mounting. Source: StreetCarJoe Race Car Wiring Pt.3. |
+| Rivnut tool + rivnut assortment | **Astro Pneumatic 1442** ([Amazon](https://www.amazon.com/Astro-Pneumatic-Tool-1442-Setter/dp/B003TODXQW) ~$71) + M4/M6 zinc rivnut kit | ~$75–90 | Installs threaded inserts into thin sheetmetal or carbon panels without backside access. Required for PMU16 bracket and ECU bracket mounting. Source: StreetCarJoe Race Car Wiring Pt.3. |
 | **Molex CMC crimp — small** | **63811-9200** | ~$200–250 | MaxxECU C1/C2 small terminals (643221029, 0.75mm²/~20 AWG) — 40 of 48 C1 pins and 24 of 32 C2 pins are this size. **Primary tool for ECU connector wiring.** Source: Digikey, Mouser. |
 | **Molex CMC crimp — big (0.5–1mm²)** | **63811-8900** | ~$200–250 | MaxxECU C1/C2 big terminals (643231029) — 7 on C1, 8 on C2. Used for heavier signal and power wires (18–20 AWG). Source: Digikey, Mouser. |
 | **Molex CMC crimp — big (1–2mm²)** | **63811-9000** | ~$200–250 | MaxxECU C1 big terminals (643231039) — 1 pin on C1 only (engine GND/ECU power, 14–16 AWG). Optional if routing large wires through C1. Source: Digikey, Mouser. |
@@ -463,10 +446,10 @@ One-time tooling purchase — covers all connector families in this build. See [
 | 1 bag | **One-to-many (1→4) non-insulated crimp junctions** | Branches one input wire to 4 outputs. Use for 5V SENS OUT distribution from MaxxECU to multiple sensors (TPS, MAP, APS, etc.) from a single ECU pin. Keeps star topology. Source: StreetCarJoe Race Car Wiring Pt.1. |
 | 1 roll | Adhesive-lined heat shrink 3:1 — assorted (1/4", 3/8", 1/2") | Required over every non-insulated crimp. Adhesive liner is essential — non-adhesive slides and leaves the crimp exposed. |
 | 1 roll | **Tesa 51608 Fleece Harness Tape** (or 3M 1300E equiv) | Cloth harness tape for binding loom and holding sleeving ends closed. Use at all breakout points and sleeve terminations. More durable than PVC electrical tape. Source: StreetCarJoe Race Car Wiring Pt.2. |
-| 1 bag | Adhesive-backed zip tie anchor mounts (cable saddle clips) | Stick to panel backs for routing harness without drilling. Key for relay board rear face, dash inner panel, anywhere drilling is impractical. Source: StreetCarJoe Race Car Wiring Pt.3. |
+| 1 bag | Adhesive-backed zip tie anchor mounts (cable saddle clips) | Stick to panel backs for routing harness without drilling. Key for PMU16 mounting surface, dash inner panel, anywhere drilling is impractical. Source: StreetCarJoe Race Car Wiring Pt.3. |
 | 1 roll | Alex Tech / Techflex split loom — 1/4" + 3/8" + 1/2" assorted | Split loom for cabin and engine bay runs. Tesa tape on both ends holds sleeve closed. |
 | 1 set | P-clamps — 1/4", 3/8", 1/2", 5/8" | Secure main power cables every 12 inches minimum. |
-| 1 bag | M4 / M6 rivnuts (steel or zinc) — assorted | Used with rivnut tool for relay board and ECU bracket mounting. |
+| 1 bag | M4 / M6 rivnuts (steel or zinc) — assorted | Used with rivnut tool for PMU16 bracket and ECU bracket mounting. |
 
 > **Total non-Molex tools: ~$186** (flush cutters $20 + wire stripper $30 + IWS-2820M $20 + IWS-2412M $20 + Lisle $20 + rivnut tool ~$71 + Deutsch extraction $15 + ferrule crimper $25). Add ~$350–465 for the Deutsch HDT-48-00 solid barrel crimper (or ~$169 for JRready NEW-DT2 equivalent). Total with solid barrel crimper: **~$355–651** one-time purchase.
 >
