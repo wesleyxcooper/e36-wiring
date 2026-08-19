@@ -13,22 +13,23 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 
 *Source: `power-distribution.wv`*
 
+> **Architecture:** Ecumaster PMU16 replaces relay board, blade fuse block, and Crydom D1D40 SSR. MaxxECU controls PMU16 via CAN. Load `MaxxECU.canx` template in PMU software before first run.
+
 ### Connectors
 
 | Qty | Item | Notes |
 |-----|------|-------|
 | 1 | Battery positive terminal | Ring terminal, trunk/engine bay |
 | 1 | Battery negative terminal | Ring terminal — chassis stud. Engine block direct cable is **optional** (see below) |
-| 1 | Chassis ground stud, M8 | Engine bay — body/relay returns. MaxxECU engine GND goes to cylinder head (in ECU harness, not here) |
+| 1 | Chassis ground stud, M8 | Engine bay — PMU16 GND lug + body electrical returns. MaxxECU engine GND goes to cylinder head (in ECU harness, not here) |
 | 1 (optional) | Engine block ground stud, M8 | **Optional** — only if running a dedicated battery→engine block direct cable (belt-and-suspenders; not required while factory M52 bonding straps are intact and clean) |
-| 1 (optional) | **4-post battery cutoff switch — Moroso 74108** ([Amazon](https://www.amazon.com/Moroso-74108-Battery-Alternator-Disconnect/dp/B01GWD2XUS) ~$101 / [moroso.com](https://www.moroso.com/battery-and-alternator-disconnect-switch74108/) $113) | **Optional** — not required on a dual-duty street/drift car with a working ignition key. Install only if HPDE org or track rules require it. If installed: must be 4-post (NOT 2-post) — 2-post will not shut off engine on alternator-equipped car. |
-| 2–3 | **Amphenol Radlok 8mm — M8×1.25 Male** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-male/), ~$15 CAD ea — thread into cylinder head and engine block GND strap bosses. Replaces ring terminal + bolt — tool-free press-lock disconnect. Speeds up M52→07K swap. Secure cable within 3 cm; inspect annually. |
-| 1 | **Amphenol Radlok 8mm — M8×1.25 Female** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-female/), ~$22 CAD — threads onto M8 B+ stud of 07K alternator (`07K 903 023 A`). Cable-end Radlok socket on charge wire → tool-free disconnect at alternator removal. |
-| 4 | Bosch ISO mini relay, 12V coil / 30A contacts | `0 332 002 150` or equiv — ECU main, coil/inj, fan, fuel pump |
-| 1 | Mini blade fuse block, 8-position | ⚠️ TODO: source specific block |
-| 1 | Inline ANL or MAXI fuse holder | ⚠️ TODO: size — likely 60–80A main fuse |
-| 1 | IGN switched 12V source connector | ⚠️ TODO: confirm X20 pin |
-| 1 | Fuel pump motor connector, 2-pin | ⚠️ TODO: confirm connector type (Walbro replaced by Radium hanger in Phase 1 — see System 4) |
+| 1 (optional) | **4-post battery cutoff switch — Moroso 74108** ([Amazon](https://www.amazon.com/Moroso-74108-Battery-Alternator-Disconnect/dp/B01GWD2XUS) ~$101 / [moroso.com](https://www.moroso.com/battery-and-alternator-disconnect-switch74108/) $113) | **Optional** — not required on a dual-duty street/drift car with a working ignition key. Install only if HPDE org or track rules require it. If installed: must be 4-post (NOT 2-post). |
+| 2–3 | **Amphenol Radlok 8mm — M8×1.25 Male** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-male/), ~$15 CAD ea — thread into cylinder head and engine block GND strap bosses. Tool-free press-lock disconnect. Speeds up M52→07K swap. Secure cable within 3 cm; inspect annually. |
+| 1 | **Amphenol Radlok 8mm — M8×1.25 Female** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-female/), ~$22 CAD — threads onto M8 B+ stud of 07K alternator (`07K 903 023 A`). Tool-free disconnect at alternator removal. |
+| 1 | **Ecumaster PMU16** ([ecumasterusa.com](https://ecumasterusa.com/products/ecumaster-pmu16-power-management-unit) ~$500) | 16-output MOSFET PDM. Replaces relay board + fuse block + Crydom SSR. Outputs: O1 ECU logic · O2 coil/inj · O3 fan (PWM) · O4 pump (PWM) · O5 EWP · O6 condenser fan · O7 AC relay coil. Connector: 39-way Sicma/FCI. Power via M6 BATT+ stud. Manual: [ecumaster.com/files/PMU/PMU_Manual.pdf](https://www.ecumaster.com/files/PMU/PMU_Manual.pdf) · Pinout: [PMU-16_Pinout_v1.2.pdf](https://www.ecumaster.com/files/PMU/PMU-16_Pinout_v1.2.pdf) |
+| 1 | **Ecumaster USB-CAN adapter** ([ecumasterusa.com](https://ecumasterusa.com) ~$85) | Required for initial PMU16 programming. One-time setup tool. |
+| 1 | Inline ANL or MAXI fuse holder | ⚠️ TODO: size — est. 80–100A (sum PMU16 channel loads + 20% headroom) |
+| 1 | IGN switched 12V source connector | ⚠️ TODO: confirm X20 pin — feeds PMU16 +12V SW (on/off sense) |
 | 1 | Radiator fan motor connector, 2-pin | ⚠️ TODO: SPAL fan model — source correct connector end |
 
 ### Cables
@@ -37,16 +38,21 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 
 | Run | Color | Gauge | Est. Length | Notes |
 |-----|-------|-------|-------------|-------|
-| BATT_POS → ANL fuse | RD | 4 AWG welding cable | TBD | Battery + → main ANL fuse (within 18 in of battery) → fuse block |
-| **(optional) BATT_POS → cutoff switch → ANL fuse** | RD | 4 AWG welding cable | TBD | If cutoff switch installed: BATT_POS → CUTOFF_4POST → ANL fuse → fuse block |
-| ANL fuse → fuse block | RD | 8 AWG | TBD | Fused batt+ to relay board fuse block |
-| BATT_NEG → chassis stud | BK | 4 AWG welding cable | TBD | Battery − → chassis ground stud M8 — relay board / body returns |
-| **(optional) BATT_NEG → engine block (direct)** | BK | 4 AWG welding cable | TBD | Optional dedicated battery negative → engine block cable. Not required while factory M52 engine→chassis bonding strap is intact and clean. |
-| Relay coil feeds × 4 | GN | 18 AWG | TBD | IGN switched +12V → relay pin 86 |
-| ECU / coil / inj relay outputs | RD | 12–14 AWG | TBD | Relay pin 87 → downstream loads |
-| Fan load feed | RD | 12 AWG | TBD | Relay 87 → SPAL fan |
-| Pump load feed | RD | 12 AWG | TBD | Relay 87 → fuel pump (Phase 1 Walbro; replaced by Radium hanger in Phase 1B) |
-| GPO trigger wires (GPO 2, GPO 6) | VT | 22 AWG | TBD | MaxxECU GND-sink → relay pin 85 |
+| BATT_POS → ANL fuse | RD | 4 AWG welding cable | TBD | Battery + → main ANL fuse (within 18 in of battery) → PMU16 M6 stud |
+| **(optional) BATT_POS → cutoff switch → ANL fuse** | RD | 4 AWG welding cable | TBD | If cutoff switch installed: BATT_POS → CUTOFF_4POST → ANL fuse → PMU16 M6 stud |
+| ANL fuse → PMU16 M6 stud | RD | 4 AWG welding cable | TBD | Fused batt+ directly to PMU16 power stud (replaces fuse block feed) |
+| PMU16 GND lug → chassis stud | BK | 4–8 AWG | TBD | PMU16 body GND lug → chassis ground stud M8. Keep short. All PMU output return currents flow here. |
+| BATT_NEG → chassis stud | BK | 4 AWG welding cable | TBD | Battery − → chassis ground stud M8 — body electrical returns |
+| **(optional) BATT_NEG → engine block (direct)** | BK | 4 AWG welding cable | TBD | Optional dedicated battery negative → engine block cable. Not required while factory M52 bonding strap is clean. |
+| IGN +12V → PMU16 pin 7 (+12V SW) | RD | 18 AWG | TBD | IGN-switched +12V → PMU16 on/off sense. Fuse at source: 5A. |
+| PMU16 CAN2 H/L → MaxxECU CAN1 H/L | GY/PU | 22 AWG shielded twisted pair | TBD | PMU16 pins 24/34 → MaxxECU CAN1H/CAN1L. Drain at MaxxECU end only. Route away from coil/injector wires. |
+| PMU16 O1 → ECU logic +12V | RD | 16 AWG | TBD | O1 (pin 38, 25A) → MaxxECU 12-pin pin 7 |
+| PMU16 O2 → coil+inj +12V | RD | 12 AWG | TBD | O2 (pin 39, 25A) → MaxxECU 12-pin pin 1 |
+| PMU16 O3 → SPAL fan | RD | 12 AWG | TBD | O3 (pin 26, 25A PWM) → fan motor + terminal |
+| PMU16 O4 → fuel pump (PWM) | RD | 12 AWG | TBD | O4 (pin 13, 25A PWM) → Radium hanger pump+ stud. Replaces Crydom SSR. |
+| PMU16 O5 → EWP supply | RD | 10 AWG | TBD | O5 (pin 12, 25A) → CWA400 pin 3. ⚠️ CWA400 draws 35.5A — may need to parallel O5+O14. See power-distribution.wv TODO. |
+| PMU16 O6 → condenser fan | RD | 12 AWG | TBD | O6 (pin 11, 15A) → condenser fan motor + terminal |
+| PMU16 O7 → AC relay coil | RD | 18 AWG | TBD | O7 (pin 10, 15A) → ac-compressor.wv AC_RELAY coil pin 86. Low current (~200mA). |
 
 ---
 

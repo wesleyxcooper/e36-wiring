@@ -1,28 +1,37 @@
 metadata:
   project: E36 Restomod -- Power Distribution
   description: >-
-    Relay board and fuse block wiring for MaxxECU Race installation.
-    Phase 1 (M52 engine). All values are stubs -- confirm fuse sizes,
-    wire gauges, relay part numbers, and physical layout before building.
-    Cross-reference harnesses/maxxecu-m52.wv for ECU pin assignments.
+    Ecumaster PMU16 power management unit replaces relay board, fuse block,
+    and DC SSR from earlier design. PMU16 provides 16 programmable MOSFET
+    high-side outputs with per-channel digital fusing, current monitoring,
+    PWM capability, and CAN control from MaxxECU RACE.
+    Phase 1 (M52 engine). All wire lengths are stubs -- confirm before building.
+    Cross-reference harnesses/maxxecu-m52.wv for ECU CAN pin assignments.
 
 # ── TODO list ──────────────────────────────────────────────────────────────────
 #
-#   RELAY BOARD:
-#   [ ] Confirm relay board physical location (firewall? fender well?)
-#   [ ] Confirm whether to use a pre-made relay/fuse block combo (e.g.
-#       Mictuning, Bussmann, or custom) or individual relays on a DIN rail
-#   [ ] Size wire gauges for each run -- use a wire gauge calculator:
-#       12 AWG :: up to 20A for engine bay runs (3-5ft)
-#       10 AWG :: up to 30A
-#        8 AWG :: up to 40A (fan, fuel pump on long runs)
-#        4 AWG :: main battery cable to fuse block
-#   [ ] Confirm fuse sizes after confirming all load current draws
+#   PMU16 SETUP:
+#   [ ] Load MaxxECU.canx template in PMU software (Ecumaster USB-CAN required)
+#   [ ] Configure MaxxECU MTune: Configuration -> CAN settings -> Data transmission -> Enable
+#   [ ] Set MaxxECU CAN1 speed to match PMU16 CAN2 speed (1Mbit or 500kbps)
+#   [ ] Enable CAN2 software termination on PMU16 (120 ohm -- in PMU config)
+#   [ ] Verify MaxxECU CAN1 has its own 120 ohm termination at ECU end
+#   [ ] Confirm output channel assignments in PMU software before first run
+#   [ ] Program post-shutdown EWP logic: keep O5 active after key-off until
+#       CLT CAN value from MaxxECU drops below 70 deg C OR 3-min fallback timer
+#
+#   EWP CURRENT NOTE:
+#   [ ] !! Pierburg CWA400 draws up to 35.5A nominal. Single PMU16 output is 25A max.
+#       Options: (a) parallel O5 + O14 for EWP (50A combined -- PMU software supports this)
+#       OR (b) keep a dedicated 40A relay with PMU16 O5 as coil driver (O5 carries
+#       only the relay coil current ~200mA, relay contacts carry 35.5A pump load).
+#       Confirm with ewp-controller.wv actual steady-state draw before choosing.
+#       If paralleling outputs: update connections section to add second output wire.
 #
 #   BATTERY / CUTOFF SWITCH:
 #   [ ] Confirm battery location (stock E36 = driver footwell OR engine bay)
 #   [ ] If trunk or footwell: run 4 AWG battery cable + separate ground
-#   [ ] Add fusible link or ANL fuse within 18 inches of battery positive
+#   [ ] Add ANL or MAXI fuse within 18 inches of battery positive
 #   [ ] **CUTOFF SWITCH MUST BE 4-POST (e.g. Moroso 74108)** -- NOT a 2-post switch.
 #       A standard 2-post switch only disconnects the battery; with an alternator present
 #       the car will not actually shut off because the alternator keeps producing current.
@@ -46,28 +55,20 @@ metadata:
 #   [ ] E36 has known ground issues -- run all new straps, do not rely on OEM
 #
 #   ECU AND COIL POWER/GROUND -- MUST GO DIRECTLY TO BATTERY TERMINALS:
-#   [ ] MaxxECU main power (relay output) and ECU GND must connect to battery
-#       terminals (or ANL fuse stud close to battery), NOT to a distribution block
-#       or chassis star point. Using a shared distro block causes ground offsets
-#       that manifest as sensor drift and ignition noise.
+#   [ ] MaxxECU main power (PMU16 O1 output) and ECU GND must ultimately reference battery
+#       terminals, NOT a chassis star point. PMU16 M6 stud connects to ANL fuse, which
+#       connects directly to battery (or 4-post cutoff switch output).
+#   [ ] Coil pack GND: run secondary GND from coil packs to cylinder head -- not chassis.
 #       Source: StreetCarJoe Race Car Wiring Series Pt.2 (youtube.com/watch?v=PNyScqftGQw)
-#   [ ] Coil pack power and GND: same rule -- run directly to battery. Do not share
-#       with body electrical distribution. Coil secondary grounds go to cylinder head.
 #
-#   FUEL PUMP:
-#   [ ] Confirm pump model (OEM Bosch vs Walbro 255 vs AEM 320)
-#   [ ] Walbro 255 draws ~8A max :: 15A fuse is correct
-#   [ ] AEM 340 draws up to 12A :: use 20A fuse
-#
-#   FAN:
-#   [ ] Confirm SPAL fan model -- single speed vs PWM
-#   [ ] Single-speed SPAL 30102049 (12-inch puller): 15A draw :: 20A fuse
-#   [ ] Phase 2: swap to PWM SPAL, wire GPO 6 direct for variable speed
-#
-#   ECU MAIN RELAY:
-#   [ ] MaxxECU Race has its own power relay -- confirm if external relay
-#       is also needed or if ECU handles this internally
-#   [ ] See maxxecu.com/webhelp/wirings-power_supply.html
+#   DOWNSTREAM HARNESS UPDATES NEEDED:
+#   [ ] ewp-controller.wv: internal MAIN_RELAY is replaced by PMU16 O5 direct output.
+#       Update to remove relay -- connect PMU16 O5 wire directly to CWA400 pin 3.
+#       (Pending resolution of 35.5A current draw vs 25A O5 limit -- see above.)
+#   [ ] fuel-pump-hanger.wv: SSR (Crydom D1D40) is replaced by PMU16 O4 PWM output.
+#       Update SSR section -- PMU16 O4 wire goes directly to pump(+) stud on hanger.
+#   [ ] ac-compressor.wv: AC_RELAY coil is now driven by PMU16 O7 output (low current).
+#       Update coil power source reference from fuse block F10 to PMU16 O7.
 
 # ── Connectors ─────────────────────────────────────────────────────────────────
 
@@ -105,7 +106,7 @@ connectors:
     pinlabels:
       - "Batt IN (from BATT_POS)"
       - "Alt IN (from alternator B+)"
-      - "Output (to main ANL fuse → loads)"
+      - "Output (to main ANL fuse → PMU16 stud)"
       - "Alt charge loop (charges battery via alt when switch ON)"
     notes: >-
       MUST be a 4-post switch, NOT a 2-post. On an alternator-equipped car a 2-post
@@ -140,14 +141,16 @@ connectors:
   # ── Main fuse (close to battery) ───────────────────────────────────────────
   MAIN_FUSE:
     type: "Inline ANL or MAXI fuse holder"
-    subtype: "TODO: size -- likely 60-80A"
+    subtype: "TODO: size -- likely 80-100A for PMU16 total load"
     pincount: 2
-    pinlabels: ["In (from CUTOFF_4POST output)", "Out (to fuse block)"]
+    pinlabels: ["In (from CUTOFF_4POST output)", "Out (to PMU16 M6 BATT+ stud)"]
     notes: >-
       Must be mounted within 18 inches of battery positive terminal / cutoff switch output.
-      Power path: BATT_POS → CUTOFF_4POST → MAIN_FUSE → FUSE_BLOCK.
+      Power path: BATT_POS → CUTOFF_4POST → MAIN_FUSE → PMU16 M6 BATT+ stud.
       Protects entire power distribution loom from dead short.
-      TODO: size after summing all fused circuit loads with 20% headroom.
+      TODO: size after summing all PMU16 channel loads with 20% headroom.
+      PMU16 has 10x 25A outputs + 6x 15A outputs; this build uses ~4x 25A + 3x 15A max.
+      Estimated peak: ECU 10A + coil/inj 20A + fan 15A + pump 20A + EWP 35A = ~100A.
       Blue Sea 5191 (MRBF) or equivalent.
       Product: https://www.bluesea.com/products/5191/MRBF_Terminal_Fuse_Block_-_30_to_300A
 
@@ -158,8 +161,9 @@ connectors:
     pincount: 1
     pinlabels: ["GND"]
     notes: >-
-      Primary battery negative lead terminates here. Relay board GND, body electrics,
-      and fan/pump returns terminate here.
+      Primary battery negative lead terminates here.
+      PMU16 GND lug terminates here (W_PMU16_GND).
+      Fan motor GND, condenser fan GND, and body electrical returns terminate here.
       E36 engine bay ground stud is on the strut tower or firewall.
       TODO: confirm exact stud location for this car.
       Keep M52 factory engine block-to-chassis bonding strap -- it provides the
@@ -171,175 +175,91 @@ connectors:
     type: "Ignition-switched +12V"
     subtype: "From ignition switch or X20 -- TODO confirm pin"
     pincount: 1
-    pinlabels: ["+12V IGN"]
+    pinlabels: ["+12V IGN → PMU16 +12V SW"]
     notes: >-
+      Feeds PMU16 pin 7 (+12V SW) -- this is the PMU16 on/off sense input.
+      When IGN is ON: PMU16 activates and begins executing programmed output logic.
+      When IGN is OFF: PMU16 runs post-shutdown logic (e.g. EWP cooling) then powers down.
       TODO: confirm which ignition switch terminal or X20 pin carries
       key-on switched +12V for this RHD car.
       On E36, the ignition switch (pin 15) provides switched +12V.
       May be accessible at the fuse box or tapped from X20.
-      Wire gauge: 12 AWG to relay coil fuses.
+      Wire gauge: 18 AWG is sufficient (PMU16 +12V SW is a signal input, very low current).
 
-  # ── Fuse block ─────────────────────────────────────────────────────────────
-  FUSE_BLOCK:
-    type: "Mini blade fuse block"
-    subtype: "10-position -- TODO: source block"
-    pincount: 10
-    pinlabels:
-      - "F1: ECU logic (10A)"
-      - "F2: Coil+Inj relay coil (5A)"
-      - "F3: Radiator fan relay coil (5A)"
-      - "F4: Fuel pump SSR ctrl (5A)"
-      - "F5: Coil+Inj load feed (20A)"
-      - "F6: Radiator fan load feed (20A)"
-      - "F7: Fuel pump load feed (25A)"
-      - "F8: Spare / accessories (10A)"
-      - "F9: EWP relay coil (5A)"
-      - "F10: AC relay coil (5A)"
-    notes: >-
-      Pins 1-4, 10 powered by IGN-switched +12V (relay coil circuits).
-      Pins 5-7 powered by battery +12V via main fuse (relay load circuits).
-      Pin 9 powered by battery +12V (EWP coil -- must be BATT+ for post-shutdown cooling).
-      Relays switch the load circuits -- the fuses here protect the wires.
-      F9 (EWP coil): 18 AWG to ewp-controller.wv MAIN_RELAY pin 86. BATT+ so MaxxECU
-      power-hold relay can keep pump running after key-off until CLT below 70 deg C.
-      F10 (AC coil): 18 AWG to ac-compressor.wv AC_RELAY pin 86.
-      F4 (Fuel pump SSR ctrl): 18 AWG to fuel-pump-hanger.wv SSR Ctrl(+).
-      TODO: confirm fuse block part. Options: Blue Sea ST Blade (5025),
-      Bussmann 15600, or a pre-made relay+fuse combo block (10-pos).
-
-  # ── Relay board ────────────────────────────────────────────────────────────
-  # Standard Bosch ISO mini relay (5-pin):
-  #   85 -- coil negative (pulled to GND to activate)
-  #   86 -- coil positive (+12V IGN to energize)
-  #   30 -- common / power input (from fused battery +12V)
-  #   87 -- normally open (NO) contact -- load output when relay is ON
-  #   87a -- normally closed (NC) contact -- load output when relay is OFF
+  # ── Ecumaster PMU16 Power Management Unit ─────────────────────────────────
   #
-  # MaxxECU GPOs are low-side switches (they pull to GND).
-  # So: 86 = +12V IGN (constant), 85 = ECU GPO (switches to GND).
+  # Physical connections:
+  #   M6 BATT+ stud (body of unit): main power in from ANL fuse. Up to 150A continuous.
+  #   GND lug (body of unit): chassis GND. Must be shortest possible run.
+  #   39-pin Sicma/FCI connector: all signal, control, and output pins.
   #
-  # Flyback suppression: mount 1N4007 diode across each relay coil at the relay socket.
-  #   Cathode (banded end) → pin 86 (+12V side)
-  #   Anode → pin 85 (GND/GPO side)
-  # Bosch 0 332 002 150 has no built-in suppression (type 1). External diode required.
-
-  RELAY_ECU_MAIN:
-    type: "Bosch ISO mini relay"
-    subtype: "12V coil / 30A contacts"
-    pincount: 5
+  # Connector terminals:
+  #   1.5mm (211CC2S2160P): 14-17 AWG -- use for signal/low-current pins
+  #   2.8mm (211CC3S2120):  14-16 AWG -- use for medium outputs (fan, SSR ctrl)
+  #   2.8mm heavy (211CC3S3120): 10-12 AWG -- use for high-current outputs (pump, EWP)
+  #
+  # Procurement: ecumasterusa.com ~$500 USD
+  # Manual: ecumaster.com/files/PMU/PMU_Manual.pdf
+  # Pinout: ecumaster.com/files/PMU/PMU-16_Pinout_v1.2.pdf
+  # MaxxECU integration: ecumaster.com/files/ADU/AN/maxxEcu.pdf
+  # MaxxECU.canx template: available from Ecumaster download page
+  #
+  PMU16:
+    type: "Ecumaster PMU16 Power Management Unit"
+    subtype: "39-way Sicma/FCI + M6 BATT+ stud + GND lug"
+    pincount: 12
     pinlabels:
-      - "85 (coil-)"
-      - "86 (coil+)"
-      - "30 (batt+)"
-      - "87 (NO load out)"
-      - "87a (NC -- unused)"
+      - "BATT+ (M6 stud -- to ANL fuse output)"
+      - "GND (body lug -- PHYS chassis GND)"
+      - "+12V SW (PHYS pin 7 -- IGN sense)"
+      - "CAN2.H (PHYS pin 24 -- MaxxECU CAN1H)"
+      - "CAN2.L (PHYS pin 34 -- MaxxECU CAN1L)"
+      - "O1 25A -- ECU logic power (PHYS pin 38)"
+      - "O2 25A -- coil+inj supply (PHYS pin 39)"
+      - "O3 25A -- radiator fan PWM (PHYS pin 26)"
+      - "O4 25A -- fuel pump PWM (PHYS pin 13)"
+      - "O5 25A -- EWP supply ⚠️ see TODO (PHYS pin 12)"
+      - "O6 15A -- condenser fan (PHYS pin 11)"
+      - "O7 15A -- AC relay coil drive (PHYS pin 10)"
     notes: >-
-      ECU logic power relay.
-      Coil: 86 from IGN +12V (F1), 85 to chassis GND.
-      Load: 30 from fused batt+, 87 to MaxxECU 12-pin pin 7 (+12V ECU logic).
-      Keeps ECU unpowered when ignition is off.
-      TODO: MaxxECU Race may handle main relay internally -- verify
-      whether this external relay is required. See maxxecu.com/webhelp
-      section on power supply wiring.
-      Part: Bosch 0332019150 or Tyco V23134 or equivalent.
-      Flyback: 1N4007 across coil at relay socket (cathode to pin 86, anode to pin 85).
+      PDM replaces: relay board (ECU main, coil/inj, fan, EWP, condenser relays),
+      blade fuse block, and Crydom D1D40 SSR.
+      No flyback diodes needed -- MOSFET outputs have integrated protection.
+      Per-channel current sensing: all output currents are logged over CAN to MaxxECU.
+      Post-shutdown EWP: O5 programmed to stay active after key-off until
+        MaxxECU CAN CLT channel drops below 70 deg C or 3-min fallback timer.
+        PMU16 M6 stud is BATT+ always (not IGN-switched), enabling this behavior.
+      EWP current warning: CWA400 draws up to 35.5A. O5 is 25A rated.
+        Resolve per TODO block at top of file before building.
+      Spare outputs available for future: O8-O16, plus 16x analog inputs A1-A16.
+      CAN1 (PHYS pins 23/35): reserved for PC programming via Ecumaster USB-CAN.
+        Do NOT connect CAN1 to MaxxECU -- CAN1 is PC-only on PMU16.
 
-  RELAY_COIL_INJ:
-    type: "Bosch ISO mini relay"
-    subtype: "12V coil / 30A contacts"
-    pincount: 5
-    pinlabels:
-      - "85 (coil-)"
-      - "86 (coil+)"
-      - "30 (batt+)"
-      - "87 (NO load out)"
-      - "87a (NC -- unused)"
+  # ── MaxxECU CAN1 stub (cross-reference) ──────────────────────────────────
+  MAXXECU_CAN1_STUB:
+    type: "MaxxECU RACE CAN1 stub"
+    subtype: "Cross-reference maxxecu-m52.wv -- CAN1H/CAN1L pins"
+    pincount: 2
+    pinlabels: ["CAN1H (to PMU16 CAN2.H)", "CAN1L (to PMU16 CAN2.L)"]
     notes: >-
-      Coil pack and injector supply relay.
-      Coil: 86 from IGN +12V (F2), 85 to chassis GND.
-      Load: 30 from fused batt+ (F5 20A), 87 to coil+inj +12V rail.
-      Output feeds MaxxECU 12-pin pin 1 (+12V coil/injector supply).
-      TODO: confirm whether this relay is triggered by IGN directly
-      or by a dedicated ECU relay output. MaxxECU Race has a relay
-      drive output -- check wiring PDF.
-      Wire gauge: 12 AWG on load side.
-      Flyback: 1N4007 across coil at relay socket (cathode to pin 86, anode to pin 85).
+      PMU16 CAN2 (pins 24/34) connects to MaxxECU RACE CAN1H/CAN1L.
+      Twisted pair cable, 22 AWG shielded. Drain at MaxxECU end only.
+      Speed: must match on both sides. PMU16 CAN2 default = 500kbps or 1Mbit
+        (configure in PMU software). MaxxECU MTune: set CAN1 to same speed.
+      Bus termination: 120 ohm at each end. Enable PMU16 CAN2 software
+        termination in PMU config. Verify MaxxECU CAN1 has termination.
+      Cross-reference: maxxecu-m52.wv for ECU CAN1 physical pin assignment.
 
-  RELAY_FAN:
-    type: "Bosch ISO mini relay"
-    subtype: "12V coil / 30A contacts"
-    pincount: 5
-    pinlabels:
-      - "85 (coil-)"
-      - "86 (coil+)"
-      - "30 (batt+)"
-      - "87 (NO load out)"
-      - "87a (NC -- unused)"
-    notes: >-
-      Radiator fan relay.
-      Coil: 86 from IGN +12V (F3), 85 from MaxxECU GPO 6 (12-pin pin 6).
-      Load: 30 from fused batt+ (F6), 87 to SPAL fan motor positive.
-      Fan motor negative to chassis GND.
-      MaxxECU pulls 85 to GND to energize relay and spin fan.
-      TODO: confirm SPAL fan model and current draw.
-      TODO: Phase 2 upgrade -- SPAL PWM fan wired direct from GPO 6,
-      relay no longer needed. Check SPAL PWM wiring instructions.
-      Flyback: 1N4007 across coil at relay socket (cathode to pin 86, anode to pin 85).
-
-  FUEL_PUMP_SSR:
-    type: "Crydom D1D40 DC solid-state relay (SSR)"
-    subtype: "3-32V ctrl / 40A load -- replaces mechanical relay for PWM control"
-    pincount: 4
-    pinlabels:
-      - "Ctrl+ (from fuse F4 IGN +12V)"
-      - "Ctrl- (MaxxECU GPO 2 -- low-side sink)"
-      - "Load+ (from fused BATT+ to pump positive)"
-      - "Load- (to pump positive -- switched output)"
-    notes: >-
-      DC SSR replaces mechanical relay -- enables PWM speed control of Walbro
-      F90000267 via MaxxECU GPO. See harnesses/fuel-pump-hanger.wv for full
-      Radium 20-1170 hanger pinout and hanger connector details.
-      Ctrl+ from fuse F4 (IGN-switched). Ctrl- from MaxxECU GPO 2 (pin 3).
-      Load side: 8 AWG from fused BATT+, output to pump positive stud.
-      Do NOT use with a mechanical relay -- SSR only. Fuse F7 updated to 25A
-      (Walbro F90000267 max draw is ~20A at 13.5V under max load).
-      Mount SSR to metal bracket for heat sinking -- dissipates ~1W/A at load.
-
-  # ── Condenser fan relay (AC system) ────────────────────────────────────────
-  RELAY_CONDENSER_FAN:
-    type: "Bosch ISO mini relay"
-    subtype: "12V coil / 30A contacts"
-    pincount: 4
-    pinlabels:
-      - "85 (coil- :: chassis GND)"
-      - "86 (coil+ :: AC relay coil tap)"
-      - "30 (batt+ :: fused from BATT_POS)"
-      - "87 (NO load out :: condenser fan motor +)"
-    notes: >-
-      Condenser fan relay for AC system. Required -- AC compressor inverter
-      controller will not enable without condenser fan present.
-      Coil pin 86: tapped from AC relay coil wire (after AC switch) so
-      condenser fan turns on simultaneously with compressor.
-      Coil pin 85: chassis GND.
-      Load: dedicated fused BATT+ run (inline 20A fuse, 12 AWG).
-      Output to condenser fan motor +. Fan motor GND to chassis.
-      Flyback: 1N4007 across coil at relay socket (cathode to pin 86, anode to pin 85).
-      If radiator and condenser share one dual-purpose fan: wire this relay
-      output in parallel with RELAY_FAN output -- verify fan can handle
-      combined thermal load before doing so.
-      TODO: confirm condenser fan model (SPAL or equivalent slimline).
-      TODO: confirm whether radiator fan and condenser fan are the same unit.
-
-  # ── Load stubs ─────────────────────────────────────────────────────────────
+  # ── ECU power stubs (cross-ref to maxxecu-m52.wv) ────────────────────────
   ECU_POWER_STUBS:
     type: "MaxxECU Race 12-pin power stub"
     subtype: "Cross-reference maxxecu-m52.wv ECU_12PIN"
     pincount: 2
-    pinlabels: ["Pin 1 (+12V coil/inj)", "Pin 7 (+12V ECU logic)"]
+    pinlabels: ["Pin 1 (+12V coil/inj -- from PMU16 O2)", "Pin 7 (+12V ECU logic -- from PMU16 O1)"]
     notes: >-
-      Both power pins must be supplied.
-      Pin 1: coil and injector supply -- from RELAY_COIL_INJ output.
-      Pin 7: ECU logic supply -- from RELAY_ECU_MAIN output.
+      Both power pins must be supplied. Previously from relay outputs -- now from PMU16.
+      Pin 1: coil and injector supply -- from PMU16 O2 (25A channel).
+      Pin 7: ECU logic supply -- from PMU16 O1 (25A channel).
       See maxxecu-m52.wv for full 12-pin connector wiring.
       *** GROUND CRITICAL: MaxxECU GND pins (power GND and sensor GND) must run
           directly to battery negative terminal -- not to chassis star point.
@@ -350,95 +270,86 @@ connectors:
           cylinder head (one per coil bank) in addition to the main coil power/GND
           running to the battery. Do not skip or merge with sensor ground path. ***
 
+  # ── Fan and condenser fan load connectors ─────────────────────────────────
   FAN_MOTOR:
     type: "Radiator fan motor"
     subtype: "TODO: SPAL model -- 2-pin"
     pincount: 2
-    pinlabels: ["+12V", "GND"]
+    pinlabels: ["+12V (from PMU16 O3)", "GND"]
     notes: >-
       TODO: confirm SPAL fan model and connector.
-      Puller vs pusher depends on radiator position.
-      Common choice: SPAL 30102049 (12-inch puller, 15A).
-      For PWM: SPAL 30102057 + wire GPO 6 direct (no relay needed).
+      Common choice: SPAL 30102049 (12-inch puller, 15A single-speed).
+      Phase 2 upgrade: SPAL 30102057 (PWM-capable) -- PMU16 O3 PWMs directly
+        to this fan, enabling variable speed control without any relay or driver.
+        Update output channel assignment in PMU config (frequency, duty table).
+      Fan GND to chassis GND stud (W_FAN_GND).
 
   CONDENSER_FAN:
     type: "Condenser fan motor"
     subtype: "TODO: SPAL slimline or equivalent -- 2-pin"
     pincount: 2
-    pinlabels: ["+12V (from relay 87)", "GND"]
+    pinlabels: ["+12V (from PMU16 O6)", "GND"]
     notes: >-
-      AC condenser fan. Mounts in front of or behind AC condenser.
-      Must run whenever AC compressor is active.
-      TODO: confirm model. SPAL 30102049 (12-inch) or slimline equivalent.
-      GND to chassis ground stud. +12V from RELAY_CONDENSER_FAN pin 87.
+      AC condenser fan. Must run whenever AC compressor is active.
+      PMU16 O6 configured to activate when MaxxECU CAN signals AC on.
+      TODO: confirm model. SPAL slimline or equivalent.
+      Fan GND to chassis GND stud (W_CONDENSER_FAN_GND).
 
-  # ── ECU GPO cross-references (from maxxecu-m52.wv) ────────────────────────
-  # These are not physical connectors on the power board -- they represent
-  # the wire coming from the ECU 12-pin connector to the relay coil.
-  ECU_GPO_FAN:
-    type: "MaxxECU GPO 6 trigger"
-    subtype: "12-pin pin 6 -- see maxxecu-m52.wv"
+  # ── External harness stubs ─────────────────────────────────────────────────
+  EWP_OUTPUT_STUB:
+    type: "Stub: PMU16 O5 → ewp-controller.wv CWA400 supply"
+    subtype: "See harnesses/ewp-controller.wv -- replaces MAIN_RELAY"
     pincount: 1
-    pinlabels: ["GPO 6 (fan trigger)"]
+    pinlabels: ["EWP +12V supply (from PMU16 O5)"]
     notes: >-
-      Low-side switch output. Pulls relay pin 85 to GND when fan is commanded.
-      Defined in maxxecu-m52.wv W_FAN cable.
-
-  ECU_GPO_PUMP:
-    type: "MaxxECU GPO 2 trigger (PWM)"
-    subtype: "12-pin pin 3 -- see maxxecu-m52.wv"
-    pincount: 1
-    pinlabels: ["GPO 2 PWM (SSR Ctrl-"]
-    notes: >-
-      PWM low-side switch output. Controls Crydom D1D40 SSR Ctrl- for
-      variable-speed fuel pump (Walbro F90000267 via Radium 20-1170 hanger).
-      65% idle / 100% WOT+boost. Defined in maxxecu-m52.wv W_FUELPUMP cable.
-      See harnesses/fuel-pump-hanger.wv for full SSR and hanger wiring.
-
-  # ── External harness stubs (cross-reference only) ────────────────────────────
-  EWP_RELAY_COIL_STUB:
-    type: "Stub: EWP relay coil pin 86"
-    subtype: "See harnesses/ewp-controller.wv MAIN_RELAY -- this is the far end of W_EWP_RELAY_86"
-    pincount: 1
-    pinlabels: ["86 (coil+ in ewp-controller.wv)"]
-    notes: >-
-      Physical wire terminates at MAIN_RELAY pin 86 in ewp-controller.wv.
-      18 AWG, red. Fuse F9 (5A, BATT+) protects this coil feed.
-      BATT+ source (not IGN) required -- MaxxECU power-hold keeps ECU alive post key-off
-      and commands EWP via GPO until CLT below 70 deg C. IGN-switched would cut pump immediately.
-
-  AC_RELAY_COIL_STUB:
-    type: "Stub: AC relay coil pin 86"
-    subtype: "See harnesses/ac-compressor.wv AC_RELAY -- this is the far end of W_AC_RELAY_86"
-    pincount: 1
-    pinlabels: ["86 (coil+ in ac-compressor.wv)"]
-    notes: >-
-      Physical wire terminates at AC_RELAY pin 86 in ac-compressor.wv.
-      18 AWG, red. Fuse F10 (5A) protects this coil feed.
+      PMU16 O5 output drives the EWP directly -- MAIN_RELAY in ewp-controller.wv
+      is replaced. TODO: update ewp-controller.wv to remove internal relay and
+      connect this wire directly to CWA400 Pin 3 (+12V supply input).
+      CWA400 GND (Pin 4) still to chassis GND stud.
+      ⚠️ CWA400 draws up to 35.5A nominal. PMU16 O5 is 25A max.
+         Resolve per TODO block at top of file before building this run.
+      Wire gauge: 10 AWG minimum (35.5A load; use 8 AWG if paralleling outputs).
+      Post-shutdown cooling: PMU16 logic keeps O5 active after key-off per
+        programmed CLT threshold -- no separate power-hold relay needed.
 
   RADIUM_HANGER_STUB:
-    type: "Stub: Radium 20-1170 hanger pump stud"
-    subtype: "See harnesses/fuel-pump-hanger.wv -- SSR Load- output"
+    type: "Stub: PMU16 O4 → Radium 20-1170 hanger pump stud"
+    subtype: "See harnesses/fuel-pump-hanger.wv -- replaces Crydom D1D40 SSR"
     pincount: 1
-    pinlabels: ["Pump+ stud (Radium hanger)"]
+    pinlabels: ["Pump+ stud (from PMU16 O4 PWM output)"]
     notes: >-
-      SSR Load- (switched output) connects to pump positive stud on
-      Radium 20-1170 hanger. See fuel-pump-hanger.wv for full hanger
-      connector wiring, sender, and return.
+      PMU16 O4 (25A, PWM-capable) output connects to pump positive stud on
+      Radium 20-1170 hanger, replacing the Crydom D1D40 DC SSR.
+      TODO: update fuel-pump-hanger.wv to remove SSR -- wire PMU16 O4 directly
+        to pump+ stud. The Ctrl+/Ctrl- SSR wires to MaxxECU GPO are eliminated;
+        PWM duty is now commanded by MaxxECU over CAN to PMU16 channel O4.
+      Wire gauge: 12 AWG (Walbro F90000267 draws 14.1A max).
+      See fuel-pump-hanger.wv for full hanger pinout and return wiring.
 
-  # ── AC system cross-reference (from ac-compressor.wv) ──────────────────────
+  AC_RELAY_COIL_STUB:
+    type: "Stub: PMU16 O7 → ac-compressor.wv AC_RELAY coil pin 86"
+    subtype: "See harnesses/ac-compressor.wv AC_RELAY"
+    pincount: 1
+    pinlabels: ["AC relay coil 86 (from PMU16 O7)"]
+    notes: >-
+      PMU16 O7 (15A) drives AC relay coil -- replaces fuse block F10 feed.
+      Very low current (relay coil ~200mA); 18 AWG sufficient.
+      TODO: update ac-compressor.wv to reference PMU16 O7 as coil power source.
+      Condenser fan coil is no longer tapped from AC relay coil wire;
+        PMU16 O6 drives condenser fan directly (separate channel).
+
+  # ── AC system cross-reference ───────────────────────────────────────────────
   AC_SWITCH_TAP:
     type: "AC enable signal tap -- from ac-compressor.wv AC_SWITCH pin 2"
     subtype: "Junction at AC switch output -- see ac-compressor.wv"
     pincount: 1
     pinlabels: ["AC switch output (+12V IGN when AC on)"]
     notes: >-
-      This wire runs from the AC cabin switch output (after the switch,
-      before relay coil) to RELAY_CONDENSER_FAN coil pin 86.
-      When AC switch is on: energizes both the AC main relay coil (in
-      ac-compressor.wv) AND the condenser fan relay coil here.
-      Ensures condenser fan runs whenever compressor runs.
-      Cross-reference ac-compressor.wv AC_SWITCH and AC_RELAY.
+      With PMU16, this tap may no longer be needed for condenser fan control.
+      PMU16 O6 (condenser fan) can be activated by MaxxECU CAN AC-on signal
+      rather than a hardwired tap from the AC switch output.
+      Cross-reference ac-compressor.wv for AC switch wiring.
+      TODO: decide whether to keep hardwired tap or use CAN logic for condenser fan.
 
 
 # ── Cables ─────────────────────────────────────────────────────────────────────
@@ -458,12 +369,13 @@ cables:
     wirelabels: ["+12V cutoff out → ANL"]
     notes: "4 AWG welding cable. Red. CUTOFF_4POST output post → MAIN_FUSE input. ANL fuse within 18 in of cutoff switch output. Ring lug both ends."
 
-  W_BATT_POS_MAIN:
+  W_MAIN_TO_PMU16:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["+12V fused batt"]
-    notes: "Superseded -- was direct BATT_POS → MAIN_FUSE. Now routed through CUTOFF_4POST. See W_BATT_POS_TO_CUTOFF + W_CUTOFF_TO_ANL."
+    wirelabels: ["+12V fused batt → PMU16 stud"]
+    notes: "4 AWG welding cable. Red. MAIN_FUSE output → PMU16 M6 BATT+ stud. Ring lug at fuse end. M6 ring lug at PMU16 stud. Keep run as short as practical."
 
+  # ── Battery negative: two separate leads ────────────────────────────────────
   W_BATT_NEG_CHASSIS:
     wirecount: 1
     colors: [BK]
@@ -482,165 +394,80 @@ cables:
       Route through cabin or alongside fuel pump run. P-clamp every 12 inches.
       Reference: StreetCarJoe Race Car Wiring Series Pt.2 (youtu.be/PNyScqftGQw)
 
-  W_MAIN_TO_FUSE_BLOCK:
+  # ── PMU16 power and control wiring ──────────────────────────────────────────
+  W_PMU16_GND:
     wirecount: 1
-    colors: [RD]
-    wirelabels: ["+12V fused batt"]
-    notes: "TODO: 8-10 AWG from ANL fuse output to fuse block batt+ rail."
+    colors: [BK]
+    wirelabels: ["PMU16 GND → chassis stud"]
+    notes: "4 AWG or 8 AWG welding cable. Black. PMU16 GND lug (body of unit) → chassis GND stud. Keep as short as possible. Ring lug both ends. Critical -- PMU16 output return currents all flow through this wire."
 
-  # ── IGN switched feed to fuse block ────────────────────────────────────────
-  W_IGN_FEED:
+  W_IGN_TO_PMU16:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["+12V IGN"]
-    notes: "12 AWG. IGN-switched +12V from ignition switch to fuse block IGN rail."
+    wirelabels: ["+12V IGN → PMU16 +12V SW"]
+    notes: "18 AWG. Red. IGN-switched +12V source → PMU16 39-pin pin 7 (+12V SW). Low current -- PMU16 on/off sense only. Fuse at source end: 5A."
 
-  # ── Relay coil pin 86 feeds (+12V IGN from fuse block) ──────────────────────
-  # Each relay gets its own wire. 18 AWG is sufficient for coil current (~150-200mA).
-  W_ECU_RELAY_86:
-    wirecount: 1
-    colors: [RD]
-    wirelabels: ["+12V IGN (86)"]
-    notes: "Fuse F1 :: RELAY_ECU_MAIN pin 86. 18 AWG."
+  W_CAN2_PMU16:
+    wirecount: 2
+    colors: [GY, PU]
+    wirelabels: ["CAN2.H → MaxxECU CAN1H", "CAN2.L → MaxxECU CAN1L"]
+    notes: "22 AWG shielded twisted pair. Grey = CAN H (pin 24), Purple = CAN L (pin 34). Drain at MaxxECU end only (chassis GND at ECU connector body). Do NOT untwist more than 5cm at each end. Route away from coil primaries and injector wires. 120 ohm terminators: enable PMU16 CAN2 software termination + verify MaxxECU CAN1 termination."
 
-  W_COIL_INJ_RELAY_86:
+  # ── PMU16 output wires ───────────────────────────────────────────────────────
+  W_PMU16_O1_ECU:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["+12V IGN (86)"]
-    notes: "Fuse F2 :: RELAY_COIL_INJ pin 86. 18 AWG."
+    wirelabels: ["O1 → ECU logic +12V"]
+    notes: "16 AWG. Red. PMU16 O1 (PHYS pin 38, 25A) → MaxxECU 12-pin pin 7 (+12V ECU logic). Cross-reference maxxecu-m52.wv ECU_12PIN pin 7."
 
-  W_FAN_RELAY_86:
+  W_PMU16_O2_COIL_INJ:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["+12V IGN (86)"]
-    notes: "Fuse F3 :: RELAY_FAN pin 86. 18 AWG."
+    wirelabels: ["O2 → coil+inj +12V"]
+    notes: "12 AWG. Red. PMU16 O2 (PHYS pin 39, 25A) → MaxxECU 12-pin pin 1 (+12V coil/injector supply). Cross-reference maxxecu-m52.wv ECU_12PIN pin 1."
 
-  W_PUMP_SSR_CTRL_POS:
+  W_PMU16_O3_FAN:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["+12V IGN (SSR Ctrl+)"]
-    notes: "Fuse F4 :: FUEL_PUMP_SSR Ctrl+. 18 AWG. IGN-switched supply for SSR control circuit."
+    wirelabels: ["O3 → fan motor +12V"]
+    notes: "12 AWG. Red. PMU16 O3 (PHYS pin 26, 25A PWM) → FAN_MOTOR pin 1. PMU16 PWMs O3 directly for variable speed (future SPAL PWM fan). No relay needed."
 
-  W_EWP_RELAY_86:
+  W_PMU16_O4_PUMP:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["+12V BATT (86)"]
-    notes: "Fuse F9 (BATT+) :: EWP relay coil pin 86 (in ewp-controller.wv MAIN_RELAY). 18 AWG. BATT+ enables post-shutdown cooling via MaxxECU power-hold."
+    wirelabels: ["O4 → pump+ stud (PWM)"]
+    notes: "12 AWG. Red. PMU16 O4 (PHYS pin 13, 25A PWM) → RADIUM_HANGER_STUB pump+ stud. Replaces Crydom D1D40 SSR. PMU16 O4 PWMs fuel pump speed via MaxxECU CAN command."
 
-  W_AC_RELAY_86:
+  W_PMU16_O5_EWP:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["+12V IGN (86)"]
-    notes: "Fuse F10 :: AC relay coil pin 86 (in ac-compressor.wv AC_RELAY). 18 AWG."
+    wirelabels: ["O5 → EWP +12V supply"]
+    notes: "10 AWG (or 8 AWG if paralleling O5+O14). Red. PMU16 O5 (PHYS pin 12, 25A) → EWP_OUTPUT_STUB. See TODO re: 35.5A CWA400 current vs 25A channel limit."
 
-  W_CONDENSER_FAN_RELAY_86:
+  W_PMU16_O6_CONDENSER:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["AC switch tap (86)"]
-    notes: "AC_SWITCH_TAP :: RELAY_CONDENSER_FAN pin 86. 18 AWG. Same signal as AC main relay coil."
+    wirelabels: ["O6 → condenser fan +12V"]
+    notes: "12 AWG. Red. PMU16 O6 (PHYS pin 11, 15A) → CONDENSER_FAN pin 1. PMU16 activates O6 when MaxxECU CAN AC-on signal received."
 
-  W_CONDENSER_FAN_LOAD:
+  W_PMU16_O7_AC_RELAY:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["fan +12V (87)"]
-    notes: "Inline 20A fuse from BATT+ :: RELAY_CONDENSER_FAN pin 30. 12 AWG."
+    wirelabels: ["O7 → AC relay coil 86"]
+    notes: "18 AWG. Red. PMU16 O7 (PHYS pin 10, 15A) → AC_RELAY_COIL_STUB (ac-compressor.wv AC_RELAY pin 86). Very low current -- relay coil only (~200mA). Replaces fuse block F10 feed."
 
-  W_CONDENSER_FAN_OUT:
+  # ── Fan and condenser GND returns ───────────────────────────────────────────
+  W_FAN_GND:
     wirecount: 1
-    colors: [RD]
-    wirelabels: ["condenser fan +12V"]
-    notes: "RELAY_CONDENSER_FAN pin 87 :: CONDENSER_FAN pin 1. 12 AWG."
+    colors: [BK]
+    wirelabels: ["fan GND"]
+    notes: "FAN_MOTOR pin 2 :: chassis GND stud. 12 AWG. Return current path."
 
   W_CONDENSER_FAN_GND:
     wirecount: 1
     colors: [BK]
     wirelabels: ["condenser fan GND"]
-    notes: "CONDENSER_FAN pin 2 :: chassis GND. 12 AWG."
-
-  W_CONDENSER_FAN_RELAY_85:
-    wirecount: 1
-    colors: [BK]
-    wirelabels: ["coil GND (85)"]
-    notes: "RELAY_CONDENSER_FAN pin 85 :: chassis GND. 18 AWG."
-
-  # ── Relay coil pin 85 GND (for ECU main and coil/inj -- straight to chassis GND)
-  # Fan and pump relay pin 85 comes from ECU GPO (defined below).
-  W_ECU_RELAY_85_GND:
-    wirecount: 1
-    colors: [BK]
-    wirelabels: ["coil GND (85)"]
-    notes: "RELAY_ECU_MAIN pin 85 :: chassis GND. 18 AWG."
-
-  W_COIL_INJ_RELAY_85_GND:
-    wirecount: 1
-    colors: [BK]
-    wirelabels: ["coil GND (85)"]
-    notes: "RELAY_COIL_INJ pin 85 :: chassis GND. 18 AWG."
-
-  # ── ECU GPO trigger wires (cross-reference to maxxecu-m52.wv) ───────────────
-  W_GPO6_FAN_TRIGGER:
-    wirecount: 1
-    colors: [GN]
-    wirelabels: ["GPO 6 (85)"]
-    notes: "MaxxECU 12-pin pin 6 :: RELAY_FAN pin 85. 18 AWG. Low-side switch (pulls to GND)."
-
-  W_GPO2_PUMP_TRIGGER:
-    wirecount: 1
-    colors: [GN]
-    wirelabels: ["GPO 2 (85)"]
-    notes: "MaxxECU 12-pin pin 3 :: FUEL_PUMP_SSR Ctrl-. 18 AWG. Low-side PWM switch."
-
-  # ── Relay load feeds (fused batt+ to relay pin 30) ──────────────────────────
-  W_COIL_INJ_LOAD_FEED:
-    wirecount: 1
-    colors: [RD]
-    wirelabels: ["batt+ (30)"]
-    notes: "Fuse F5 (20A) :: RELAY_COIL_INJ pin 30. 12 AWG."
-
-  W_FAN_LOAD_FEED:
-    wirecount: 1
-    colors: [RD]
-    wirelabels: ["batt+ (30)"]
-    notes: "Fuse F6 (20A) :: RELAY_FAN pin 30. 12 AWG."
-
-  W_PUMP_LOAD_FEED:
-    wirecount: 1
-    colors: [RD]
-    wirelabels: ["batt+ (30)"]
-    notes: "Fuse F7 (25A) :: FUEL_PUMP_SSR Load+. 12 AWG. (F90000267 draws 14.1A max -- 8 AWG oversized from old pump spec)"
-
-  # ── Relay outputs to loads (relay pin 87 :: load positive) ─────────────────
-  W_ECU_MAIN_RELAY_OUT:
-    wirecount: 1
-    colors: [RD]
-    wirelabels: ["ECU logic +12V (87)"]
-    notes: "RELAY_ECU_MAIN pin 87 :: ECU 12-pin pin 7. 16 AWG."
-
-  W_COIL_INJ_RELAY_OUT:
-    wirecount: 1
-    colors: [RD]
-    wirelabels: ["coil+inj +12V (87)"]
-    notes: "RELAY_COIL_INJ pin 87 :: ECU 12-pin pin 1. 12 AWG."
-
-  W_FAN_POS:
-    wirecount: 1
-    colors: [RD]
-    wirelabels: ["fan +12V (87)"]
-    notes: "RELAY_FAN pin 87 :: FAN_MOTOR pin 1. 12 AWG."
-
-  W_FAN_GND:
-    wirecount: 1
-    colors: [BK]
-    wirelabels: ["fan GND"]
-    notes: "FAN_MOTOR pin 2 :: chassis GND. 12 AWG. Return current path."
-
-  W_PUMP_POS:
-    wirecount: 1
-    colors: [RD]
-    wirelabels: ["pump +12V (SSR out)"]
-    notes: "FUEL_PUMP_SSR Load- (switched output) :: RADIUM_HANGER_STUB (pump+). 12 AWG. (F90000267 14.1A max)"
-
-  # W_PUMP_GND removed -- pump GND is handled within fuel-pump-hanger.wv
+    notes: "CONDENSER_FAN pin 2 :: chassis GND stud. 12 AWG."
 
 
 # ── Connections ─────────────────────────────────────────────────────────────────
@@ -649,7 +476,7 @@ cables:
 
 connections:
 
-  # ── Main power path: BATT+ → 4-post cutoff → ANL fuse → fuse block ──────────
+  # ── Main power path: BATT+ → 4-post cutoff → ANL fuse → PMU16 stud ──────────
   - - BATT_POS: [1]
     - W_BATT_POS_TO_CUTOFF: [1]
     - CUTOFF_4POST: [1]
@@ -659,118 +486,67 @@ connections:
     - MAIN_FUSE: [1]
 
   - - MAIN_FUSE: [2]
-    - W_MAIN_TO_FUSE_BLOCK: [1]
-    - FUSE_BLOCK: [5]
+    - W_MAIN_TO_PMU16: [1]
+    - PMU16: [1]
 
   # ── Battery negative: two separate leads ─────────────────────────────────────
-  # Lead 1: battery → chassis stud (relay board GND, body returns, fan/pump GND)
+  # Lead 1: battery → chassis stud (PMU16 GND, body returns, fan/pump GND)
   - - BATT_NEG: [1]
     - W_BATT_NEG_CHASSIS: [1]
     - CHASSIS_GND: [1]
 
-  # Lead 2: battery → engine block directly (ECU GND, coil GND reference, sensor GND)
+  # Lead 2: battery → engine block directly (ECU GND, coil GND reference)
   - - BATT_NEG: [2]
     - W_BATT_NEG_ENGINE: [1]
     - ENGINE_BLOCK_GND: [1]
 
-  # ── IGN feed to fuse block ───────────────────────────────────────────────────
+  # ── PMU16 GND and IGN sense ───────────────────────────────────────────────────
+  - - CHASSIS_GND: [1]
+    - W_PMU16_GND: [1]
+    - PMU16: [2]
+
   - - IGN_12V_SOURCE: [1]
-    - W_IGN_FEED: [1]
-    - FUSE_BLOCK: [1]
+    - W_IGN_TO_PMU16: [1]
+    - PMU16: [3]
 
-  # ── Relay coil pin 86 (+12V IGN from fuse block) ─────────────────────────────
-  - - FUSE_BLOCK: [1]
-    - W_ECU_RELAY_86: [1]
-    - RELAY_ECU_MAIN: [2]
+  # ── PMU16 CAN2 to MaxxECU CAN1 ───────────────────────────────────────────────
+  - - PMU16: [4, 5]
+    - W_CAN2_PMU16: [1, 2]
+    - MAXXECU_CAN1_STUB: [1, 2]
 
-  - - FUSE_BLOCK: [2]
-    - W_COIL_INJ_RELAY_86: [1]
-    - RELAY_COIL_INJ: [2]
-
-  - - FUSE_BLOCK: [3]
-    - W_FAN_RELAY_86: [1]
-    - RELAY_FAN: [2]
-
-  - - FUSE_BLOCK: [4]
-    - W_PUMP_SSR_CTRL_POS: [1]
-    - FUEL_PUMP_SSR: [1]
-
-  - - FUSE_BLOCK: [9]
-    - W_EWP_RELAY_86: [1]
-    - EWP_RELAY_COIL_STUB: [1]
-
-  - - FUSE_BLOCK: [10]
-    - W_AC_RELAY_86: [1]
-    - AC_RELAY_COIL_STUB: [1]
-
-  # ── Relay coil pin 85 GND (ECU main and coil/inj go straight to GND) ─────────
-  - - CHASSIS_GND: [1]
-    - W_ECU_RELAY_85_GND: [1]
-    - RELAY_ECU_MAIN: [1]
-
-  - - CHASSIS_GND: [1]
-    - W_COIL_INJ_RELAY_85_GND: [1]
-    - RELAY_COIL_INJ: [1]
-
-  # ── Fan and pump relay coil pin 85 from ECU GPO ──────────────────────────────
-  - - ECU_GPO_FAN: [1]
-    - W_GPO6_FAN_TRIGGER: [1]
-    - RELAY_FAN: [1]
-
-  - - ECU_GPO_PUMP: [1]
-    - W_GPO2_PUMP_TRIGGER: [1]
-    - FUEL_PUMP_SSR: [2]
-
-  # ── Relay load inputs (fused batt+ to relay pin 30) ──────────────────────────
-  - - FUSE_BLOCK: [5]
-    - W_COIL_INJ_LOAD_FEED: [1]
-    - RELAY_COIL_INJ: [3]
-
-  - - FUSE_BLOCK: [6]
-    - W_FAN_LOAD_FEED: [1]
-    - RELAY_FAN: [3]
-
-  - - FUSE_BLOCK: [7]
-    - W_PUMP_LOAD_FEED: [1]
-    - FUEL_PUMP_SSR: [3]
-
-  # ── Relay outputs to loads ────────────────────────────────────────────────────
-  - - RELAY_ECU_MAIN: [4]
-    - W_ECU_MAIN_RELAY_OUT: [1]
+  # ── PMU16 outputs to loads ────────────────────────────────────────────────────
+  - - PMU16: [6]
+    - W_PMU16_O1_ECU: [1]
     - ECU_POWER_STUBS: [2]
 
-  - - RELAY_COIL_INJ: [4]
-    - W_COIL_INJ_RELAY_OUT: [1]
+  - - PMU16: [7]
+    - W_PMU16_O2_COIL_INJ: [1]
     - ECU_POWER_STUBS: [1]
 
-  - - RELAY_FAN: [4]
-    - W_FAN_POS: [1]
+  - - PMU16: [8]
+    - W_PMU16_O3_FAN: [1]
     - FAN_MOTOR: [1]
 
+  - - PMU16: [9]
+    - W_PMU16_O4_PUMP: [1]
+    - RADIUM_HANGER_STUB: [1]
+
+  - - PMU16: [10]
+    - W_PMU16_O5_EWP: [1]
+    - EWP_OUTPUT_STUB: [1]
+
+  - - PMU16: [11]
+    - W_PMU16_O6_CONDENSER: [1]
+    - CONDENSER_FAN: [1]
+
+  - - PMU16: [12]
+    - W_PMU16_O7_AC_RELAY: [1]
+    - AC_RELAY_COIL_STUB: [1]
+
+  # ── Fan and condenser GND returns ─────────────────────────────────────────────
   - - CHASSIS_GND: [1]
     - W_FAN_GND: [1]
     - FAN_MOTOR: [2]
-
-  - - FUEL_PUMP_SSR: [4]
-    - W_PUMP_POS: [1]
-    - RADIUM_HANGER_STUB: [1]
-
-  # ── Condenser fan relay connections ──────────────────────────────────────────────────
-  - - BATT_POS: [1]
-    - W_CONDENSER_FAN_LOAD: [1]
-    - RELAY_CONDENSER_FAN: [3]
-
-  - - AC_SWITCH_TAP: [1]
-    - W_CONDENSER_FAN_RELAY_86: [1]
-    - RELAY_CONDENSER_FAN: [2]
-
-  - - CHASSIS_GND: [1]
-    - W_CONDENSER_FAN_RELAY_85: [1]
-    - RELAY_CONDENSER_FAN: [1]
-
-  - - RELAY_CONDENSER_FAN: [4]
-    - W_CONDENSER_FAN_OUT: [1]
-    - CONDENSER_FAN: [1]
 
   - - CHASSIS_GND: [1]
     - W_CONDENSER_FAN_GND: [1]
