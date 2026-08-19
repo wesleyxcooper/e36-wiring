@@ -94,6 +94,12 @@
 #   - Bosch PST-F1 oil sensor (AIN 1 temp, AIN 3 pressure)
 #   - Gauge.S cluster CAN (shared CAN bus with 8HP)
 #   - SPAL fan PWM (GPO 6 :: relay)
+#   - 8HP virtual clutch position sensor (C2 AIN 5 / C2 pin G3)
+#       E36 clutch pedal retained, mechanical linkage disconnected.
+#       Rotary position sensor at pedal pivot → MaxxECU C2 AIN 5.
+#       C1 AIN 1-4 are fully allocated; C2 is REQUIRED for this signal.
+#       Requires Binary5 8HP TCU firmware + MTune 1.157+.
+#       Source: maxxecu.com/webhelp/advanced-8hp-virtual_clutch.html
 
 connectors:
 
@@ -464,6 +470,44 @@ connectors:
       hardwired within the terminated harness; only the breakout connectors are
       accessible in the engine bay.
 
+  # ── MaxxECU C2 (32-pin Molex CMC) — stub for virtual clutch AIN 5 ─────────────
+  # Full C2 pinout: maxxecu.com/webhelp/wirings-maxxecu_pinout.html
+  # Per MaxxECU RACE REV9+ wiring diagram: AIN 5 = C2 pin G3 (labeled
+  # "Extra analog sensor / pedal main position 0-5V").
+  # C2 also carries: EGT 1-8, AIN 6-8, DIN 4-5, GPO 15-16, motor H-bridge 1-2.
+  # Only AIN 5 (+ its sensor supply / GND) is used in this harness.
+  # Purchase: MaxxECU store ID 1982, $32.25. C2 is REQUIRED (not optional).
+  ECU_C2:
+    type: "Molex CMC 32-pin (MaxxECU Race C2)"
+    subtype: "Stub — only AIN 5 (G3) used for virtual clutch position"
+    pincount: 3
+    pinlabels:
+      - "G3: AIN 5 — clutch position signal (0-5V)"
+      - "+5V sensor supply (C2 shared rail)"
+      - "Sensor GND (C2 shared rail)"
+    notes: >
+      Confirm pin G3 = AIN 5 from MaxxECU RACE REV9+ wiring diagram before crimping.
+      MTune: Analog Inputs → AIN 5 → type = 0-5V, assign function = Clutch Position.
+      Calibrate: 0% = pedal fully up, 100% = pedal fully depressed.
+      +5V / GND are shared with C1 sensor rail internally — C2 provides its own
+      supply breakout pins. Can alternatively tap ECU_16PIN pins 1/2 for +5V/GND
+      if C2 harness is not fully assembled (splice to signal wire only).
+
+  # ── Virtual clutch pedal position sensor ─────────────────────────────────────
+  CLUTCH_POS_SENSOR:
+    type: "Rotary position sensor 0-5V — E36 clutch pedal pivot"
+    subtype: "Hall effect or potentiometer; mechanical linkage disconnected at Phase 1"
+    pincount: 3
+    pinlabels: ["+5V", Signal, GND]
+    notes: >
+      Mount at clutch pedal pivot. E36 clutch pedal retained in cabin; hydraulic
+      pushrod or cable disconnected — pedal freewheels. Add a return spring to
+      hold pedal at top of travel when not pressed.
+      Sensor options: any 0-5V rotary position sensor matching pedal arc travel
+      (e.g., Bosch 0 280 122 001 TPS body repurposed, or dedicated pedal sensor).
+      All wiring is cabin-side — no bulkhead crossing required.
+      Signal → C2 AIN 5 (C2 pin G3). +5V and GND → C2 sensor supply / GND.
+
 
 cables:
 
@@ -553,6 +597,89 @@ cables:
     wirelabels: ["+5V", GND, "Pressure (AIN 3)", "Temp (AIN 1)"]
     length: 0.6 m
 
+  # M52 Idle air control valve (ICV / stepper)
+  # Hardwired inside M50 terminated harness; modeled here for completeness.
+  # GPO 4 (E4/CMC 20) = Coil A, GPO 5 (A1/CMC 1) = Coil B.
+  W_ICV:
+    wirecount: 3
+    colors: [BK, WH, GN]
+    wirelabels: [GND, "Coil A (GPO 4)", "Coil B (GPO 5)"]
+    length: 0.4 m
+    notes: "Flyback diode 1N4007 across each coil at ICV connector, cathode toward +12V rail."
+
+  # Injectors (6×2-wire; +12V rail + ECU driver). Inside M50 terminated harness.
+  W_INJ_1:
+    wirecount: 2
+    colors: [RD, GN]
+    wirelabels: ["+12V", "INJ 1"]
+    length: 0.4 m
+  W_INJ_2:
+    wirecount: 2
+    colors: [RD, GN]
+    wirelabels: ["+12V", "INJ 2"]
+    length: 0.4 m
+  W_INJ_3:
+    wirecount: 2
+    colors: [RD, GN]
+    wirelabels: ["+12V", "INJ 3"]
+    length: 0.4 m
+  W_INJ_4:
+    wirecount: 2
+    colors: [RD, GN]
+    wirelabels: ["+12V", "INJ 4"]
+    length: 0.4 m
+  W_INJ_5:
+    wirecount: 2
+    colors: [RD, GN]
+    wirelabels: ["+12V", "INJ 5"]
+    length: 0.4 m
+  W_INJ_6:
+    wirecount: 2
+    colors: [RD, GN]
+    wirelabels: ["+12V", "INJ 6"]
+    length: 0.4 m
+
+  # Ignition coils — S54 COP, VAG 4-pin. Inside M50 terminated harness.
+  # +12V = M4/CMC48, GND = L4/CMC44, Signal per cyl, Shield = E3/CMC19.
+  W_IGN_1:
+    wirecount: 4
+    colors: [RD, BK, WH, GY]
+    wirelabels: ["+12V", GND, "IGN 1", Shield]
+    length: 0.5 m
+  W_IGN_2:
+    wirecount: 4
+    colors: [RD, BK, WH, GY]
+    wirelabels: ["+12V", GND, "IGN 2", Shield]
+    length: 0.5 m
+  W_IGN_3:
+    wirecount: 4
+    colors: [RD, BK, WH, GY]
+    wirelabels: ["+12V", GND, "IGN 3", Shield]
+    length: 0.5 m
+  W_IGN_4:
+    wirecount: 4
+    colors: [RD, BK, WH, GY]
+    wirelabels: ["+12V", GND, "IGN 4", Shield]
+    length: 0.5 m
+  W_IGN_5:
+    wirecount: 4
+    colors: [RD, BK, WH, GY]
+    wirelabels: ["+12V", GND, "IGN 5", Shield]
+    length: 0.5 m
+  W_IGN_6:
+    wirecount: 4
+    colors: [RD, BK, WH, GY]
+    wirelabels: ["+12V", GND, "IGN 6", Shield]
+    length: 0.5 m
+
+  # Wideband O2 — LSU 4.9. M50 terminated harness includes built-in WBO2 circuit.
+  W_WBO2:
+    wirecount: 5
+    colors: [WH, WH, WH, WH, BK]
+    wirelabels: ["WBO2 VS", "WBO2 VREF", "WBO2 IP", "WBO2 RCAL", "WBO2 Htr-"]
+    length: 1.0 m
+    shield: true
+
   # Boost solenoid
   W_BOOST:
     wirecount: 2
@@ -573,6 +700,17 @@ cables:
     colors: [BK, GN]
     wirelabels: [GND, "GPO 2"]
     length: 0.8 m
+
+  # Virtual clutch position sensor — cabin-side, no bulkhead crossing
+  W_CLUTCH_POS:
+    wirecount: 3
+    colors: [RD, WH, BK]
+    wirelabels: ["+5V", "AIN 5 signal", GND]
+    length: 0.8 m
+    notes: >
+      All cabin-side. 22 AWG, no shield required (short run, low-frequency signal).
+      +5V and GND route to C2 sensor supply pins (or tap ECU_16PIN pins 1/2).
+      Signal routes to C2 pin G3 (AIN 5). Confirm pin ref at crimp time.
 
   # CAN to 8HP
   W_CAN_8HP:
@@ -688,3 +826,75 @@ connections:
   - - FUEL_PUMP_RELAY: [1, 2]
     - W_FUELPUMP: [1, 2]
     - ECU_12PIN: [2, 3]
+
+  # ── Virtual clutch position sensor (cabin-side, no bulkhead crossing) ─────────
+  # +5V=ECU_C2[2], Signal=ECU_C2[1] (AIN 5 / C2 pin G3), GND=ECU_C2[3]
+  - - CLUTCH_POS_SENSOR: [1, 2, 3]
+    - W_CLUTCH_POS: [1, 2, 3]
+    - ECU_C2: [2, 1, 3]
+
+  # ── M52 Idle air control valve (ICV) ─────────────────────────────────────────
+  # GND=H1/CMC29, Coil A=E4 GPO4/CMC20, Coil B=A1 GPO5/CMC1
+  - - IDLE_VALVE: [1, 2, 3]
+    - W_ICV: [1, 2, 3]
+    - ECU_CMC: [29, 20, 1]
+
+  # ── Injectors (M52 inline-6, EV1 Bosch JPT) ──────────────────────────────────
+  # +12V=M4/CMC48; INJ1=K1/CMC37, INJ2=K2/CMC38, INJ3=M1/CMC45
+  # INJ4=M2/CMC46, INJ5=M3/CMC47, INJ6=L3/CMC43
+  - - INJ_1: [1, 2]
+    - W_INJ_1: [1, 2]
+    - ECU_CMC: [48, 37]
+
+  - - INJ_2: [1, 2]
+    - W_INJ_2: [1, 2]
+    - ECU_CMC: [48, 38]
+
+  - - INJ_3: [1, 2]
+    - W_INJ_3: [1, 2]
+    - ECU_CMC: [48, 45]
+
+  - - INJ_4: [1, 2]
+    - W_INJ_4: [1, 2]
+    - ECU_CMC: [48, 46]
+
+  - - INJ_5: [1, 2]
+    - W_INJ_5: [1, 2]
+    - ECU_CMC: [48, 47]
+
+  - - INJ_6: [1, 2]
+    - W_INJ_6: [1, 2]
+    - ECU_CMC: [48, 43]
+
+  # ── Ignition coils (S54 COP, VAG 4-pin) ──────────────────────────────────────
+  # +12V=M4/CMC48, GND=L4/CMC44, Shield=E3/CMC19
+  # IGN1=A2/CMC2, IGN2=A3/CMC3, IGN3=B2/CMC6, IGN4=B3/CMC7, IGN5=C2/CMC10, IGN6=C3/CMC11
+  - - IGN_1: [1, 2, 3, 4]
+    - W_IGN_1: [1, 2, 3, 4]
+    - ECU_CMC: [48, 44, 2, 19]
+
+  - - IGN_2: [1, 2, 3, 4]
+    - W_IGN_2: [1, 2, 3, 4]
+    - ECU_CMC: [48, 44, 3, 19]
+
+  - - IGN_3: [1, 2, 3, 4]
+    - W_IGN_3: [1, 2, 3, 4]
+    - ECU_CMC: [48, 44, 6, 19]
+
+  - - IGN_4: [1, 2, 3, 4]
+    - W_IGN_4: [1, 2, 3, 4]
+    - ECU_CMC: [48, 44, 7, 19]
+
+  - - IGN_5: [1, 2, 3, 4]
+    - W_IGN_5: [1, 2, 3, 4]
+    - ECU_CMC: [48, 44, 10, 19]
+
+  - - IGN_6: [1, 2, 3, 4]
+    - W_IGN_6: [1, 2, 3, 4]
+    - ECU_CMC: [48, 44, 11, 19]
+
+  # ── Wideband O2 (LSU 4.9) ────────────────────────────────────────────────────
+  # VS=F4/CMC24, VREF=F3/CMC23, IP=G3/CMC27, RCAL=G4/CMC28, Htr-=D1/CMC13
+  - - WIDEBAND: [2, 1, 6, 5, 6]
+    - W_WBO2: [1, 2, 3, 4, 5]
+    - ECU_CMC: [24, 23, 27, 28, 13]

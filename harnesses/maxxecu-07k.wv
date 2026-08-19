@@ -8,6 +8,10 @@
 #         MaxxECU pinout: maxxecu.com/webhelp/wirings-maxxecu_pinout.html
 #         MaxxECU e-throttle: maxxecu.com/webhelp/settings-ethrottle.html
 #
+# CABIN UNCHANGED: virtual clutch position sensor (C2 AIN 5) carries from M52 phase
+#   with zero re-work. Pedal, sensor, and C2 wiring are cabin-side and engine-agnostic.
+#   See maxxecu-m52.wv CLUTCH_POS_SENSOR / ECU_C2 for sensor wiring detail.
+#
 # KEY DIFFERENCES FROM M52 (harness rebuild required — engine mating plug swap):
 #   + 5-cylinder: INJ 1-5, IGN 1-5. INJ 6 / IGN 6 cavity-plugged.
 #   + DBW throttle body (07K native, ~65mm) replaces cable TPS.
@@ -189,106 +193,115 @@ connectors:
       - "M3: INJ 5"                      # 47
       - "M4: +12V ECU power"            # 48
 
+  # ── MaxxECU C2 (32-pin Molex CMC) — stub for virtual clutch AIN 5 ─────────────
+  # Identical to M52 harness — cabin-side, no re-work at engine swap.
+  ECU_C2:
+    type: "Molex CMC 32-pin (MaxxECU Race C2)"
+    subtype: "Stub — only AIN 5 (G3) used for virtual clutch position"
+    pincount: 3
+    pinlabels:
+      - "G3: AIN 5 — clutch position signal (0-5V)"
+      - "+5V sensor supply (C2 shared rail)"
+      - "Sensor GND (C2 shared rail)"
+    notes: "Same as M52 harness. See maxxecu-m52.wv ECU_C2 for full notes."
+
+  # ── Virtual clutch pedal position sensor ─────────────────────────────────────
+  # Identical to M52 harness — cabin-side, no re-work at engine swap.
+  CLUTCH_POS_SENSOR:
+    type: "Rotary position sensor 0-5V — E36 clutch pedal pivot"
+    subtype: "Carries from Phase 1 M52 unchanged. Same pedal, same sensor, same C2 AIN 5."
+    pincount: 3
+    pinlabels: ["+5V", Signal, GND]
+    notes: "No re-work required at 07K swap. See maxxecu-m52.wv CLUTCH_POS_SENSOR for full notes."
+
+  # ── Cabin-side connectors — unchanged from M52, included to resolve diagram ──────
+
+  DCT_SHIFTER:
+    type: "DCT Shifter mechanical sequential"
+    subtype: "DCT Shifter E36 (3-wire, no +12V supply needed)"
+    pincount: 3
+    pinlabels: ["UP (Black)", "DOWN (Blue)", "GND (Brown)"]
+    notes: >
+      Source: dctshifter.com/pages/installation — 3-wire only (no +12V).
+      UP (Black) :: MaxxECU DIN 2 (Transmission UP shift).
+      DOWN (Blue) :: MaxxECU DIN 1 (Transmission DOWN shift).
+      GND (Brown) :: Sensor GND or chassis GND.
+      MTune: Advanced :: 8HP :: Shifter type :: 8HP SEQ shifter.
+      Cabin-to-cabin; does NOT cross firewall bulkhead. Unchanged from M52 phase.
+
+  CAN_BUS_JUNCTION:
+    type: "Splice / junction"
+    subtype: "CAN H/L shared bus junction"
+    pincount: 4
+    pinlabels: ["CAN H in (ECU)", "CAN L in (ECU)", "CAN H out (8HP+GaugeS)", "CAN L out (8HP+GaugeS)"]
+    notes: >
+      MaxxECU CAN 1 (16-pin pins 9-10) feeds both the 8HP CAN harness and Gauge.S cluster.
+      Bus speed: 500kbps. MaxxECU CAN 1 has built-in 120ohm terminator.
+      Add 120ohm terminator at far end of bus if bus run over 1 meter total.
+
+  HP8_CAN:
+    type: "MaxxECU 8HP GEN1 CAN harness"
+    subtype: "ZF 8HP70 transmission CAN connector"
+    pincount: 2
+    pinlabels: ["CAN H", "CAN L"]
+    notes: "See harnesses/8hp-can.wv for full CAN + power wiring. Unchanged from M52 phase."
+
+  GAUGES_CAN:
+    type: "Gauge.S cluster CAN"
+    subtype: "Gauge.S E36 PNP cluster CAN input"
+    pincount: 2
+    pinlabels: ["CAN H", "CAN L"]
+    notes: >
+      Gauge.S receives MaxxECU Default 1.3 CAN output (500kbps).
+      Enable in MTune: CAN :: Default CAN output :: MaxxECU Default 1.3.
+      Unchanged from M52 phase.
+
   # ── Engine-side mating plug (07K — replaces M52 mating plug at bulkhead) ────
 
-  BULKHEAD_ENGINE_07K:
-    type: "Deutsch AS79 / Souriau 8STA 79-way jam nut plug"
-    subtype: "Engine side — 07K Phase 3 harness. Unplugs M52 plug, inserts this plug."
-    pincount: 79
-    pinlabels:
-      # ── Group A: Power (same as M52) ──────────────────────────────────────────
-      - "+12V Coils/Inj → engine harness common rail"  # 1
-      - "+12V 8HP Main → TCU pin 13 (constant)"        # 2
-      - "+12V 8HP Wakeup → TCU pin 9 (IGN)"            # 3
-      - "+12V Fan → fan motor"                         # 4
-      - "+12V Condenser fan"                           # 5
-      - "+12V EWP → CWA400 pin 3"                      # 6
-      - "+12V AC → AC inverter"                        # 7
-      - "Engine GND → cylinder head stud"              # 8
-      - "8HP TCU GND → chassis GND"                    # 9
-      # ── Group B: Ignition (5-cyl; pin 15 cavity-plugged) ───────────────────────
-      - "IGN 1 → coil 1"       # 10
-      - "IGN 2 → coil 2"       # 11
-      - "IGN 3 → coil 3"       # 12
-      - "IGN 4 → coil 4"       # 13
-      - "IGN 5 → coil 5"       # 14
-      - "(cavity plug — IGN 6 unused on 07K)"  # 15
-      # ── Group C: Injectors (5-cyl; pin 21 cavity-plugged) ─────────────────────
-      - "INJ 1 → injector 1"   # 16
-      - "INJ 2 → injector 2"   # 17
-      - "INJ 3 → injector 3"   # 18
-      - "INJ 4 → injector 4"   # 19
-      - "INJ 5 → injector 5"   # 20
-      - "(cavity plug — INJ 6 unused on 07K)"  # 21
-      # ── Group D: Crank / Cam triggers (same pins; different connector bodies) ──
-      - "Crank VR+ → 07K crank sensor (VR 60-2)"   # 22
-      - "Crank VR- → 07K crank sensor (VR 60-2)"   # 23
-      - "Crank shield → sensor shell"               # 24
-      - "Cam Hall signal → 07K cam sensor (+5V Hall)"  # 25
-      - "(spare — 07K cam needs no +12V)"           # 26
-      # ── Group E: Sensor signals / CLT / IAT (same pins; different connectors) ──
-      - "Sensor GND → CLT/IAT/TPS/MAP/PST-F1/Cam"  # 27
-      - "CLT → 07K coolant temp sensor"             # 28
-      - "IAT → 07K intake air temp sensor"          # 29
-      - "+5V → MAP / PST-F1 / DBW TB TPS / Cam"    # 30
-      - "DBW TPS1 signal → AIN (07K; was M52 TPS)"  # 31  [07K: DBW TPS1 via G2/CMC pin 26]
-      - "MAP signal → MAP sensor"                    # 32
-      - "PST-F1 pressure → sensor pin 3"             # 33
-      - "PST-F1 temp → sensor pin 4"                # 34
-      - "Flex fuel → Continental sensor"             # 35
-      - "Flex fuel +12V"                            # 36
-      # ── Group F: WBO2 (LSU 4.9; new bung in 07K manifold) ───────────────────
-      - "WBO2 VS → LSU 4.9 pin 2"                   # 37
-      - "WBO2 VREF → LSU 4.9 pin 1"                 # 38
-      - "WBO2 IP → LSU 4.9 pin 6"                   # 39
-      - "WBO2 RCAL → LSU 4.9 pin 5"                 # 40
-      - "WBO2 Heater- → LSU 4.9 pin 3"              # 41
-      # ── Group G: GPO actuators ────────────────────────────────────────────────
-      - "GPO 1 → boost solenoid"                    # 42
-      - "GPO 3 → DBW TB Motor+ (07K; freed from VANOS)"  # 43
-      - "GPO 4 → DBW TB Motor- (07K; freed from ICV A)"  # 44
-      - "(spare — GPO 5 freed from ICV B)"           # 45
-      - "EWP PWM → CWA400 pin 1 (680 Hz)"           # 46
-      # ── Group H: CAN bus ──────────────────────────────────────────────────────
-      - "CAN H (22 AWG TP)"                          # 47
-      - "CAN L (22 AWG TP)"                          # 48
-      # ── Group J: Misc ──────────────────────────────────────────────────────────
-      - "Starter trigger"                            # 49
-      - "Alternator D+"                              # 50
-      - "AIN 2 (DBW TPS2 — 07K; was spare M52)"     # 51  [07K: DBW TPS2 via J2/CMC pin 34]
-      - "AC enable"                                  # 52
-      - "Chassis GND engine bay"                    # 53
-      # ── Group N: Expansion — 07K active pins ─────────────────────────────────
-      - "(expansion stub — INJ 7 alt routing)"       # 54
-      - "(expansion stub — IGN 7 alt routing)"       # 55
-      - "(expansion stub — DIN4 / VR3)"             # 56
-      - "(expansion stub — DIN5 / VR4)"             # 57
-      - "(expansion stub — AIN 6)"                   # 58
-      - "(expansion stub — GPO 8 / TACHO)"          # 59
-      - "(expansion stub — +5V supply 2)"           # 60
-      - "(expansion stub — Sensor GND 2)"           # 61
-      - "(expansion stub — +12V switched spare)"    # 62
-      - "(expansion stub — 07K cam alt)"            # 63
-      - "(expansion stub — 07K crank alt)"          # 64
-      - "DBW TPS1 signal (07K expansion alt)"        # 65  [see pin 31 for primary routing]
-      - "DBW TPS1 +5V (07K)"                        # 66
-      - "DBW TPS1 GND (07K)"                        # 67
-      - "(expansion stub — MAP2 / boost ref)"        # 68
-      - "Knock sensor 1 signal"                     # 69
-      - "Knock sensor 2 signal"                     # 70
-      - "Knock GND"                                  # 71
-      # ── Pins 72-77: APS e-pedal pass-through (07K Phase 3 addition) ──────────────────────
-      # Cabin side receives 6-wire run from E46 pedal at Phase 3 installation.
-      # Engine side (these labels) wires to MaxxECU CMC APS inputs (AIN TBD).
-      - "APS GND 1 (E46 pedal pin 1 → MaxxECU SGND)"    # 72
-      - "APS GND 2 (E46 pedal pin 2 → MaxxECU SGND)"    # 73
-      - "APS VCC2 (+5V circ 2 → MaxxECU +5V supply)"    # 74
-      - "APS1 signal (pedal pin 4 → MaxxECU APS1 AIN)"  # 75  [AIN TBD — assign in MTune]
-      - "APS VCC1 (+5V circ 1 → MaxxECU +5V supply)"    # 76
-      - "APS2 signal (pedal pin 6 → MaxxECU APS2 AIN)"  # 77  [AIN TBD — assign in MTune]
-      # ── Pins 78-79: True spares ───────────────────────────────────────────────────────
-      - "SPARE"  # 78
-      - "SPARE"  # 79
+  # ── Firewall bulkhead engine-side plug (07K Phase 3) — PIN REFERENCE ONLY ────────
+  # Connector type: Deutsch AS79 / Souriau 8STA 79-way jam nut plug (engine side)
+  # Operation: Unplug M52 engine mating plug, insert 07K mating plug. Cabin side unchanged.
+  # Full connector modeled in harnesses/firewall-bulkhead.wv.
+  # Excluded from WireViz connectors here — a 79-pin pass-through would require duplicating
+  # every connection in this file; bulkhead is treated as transparent in this diagram.
+  #
+  # Pin assignment (07K Phase 3):
+  #   Group A — Power (same pins as M52):
+  #     1: +12V Coils/Inj        2: +12V 8HP Main (KL30)   3: +12V 8HP Wakeup (KL15)
+  #     4: +12V Fan              5: +12V Condenser fan      6: +12V EWP → CWA400 pin 3
+  #     7: +12V AC → inverter    8: Engine GND (head stud)  9: 8HP TCU GND
+  #   Group B — Ignition (5-cyl; pin 15 cavity-plugged):
+  #     10: IGN 1   11: IGN 2   12: IGN 3   13: IGN 4   14: IGN 5   15: (cavity plug)
+  #   Group C — Injectors (5-cyl; pin 21 cavity-plugged):
+  #     16: INJ 1   17: INJ 2   18: INJ 3   19: INJ 4   20: INJ 5   21: (cavity plug)
+  #   Group D — Crank/Cam:
+  #     22: Crank VR+   23: Crank VR-   24: Crank shield
+  #     25: Cam Hall signal   26: (spare — 07K cam no +12V)
+  #   Group E — Sensor signals:
+  #     27: Sensor GND (CLT/IAT/TPS/MAP/PST-F1/Cam)
+  #     28: CLT   29: IAT   30: +5V (MAP/PST-F1/DBW TPS/Cam)
+  #     31: DBW TPS1 signal [G2/CMC pin 26]   32: MAP signal
+  #     33: PST-F1 pressure   34: PST-F1 temp
+  #     35: Flex fuel signal   36: Flex fuel +12V
+  #   Group F — WBO2 (LSU 4.9; new bung in 07K manifold):
+  #     37: VS   38: VREF   39: IP   40: RCAL   41: Heater-
+  #   Group G — GPO actuators:
+  #     42: GPO 1 (boost)   43: GPO 3 (DBW Motor+)   44: GPO 4 (DBW Motor-)
+  #     45: (spare — GPO 5 freed)   46: EWP PWM (680 Hz)
+  #   Group H — CAN bus:
+  #     47: CAN H (22 AWG TP)   48: CAN L (22 AWG TP)
+  #   Group J — Misc:
+  #     49: Starter trigger   50: Alternator D+
+  #     51: AIN 2 (DBW TPS2) [J2/CMC pin 34]   52: AC enable   53: Chassis GND engine bay
+  #   Group N — Expansion stubs:
+  #     54: INJ 7 alt   55: IGN 7 alt   56: DIN4/VR3   57: DIN5/VR4   58: AIN 6
+  #     59: GPO 8/TACHO   60: +5V supply 2   61: Sensor GND 2   62: +12V switched spare
+  #     63: 07K cam alt   64: 07K crank alt
+  #     65: DBW TPS1 alt signal   66: DBW TPS1 +5V   67: DBW TPS1 GND
+  #     68: MAP2/boost ref   69: Knock 1 signal   70: Knock 2 signal   71: Knock GND
+  #   Pins 72-77 — APS e-pedal pass-through (added Phase 3):
+  #     72: APS GND 1   73: APS GND 2   74: APS VCC2   75: APS1 signal   76: APS VCC1   77: APS2 signal
+  #   Pins 78-79 — True spares
 
   # ── 07K engine sensors / actuators ─────────────────────────────────────────
 
@@ -624,6 +637,51 @@ cables:
     wirelabels: ["+12V", "INJ 5"]
     length: 0.4 m
 
+  # Virtual clutch position sensor — cabin-side, carries unchanged from M52
+  W_CLUTCH_POS:
+    wirecount: 3
+    colors: [RD, WH, BK]
+    wirelabels: ["+5V", "AIN 5 signal", GND]
+    length: 0.8 m
+    notes: "Unchanged from M52 phase. See maxxecu-m52.wv W_CLUTCH_POS for full notes."
+
+  # ── Cabin-side cables — unchanged from M52 ────────────────────────────────────
+
+  W_CAN:
+    wirecount: 2
+    colors: [WH, BU]
+    wirelabels: ["CAN H", "CAN L"]
+    length: 2.0 m
+    notes: "Twisted pair. 120ohm at far end if bus run over 1 m. Unchanged from M52 phase."
+
+  W_SHIFTER:
+    wirecount: 3
+    colors: [BK, BU, BN]
+    wirelabels: ["UP (DIN 2)", "DOWN (DIN 1)", GND]
+    length: 1.5 m
+    notes: "DCT Shifter paddle harness. Unchanged from M52 phase."
+
+  W_FLEXFUEL:
+    wirecount: 3
+    colors: [RD, BK, WH]
+    wirelabels: ["+12V", GND, "Signal (DIN 3)"]
+    length: 0.8 m
+    notes: "Retain flex fuel sensor if present. Unchanged from M52 phase."
+
+  W_CAN_8HP:
+    wirecount: 2
+    colors: [WH, BU]
+    wirelabels: ["CAN H", "CAN L"]
+    length: 0.3 m
+    notes: "CAN junction → 8HP GEN1 harness. Unchanged from M52 phase."
+
+  W_CAN_GAUGES:
+    wirecount: 2
+    colors: [WH, BU]
+    wirelabels: ["CAN H", "CAN L"]
+    length: 0.3 m
+    notes: "CAN junction → Gauge.S cluster. Unchanged from M52 phase."
+
   # ── Wideband / Boost ──────────────────────────────────────────────────────────
   W_WBO2:
     wirecount: 5
@@ -757,3 +815,33 @@ connections:
   - - BOOST_SOL: [2]
     - W_BOOST: [2]
     - ECU_CMC: [8]
+
+  # ── Virtual clutch position sensor (cabin-side, unchanged from M52) ───────────
+  # +5V=ECU_C2[2], Signal=ECU_C2[1] (AIN 5 / C2 pin G3), GND=ECU_C2[3]
+  - - CLUTCH_POS_SENSOR: [1, 2, 3]
+    - W_CLUTCH_POS: [1, 2, 3]
+    - ECU_C2: [2, 1, 3]
+
+  # ── CAN bus (shared: 8HP + Gauge.S) — unchanged from M52 ─────────────────────
+  - - ECU_16PIN: [10, 9]
+    - W_CAN: [1, 2]
+    - CAN_BUS_JUNCTION: [1, 2]
+
+  - - CAN_BUS_JUNCTION: [3, 4]
+    - W_CAN_8HP: [1, 2]
+    - HP8_CAN: [1, 2]
+
+  - - CAN_BUS_JUNCTION: [3, 4]
+    - W_CAN_GAUGES: [1, 2]
+    - GAUGES_CAN: [1, 2]
+
+  # ── DCT Shifter — cabin-to-cabin, unchanged from M52 ─────────────────────────
+  # UP(BK)=DIN2=ECU_16PIN[15], DOWN(BU)=DIN1=ECU_16PIN[16], GND=ECU_16PIN[2]
+  - - DCT_SHIFTER: [1, 2, 3]
+    - W_SHIFTER: [1, 2, 3]
+    - ECU_16PIN: [15, 16, 2]
+
+  # ── Flex fuel sensor — unchanged from M52 ────────────────────────────────────
+  - - FLEX_FUEL: [1, 2, 3]
+    - W_FLEXFUEL: [1, 2, 3]
+    - ECU_16PIN: [1, 2, 5]

@@ -100,8 +100,8 @@ MaxxECU 1/8 NPT NTC sensor (ID 1280) threaded into Vibrant 16488 inline -8AN ada
 
 | File | Description | Phase | Project Plan |
 |---|---|---|---|
-| `harnesses/maxxecu-m52.wv` | MaxxECU Race ↔ M52 engine harness (Phase 1) | 1 | [§ harness table L387](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L387) |
-| `harnesses/maxxecu-07k.wv` | MaxxECU Race ↔ VW 07K 5-cyl harness: DBW TB, EV14 injectors, 2x knock, VW sensors; GPO 3/4 freed for ETh motor; single-plug bulkhead swap from M52 | 3 | [§ transition L531](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L531) |
+| `harnesses/maxxecu-m52.wv` | MaxxECU Race ↔ M52 engine harness (Phase 1); includes 8HP virtual clutch position sensor → C2 AIN 5 (cabin-side, no bulkhead) | 1 | [§ harness table L387](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L387) |
+| `harnesses/maxxecu-07k.wv` | MaxxECU Race ↔ VW 07K 5-cyl harness: DBW TB, EV14 injectors, 2x knock, VW sensors; GPO 3/4 freed for ETh motor; single-plug bulkhead swap from M52; virtual clutch circuit carries unchanged from M52 | 3 | [§ transition L531](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L531) |
 | `harnesses/ewp-controller.wv` | Pierburg CWA400 (PWM version) + MaxxECU RACE GPO control | 3 | [§ EWP row L461](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L461) |
 | `harnesses/fuel-pump-hanger.wv` | Radium 20-1170 hanger + Walbro F90000267 + DC SSR + MaxxECU PWM GPO | 1 | [§ Fuel System L200](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L200) |
 | `harnesses/ac-compressor.wv` | Alibaba PD2-18012AJA 12V scroll compressor + included PWM controller + 100A relay + MaxxECU DIN idle-up | 2 | [§ AC row L525](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L525) |
@@ -118,7 +118,7 @@ MaxxECU 1/8 NPT NTC sensor (ID 1280) threaded into Vibrant 16488 inline -8AN ada
 
 ## Key interfaces
 
-- **MaxxECU Race connector:** Molex CMC — C1 (48-pin, connector 1) used in M52/07K harnesses; C2 (32-pin, connector 2) carries EGT, knock 2, AIN 5/6, motor 1/2 outputs — not currently wired. Crimp tools: Molex 63811-9200 (small/20 AWG), 63811-8900 (big/0.5–1mm²). Source: [maxxecu.com pinout](https://www.maxxecu.com/webhelp/wirings-maxxecu_pinout.html)
+- **MaxxECU Race connector:** Molex CMC — C1 (48-pin, connector 1) used in M52/07K harnesses; C2 (32-pin, connector 2) AIN 5 (pin G3) wired for **8HP virtual clutch pedal position** (cabin-side, no bulkhead crossing). C2 also carries EGT 1–8, AIN 6–8, DIN 4–5, motor H-bridge 1–2 (deferred). ⚠️ C2 purchase deferred until Binary5 TCU firmware is confirmed available for Dodge TCU `1034420288` — see `docs/wiring-bom.md` §9F. Crimp tools: Molex 63811-9200 (small/20 AWG), 63811-8900 (big/0.5–1mm²). Source: [maxxecu.com pinout](https://www.maxxecu.com/webhelp/wirings-maxxecu_pinout.html)
 - **Firewall bulkhead:** Deutsch Autosport AS79 (79-way) — permanent cabin side; M52 and 07K engine harnesses each mate at a mating plug for single-connector swaps. Pin assignment: `harnesses/firewall-bulkhead.wv`
 - **E36 X20:** Chassis-to-engine-bay interface — MaxxECU RPM/temp/pressure signals to OEM instrument cluster
 - **8HP CAN:** MaxxECU GEN1 8HP CAN harness (native control — no TurboLamik)
@@ -176,6 +176,7 @@ The M52 and 07K share MaxxECU trigger type (`N-1 missing tooth`, 60-2 wheel). Si
 | MAP sensor | Same | Same | Nothing |
 | Flex fuel | Digital input | Same | Nothing |
 | 8HP CAN | Connected | Still connected | Nothing |
+| 8HP virtual clutch (C2 AIN 5) | Position sensor at clutch pedal pivot, cabin-side | Same | Nothing — cabin circuit, engine-agnostic |
 
 ## Circuit schematics (why you need both)
 

@@ -66,7 +66,7 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 | Qty | Item | Notes |
 |-----|------|-------|
 | 1 | **Molex 48-pin C1** — MaxxECU RACE/STREET/SPORT/PRO connector 1 | [MaxxECU store ID 925](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-street-or-sport-or-race-or-pro-connector-1-48-pin-molex), $33.41 — **REQUIRED** (all current harnesses). Special Molex crimp tool required (63811-9200 primary). Pin assignments in `maxxecu-m52.wv` / `maxxecu-07k.wv`. |
-| 1 | **Molex 32-pin C2** — MaxxECU RACE connector 2 | [MaxxECU store ID 1982](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-mini-or-race-c2-or-pro-c4-32-pin-molex), $32.25 — **OPTIONAL / DEFER**: C2 carries EGT 1–8 (A–D rows), knock 2, AIN 5–6, GPO 15/16, and DBW motor 1/2 H-bridge outputs. None of these are used in Phase 1/3 harnesses as currently designed. Purchase only if adding EGT probes or need the extra AIN/GPO capacity. Same crimp tools as C1. |
+| 1 | **Molex 32-pin C2** — MaxxECU RACE connector 2 | [MaxxECU store ID 1982](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-mini-or-race-c2-or-pro-c4-32-pin-molex), $32.25 — **REQUIRED**: AIN 5 (C2 pin G3) is used for 8HP virtual clutch pedal position. C1 AIN 1–4 are fully allocated; C2 is the only path for clutch position. Also carries EGT 1–8, AIN 6–8, DIN 4–5, GPO 15/16, DBW motor H-bridge 1–2 (deferred for now). Same crimp tools as C1. Source: MaxxECU RACE REV9+ wiring diagram, pin G3 = "Extra analog sensor / pedal main position 0-5V". |
 | 1 | Bosch JPT 3-way | M52 60-2 VR crank trigger |
 | 1 | BMW `12141726590` 3-pin | M52 VANOS cam Hall sensor |
 | 1 | Bosch JPT 2-way | M52 coolant temp NTC |
@@ -324,6 +324,31 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | ATF sensor GND | BK | 22 AWG | ~2.5 m | (shared with above shield) | Sensor → MaxxECU Sensor GND — non-polarity sensitive sensor, either wire can be GND |
 
 **MTune:** Analog Inputs → type = `TEMPERATURE` → calibrate to NTC curve: `-20°C = 15,462 Ω`, `130°C = 89 Ω` → assign function as extra temperature channel.
+
+### 9F — 8HP Virtual Clutch Position Sensor (`maxxecu-m52.wv` / `maxxecu-07k.wv`)
+
+> Enables full analog virtual clutch control of the ZF 8HP via MaxxECU. E36 clutch pedal is retained in the cabin; the hydraulic pushrod is disconnected. A rotary position sensor at the pedal pivot feeds 0–5V to MaxxECU C2 AIN 5. All wiring is cabin-side — no bulkhead crossing.
+>
+> **Requires:** Binary5 8HP TCU firmware + MTune 1.157+. Source: [maxxecu.com/webhelp/advanced-8hp-virtual_clutch.html](https://www.maxxecu.com/webhelp/advanced-8hp-virtual_clutch.html)
+>
+> **⚠️ Binary5 availability must be confirmed before the bench flash.** Binary5 is labeled "BETA 1" and MaxxECU distributes firmware manually per-customer. When emailing `support@maxxecu.com` with the ACDP-2 binary dump, explicitly request Binary5 and confirm it is available for TCU `1034420288` / Bosch `0260550074`. If only Binary4 is provided, virtual clutch is unavailable — fall back to clutch kick (single DIN wire, binary behavior), C2 / AIN 5 wiring unneeded. Source: [maxxecu.com/webhelp/advanced-8hp-tcu_firmware.html](https://www.maxxecu.com/webhelp/advanced-8hp-tcu_firmware.html)
+>
+> **C2 is REQUIRED if Binary5 is confirmed** — C1 AIN 1–4 are fully allocated; AIN 5 lives on C2 pin G3 per MaxxECU RACE REV9+ wiring diagram. Defer C2 purchase until Binary5 is confirmed in writing from MaxxECU support.
+
+| Qty | Item | Notes |
+|-----|------|-------|
+| 1 | Rotary position sensor 0–5V (Hall effect or pot, ~270° travel) | Mount at E36 clutch pedal pivot. Options: repurposed Bosch TPS body (0 280 122 001), dedicated pedal position sensor, or any 3-wire 0-5V rotary sensor matching pedal arc. |
+| 1 | Pedal return spring | Hold pedal at top of travel when not pressed (mechanical linkage disconnected) |
+
+| Run | Color | Gauge | Length | Shielded | Notes |
+|-----|-------|-------|--------|----------|-------|
+| +5V supply | RD | 22 AWG | ~0.8 m | No | Sensor +5V → C2 sensor supply (or tap ECU_16PIN pin 1) |
+| AIN 5 signal | WH | 22 AWG | ~0.8 m | No | Signal → C2 pin G3 (AIN 5). Confirm pin ref from MaxxECU RACE REV9+ wiring diagram |
+| Sensor GND | BK | 22 AWG | ~0.8 m | No | Sensor GND → C2 GND (or tap ECU_16PIN pin 2) |
+
+**MTune:** Advanced → 8HP → 8HP clutch control → `Enabled, Virtual clutch`. Analog Inputs → AIN 5 → type = `0-5V`, function = `Clutch Position`. Calibrate: 0% = pedal fully up, 100% = pedal fully depressed. Set clutch clamp start / end per MaxxECU 8HP settings page — these are critical for correct pressure modulation.
+
+**Phase-to-phase:** Wiring carries from M52 (Phase 1) to 07K (Phase 3) with zero re-work. Same pedal, same sensor, same C2 AIN 5 assignment.
 
 ---
 
