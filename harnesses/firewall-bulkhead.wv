@@ -201,8 +201,28 @@ connectors:
           Pins 1, 2, 29, 30 join at a splice to a single 12 AWG supply wire.
           Pins 3, 31, 52 join at a splice to a single 14 AWG GND wire.
 
-      CONTACT SIZE: All AS79 size-22D contacts, 5A max each. Use 22–26 AWG wire.
-        Souriau 8STA accepts same wire range. HDT-48-00 crimp tool required (or JRready NEW-DT2).
+      CONTACT SIZE: All AS79 size-22 contacts, 5A max each. Use 22–26 AWG wire.
+        Souriau 8STA contacts (8599-0702-900 pin / 8599-0706-900 socket) and Deutsch AS
+        contacts (38941-22 pin / 38943-22 socket) are interchangeable on the same insert.
+        CRIMP TOOL: Daniels DMC AFM8 (or M22520/2-01 equivalent) with positioner K42
+          (pin contacts, 22-26 AWG) or K40 (socket contacts). The AFM8 gives a
+          MIL-standard 8-impression crimp. Strip length: 3.5–5.5 mm.
+          Source: Deutsch AS catalog via crimptech.com.au/autosport-tooling-guide.
+        NOTE: The HDT-48-00 covers size 12/16/20 contacts (Maven HD30, DT bypass) only —
+          it does NOT support size-22 contacts and cannot be used for this connector.
+
+      CONTACT INSERTION SEQUENCE: Insert contacts center-out (per MIL-C-38999 procedure):
+        1. Before inserting any contact, slide the back shell and all accessories onto
+           the wire bundle in the correct order for reassembly.
+        2. Lubricate grommet cavities with isopropyl alcohol — do NOT use any other lubricant.
+        3. Insert pin 79 (center cavity) first. Then R4 (pins 68-77), then R3 (51-67),
+           then R2 (pins 29-50), then R1 outer ring (pins 1-28) last.
+        4. Use insertion tool M81969/14-01 (or equiv): slide wire into groove, butt tip
+           against contact shoulder, apply slow even pressure perpendicular to insert face
+           until contact clicks. Pull back lightly to confirm seating.
+        5. After all contacts inserted, slide back shell forward and tighten.
+        Source: Aero-Electric MIL-C-38999 Series I assembly instructions
+          (aero-electric.com/product/MIL-C-38999_SERIES_I/assembly_instructions.html)
 
       CRANK SHIELDED PAIR: Pins 16/17 must be shielded twisted pair. Shield drain (pin 18)
         terminates at cabin-side sensor GND (CMC H1) via pin 79. Float at engine side.

@@ -60,7 +60,17 @@ Required to build and finish the engine harness. Separate from connectors, conta
 | Techflex F6 expandable braided sleeving — 1/4" | 6mm nominal OD | Injector, coil, sensor, knock, trigger, WBO2 sub-looms (6× sub-looms ~300–500mm each) | 5m |
 | Techflex F6 expandable braided sleeving — 1/8" | 3mm nominal OD | Individual shielded runs (crank/cam twisted pair, knock, WBO2) inside the trigger/knock sub-looms | 2m |
 
-> Techflex nominal diameter = open/relaxed OD. Compressed onto a bundle it tightens ~30%. Order the same diameter as your target finished bundle OD. Source: [techflex.com](https://www.techflex.com) or WiringPros.
+> Techflex nominal diameter = open/relaxed OD.
+
+### Heat-zone sleeving (exhaust manifold / turbo proximity)
+
+The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent to the exhaust manifold. The knock sensors are on the exhaust side of the block. Standard Techflex F6 (PET braid) is not rated for sustained high-temperature exposure — add purpose-built heat sleeve before final looming. Sources: DEI product specs; `maxxecu-07k.wv` W_WBO2 and W_KNOCK notes.
+
+| Item | Spec | Use | Qty |
+|------|------|-----|-----|
+| DEI Fire Sleeve — 1/2" ID, 3 ft | silicone-over-fiberglass, ≥500°F (260°C) continuous, 2000°F (1093°C) for 15 min — DEI p/n 010461 | WBO2 cable: first 300 mm (12 in) from sensor bung outward; transition to Techflex F6 after. Applied over the bare cable before main loom assembly. | 1 pc |
+| DEI Fire Sleeve — 3/8" ID, 3 ft | same spec — DEI p/n 010460 | CLT pigtail: first 150 mm (6 in) from sensor body. | 1 pc |
+| DEI Reflect-A-Gold aluminized foil tape — 1" wide | self-adhesive, 90% radiant heat reflection — DEI p/n 010417 or equiv | KNOCK sub-loom: wrap any section that routes within 100 mm (4 in) of exhaust manifold, over the Techflex sleeve. Applied after routing is confirmed. | 1 roll | Compressed onto a bundle it tightens ~30%. Order the same diameter as your target finished bundle OD. Source: [techflex.com](https://www.techflex.com) or WiringPros.
 
 ### Splice consumables
 

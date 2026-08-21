@@ -626,7 +626,13 @@ cables:
     notes: >-
       GND via M8 mounting bolt — no GND wire.
       Shield drain (wire 2) terminates at CMC H1 (Sensor GND, pin 29) via AS79 pin 45.
-      Float at sensor side. Per firewall-bulkhead.wv line 229 spec.
+      Float at sensor side. Per firewall-bulkhead.wv knock note.
+      ROUTING: Both KS1/KS2 sensors are on the exhaust side of the block.
+      Route pigtails down the block face, away from the exhaust manifold, then
+      bundle into KNOCK sub-loom across the bottom of the engine.
+      If any section runs within 100 mm (4 in) of exhaust manifold, wrap with
+      DEI Reflect-A-Gold aluminized foil tape (DEI 010417 or equiv, 90% radiant
+      heat reflection) over the Techflex sleeve before tie-strapping.
 
   W_KNOCK_2:
     wirecount: 2
@@ -634,7 +640,9 @@ cables:
     wirelabels: ["KS2 signal", "Shield drain"]
     length: 0.4 m
     shield: true
-    notes: "Shield drain terminates at CMC H1 (Sensor GND, pin 29) via AS79 pin 45 (shared with KS1)."
+    notes: >-
+      Shield drain terminates at CMC H1 (Sensor GND, pin 29) via AS79 pin 45 (shared with KS1).
+      See W_KNOCK_1 for routing and heat management spec.
 
   # ── Ignition coils (5-cyl) ────────────────────────────────────────────────────
   W_IGN_1:
@@ -751,10 +759,16 @@ cables:
     length: 1.5 m
     shield: true
     notes: >-
-      Same wiring as M52. Heater+ (LSU 4.9 pin 4) splices to local +12V coil rail.
-      Shielded -- VS/VREF/IP/RCAL are low-level analog signals highly
-      susceptible to injector/coil noise, especially with this run's proximity
-      to the turbo/exhaust bung. Single-end drain at ECU end only.
+      Same wiring as M52. Heater+ (LSU 4.9 pin 5 / Hs+) splices to local +12V coil rail — see W_WBO2_HTR.
+      Shielded — VS/VREF/IP/RCAL are low-level analog signals susceptible to
+      injector/coil noise. Single-end drain at ECU end only.
+      HEAT MANAGEMENT: Bung is on the custom top-mount exhaust manifold. Sleeve the
+      first 300 mm (12 in) from the sensor body with DEI Fire Sleeve 1/2" ID (or
+      equivalent silicone-over-fiberglass rated ≥500°F / 260°C continuous). Transition
+      to Techflex F6 after clearing the manifold/turbo heat zone.
+      Route away from turbo turbine housing and wastegate — minimum 100 mm clearance.
+      Tie-strap cable to manifold stud boss or block surface to prevent contact with
+      hot metal under vibration.
 
   W_VVT_SOL:
     wirecount: 2
