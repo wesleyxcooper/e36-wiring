@@ -209,6 +209,43 @@ At the end of each sub-loom, individual wires branch and join to pre-bought pigt
 
 Pigtails are **pre-bought items with the correct mating connector already on the component end.** You never make the component-side connector with raw terminals. See connector table at the top of this document for part numbers.
 
+### Wires per component — injectors and coils are not 1 wire each
+
+Every component has multiple wires. The EV14 injector connector has 2 pins and requires 2 wires from the harness:
+
+| EV14 pin | Wire | Source |
+|----------|------|--------|
+| Pin 1 | +12V switched | Shared coils/inj power rail (tapped via Raychem splice from the bus wire running along the injector rail) |
+| Pin 2 | INJ-N signal | Individual wire from AS79 pin 8–13 — unique to each injector |
+
+The shared +12V bus runs as one continuous wire the full length of the injector rail. At each injector, a Raychem sleeve taps it: one wire in from the upstream bus, one stub out to the pigtail pin 1, one wire out continuing the bus downstream. The INJ signal wire (unique per injector) is a separate Raychem splice at the same pigtail, going to pin 2.
+
+The 07K COP coil (4B0973724, 4-pin) has 3 active wires:
+
+| 4-pin COP pin | Wire | Source |
+|--------------|------|--------|
+| Pin 1 | +12V switched | Shared coils/inj power rail (same bus as injectors) |
+| Pin 2 | GND | Shared engine-head GND strap; do NOT connect to sensor GND |
+| Pin 3 | IGN-N signal | Individual wire from AS79 pin 4–7 or 32–34 — unique to each coil |
+| Pin 4 | Not connected (or diagnostic — leave unconnected unless specified by ECU) | — |
+
+> **The +12V shared bus is a single wire, not 5 separate wires.** It runs the length of the injector (or coil) rail and gets tapped at each component with a Raychem splice. Think of it as a power chain — one wire in, stub out, same wire continues to the next injector.
+
+### Wire bundling inside sub-looms — parallel, not twisted or braided
+
+Individual wires within a sub-loom run **side-by-side in parallel**. Do not twist the bundle, do not braid individual wires together. Reasons:
+- Twisting the whole bundle makes it rigid and adds length, making it difficult to branch individual wires at different component positions along the sub-loom
+- The Techflex expandable braid holds the bundle together and provides abrasion resistance without any twisting underneath
+- For the breakout transition from main trunk to sub-loom, a few wraps of Tesa 51036 fabric tape (or similar) under the Techflex consolidates the bundle at the branch point — optional but keeps things clean
+
+**The one exception is the crank VR pair.** The VR+ and VR− wires **must be twisted together** before going into the TRIGGER sub-loom:
+- Twist rate: ~1 twist per 25mm (1 twist per inch) — twist by hand from tip to tip before routing
+- The twist causes both wires to intercept identical electromagnetic interference simultaneously; the ECU's differential input subtracts the common-mode noise, leaving only the real crank signal
+- Laying them parallel instead of twisted degrades trigger signal quality and can cause dropout at high RPM under electrical load
+- After twisting, both wires run inside the TRIGGER sub-loom sleeve alongside the shield drain wire — do not separate them at any point in the routing
+
+The CAM Hall signal wire does not need twisting — it is a single-ended digital output with its own dedicated +5V and GND, not a differential pair.
+
 ### Splice types — no iron soldering
 
 The joint between a harness wire and a pigtail bare end is the only permanent connection in the system. Two acceptable methods:
@@ -254,6 +291,135 @@ Zip-tie flag labels (a printed tab folded through a zip-tie cinched to the loom)
 8. Run full bench continuity test (see next section)
 9. Only after passing continuity: close connector shells, install sealing boots
 
+### Complete label inventory — AS79 engine harness
+
+Print this list before touching any wire. Source: `firewall-bulkhead.wv` — BULKHEAD_ENGINE_M52 pinlabels. 07K additions (Phase 3 plug) noted separately.
+
+**Type A — Main harness wire labels** (Brady M21-125-C-342, ×2 per wire)
+
+- **End 1 — AS79 end:** slide onto wire before crimping the AS79 contact; position within ~50mm of the connector body after insertion. This is what you read when tracing wires at the bulkhead.
+- **End 2 — splice end:** slide onto wire before cutting to length; position within ~20mm of the bare wire tip. This label sits right at the splice point during Phase C so you can match each harness wire to the correct pigtail without tracing back to the AS79. It is at the tip of the wire, not at the sub-loom breakout (the sub-loom breakout has its own separate Type C label).
+
+| Pin | Label text | Sub-loom | M52 | 07K |
+|-----|-----------|---------|-----|-----|
+| 1 | `1 +12V-COILS` | COILS | ✓ | ✓ |
+| 2 | `2 +12V-COILS` | COILS | ✓ | ✓ |
+| 3 | `3 ENG-GND` | COILS | ✓ | ✓ |
+| 4 | `4 IGN1` | COILS | ✓ | ✓ |
+| 5 | `5 IGN2` | COILS | ✓ | ✓ |
+| 6 | `6 IGN3` | COILS | ✓ | ✓ |
+| 7 | `7 IGN4` | COILS | ✓ | ✓ |
+| 8 | `8 INJ1` | INJECTORS | ✓ | ✓ |
+| 9 | `9 INJ2` | INJECTORS | ✓ | ✓ |
+| 10 | `10 INJ3` | INJECTORS | ✓ | ✓ |
+| 11 | `11 INJ4` | INJECTORS | ✓ | ✓ |
+| 12 | `12 INJ5` | INJECTORS | ✓ | ✓ |
+| 13 | `13 INJ6` | INJECTORS | ✓ (M52) | — (cavity-plug) |
+| 14 | `14 INJ7` | INJECTORS | — (stub) | ✓ (07K 5th cyl) |
+| 16 | `16 CRANK-VR+` | TRIGGER | ✓ | — (07K uses pin 41) |
+| 17 | `17 CRANK-VR-` | TRIGGER | ✓ | — |
+| 18 | `18 CRANK-SHLD` | TRIGGER | ✓ | ✓ |
+| 19 | `19 CAM-HALL` | TRIGGER | ✓ (M52) | — (07K uses pin 20) |
+| 20 | `20 CAM-07K` | TRIGGER | — (stub) | ✓ (07K cam) |
+| 22 | `22 DBW-SIG` | SENSORS | — (stub) | ✓ (07K DBW TB signal) |
+| 23 | `23 DBW-5V` | SENSORS | — (stub) | ✓ (07K DBW TB +5V) |
+| 24 | `24 DBW-GND` | SENSORS | — (stub) | ✓ (07K DBW TB GND) |
+| 25 | `25 CLT` | SENSORS | ✓ | ✓ |
+| 26 | `26 IAT` | SENSORS | ✓ | ✓ |
+| 27 | `27 FLEX-12V` | SENSORS | ✓ | ✓ |
+| 29 | `29 +12V-COILS` | COILS | ✓ | ✓ |
+| 30 | `30 +12V-COILS` | COILS | ✓ | ✓ |
+| 31 | `31 ENG-GND` | COILS | ✓ | ✓ |
+| 32 | `32 IGN5` | COILS | ✓ | ✓ |
+| 33 | `33 IGN6` | COILS | ✓ (M52) | — (cavity-plug) |
+| 34 | `34 IGN7` | COILS | — (stub) | ✓ (07K 5th cyl) |
+| 35 | `35 VANOS` | ACTUATORS | ✓ (M52) | — |
+| 36 | `36 ICV-A` | ACTUATORS | ✓ (M52) | — |
+| 37 | `37 ICV-B` | ACTUATORS | ✓ (M52) | — |
+| 38 | `38 STARTER` | ACTUATORS | ✓ | ✓ |
+| 39 | `39 ALT-D+` | ACTUATORS | ✓ | ✓ |
+| 41 | `41 CRANK-07K` | TRIGGER | — (stub) | ✓ (07K crank VR+) |
+| 43 | `43 KNOCK1` | KNOCK | — (stub) | ✓ |
+| 44 | `44 KNOCK2` | KNOCK | — (stub) | ✓ |
+| 45 | `45 KNOCK-GND` | KNOCK | — (stub) | ✓ |
+| 47 | `47 +5V-SENS` | SENSORS | ✓ | ✓ |
+| 48 | `48 TPS` | SENSORS | ✓ | ✓ |
+| 49 | `49 MAP` | SENSORS | ✓ | ✓ |
+| 50 | `50 PST-F1-P` | SENSORS | ✓ | ✓ |
+| 51 | `51 PST-F1-T` | SENSORS | ✓ | ✓ |
+| 52 | `52 ENG-GND` | COILS | ✓ | ✓ |
+| 56 | `56 ATF-TEMP` | SENSORS | optional | optional |
+| 64 | `64 FLEX-SIG` | SENSORS | ✓ | ✓ |
+| 79 | `79 SENS-GND` | SENSORS | ✓ | ✓ |
+
+**Type A totals:** M52 Phase 1 plug — 37 wires × 2 = **74 labels**. 07K Phase 3 plug adds 13 wires (pins 14, 20, 22–24, 34, 41, 43–45 + 3 DBW) × 2 = **26 more labels → 100 total**.
+
+---
+
+**Type B — Pigtail connector labels** (Brady M21-125-C-342, ×1 per pigtail, applied near connector end before body snaps on)
+
+| Label text | Connector type | Critical warning |
+|-----------|---------------|-----------------|
+| `INJ1` | EV14 2-pin | — |
+| `INJ2` | EV14 2-pin | — |
+| `INJ3` | EV14 2-pin | — |
+| `INJ4` | EV14 2-pin | — |
+| `INJ5` | EV14 2-pin | — |
+| `INJ6` | EV14 2-pin | M52 only |
+| `COL1` | M52: 2-pin pencil coil / 07K: 4B0973724 4-pin COP | — |
+| `COL2` | Same | — |
+| `COL3` | Same | — |
+| `COL4` | Same | — |
+| `COL5` | Same | — |
+| `COL6` | M52 pencil coil only | M52 only |
+| `CAM` | 3B0973703G (3-pin VAG) | ⚠️ Label before body snaps on — identical housing to CRANK |
+| `CRANK` | 3B0973703G (3-pin VAG) | ⚠️ Label before body snaps on — identical housing to CAM |
+| `CLT` | 1J0973702 (2-pin JPT) | — |
+| `IAT` | 1J0973702 (2-pin JPT) | — |
+| `MAP` | 3B0973703G (3-pin VAG) | — |
+| `KS1` | 1J0973712 (2-pin flat) | 07K only |
+| `KS2` | 1J0973712 (2-pin flat) | 07K only |
+
+**Type B total:** M52 — 18 labels. 07K — 19 labels (adds KS1/KS2, swaps to COP pigtail format).
+
+---
+
+**Type C — Sub-loom breakout labels** (Brady M21-375-C-342 3/8" cartridge, ×1 per sub-loom, slides over bare sub-loom bundle before Techflex goes on)
+
+| Label text | Sub-loom | Applies to |
+|-----------|---------|-----------|
+| `INJECTORS` | INJ 1–5/6 wires | M52 + 07K |
+| `COILS` | IGN 1–5/6 + +12V rail wires | M52 + 07K |
+| `TRIGGER` | Crank VR+/VR−/shield + Cam Hall | M52 + 07K |
+| `SENSORS` | CLT, IAT, MAP, TPS, +5V, SENS-GND, PST-F1, Flex | M52 + 07K |
+| `KNOCK` | KS1, KS2, KNOCK-GND | 07K only |
+| `ACTUATORS` | VANOS, ICV-A, ICV-B, Starter, Alt-D+ | M52 (subset 07K) |
+
+**Type C total:** 5 labels (M52), 6 labels (07K).
+
+---
+
+**Type D — Main trunk label** (Brady M21-500-C-342 1/2" cartridge, ×1, at AS79 exit from main trunk)
+
+| Label text | When |
+|-----------|------|
+| `ENGINE M52 PH1` | M52 Phase 1 engine-side plug |
+| `ENGINE 07K PH3` | 07K Phase 3 engine-side plug |
+
+---
+
+**Print queue summary:**
+
+| Type | Cartridge | M52 count | 07K count |
+|------|----------|----------|----------|
+| A — wire labels | M21-125-C-342 | 74 | 100 total |
+| B — pigtail labels | M21-125-C-342 | 18 | 19 |
+| C — sub-loom breakout | M21-375-C-342 | 5 | 6 |
+| D — main trunk | M21-500-C-342 | 1 | 1 |
+| **Total** | | **98** | **126** |
+
+Print all Type A and B labels before touching any wire. Print Type C and D labels before sleeving begins.
+
 ---
 
 ## Build Sequence
@@ -276,11 +442,53 @@ Zip-tie flag labels (a printed tab folded through a zip-tie cinched to the loom)
 
 ## Bench Test Before Install
 
-Run each harness on the bench before it goes in the car:
+Run each harness on the bench before it goes in the car. All checks are done with a multimeter — no car battery connected, no ECU powered.
 
-1. **Continuity:** Every signal wire from ECU pin to sensor pigtail — verify against `.wv` file
-2. **Isolation:** No contact between adjacent pins (especially power to signal grounds)
-3. **Resistance:** Power and ground runs ≤ 0.1 Ω end-to-end for 12 AWG; sensor signal runs ≤ 0.5 Ω
-4. **Connector retention:** Every pin survives a 5 N tug test in both directions
+### Multimeter setup
 
-Only after bench pass → sleeve → route → install.
+Set the dial to **continuity mode** (symbol: `)))` or a speaker/wave icon — the meter beeps when the circuit is closed). Continuity mode generates its own internal test signal (~0.5–1.5V, a few milliamps) — you are not applying battery voltage. The voltage and current range settings on the dial are for measuring live circuits and are not used for harness testing.
+
+If your multimeter does not have a dedicated continuity mode, use **resistance (Ω) mode** at the 200Ω range. A good 22 AWG wire ≤2m reads <0.5Ω. Higher = partial break or bad crimp.
+
+### Test procedure — four checks in order
+
+**Check 1 — Continuity (every signal wire)**
+1. Open the `.wv` file (`firewall-bulkhead.wv` for the engine harness)
+2. For each populated pin: touch one probe to the AS79 cabin-side wire end (or the ECU C1/C2 connector pin), touch the other probe to the expected sensor pigtail pin at the far end
+3. Beep (or <0.5Ω) = wire seated correctly and circuit complete
+4. No beep = break — bad crimp, pin not fully seated, or wrong pin. Do NOT sleeve until resolved. Depin, inspect, re-crimp.
+5. Work through every signal pin in the label inventory table above, in pin order — check them off on a printed copy of the label inventory
+
+**Check 2 — Isolation (no shorts between adjacent pins)**
+1. For each pair of adjacent signal pins (especially power pins adjacent to signal pins), touch one probe to pin A and the other to pin B
+2. Should get **no** beep / open circuit (infinite Ω)
+3. Any beep between adjacent signal pins = short — strands bridging inside the connector or a crimped terminal touching its neighbor. Find and fix before sleeving.
+4. Critical pairs to test: every IGN pin against every adjacent INJ pin; every +12V pin against every SENS-GND pin; SENS-GND (pin 79) against chassis GND (they must NOT be shorted together — see Power & Ground Rules)
+
+**Check 3 — Resistance (power and ground runs)**
+
+| Wire type | Spec |
+|-----------|------|
+| 12–14 AWG power/GND wire, ≤2m | ≤0.1Ω |
+| 22 AWG signal wire, ≤2m | ≤0.5Ω |
+| Any wire | >2Ω = investigate (bad crimp or wrong gauge) |
+
+Measure resistance end-to-end using resistance mode (200Ω range). Values above spec indicate a marginal crimp — rework before sleeving. A crimp that passes the pull-test but reads high resistance will cause voltage drop and intermittent sensor errors at temperature.
+
+**Check 4 — Connector retention (pull-test)**
+1. Grip each wire within 50mm of the connector body (not the wire far from the terminal — grip near the barrel)
+2. Apply a firm hand tug toward the wire exit (~5 N, roughly 1.1 lb-force)
+3. Any terminal that moves or pulls out = bad crimp or lance not engaged. Depin, inspect barrel for cut strands, re-crimp.
+
+### Pass criteria
+
+All four checks must pass before sleeving begins:
+
+| Check | Pass | Action on fail |
+|-------|------|---------------|
+| Continuity | Beep on every signal wire end-to-end | Depin, inspect, re-crimp |
+| Isolation | Open (no beep) between all adjacent pins | Find bridging strands or touching terminals, fix |
+| Resistance | Within spec for each wire type | Re-crimp or replace wire |
+| Pull-test | No terminal movement under hand tug | Depin, inspect, re-crimp |
+
+**Only after all four checks pass → sleeve → route → install.**
