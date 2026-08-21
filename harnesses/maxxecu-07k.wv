@@ -80,17 +80,26 @@
 #       Motor wires cross AS79 via cabin pins 22 (C2 H4) and 23 (C2 H2).
 #       In MTune: Settings → E-Throttle → Motor output → Motor 1 (not GPO).
 #
-# TODO: Injector firing order — 07K order is 1-2-4-5-3.
-#       Document INJ channel-to-cylinder mapping in MTune :: Engine :: Injectors.
+# DONE: Injector firing order — 07K order is 1-2-4-5-3 (confirmed).
+#       Physical wiring: INJ 1 → Cyl 1, INJ 2 → Cyl 2, ... INJ 5 → Cyl 5 (sequential).
+#       MaxxECU handles timing: MTune → Engine → Injectors → Firing order: 1-2-4-5-3.
+#       INJ CMC channels: K1/K2/M1/M2/M3 (CMC pins 37/38/45/46/47).
+#       Source: VW 07K CBUA/BGP documentation; confirmed standard VW I5 firing order.
 #
-# TODO: Ignition firing order — same 1-2-4-5-3 as fuel.
-#       Document IGN channel-to-coil mapping in MTune :: Engine :: Ignition.
+# DONE: Ignition firing order — same 1-2-4-5-3 as fuel.
+#       Physical wiring: IGN 1 → Coil 1, IGN 2 → Coil 2, ... IGN 5 → Coil 5 (sequential).
+#       MaxxECU handles timing: MTune → Engine → Ignition → Firing order: 1-2-4-5-3.
+#       IGN CMC channels: A2/A3/B2/B3/C2 (CMC pins 2/3/6/7/10). GND = L4 (CMC pin 44).
+#       Source: VW 07K CBUA/BGP documentation; confirmed standard VW I5 firing order.
 #
 # TODO: Wire bung for WBO2 in 07K top-mount exhaust manifold (custom fab).
 #       Confirm bung position upstream of turbo, min 6in from collector.
 #
-# TODO: EWS2 bypass not needed — 07K has no factory immobilizer in MaxxECU context.
-#       Confirm any remaining OBD/CAN interference from retained body harness.
+# DONE: EWS2 bypass not needed — 07K has no factory immobilizer in MaxxECU context.
+#       07K (CBUA/BGP) ECM communicates via K-line/OBD2; no EWS immobilizer ring.
+#       MaxxECU replaces the ECM entirely. No bypass loop required.
+#       Body harness CAN/K-line: body modules (cluster, DME) are either deleted or
+#       replaced by Gauge.S (CAN) and 8HP TCU (CAN). No OBD interference expected.
 #
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -278,47 +287,41 @@ connectors:
 
   # ── Engine-side mating plug (07K — replaces M52 mating plug at bulkhead) ────
 
-  # ── Firewall bulkhead engine-side plug (07K Phase 3) — PIN REFERENCE ONLY ────────
+  # ── Firewall bulkhead engine-side plug (07K Phase 3) — PIN REFERENCE ───────────
   # Connector type: Deutsch AS79 / Souriau 8STA 79-way jam nut plug (engine side)
   # Operation: Unplug M52 engine mating plug, insert 07K mating plug. Cabin side unchanged.
-  # Full connector modeled in harnesses/firewall-bulkhead.wv.
-  # Excluded from WireViz connectors here — a 79-pin pass-through would require duplicating
-  # every connection in this file; bulkhead is treated as transparent in this diagram.
+  # Full connector modeled in harnesses/firewall-bulkhead.wv (BULKHEAD_ENGINE_M52 / 07K notes).
+  # Excluded from WireViz connectors here — bulkhead treated as transparent in this diagram.
   #
-  # Pin assignment (07K Phase 3):
-  #   Group A — Power (same pins as M52):
-  #     1: +12V Coils/Inj        2: +12V 8HP Main (KL30)   3: +12V 8HP Wakeup (KL15)
-  #     4: +12V Fan              5: +12V Condenser fan      6: +12V EWP → CWA400 pin 3
-  #     7: +12V AC → inverter    8: Engine GND (head stud)  9: 8HP TCU GND
-  #   Group B — Ignition (5-cyl; pin 15 cavity-plugged):
-  #     10: IGN 1   11: IGN 2   12: IGN 3   13: IGN 4   14: IGN 5   15: (cavity plug)
-  #   Group C — Injectors (5-cyl; pin 21 cavity-plugged):
-  #     16: INJ 1   17: INJ 2   18: INJ 3   19: INJ 4   20: INJ 5   21: (cavity plug)
-  #   Group D — Crank/Cam:
-  #     22: Crank VR+   23: Crank VR-   24: Crank shield
-  #     25: Cam Hall signal   26: (spare — 07K cam no +12V)
-  #   Group E — Sensor signals:
-  #     27: Sensor GND (CLT/IAT/TPS/MAP/PST-F1/Cam)
-  #     28: CLT   29: IAT   30: +5V (MAP/PST-F1/DBW TPS/Cam)
-  #     31: DBW TPS1 signal [G2/CMC pin 26]   32: MAP signal
-  #     33: PST-F1 pressure   34: PST-F1 temp
-  #     35: Flex fuel signal   36: Flex fuel +12V
-  #   Group F — WBO2 (LSU 4.9; new bung in 07K manifold):
-  #     37: VS   38: VREF   39: IP   40: RCAL   41: Heater-
-  #   Group G — GPO actuators:
-  #     42: GPO 1 (boost)   43: GPO 3 (VVT solenoid)   44: GPO 4 (SPARE — NOT Motor-)
-  #     45: (spare — GPO 5 freed)   46: EWP PWM (680 Hz)
-  #   Group H — CAN bus:
-  #     47: CAN H (22 AWG TP)   48: CAN L (22 AWG TP)
-  #   Group J — Misc:
-  #     49: Starter trigger   50: Alternator D+
-  #     51: AIN 2 (DBW TPS2) [J2/CMC pin 34 = AS79 pin 56]   52: AC enable   53: Chassis GND engine bay
-  #   NOTE: DBW Motor+/Motor- cross the AS79 bulkhead via AS79 pins 22/23 (cabin side
-  #     wired to MaxxECU C2 H4/H2). These are in the engine-side 07K plug only.
-  #   Group N — Expansion stubs (reference only; these are NOT in this dual-connector design):
-  #     69: Knock 1 signal   70: Knock 2 signal   71: Knock GND
-  #     [AS79 design uses pins 43/44/45 for knock instead]
-  #   Pins 72-79 — ALL SPARE (APS is cabin-to-cabin; no bulkhead crossing for APS)
+  # ── Confirmed AS79 pin assignments (cross-reference firewall-bulkhead.wv BULKHEAD_CABIN) ──
+  #   Power rails (Option B — via bulkhead; Option A routes separately through DT grommet):
+  #     1, 2, 29, 30: +12V Coils/Inj rails (four contacts in parallel, 4×5A = 20A)
+  #     3, 31, 52:    Engine GND (three contacts in parallel, 3×5A = 15A)
+  #   Ignition outputs (22 AWG max per size-22D contact):
+  #     4: IGN 1 (CMC A2)   5: IGN 2 (CMC A3)   6: IGN 3 (CMC B2)   7: IGN 4 (CMC B3)
+  #     32: IGN 5 (CMC C2)  33: IGN 6 [M52 only, cavity-plug 07K]    34: EXP IGN 7
+  #   Injector outputs (20 AWG):
+  #     8: INJ 1 (CMC K1)   9: INJ 2 (CMC K2)   10: INJ 3 (CMC M1)
+  #     11: INJ 4 (CMC M2)  12: INJ 5 (CMC M3)  13: INJ 6 [M52 only, cavity-plug 07K]
+  #   Crank / Cam triggers:
+  #     16: Crank VR+ (CMC H3)  17: Crank VR- (CMC H2)  18: Crank shield drain
+  #     19: Cam Hall signal (CMC H4)   [M52 + 07K — same pins, swap connector body only]
+  #   DBW throttle body (07K only; cavity-plug on M52):
+  #     22: ETh Motor+ → MaxxECU C2 H4 (MOTOR 1+)   23: ETh Motor- → MaxxECU C2 H2 (MOTOR 1-)
+  #     48: TPS1 (CMC G2)   56: TPS2 / AIN 2 (CMC J2)   [+5V from 47, GND from 79]
+  #   Sensor signals:
+  #     25: CLT (CMC F1)   26: IAT (CMC F2)   27: Flex fuel +12V
+  #     47: +5V sensor supply (CMC G1 — TPS/MAP/PST-F1/Cam/07K DBW TPS)
+  #     48: TPS1 signal (CMC G2)   49: MAP signal (AIN 4)   79: Sensor GND (CMC H1, center pin)
+  #   GPO actuators:
+  #     35: GPO 3 → VANOS (M52) / VVT solenoid (07K)   36: GPO 4 → ICV-A (M52) / SPARE (07K)
+  #     37: GPO 5 → ICV-B (M52)   38: Starter trigger   39: Alt D+
+  #   Knock sensors (07K only; cavity-plug on M52):
+  #     43: Knock 1 signal (CMC K3)   44: Knock 2 signal (CMC K4)   45: Knock GND / shield drain
+  #   Misc:
+  #     64: Flex fuel signal (CMC C1 / DIN3)
+  #   Pins 20, 24, 41, 50–63, 65–78: SPARE / cavity-plug
+  #   Pins 72–79 (except 79): SPARE — APS is cabin-to-cabin, no bulkhead crossing needed
 
   # ── 07K engine sensors / actuators ─────────────────────────────────────────
 
@@ -409,7 +412,7 @@ connectors:
     notes: >
       GND via M8 mounting bolt to block — no separate GND wire.
       ME7.1.1 ref: pin 106. MaxxECU: CMC K3 (DIN/VR1, pin 39).
-      Bulkhead expansion pin 69.
+      AS79 bulkhead: signal via pin 43 (EXP: Knock sensor 1). Shield drain via pin 45.
       Location: "back side of engine block" = exhaust side (both KS1 and KS2).
       Source: charm.li CBTA/BGP component locations — "Knock Sensors" section.
 
@@ -420,7 +423,7 @@ connectors:
     pinlabels: ["KS2 signal"]
     notes: >
       GND via M8 mounting bolt. ME7.1.1 ref: pin 107.
-      MaxxECU: CMC K4 (DIN/VR2, pin 40). Bulkhead expansion pin 70.
+      MaxxECU: CMC K4 (DIN/VR2, pin 40). AS79 bulkhead: signal via pin 44. Shield drain via pin 45.
 
   # ── Ignition (5-cyl — same VAG 4-way COP as M52; S54 COPs retained) ─────────
 
@@ -512,6 +515,22 @@ connectors:
       Sensor: Bosch 0 258 017 025 (LSU 4.9).
       Product: https://www.bosch-motorsport.com/products/sensors/lambda/lambda-sensor-lsu-4-9/
 
+  VVT_SOL:
+    type: "VW 07K intake cam VVT solenoid — connector TBD"
+    subtype: "2-pin. ME7.1.1 ref: cam actuator pin 115. MaxxECU GPO 3 (CMC D4 = pin 16)."
+    pincount: 2
+    pinlabels: ["+12V", "GPO 3 signal"]
+    notes: >
+      07K intake cam VVT actuator solenoid. MaxxECU GPO 3 (CMC D4/pin 16) drives this.
+      AS79 bulkhead: GPO 3 signal crosses via CABIN pin 35 (engine-side 07K plug pin 35).
+      +12V from coil/inj relay (ECU_12PIN[1]).
+      Flyback diode: 1N4007 at solenoid connector, cathode (banded end) to +12V pin, anode to GPO 3 pin.
+      MTune: Settings → Outputs → GPO 3 → Function: PWM Solenoid → assign to Cam VVT control.
+      Closed-loop cam timing target map: RPM vs load.
+      TODO: Confirm VW 07K VVT solenoid connector body at install.
+        TTRS/CEPA intake cam VVT actuator is typically a 2-pin vertical-latch connector
+        on the intake cam cap at the cylinder-5 end of the head. Verify at engine.
+
   BOOST_SOL:
     type: "Superseal 2-way"
     subtype: "Turbosmart boost solenoid (2-port PWM)"
@@ -541,14 +560,18 @@ cables:
     colors: [WH, BK, GY]
     wirelabels: [Signal+, Signal-, Shield]
     length: 1.0 m
-    notes: "Shielded twisted pair. Shield terminates at sensor GND (CMC H1/pin 29)."
+    notes: "Shielded twisted pair. Shield terminates at CMC E3 (GND Shield, pin 19) — dedicated shield ground, not sensor GND bus."
 
   W_CAM:
     wirecount: 3
     colors: [RD, BK, WH]
     wirelabels: ["+5V", "Sensor GND", Signal]
     length: 0.8 m
-    notes: "+5V from shared sensor rail (CMC G1/pin 25 → bulkhead pin 30)."
+    shield: true
+    notes: >-
+      +5V from shared sensor rail (CMC G1/pin 25 → AS79 pin 47).
+      Shielded recommended — cam Hall signal runs in Sector 1 near crank trigger and coil primaries.
+      Shield drain terminates at CMC E3 (GND Shield, pin 19). Float at sensor side.
 
   # ── Temperature / pressure sensors ────────────────────────────────────────────
   W_CLT:
@@ -595,17 +618,23 @@ cables:
 
   # ── Knock sensors ─────────────────────────────────────────────────────────────
   W_KNOCK_1:
-    wirecount: 1
-    colors: [WH]
-    wirelabels: ["KS1 signal"]
+    wirecount: 2
+    colors: [WH, GY]
+    wirelabels: ["KS1 signal", "Shield drain"]
     length: 0.4 m
-    notes: "GND via M8 mounting bolt — no GND wire. Shield/GND at expansion pin 71."
+    shield: true
+    notes: >-
+      GND via M8 mounting bolt — no GND wire.
+      Shield drain (wire 2) terminates at CMC H1 (Sensor GND, pin 29) via AS79 pin 45.
+      Float at sensor side. Per firewall-bulkhead.wv line 229 spec.
 
   W_KNOCK_2:
-    wirecount: 1
-    colors: [WH]
-    wirelabels: ["KS2 signal"]
+    wirecount: 2
+    colors: [WH, GY]
+    wirelabels: ["KS2 signal", "Shield drain"]
     length: 0.4 m
+    shield: true
+    notes: "Shield drain terminates at CMC H1 (Sensor GND, pin 29) via AS79 pin 45 (shared with KS1)."
 
   # ── Ignition coils (5-cyl) ────────────────────────────────────────────────────
   W_IGN_1:
@@ -727,6 +756,20 @@ cables:
       susceptible to injector/coil noise, especially with this run's proximity
       to the turbo/exhaust bung. Single-end drain at ECU end only.
 
+  W_VVT_SOL:
+    wirecount: 2
+    colors: [RD, GN]
+    wirelabels: ["+12V", "GPO 3 (VVT)"]
+    length: 0.6 m
+    notes: "20 AWG minimum. Flyback diode at solenoid connector. Route in actuators sub-loom with boost solenoid."
+
+  W_WBO2_HTR:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["WBO2 Hs+ (heater+)"]
+    length: 0.3 m
+    notes: "Splices to +12V coil/inj rail on engine side (ECU_12PIN[1]). Short stub — splice at rail, no ECU termination."
+
   W_BOOST:
     wirecount: 2
     colors: [RD, GN]
@@ -775,14 +818,21 @@ connections:
     - W_DBW_MOTOR: [1, 2]
     - ECU_C2: [4, 5]
 
-  # ── Knock sensors (via expansion bulkhead pins 69/70/71 → CMC K3/K4) ─────────
+  # ── Knock sensors (via AS79 pins 43/44/45 → CMC K3/K4; GND via M8 bolt to block) ──
+  # Shield drain for both sensors shares AS79 pin 45 → CMC H1 (Sensor GND, pin 29)
   - - KNOCK_1: [1]
     - W_KNOCK_1: [1]
     - ECU_CMC: [39]
 
+  - - W_KNOCK_1: [2]
+    - ECU_CMC: [29]
+
   - - KNOCK_2: [1]
     - W_KNOCK_2: [1]
     - ECU_CMC: [40]
+
+  - - W_KNOCK_2: [2]
+    - ECU_CMC: [29]
 
   # ── Ignition coils ────────────────────────────────────────────────────────────
   # +12V from coil/inj relay (ECU_12PIN[1]) — NOT ECU_CMC[48] (ECU logic power).
@@ -877,9 +927,25 @@ connections:
     - ECU_CMC: [25, 29, 35, 33]
 
   # ── Wideband O2 (LSU 4.9) ─────────────────────────────────────────────────────
-  - - WIDEBAND: [2, 1, 6, 5, 6]
+  # ECU inputs: VS(2)→F4[24], APE(3)→F3[23], IP(1)→G3[27], Trim(4)→G4[28], Hs-(6)→D1[13]
+  # Hs+ (pin 5) splices to local +12V coil rail — separate connection below
+  - - WIDEBAND: [2, 3, 1, 4, 6]
     - W_WBO2: [1, 2, 3, 4, 5]
     - ECU_CMC: [24, 23, 27, 28, 13]
+
+  # WBO2 heater positive: WIDEBAND pin 5 (Hs+) → splice to +12V coil/inj rail
+  - - WIDEBAND: [5]
+    - W_WBO2_HTR: [1]
+    - ECU_12PIN: [1]
+
+  # ── VVT solenoid (07K intake cam) — GPO 3 ─────────────────────────────────────
+  - - ECU_12PIN: [1]
+    - W_VVT_SOL: [1]
+    - VVT_SOL: [1]
+
+  - - VVT_SOL: [2]
+    - W_VVT_SOL: [2]
+    - ECU_CMC: [16]
 
   # ── Boost solenoid ────────────────────────────────────────────────────────────
   - - ECU_12PIN: [1]
