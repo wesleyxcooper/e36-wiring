@@ -3,7 +3,7 @@
 #
 # Same MaxxECU RACE ECU as M52 phase — zero ECU cost at swap.
 # Firewall bulkhead: engine mating plug swaps (M52 out, 07K in). Cabin side mostly
-# permanent — ONE addition: e-pedal harness (E46 module → bulkhead pins 72-77).
+# permanent — NO bulkhead additions: APS pedal wires are cabin-to-cabin (see below).
 # Source: ME7.1.1 pinout — https://drive.google.com/file/d/15RPWyYPLHGEMMQZIlUgpoo77T-CxjyMP/
 #         MaxxECU pinout: maxxecu.com/webhelp/wirings-maxxecu_pinout.html
 #         MaxxECU e-throttle: maxxecu.com/webhelp/settings-ethrottle.html
@@ -15,21 +15,25 @@
 # KEY DIFFERENCES FROM M52 (harness rebuild required — engine mating plug swap):
 #   + 5-cylinder: INJ 1-5, IGN 1-5. INJ 6 / IGN 6 cavity-plugged.
 #   + DBW throttle body (07K native, ~65mm) replaces cable TPS.
-#     Motor+/Motor- use GPO 3/4 freed from M52 VANOS/ICV.
-#     TPS1/TPS2 route through expansion bulkhead pins 65-67.
-#   + VW cam Hall sensor (+5V type): different connector body; same bulkhead pin 25.
+#     Motor+/Motor- use MaxxECU C2 H4/H2 (MOTOR 1+/MOTOR 1-). NOT GPO3/4.
+#     GPO3 → VVT solenoid. GPO4 → freed/spare.
+#     Motor wires cross AS79 bulkhead via pins 22 (Motor+) and 23 (Motor-).
+#     TPS1 → AS79 pin 48 (CMC G2, was M52 TPS). TPS2 → AS79 pin 56 (CMC J2/AIN2).
+#   + VW cam Hall sensor (+5V type): different connector body; SAME AS79 pin 19 as M52 cam.
 #   + VW crank VR 60-2: same trigger type as M52, different connector body.
-#     MaxxECU trigger type N-1 unchanged — only crank angle offset needs recalibrate.
+#     SAME AS79 pins 16/17/18 as M52 crank. MaxxECU trigger type N-1 unchanged.
+#     Only crank angle offset needs recalibrate.
 #   + Bosch EV14 injectors (ID1050x x5): M50 harness ships with EV1 pigtails —
 #     replace with EV14 pigtail ends at engine-side harness build.
-#   + 2x Bosch flat knock sensors: route through expansion pins 69/70/71.
-#   + NO VANOS solenoid. NO ICV. GPO 3/4/5 freed (GPO 3+4 → ETh Motor+/-).
+#   + 2x Bosch flat knock sensors: route through AS79 expansion pins 43/44/45.
+#   + NO VANOS solenoid. NO ICV. GPO 5 freed. GPO 3 → VVT solenoid.
 #   + PST-F1: same wiring, new mount (iABED M10x1.0 port) — no wiring change.
 #   + WBO2 LSU 4.9: same wiring, new bung in 07K top-mount exhaust manifold.
-#   + CABIN-SIDE ADDITION: BMW E46 DBW accelerator pedal installed; 6-wire shielded
-#     run from pedal module → bulkhead cabin face pins 72-77 (APS GND1/GND2,
-#     VCC1/VCC2, APS1/APS2 signals) → MaxxECU CMC APS inputs (engine side).
-#     All other cabin wiring unchanged. See harnesses/epedal-bmw-e46.wv.
+#   + CABIN-SIDE ADDITION: BMW E46 DBW accelerator pedal installed.
+#     CABIN-TO-CABIN ONLY (no bulkhead crossing): pedal (footwell) → MaxxECU C2
+#     directly. APS1 → C2 E4 (AIN 6), APS2 → C2 F1 (AIN 7). +5V → CMC G1,
+#     GND → CMC H1. AS79 pins 72-77 are NOT used for APS.
+#     See harnesses/epedal-bmw-e46.wv.
 #   + OEM ME7.1.1 engine connector reference:
 #     Crank VR: ME7 pin 82  |  Cam Hall: pin 86  |  CLT: pin 93  |  MAP: pin 101
 #     INJ 1-5: pins 96/97/112/88/89  |  IGN 1-5: pins 102/103/111/94/95
@@ -69,8 +73,12 @@
 #       Confirm TPS1/TPS2 pin assignment at TB connector.
 #       Verify ETh motor wire polarity at TB before wiring (swap if TB runs backwards).
 #
-# TODO: MaxxECU ETh1 GPO assignment — confirm GPO 3 + GPO 4 as Motor+/Motor-
-#       in MTune :: Throttle :: E-Throttle wizard before committing wiring.
+# DONE: MaxxECU ETh1 motor assignment CONFIRMED — C2 H4 (MOTOR 1+) and C2 H2 (MOTOR 1-).
+#       NOT GPO3/GPO4. MaxxECU RACE C2 has dedicated H-bridge outputs for e-throttle.
+#       Source: MaxxECU RACE GEN1 C2 pinout (maxxecu.com/webhelp/wirings-maxxecu_pinout.html).
+#       GPO3 → VVT solenoid (CMC D4). GPO4 → freed/spare.
+#       Motor wires cross AS79 via cabin pins 22 (C2 H4) and 23 (C2 H2).
+#       In MTune: Settings → E-Throttle → Motor output → Motor 1 (not GPO).
 #
 # TODO: Injector firing order — 07K order is 1-2-4-5-3.
 #       Document INJ channel-to-cylinder mapping in MTune :: Engine :: Injectors.
@@ -132,9 +140,13 @@ connectors:
 
   # ── MaxxECU CMC main connector — SAME AS M52, updated GPO notes ─────────────
   # Source: maxxecu.com/webhelp/wirings-maxxecu_pinout.html
-  # GPO 3 (D4/pin 16): freed from VANOS → ETh Motor+ (07K)
-  # GPO 4 (E4/pin 20): freed from ICV A → ETh Motor- (07K)
+  # GPO 3 (D4/pin 16): freed from VANOS → VVT actuator (07K intake cam)
+  # GPO 4 (E4/pin 20): freed from ICV A → SPARE (NOT Motor- — see C2 below)
   # GPO 5 (A1/pin 1):  freed from ICV B → spare / future actuator
+  # ETh Motor+/Motor-: MaxxECU C2 H4 (MOTOR 1+) and C2 H2 (MOTOR 1-). NOT GPO3/GPO4.
+  #   C2 has dedicated H-bridge outputs for e-throttle.
+  #   Motor+ (C2 H4) → AS79 cabin pin 22 → TB motor lead.
+  #   Motor- (C2 H2) → AS79 cabin pin 23 → TB motor lead.
   # GPO 2 (C4/pin 12): fan/pump NO LONGER physical relay wires — MaxxECU broadcasts
   # GPO 6 (B1/pin 5):  fan/pump states over CAN1 → PMU16 maps to O3/O4 outputs.
   #                    12-pin relay trigger pins 2/3/9 are also unconnected (N/C).
@@ -159,11 +171,11 @@ connectors:
       - "D1: WBO2 Heater-"              # 13
       - "D2: IGN 7 (unused)"            # 14
       - "D3: IGN 8 (unused)"            # 15
-      - "D4: GPO 3 (ETh Motor+)"        # 16  — freed from VANOS
+      - "D4: GPO 3 (VVT actuator)"       # 16  — was VANOS; now 07K intake VVT solenoid
       - "E1: CAN H"                      # 17
       - "E2: CAN L"                      # 18
       - "E3: GND Shield"                # 19
-      - "E4: GPO 4 (ETh Motor-)"        # 20  — freed from ICV A
+      - "E4: GPO 4 (SPARE)"            # 20  — freed from ICV A; NOT ETh Motor-
       - "F1: CLT"                        # 21
       - "F2: IAT"                        # 22
       - "F3: WBO2 VREF"                  # 23
@@ -193,17 +205,25 @@ connectors:
       - "M3: INJ 5"                      # 47
       - "M4: +12V ECU power"            # 48
 
-  # ── MaxxECU C2 (32-pin Molex CMC) — stub for virtual clutch AIN 5 ─────────────
-  # Identical to M52 harness — cabin-side, no re-work at engine swap.
+  # ── MaxxECU C2 (32-pin Molex CMC) — clutch position + ETh motor outputs ────────
   ECU_C2:
     type: "Molex CMC 32-pin (MaxxECU Race C2)"
-    subtype: "Stub — only AIN 5 (G3) used for virtual clutch position"
-    pincount: 3
+    subtype: "AIN 5 (clutch) + MOTOR 1+/1- (ETh) + AIN 6/7 (APS, cabin-side only)"
+    pincount: 5
     pinlabels:
       - "G3: AIN 5 — clutch position signal (0-5V)"
       - "+5V sensor supply (C2 shared rail)"
       - "Sensor GND (C2 shared rail)"
-    notes: "Same as M52 harness. See maxxecu-m52.wv ECU_C2 for full notes."
+      - "H4: MOTOR 1+ — ETh Motor+ → AS79 pin 22 → TB motor"
+      - "H2: MOTOR 1- — ETh Motor- → AS79 pin 23 → TB motor"
+    notes: >-
+      C2 H4 (MOTOR 1+) and C2 H2 (MOTOR 1-) are the dedicated H-bridge outputs for
+      the 07K DBW throttle body. NOT GPO3/4. These wires cross the AS79 bulkhead via
+      cabin pins 22 and 23 respectively.
+      AIN 6 (C2 E4) and AIN 7 (C2 F1) are used for APS1/APS2 from the E46 pedal --
+      those are cabin-to-cabin wires and do not appear in engine-side connections here.
+      Source: MaxxECU RACE GEN1 C2 pinout (maxxecu.com/webhelp/wirings-maxxecu_pinout.html).
+      See maxxecu-m52.wv ECU_C2 for AIN 5 clutch wiring detail.
 
   # ── Virtual clutch pedal position sensor ─────────────────────────────────────
   # Identical to M52 harness — cabin-side, no re-work at engine swap.
@@ -286,22 +306,19 @@ connectors:
   #   Group F — WBO2 (LSU 4.9; new bung in 07K manifold):
   #     37: VS   38: VREF   39: IP   40: RCAL   41: Heater-
   #   Group G — GPO actuators:
-  #     42: GPO 1 (boost)   43: GPO 3 (DBW Motor+)   44: GPO 4 (DBW Motor-)
+  #     42: GPO 1 (boost)   43: GPO 3 (VVT solenoid)   44: GPO 4 (SPARE — NOT Motor-)
   #     45: (spare — GPO 5 freed)   46: EWP PWM (680 Hz)
   #   Group H — CAN bus:
   #     47: CAN H (22 AWG TP)   48: CAN L (22 AWG TP)
   #   Group J — Misc:
   #     49: Starter trigger   50: Alternator D+
-  #     51: AIN 2 (DBW TPS2) [J2/CMC pin 34]   52: AC enable   53: Chassis GND engine bay
-  #   Group N — Expansion stubs:
-  #     54: INJ 7 alt   55: IGN 7 alt   56: DIN4/VR3   57: DIN5/VR4   58: AIN 6
-  #     59: GPO 8/TACHO   60: +5V supply 2   61: Sensor GND 2   62: +12V switched spare
-  #     63: 07K cam alt   64: 07K crank alt
-  #     65: DBW TPS1 alt signal   66: DBW TPS1 +5V   67: DBW TPS1 GND
-  #     68: MAP2/boost ref   69: Knock 1 signal   70: Knock 2 signal   71: Knock GND
-  #   Pins 72-77 — APS e-pedal pass-through (added Phase 3):
-  #     72: APS GND 1   73: APS GND 2   74: APS VCC2   75: APS1 signal   76: APS VCC1   77: APS2 signal
-  #   Pins 78-79 — True spares
+  #     51: AIN 2 (DBW TPS2) [J2/CMC pin 34 = AS79 pin 56]   52: AC enable   53: Chassis GND engine bay
+  #   NOTE: DBW Motor+/Motor- cross the AS79 bulkhead via AS79 pins 22/23 (cabin side
+  #     wired to MaxxECU C2 H4/H2). These are in the engine-side 07K plug only.
+  #   Group N — Expansion stubs (reference only; these are NOT in this dual-connector design):
+  #     69: Knock 1 signal   70: Knock 2 signal   71: Knock GND
+  #     [AS79 design uses pins 43/44/45 for knock instead]
+  #   Pins 72-79 — ALL SPARE (APS is cabin-to-cabin; no bulkhead crossing for APS)
 
   # ── 07K engine sensors / actuators ─────────────────────────────────────────
 
@@ -372,10 +389,16 @@ connectors:
     notes: >
       TODO: Confirm VW TB connector body and motor wire polarity at install.
       ME7.1.1 ref: Motor+=pin84, Motor-=pin92, TPS1=pin117, TPS2=pin118.
-      MaxxECU ETh1: GPO 3 (CMC D4=pin16) → Motor+, GPO 4 (CMC E4=pin20) → Motor-.
+      MaxxECU ETh1 motor: C2 H4 (MOTOR 1+) → AS79 pin 22 → TB Motor+.
+                           C2 H2 (MOTOR 1-) → AS79 pin 23 → TB Motor-.
+      NOT GPO3/GPO4. C2 MOTOR 1+/1- are the correct H-bridge outputs.
+      Source: MaxxECU RACE GEN1 C2 pinout (maxxecu.com/webhelp/wirings-maxxecu_pinout.html).
+      MTune: Settings → E-Throttle → Motor output → Motor 1.
       IMPORTANT: verify motor polarity with volt meter before wiring — swap Motor+/-
-      if throttle runs in wrong direction during e-throttle wizard calibration.
-      TPS1 → CMC G2 (pin 26) / bulkhead pin 31. TPS2 → CMC J2 (pin 34) / bulkhead pin 51.
+      at TB connector if throttle runs in wrong direction during e-throttle wizard.
+      TPS1 → CMC G2 (pin 26) / AS79 pin 48 (was M52 TPS — same wire).
+      TPS2 → CMC J2 (AIN 2, pin 34) / AS79 pin 56 (was ATF temp spare — repurposed).
+      +5V → AS79 pin 47 (shared +5V rail, CMC G1). GND → AS79 pin 79 (SGND, CMC H1).
       Calibrate in MTune :: Throttle :: E-Throttle wizard.
 
   KNOCK_1:
@@ -563,9 +586,12 @@ cables:
   W_DBW_MOTOR:
     wirecount: 2
     colors: [OG, VT]
-    wirelabels: ["Motor+ (ETh GPO3)", "Motor- (ETh GPO4)"]
+    wirelabels: ["Motor+ (C2 H4 MOTOR 1+)", "Motor- (C2 H2 MOTOR 1-)"]
     length: 0.5 m
-    notes: "Heavier gauge — 20 AWG minimum (3A H-bridge output). Verify polarity before final assembly."
+    notes: >-
+      20 AWG minimum (H-bridge output, ~3A peak). Verify polarity at TB before final crimp.
+      Engine-side wires terminate at throttle body motor leads (OE ref: pin 84 Mot+, pin 92 Mot-).
+      Cabin side of this wire goes to MaxxECU C2 H4/H2 via AS79 pins 22/23.
 
   # ── Knock sensors ─────────────────────────────────────────────────────────────
   W_KNOCK_1:
@@ -743,11 +769,11 @@ connections:
     - W_DBW_TPS: [1, 2, 3, 4]
     - ECU_CMC: [25, 29, 26, 34]
 
-  # ── DBW throttle body — motor (H-bridge via GPO 3 + GPO 4) ──────────────────
-  # Motor+ = GPO 3 = CMC D4 = pin 16; Motor- = GPO 4 = CMC E4 = pin 20
+  # ── DBW throttle body — motor (C2 H4/H2 internal H-bridge) ─────────────────────
+  # Motor+ = C2 H4 (MOTOR 1+) → AS79 pin 22; Motor- = C2 H2 (MOTOR 1-) → AS79 pin 23
   - - DBW_TB: [5, 6]
     - W_DBW_MOTOR: [1, 2]
-    - ECU_CMC: [16, 20]
+    - ECU_C2: [4, 5]
 
   # ── Knock sensors (via expansion bulkhead pins 69/70/71 → CMC K3/K4) ─────────
   - - KNOCK_1: [1]

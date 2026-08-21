@@ -54,9 +54,13 @@ metadata:
 #   [ ] Confirm this is the "Basic EPS Controller" family (manual Adjustment
 #       Knob) and not a different controller variant -- verify with vendor
 #       at order time, since no e36-specific PDF is published
-#   [ ] Confirm IGN-switched 10A source for EPS Controller -- PMU16 spare
-#       output (O8) in power-distribution.wv is the designated source.
-#       Alternatively: kit-supplied fuse-tap lead on an existing IGN circuit.
+#   [ ] Confirm IGN-switched 10A source for EPS Controller:
+#       M5x Phase 1: relay board IGN-switched output, or fuse-tap on an existing
+#       OEM IGN circuit (e.g. the OEM ignition relay switched-output feed shared
+#       by the fan/fuel relay coils in maxxecu-m52.wv). Kit-supplied 10A Mini ATM
+#       fuse protects this feed. One wire end moves at 07K swap (see below).
+#       07K Phase 3: remapped to PMU16 spare output O8 (10A channel, power-distribution.wv)
+#       at PMU16 installation. Single-wire retermination from relay board → PMU16 O8.
 #   [ ] Confirm 60A Maxi fuse mounting point near battery -- coordinate with
 #       MAIN_FUSE in power-distribution.wv (separate fuse, do not combine)
 #   [ ] Confirm Steering ECU mounting location -- vendor recommends bare
@@ -168,16 +172,21 @@ connectors:
       Shop slim RHD shaft (see project plan Steering Shaft row).
 
   IGN_12V_TAP:
-    type: "Stub -- IGN-switched +12V source, see power-distribution.wv"
-    subtype: "PMU16 spare output O8 (10A channel) — Phase 3 assignment"
+    type: "Stub -- IGN-switched +12V source, two-phase assignment"
+    subtype: "M5x Phase 1: relay board IGN output | 07K Phase 3: PMU16 O8"
     pincount: 1
     pinlabels: ["+12V IGN"]
     notes: >-
       10A Mini ATM fuse (supplied with kit) protects this feed specifically
       for the EPS Controller -- independent of the 60A Maxi fuse on the
-      Steering ECU's main battery feed. Source: PMU16 O8 (power-distribution.wv
-      spare channel). No fuse block position needed -- PMU16 per-channel
-      digital fusing replaces discrete blade fuse.
+      Steering ECU's main battery feed.
+      M5x Phase 1: tap the relay board IGN-switched output (the same +12V rail
+      used for fuel pump / fan relay coil pin 86 in maxxecu-m52.wv), or use a
+      fuse-tap on an OEM IGN circuit from the body harness. No additional relay
+      is needed -- just fuse this feed with the supplied 10A Mini ATM.
+      07K Phase 3: at PMU16 installation, move this one wire end from the relay
+      board to PMU16 O8 (10A digital channel, power-distribution.wv spare output).
+      PMU16 per-channel fusing replaces the discrete 10A ATM at that stage.
 
 # ── Cables ─────────────────────────────────────────────────────────────────────
 
