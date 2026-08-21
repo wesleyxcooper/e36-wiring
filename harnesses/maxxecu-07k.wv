@@ -631,8 +631,10 @@ cables:
       Route pigtails down the block face, away from the exhaust manifold, then
       bundle into KNOCK sub-loom across the bottom of the engine.
       If any section runs within 100 mm (4 in) of exhaust manifold, wrap with
-      DEI Reflect-A-Gold aluminized foil tape (DEI 010417 or equiv, 90% radiant
-      heat reflection) over the Techflex sleeve before tie-strapping.
+      DEI Reflect-A-Gold (p/n 010394, 1-1/2"x15' roll, $42.99 — designengineering.com/reflect-a-gold-heat-reflective-tape-1-5-x-15/)
+      over the Techflex sleeve before tie-strapping. Reflect-A-Gold is a metalized
+      polyimide laminated glass cloth, 800°F continuous (adhesive rated 325°F).
+      NOT to be confused with Reflect-A-Cool (fiberglass foil sheet, 400°F).
 
   W_KNOCK_2:
     wirecount: 2
@@ -763,8 +765,9 @@ cables:
       Shielded — VS/VREF/IP/RCAL are low-level analog signals susceptible to
       injector/coil noise. Single-end drain at ECU end only.
       HEAT MANAGEMENT: Bung is on the custom top-mount exhaust manifold. Sleeve the
-      first 300 mm (12 in) from the sensor body with DEI Fire Sleeve 1/2" ID (or
-      equivalent silicone-over-fiberglass rated ≥500°F / 260°C continuous). Transition
+      first 300 mm (12 in) from the sensor body with DEI Fire Sleeve 3/8" ID
+      (p/n 010470, 3/8"x36" kit, $26.99 — designengineering.com/fire-sleeve-tape-kit-0-375-id-x-36/;
+      silicone-over-fiberglass, 500°F/260°C continuous, 2000°F intermittent). Transition
       to Techflex F6 after clearing the manifold/turbo heat zone.
       Route away from turbo turbine housing and wastegate — minimum 100 mm clearance.
       Tie-strap cable to manifold stud boss or block surface to prevent contact with
