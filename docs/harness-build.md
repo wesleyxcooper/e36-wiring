@@ -240,11 +240,57 @@ Individual wires within a sub-loom run **side-by-side in parallel**. Do not twis
 
 **The one exception is the crank VR pair.** The VR+ and VR− wires **must be twisted together** before going into the TRIGGER sub-loom:
 - Twist rate: ~1 twist per 25mm (1 twist per inch) — twist by hand from tip to tip before routing
+- **Twist direction: does not matter.** The noise-cancellation physics work identically with clockwise or counterclockwise lay — both wires still intercept the same magnetic field simultaneously. Twist whichever way feels natural.
+- The only case where twist direction matters: if two twisted pairs run inside the same sleeve side-by-side, twist them in opposite directions to minimize inductive coupling between pairs. In the TRIGGER sub-loom the crank pair is the only twisted pair, so this is not relevant here.
 - The twist causes both wires to intercept identical electromagnetic interference simultaneously; the ECU's differential input subtracts the common-mode noise, leaving only the real crank signal
 - Laying them parallel instead of twisted degrades trigger signal quality and can cause dropout at high RPM under electrical load
 - After twisting, both wires run inside the TRIGGER sub-loom sleeve alongside the shield drain wire — do not separate them at any point in the routing
 
 The CAM Hall signal wire does not need twisting — it is a single-ended digital output with its own dedicated +5V and GND, not a differential pair.
+
+### Harness finishing methods — Techflex vs. lacing vs. individual sheaths
+
+What you see in high-end motorsport harness photos is not always the same as Techflex F6:
+
+| Method | What it is | Used where | DIY suitability |
+|--------|-----------|-----------|----------------|
+| **Techflex F6 expandable braid** | Woven nylon braid that slides over the bundle; this build's standard | Street, club motorsport, OEM-style custom harnesses | High — fast, clean, adequate protection |
+| **Mil-spec waxed lacing** | Waxed nylon cord wound in tight spiral or cross-stitch directly around the wire bundle — no outer sleeve | Aerospace, Formula 1, professional race shops | Low — hours per sub-loom, specialized technique |
+| **Individually sheathed wires** | Each wire gets its own expandable cloth braid or PTFE sleeve before going into the outer loom | Ultra-high-end show/motorsport builds | Low — significant per-wire cost and added diameter that makes contact insertion harder |
+| **Hand-braided bundles** | Wires braided together like hair braiding — structural, distributes strain across the bundle | Formula 1 territory only | Not applicable |
+
+For this build, Techflex F6 + P-clips + heat-shrink boots at breakouts is correct. The mil-spec lacing look is genuine craftsmanship (not pure aesthetics), but the labor cost — easily 20+ additional hours for an engine harness — is not justified on a street/drift E36. The electrical performance difference comes from the twisted crank pair, shield grounding, and Sensor GND isolation — not from the sleeving method.
+
+### Service loops at connectors
+
+A service loop is a small coil of extra wire (1–2 turns, ~30–50mm diameter) left between the sub-loom Techflex end and the connector entry, captured inside the heat-shrink boot when shrunk. Invisible from outside. Worth the extra minute per connector.
+
+**Why:** The crimp terminal is designed to carry current, not cyclic mechanical load. Without a loop, vibration and thermal expansion load pull directly on the terminal. The loop intercepts that motion before it reaches the crimp. A service loop also provides material for re-termination if a terminal ever needs rework — without one, re-crimping requires splicing in new wire.
+
+**Where to apply in this harness:**
+
+| Connector | Method | Rationale |
+|-----------|--------|-----------|
+| AS79 engine-side mating plug | No individual loops — leave 200–300mm of harness slack near the connector exit, route with a gentle curve before the first P-clip | 35 wires all enter the back simultaneously through individual grommets; individual loops inside the backshell are not practical. Bundle-level slack provides the same function |
+| Crank VR+/VR− pigtail end | ✓ Individual loop, 1–2 turns | Most vibration-sensitive signal; crank sensor at front of block sees belt-drive vibration |
+| CAM sensor pigtail end | ✓ Individual loop, 1–2 turns | Same rationale |
+| MaxxECU C1/C2 | ✓ Individual loop per wire inside the backshell | Molex backshell has enough internal volume; loop protects terminals during ECU removal/reinstall |
+| EV14 injector pigtails | No | The ~50mm bare wire between sub-loom exit and connector already provides compliant slack |
+| CLT / IAT / MAP pigtails | Optional | Same — bare wire section is usually sufficient |
+
+**No special tool required.** For 22 AWG TXL, coil the wire by hand around a Sharpie body (~13mm diameter) or your index finger (~18mm). One or two turns is all you need. TXL wire holds the loop shape without tape at this gauge.
+
+**Exact sequence — critical order:**
+
+1. **Slide the heat-shrink boot onto the wire before any terminal work** — the boot cannot pass over a terminated connector body after the fact. Do this at the same time as PermaSleeve label sleeves.
+2. Crimp contacts onto the pigtail wires
+3. Insert contacts into connector body — verify seating click on each
+4. Coil 1–2 turns around a Sharpie body or finger — wire holds shape on its own
+5. Slide the boot forward to cover the connector body exit AND the coiled loops
+6. Shrink the boot with a heat gun — loops permanently captured inside
+7. The connector is complete. **Plug into the component sensor last** — after the boot is fully shrunk.
+
+The finished result looks identical to a boot with no loop. The loop is visible only during build, before the boot is shrunk.
 
 ### Splice types — no iron soldering
 
