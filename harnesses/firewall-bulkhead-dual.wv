@@ -1,5 +1,5 @@
 # firewall-bulkhead-dual.wv
-# E36 Firewall Bulkhead — EXPERIMENTAL: Dual Maven HD30 (29-pin + 47-pin)
+# E36 Firewall Bulkhead — EXPERIMENTAL: Dual Maven HD30 (47-pin + 35-pin)
 #
 # Sources:
 #   MaxxECU GEN1 pinout:     maxxecu.com/webhelp/wirings-maxxecu_pinout.html
@@ -12,11 +12,12 @@
 #   See firewall-bulkhead.wv for the baseline AS79 single-connector design.
 #
 #   This variant replaces the AS79 with two Deutsch HD30 shell-size-24 connectors
-#   on a single Maven dual bulkhead plate (47+29 configuration, $290).
+#   on a single Maven dual bulkhead plate (47+35 configuration).
 #
-#   CONNECTOR A (29-pin — "STAYS") — never disconnected at M52→07K engine swap:
+#   CONNECTOR A (35-pin — "STAYS") — never disconnected at M52→07K engine swap:
 #     Fixed-destination signals: 8HP CAN/power, fans, EWP, AC, chassis GND
 #     Engine-agnostic signals:   WBO2 (bung is welded in exhaust, same sensor any engine)
+#     Firewall-fixed actuator:   GPO 1 → boost solenoid (confirmed firewall-bracket mounted)
 #     Cabin-originated signals:  APS e-pedal (Phase 3 addition — pedal + ECU both stay)
 #
 #   CONNECTOR B (47-pin — "ENGINE") — unplugged at engine swap:
@@ -25,30 +26,54 @@
 #     Injector outputs (INJ 1–5 common; INJ 6 M52-only)
 #     Crank/cam triggers (M52 uses B pins 15–18; 07K uses B pins 39–40 — different CMC)
 #     All engine sensors (CLT, IAT, TPS, MAP, PST-F1, flex fuel)
-#     GPO actuators (boost solenoid common; VANOS + ICV M52-only)
+#     GPO actuators (VANOS + ICV M52-only)
 #     Starter trigger, alternator D+
 #     07K-phase essentials: 5th-cyl INJ/IGN, 07K cam/crank, DBW throttle body, knock sensors
 #
 # Pin count summary:
-#   Connector A: 17 active (M52 phase) → 23 active (07K phase) / 29 cavities = 6 spare at 07K
-#   Connector B: 36 active (M52 phase) → 46 active (07K phase) / 47 cavities = 1 spare at 07K
+#   Connector A: 18 active (M52 phase) → 24 active (07K phase) / 35 cavities = 11 spare at 07K
+#   Connector B: 35 active (M52 phase) → 45 active (07K phase) / 47 cavities = 2 spare at 07K
+#   Combined:    53/82 = 64.6% (M52) → 69/82 = 84.1% (07K)  [vs AS79: 87.3% at 07K essential]
 #
 # ⚠️  DEFERRED — the following optional expansion stubs from the AS79 design do not fit:
 #     56 (DIN 4/VR 1), 57 (DIN 5/VR 2), 58 (AIN 6 spare), 59 (GPO 8/TACHO),
 #     60 (+5V supply 2), 61 (Sensor GND 2), 62 (+12V switched spare), 68 (MAP 2 spare)
 #     → Route TACHO through OEM X20 pin 5 instead of bulkhead
-#     → Consolidate 07K sensor +5V/GND onto existing Connector B pins 23/20
+#     → Consolidate 07K sensor +5V/GND onto existing Connector B pins B23/B20
 #       (verify 07K cam Hall sensor is compatible with MaxxECU CMC G1 5V ref; if not,
-#        pins 25 and 26 in Connector A can absorb +5V-2 and Sensor GND 2 — see note below)
+#        Connector A spares A25/A26 can absorb +5V-2 and Sensor GND 2)
 #
-# ⚠️  ONE-SPARE RISK: Connector B has 1 spare cavity at full 07K build. Any
-#     unanticipated signal (shield drain, additional sensor, split 5V ref) overflows.
-#     Keep this in mind before committing to the plate cutout.
+# ⚠️  TWO-SPARE RISK in Connector B at full 07K: 45/47 cavities used.
+#     Connector A has 11 spare cavities as overflow for signals confirmed fixed-destination.
+#     Connector B overflow to A is only valid for signals whose engine-side destination
+#     does not change between M52 and 07K (otherwise it defeats the swap-disconnect purpose).
+#
+# ── Redistribution caveats (resolved during design review) ──────────────────
+#
+#   BOOST SOLENOID → A (confirmed):
+#     Boost solenoid (GPO 1, CMC B4) moved to Connector A pin A24. Rationale: solenoid
+#     is firewall-bracket mounted; it stays in the car at engine swap. Both M52 and 07K
+#     use the same solenoid at the same location. Superseal connector unplugs locally
+#     at the solenoid if solenoid service is needed — bulkhead stays connected.
+#
+#   ATF TEMP SENSOR → stays on B (B36):
+#     Initially identified as a candidate for A (inline -8AN adapter in tunnel, 8HP stays).
+#     REJECTED: engine and transmission are pulled together as a unit at swap for
+#     convenience. ATF cooler lines are disconnected anyway — sensor is a simple unplug
+#     at the lines. No benefit to putting this on the "permanent" connector.
+#
+#   FLEX FUEL (B28/B29) → TBD at install:
+#     Continental inline flex sensor is not engine-mounted, but its physical location
+#     in the RHD E36 fuel line routing is unknown. If the sensor ends up in the engine
+#     bay near the fuel rail, it will be unplugged at swap regardless of which connector
+#     it's on. If it's in the tunnel before the firewall, it could move to A and free 2
+#     more cavities in B (45→43, 91.5%, 4 spare). Revisit during fuel line routing.
+#     Two spares exist in B with or without this move; not urgent.
 #
 # Tooling:
 #   Crimper:     Deutsch HDT-48-00 (~$65–120) — covers all HD30 solid contacts
 #   Depin:       Standard Deutsch round-shoulder removal tool (HD30 rear-release)
-#   Plate kit:   Maven dual bulkhead 47+29 — includes both connector bodies (plug + receptacle)
+#   Plate kit:   Maven dual bulkhead 47+35 — includes both connector bodies (plug + receptacle)
 #                + all contact terminals both sides. Boots sold separately.
 #
 # ──────────────────────────────────────────────────────────────────────────
@@ -62,9 +87,9 @@ connectors:
   # ══════════════════════════════════════════════════════════════════════
 
   BULKHEAD_A_CABIN:
-    type: "Maven / Deutsch HD30 shell-size-24 29-way flange receptacle"
-    subtype: "Connector A cabin side — permanent. 8HP + accessories + WBO2 + APS."
-    pincount: 29
+    type: "Maven / Deutsch HD30 shell-size-24 35-way flange receptacle"
+    subtype: "Connector A cabin side — permanent. 8HP + accessories + WBO2 + boost solenoid + APS."
+    pincount: 35
     pinlabels:
       # ── 8HP power + CAN ──────────────────────────────────────────────
       - "+12V 8HP Main (powerhold relay)"   # A1  Size 12  14 AWG  MUST BE CONSTANT
@@ -93,17 +118,23 @@ connectors:
       - "APS1 signal (pedal pin 4 → MaxxECU APS1)"  # A21  Phase 3  Size 20  24 AWG
       - "APS VCC1 (+5V circ 1, pedal pin 5)"        # A22  Phase 3  Size 20  24 AWG
       - "APS2 signal (pedal pin 6 → MaxxECU APS2)"  # A23  Phase 3  Size 20  24 AWG
-      # ── Spare — overflow / future ────────────────────────────────────
-      # A24–A29 reserved. Candidates if needed:
-      #   +5V supply 2 (if 07K cam Hall can't share Connector B pin B23)
-      #   Sensor GND 2  (if 07K cam Hall can't share Connector B pin B20)
-      #   Knock GND overflow (if three-pin knock topology needs dedicated return here)
-      - "SPARE"   # A24
+      # ── Boost solenoid (firewall-bracket mounted — stays at engine swap) ──
+      - "GPO 1 → Boost solenoid (CMC B4)"   # A24 Size 20  20 AWG
+      # ── Spare — overflow / future (11 spare at 07K) ──────────────────
+      # A25–A35 reserved. Candidates if needed:
+      #   +5V supply 2 / Sensor GND 2 (if 07K cam Hall can't share B23/B20)
+      #   Flex fuel sig + +12V (if sensor confirmed tunnel-mounted, move from B28/B29)
       - "SPARE"   # A25
       - "SPARE"   # A26
       - "SPARE"   # A27
       - "SPARE"   # A28
       - "SPARE"   # A29
+      - "SPARE"   # A30
+      - "SPARE"   # A31
+      - "SPARE"   # A32
+      - "SPARE"   # A33
+      - "SPARE"   # A34
+      - "SPARE"   # A35
     notes: >-
       Connector A is permanent — never disconnected at M52→07K swap.
       Engine-side of this connector also stays connected; the 8HP TCU, fans, EWP,
@@ -117,9 +148,9 @@ connectors:
       before the bulkhead — no extra pins needed.
 
   BULKHEAD_A_ENGINE:
-    type: "Maven / Deutsch HD30 shell-size-24 29-way jam nut plug"
+    type: "Maven / Deutsch HD30 shell-size-24 35-way jam nut plug"
     subtype: "Connector A engine side — permanent (never swapped)."
-    pincount: 29
+    pincount: 35
     pinlabels:
       - "+12V 8HP Main → TCU pin 13 (constant)"       # A1
       - "+12V 8HP Wakeup → TCU pin 9 (IGN)"           # A2
@@ -144,12 +175,18 @@ connectors:
       - "APS1 signal → MaxxECU APS1 AIN"               # A21  Phase 3
       - "APS VCC1 → MaxxECU +5V SENS OUT"              # A22  Phase 3
       - "APS2 signal → MaxxECU APS2 AIN"               # A23  Phase 3
-      - "SPARE — cavity plug"   # A24
+      - "Boost solenoid → firewall bracket Superseal pin 2"  # A24
       - "SPARE — cavity plug"   # A25
       - "SPARE — cavity plug"   # A26
       - "SPARE — cavity plug"   # A27
       - "SPARE — cavity plug"   # A28
       - "SPARE — cavity plug"   # A29
+      - "SPARE — cavity plug"   # A30
+      - "SPARE — cavity plug"   # A31
+      - "SPARE — cavity plug"   # A32
+      - "SPARE — cavity plug"   # A33
+      - "SPARE — cavity plug"   # A34
+      - "SPARE — cavity plug"   # A35
     notes: >-
       Connector A engine side is permanent — never replaced. The WBO2 Heater+ (LSU 4.9 pin 4)
       connects to engine-bay +12V coil/inj rail (Connector B engine side, pin B1) via
@@ -203,7 +240,7 @@ connectors:
       - "Flex fuel signal → DIN3 (CMC C1)"  # B28 Size 20  22 AWG
       - "Flex fuel +12V"                    # B29 Size 20  22 AWG
       # ── GPO actuators ────────────────────────────────────────────────
-      - "GPO 1 → Boost solenoid (CMC B4)"   # B30 Size 20  20 AWG
+      - "SPARE (boost solenoid → Connector A pin A24)" # B30
       - "GPO 3 → VANOS (CMC D4) [M52 only]" # B31 Size 20  20 AWG
       - "GPO 4 → ICV coil A (CMC E4) [M52]" # B32 Size 20  20 AWG
       - "GPO 5 → ICV coil B (CMC A1) [M52]" # B33 Size 20  20 AWG
@@ -274,7 +311,7 @@ connectors:
       - "PST-F1 temp → sensor pin 4"                    # B27
       - "Flex fuel → Continental sensor signal"          # B28
       - "Flex fuel +12V → Continental sensor +12V"      # B29
-      - "GPO 1 → boost solenoid Superseal pin 2"        # B30
+      - "SPARE — cavity plug (boost solenoid on Connector A)" # B30
       - "GPO 3 → VANOS solenoid pin 2"                  # B31  M52 only
       - "GPO 4 → ICV coil A (JPT 3-way pin 2)"          # B32  M52 only
       - "GPO 5 → ICV coil B (JPT 3-way pin 3)"          # B33  M52 only
@@ -305,7 +342,8 @@ connectors:
         B19: spare cavity-plug.
         B20–B23: same (sensor GND, CLT, IAT, +5V — verify 07K cam Hall shares G1 5V ref).
         B24: cavity-plug (M52 TPS; 07K TB TPS → B41 DBW set).
-        B25–B30: same (MAP, PST pres, PST temp, flex sig, flex +12V, boost solenoid).
+        B25–B29: same (MAP, PST pres, PST temp, flex sig, flex +12V).
+        B30: SPARE on both M52 and 07K plugs (boost solenoid moved to Connector A pin A24).
         B31–B33: cavity-plug (VANOS, ICV A/B — 07K has none).
         B34–B36: same (starter, alt D+, AIN2 stub).
         B37: INJ 7 → 07K injector 5 (CMC L2).
@@ -330,7 +368,7 @@ cables:
   # ── Connector A cable bundle ──────────────────────────────────────────
 
   W_BULKHEAD_A:
-    wirecount: 17
+    wirecount: 18
     colors:
       - RD   # A1  +12V 8HP Main
       - RD   # A2  +12V 8HP Wakeup
@@ -349,6 +387,7 @@ cables:
       - WH   # A15 WBO2 IP
       - WH   # A16 WBO2 RCAL
       - BK   # A17 WBO2 Heater-
+      - GN   # A24 GPO1 Boost solenoid
     wirelabels:
       - "+12V 8HP Main (14 AWG CONST)"
       - "+12V 8HP Wake (18 AWG IGN)"
@@ -367,6 +406,7 @@ cables:
       - "WBO2 IP"
       - "WBO2 RCAL"
       - "WBO2 Htr- (20 AWG)"
+      - "GPO1 Boost (20 AWG)"
     notes: >-
       CAN H/L (A4/A5) must be twisted pair. 120Ω at MaxxECU end and 8HP TCU end.
       APS wires (A18–A23) are added at Phase 3 as a separate cabin cable run
@@ -376,7 +416,7 @@ cables:
   # ── Connector B cable bundle ──────────────────────────────────────────
 
   W_BULKHEAD_B:
-    wirecount: 36
+    wirecount: 35
     colors:
       - RD   # B1  +12V Coils/Inj
       - BK   # B2  Engine GND
@@ -407,8 +447,7 @@ cables:
       - WH   # B27 PST temp
       - WH   # B28 Flex sig
       - RD   # B29 Flex +12V
-      - GN   # B30 GPO1 Boost
-      - GN   # B31 GPO3 VANOS
+      - GN   # B31 GPO3 VANOS  (B30 spare — boost solenoid on Connector A wire 18)
       - GN   # B32 GPO4 ICV-A
       - GN   # B33 GPO5 ICV-B
       - YE   # B34 Starter
@@ -444,7 +483,6 @@ cables:
       - "PST temp"
       - "Flex sig"
       - "Flex +12V"
-      - "GPO1 Boost"
       - "GPO3 VANOS"
       - "GPO4 ICV-A"
       - "GPO5 ICV-B"
@@ -462,10 +500,14 @@ cables:
 
 connections:
 
-  - - BULKHEAD_A_CABIN: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
-    - W_BULKHEAD_A: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
-    - BULKHEAD_A_ENGINE: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+  # Connector A: pins 1–17 active M52 phase + pin 24 (boost solenoid, always active)
+  # Wire 18 in W_BULKHEAD_A carries pin A24 (boost solenoid)
+  - - BULKHEAD_A_CABIN: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24]
+    - W_BULKHEAD_A: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+    - BULKHEAD_A_ENGINE: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24]
 
-  - - BULKHEAD_B_CABIN: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36]
-    - W_BULKHEAD_B: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36]
-    - BULKHEAD_B_ENGINE_M52: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36]
+  # Connector B: pins 1–36 minus B30 (spare). W_BULKHEAD_B wires 1–35 map sequentially,
+  # skipping the B30 spare cavity: B1–B29 → wires 1–29, B31–B36 → wires 30–35.
+  - - BULKHEAD_B_CABIN: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36]
+    - W_BULKHEAD_B: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+    - BULKHEAD_B_ENGINE_M52: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36]
