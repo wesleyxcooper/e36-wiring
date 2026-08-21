@@ -69,7 +69,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 | Item | Spec | Use | Qty |
 |------|------|-----|-----|
 | DEI Fire Sleeve — 3/8" ID × 36" kit | silicone-over-fiberglass, 500°F (260°C) continuous / 2000°F (1093°C) intermittent — **DEI p/n 010470, $26.99** — [designengineering.com](https://www.designengineering.com/fire-sleeve-tape-kit-0-375-id-x-36/) — includes 36" sleeve + 16" Fire Tape | WBO2 cable: first 300 mm (12 in) from sensor bung outward. CLT pigtail: first 150 mm (6 in) from sensor body. Both cables fit the 3/8" ID (10 mm). One 36" kit covers both runs (450 mm total needed). Applied over the bare cable before main loom assembly. | 1 kit |
-| DEI Reflect-A-Gold — 1-1/2" × 15' roll | Metalized polyimide laminated glass cloth, 800°F continuous (adhesive rated to 325°F) — **DEI p/n 010394, $42.99** — [designengineering.com](https://www.designengineering.com/reflect-a-gold-heat-reflective-tape-1-5-x-15/) — NOT Reflect-A-Cool (different product, 400°F limit) | KNOCK sub-loom: wrap any section that routes within 100 mm (4 in) of exhaust manifold, over the Techflex sleeve. Applied after routing is confirmed. | 1 roll | Compressed onto a bundle it tightens ~30%. Order the same diameter as your target finished bundle OD. Source: [techflex.com](https://www.techflex.com) or WiringPros.
+| DEI Reflect-A-Gold — 1-1/2" × 15' roll | Metalized polyimide laminated glass cloth, 800°F continuous (adhesive rated to 325°F) — **DEI p/n 010394, $42.99** — [designengineering.com](https://www.designengineering.com/reflect-a-gold-heat-reflective-tape-1-5-x-15/) — NOT Reflect-A-Cool (different product, 400°F limit) | KNOCK sub-loom: wrap any section that routes within 100 mm (4 in) of exhaust manifold, over the Techflex sleeve. Applied after routing is confirmed. | 1 roll |
 
 ### Splice consumables
 
@@ -593,7 +593,7 @@ One-time tooling purchase — covers all connector families in this build. See [
 | 1 set | P-clamps — 1/4", 3/8", 1/2", 5/8" | Secure main power cables every 12 inches minimum. |
 | 1 bag | M4 / M6 rivnuts (steel or zinc) — assorted | Used with rivnut tool for PMU16 bracket and ECU bracket mounting. |
 
-> **Total non-Molex tools: ~$186** (flush cutters $20 + wire stripper $30 + IWS-2820M $20 + IWS-2412M $20 + Lisle $20 + rivnut tool ~$71 + Deutsch extraction $15 + ferrule crimper $25). Add ~$426 for the Fischer Motorsports DMC AS size-20 kit (M22520/2-01 handle + K43 positioner — the correct tool for AS79 contacts; HDT-48-00 and JRready clones are DT/DTM/DTP only). Total with AS crimper: **~$612** one-time purchase.
+> **Total non-Molex tools: ~$186** (flush cutters $20 + wire stripper $30 + IWS-2820M $20 + IWS-2412M $20 + Lisle $20 + rivnut tool ~$71 + Deutsch extraction $15 + ferrule crimper $25). Add **~$808** for the AS79 crimp set: AFM8 handle $601.65 + K42 pin positioner $112.64 + K40 socket positioner $93.86 — all at verified prices (dmctools.com / deltaintl.com). HDT-48-00 and JRready NEW-DT2 are for Maven HD30 (size-16/20) and DT bypass only — not for AS79 size-22 contacts. Total with AS crimper: **~$994** one-time purchase.
 >
 > **Budget tracking:** Key tools above are also tracked in `e36-docs/E36_CSVs/E36_Phase1_Foundation.csv` (Tooling category) with purchase links and price ranges for build cost rollup.
 > If using Souriau 8STA for the bulkhead instead of Deutsch AS, confirm the correct positioner for Souriau contacts at purchase — Souriau uses compatible tooling but a different positioner.

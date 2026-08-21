@@ -10,7 +10,7 @@ Reference for connector pinning, depinning, and harness assembly across all e36-
 |-----------|--------|---------------|------|
 | MaxxECU RACE C1 | Molex 48-pin | ~40 (varies by harness) | 63811-9200 (small) · 63811-8900/9000 (big) |
 | MaxxECU RACE C2 | Molex 32-pin | 0 (Phase 1/3) — defer | Same as C1 |
-| Deutsch AS firewall bulkhead | AS series, size 20 | Up to 79 | Daniels M22520/2-01 + K43 positioner (M22520/2-10) |
+| Deutsch AS firewall bulkhead | AS series, **size 22** | Up to 79 | Daniels M22520/2-01 (AFM8) + **K42** positioner (pin) / **K40** positioner (socket). Source: m-cal.com AS020-35SN; ecuplus.de AS620-35PN. |
 | 07K cam sensor pigtail | 3B0973703G (3-pin VAG JMT) | 3 | Engineer PA-09 |
 | 07K crank sensor pigtail | 3B0973703G (3-pin VAG JMT) | 3 | Engineer PA-09 |
 | 07K MAP sensor pigtail | 3B0973703G (3-pin VAG JMT) | 3 | Engineer PA-09 |
