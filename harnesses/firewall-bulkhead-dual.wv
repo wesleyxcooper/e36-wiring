@@ -1,12 +1,16 @@
 # firewall-bulkhead-dual.wv
 # E36 Firewall Bulkhead — EXPERIMENTAL: Dual Maven HD30 (47-pin + 35-pin)
+# NOTE: In the chosen HYBRID design the 47-pin Connector B is replaced by the Deutsch Autosport AS79.
+#       See firewall-bulkhead.wv for the final hybrid AS79 engine connector.
+#       This file is retained for the 35-pin Connector A (accessories/stays) design reference.
 #
 # Sources:
 #   MaxxECU GEN1 pinout:     maxxecu.com/webhelp/wirings-maxxecu_pinout.html
 #   M50 terminated harness:  maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html
 #   8HP wiring:              maxxecu.com/webhelp/advanced-8hp-wiring_information.html
 #   DCTShifter:              dctshifter.com/pages/installation
-#   Connector supplier:      mavenspeed.com/products/dual-connector-bulkhead
+#   Connector supplier:      mavenspeed.com/products/single-connector-bulkhead-s24 (35-pin)
+#   HD30 24-35 layout:       Deutsch HD30 & HDP20 Series Technical Manual (Edition 2007), p.9
 #
 # Architecture:
 #   See firewall-bulkhead.wv for the baseline AS79 single-connector design.
@@ -81,9 +85,27 @@
 connectors:
 
   # ══════════════════════════════════════════════════════════════════════
-  #  CONNECTOR A  —  29-pin  —  "STAYS"
-  #  Maven HD30 shell-size-24, 29-way
+  #  CONNECTOR A  —  35-pin  —  "STAYS"
+  #  Maven / Deutsch HD30 shell-size-24, 35-way (arrangement 24-35)
   #  Cabin side: permanent. Engine side: also permanent (never swapped).
+  #
+  #  HD30 24-35 INSERT LAYOUT (Deutsch HD30 & HDP20 Technical Manual, Ed.2007, p.9):
+  #    3 size-16 contacts (13A max, AWG 14–20):  positions 4, 7, 12
+  #    32 size-20 contacts (7.5A max, AWG 16–22): all other positions
+  #    ⚠️  NO size-12 or size-8 contacts exist in the 24-35 arrangement.
+  #
+  #  HIGH-CURRENT POWER LINES (fan relays, EWP, AC relay) CANNOT route through this connector:
+  #    +12V Fan (20A fuse, 12 AWG)      → exceeds size-16 13A → bypass via dedicated fitting
+  #    +12V Condenser fan (20A, 12 AWG) → same
+  #    +12V EWP (36.3A max, 10 AWG)    → far exceeds size-16 → bypass via dedicated fitting
+  #    +12V AC (20A, 8 AWG)            → exceeds size-16 → bypass via dedicated fitting
+  #  Route those 4 relay outputs through individual Deutsch DT 2-pin connectors (or a DT 4-pin)
+  #  through a separate weatherproof grommet alongside the HD30 bulkhead plate.
+  #
+  #  SIZE-16 POSITION ASSIGNMENT (pins 4, 7, 12):
+  #    Pin 4  (inner ring, ~6 o'clock): +12V 8HP Main (14 AWG, ~5A continuous)
+  #    Pin 7  (middle ring, 12 o'clock — largest cavity): 8HP TCU GND (14 AWG, ~5A)
+  #    Pin 12 (middle ring, ~4 o'clock): Chassis GND engine bay (14 AWG, shared return)
   # ══════════════════════════════════════════════════════════════════════
 
   BULKHEAD_A_CABIN:
@@ -92,38 +114,41 @@ connectors:
     pincount: 35
     pinlabels:
       # ── 8HP power + CAN ──────────────────────────────────────────────
-      - "+12V 8HP Main (powerhold relay)"   # A1  Size 12  14 AWG  MUST BE CONSTANT
+      - "+12V 8HP Main (powerhold relay)"   # A1  Size 16  14 AWG  MUST BE CONSTANT  → pin position 4
       - "+12V 8HP Wakeup (IGN switched)"    # A2  Size 20  18 AWG
-      - "8HP TCU GND"                       # A3  Size 12  14 AWG
+      - "8HP TCU GND"                       # A3  Size 16  14 AWG                    → pin position 7
       - "CAN H (CMC E1)"                    # A4  Size 20  22 AWG twisted pair
       - "CAN L (CMC E2)"                    # A5  Size 20  22 AWG twisted pair
-      # ── Fixed accessories (fans, EWP, AC) ────────────────────────────
-      - "+12V Fan relay out"                # A6  Size 12  12 AWG
-      - "+12V Condenser fan relay out"      # A7  Size 12  12 AWG
-      - "+12V EWP relay out"                # A8  Size 8   10 AWG  CWA400 36.3A max
-      - "+12V AC relay out"                 # A9  Size 12  8 AWG
-      - "EWP PWM (GPO → CWA400 pin 1)"     # A10 Size 20  20 AWG  680 Hz
-      - "AC enable signal (GPO → AC relay)" # A11 Size 20  18 AWG
-      - "Chassis GND engine bay"            # A12 Size 12  14 AWG
+      # ── Fixed accessories (fans, EWP, AC — relay POWER lines bypass this connector) ──────────────────
+      # ⚠️  +12V Fan, +12V Cond Fan, +12V EWP, +12V AC relay outputs exceed size-16 13A rating.
+      # ⚠️  Route those 4 wires through dedicated DT 2-pin connectors via separate grommet.
+      # ⚠️  Signal-level controls (EWP PWM and AC enable) DO pass through here at size-20.
+      - "EWP PWM (GPO → CWA400 pin 1)"     # A6  Size 20  20 AWG  680 Hz
+      - "AC enable signal (GPO → AC relay)" # A7  Size 20  18 AWG
+      - "Chassis GND engine bay"            # A8  Size 16  14 AWG                    → pin position 12
       # ── WBO2 (engine-agnostic — bung welded in exhaust) ──────────────
-      - "WBO2 VS (CMC F4)"                  # A13 Size 20  22 AWG
-      - "WBO2 VREF (CMC F3)"                # A14 Size 20  22 AWG
-      - "WBO2 IP (CMC G3)"                  # A15 Size 20  22 AWG
-      - "WBO2 RCAL (CMC G4)"                # A16 Size 20  22 AWG
-      - "WBO2 Heater- (CMC D1)"             # A17 Size 20  20 AWG
+      - "WBO2 VS (CMC F4)"                  # A9  Size 20  22 AWG
+      - "WBO2 VREF (CMC F3)"                # A10 Size 20  22 AWG
+      - "WBO2 IP (CMC G3)"                  # A11 Size 20  22 AWG
+      - "WBO2 RCAL (CMC G4)"                # A12 Size 20  22 AWG
+      - "WBO2 Heater- (CMC D1)"             # A13 Size 20  20 AWG
       # ── APS e-pedal (Phase 3 addition — both pedal and ECU stay) ─────
-      - "APS GND 1 (pedal pin 1 → MaxxECU SGND)"   # A18  Phase 3  Size 20  24 AWG
-      - "APS GND 2 (pedal pin 2 → MaxxECU SGND)"   # A19  Phase 3  Size 20  24 AWG
-      - "APS VCC2 (+5V circ 2, pedal pin 3)"        # A20  Phase 3  Size 20  24 AWG
-      - "APS1 signal (pedal pin 4 → MaxxECU APS1)"  # A21  Phase 3  Size 20  24 AWG
-      - "APS VCC1 (+5V circ 1, pedal pin 5)"        # A22  Phase 3  Size 20  24 AWG
-      - "APS2 signal (pedal pin 6 → MaxxECU APS2)"  # A23  Phase 3  Size 20  24 AWG
+      - "APS GND 1 (pedal pin 1 → MaxxECU SGND)"   # A14  Phase 3  Size 20  24 AWG
+      - "APS GND 2 (pedal pin 2 → MaxxECU SGND)"   # A15  Phase 3  Size 20  24 AWG
+      - "APS VCC2 (+5V circ 2, pedal pin 3)"        # A16  Phase 3  Size 20  24 AWG
+      - "APS1 signal (pedal pin 4 → MaxxECU APS1)"  # A17  Phase 3  Size 20  24 AWG
+      - "APS VCC1 (+5V circ 1, pedal pin 5)"        # A18  Phase 3  Size 20  24 AWG
+      - "APS2 signal (pedal pin 6 → MaxxECU APS2)"  # A19  Phase 3  Size 20  24 AWG
       # ── Boost solenoid (firewall-bracket mounted — stays at engine swap) ──
-      - "GPO 1 → Boost solenoid (CMC B4)"   # A24 Size 20  20 AWG
-      # ── Spare — overflow / future (11 spare at 07K) ──────────────────
-      # A25–A35 reserved. Candidates if needed:
-      #   +5V supply 2 / Sensor GND 2 (if 07K cam Hall can't share B23/B20)
-      #   Flex fuel sig + +12V (if sensor confirmed tunnel-mounted, move from B28/B29)
+      - "GPO 1 → Boost solenoid (CMC B4)"   # A20 Size 20  20 AWG
+      # ── Spare — 15 spare at 07K ──────────────────────────────────────
+      # A21–A35 reserved. Candidates if needed:
+      #   +5V supply 2 / Sensor GND 2 (if 07K cam Hall can't share AS79 pin 47/79)
+      #   Flex fuel sig + +12V (if sensor confirmed tunnel-mounted)
+      - "SPARE"   # A21
+      - "SPARE"   # A22
+      - "SPARE"   # A23
+      - "SPARE"   # A24
       - "SPARE"   # A25
       - "SPARE"   # A26
       - "SPARE"   # A27
@@ -137,12 +162,22 @@ connectors:
       - "SPARE"   # A35
     notes: >-
       Connector A is permanent — never disconnected at M52→07K swap.
-      Engine-side of this connector also stays connected; the 8HP TCU, fans, EWP,
-      AC compressor, and WBO2 sensor do not move at engine swap time.
-      APS pins A18–A23 are cavity-plugged in Phase 1 (M52); the cabin-side cable run
+      Engine-side of this connector also stays connected; the 8HP TCU, WBO2 sensor,
+      and boost solenoid do not move at engine swap time.
+      APS pins A14–A19 are cavity-plugged in Phase 1 (M52); the cabin-side cable run
       (E46 pedal → A cabin face) is the one cabin-side harness addition at Phase 3.
-      A8 (+12V EWP): use HD30 size-8 contact (60A rating) — CWA400 draws 36.3A max,
-      which exceeds size-12 (25A). HD30 natively supports size-8; no Souriau substitution needed.
+
+      HD30 24-35 CONTACT SIZE CONSTRAINT (source: Deutsch HD30 & HDP20 Technical Manual, Ed.2007, p.9):
+        The 24-35 insert contains only size-16 (13A max) and size-20 (7.5A max) contacts.
+        Size-16 positions: 4 (inner ring ~6 o'clock), 7 (middle ring 12 o'clock), 12 (middle ring ~4 o'clock).
+        All other positions are size-20. There are NO size-12 or size-8 positions in this insert.
+        ⚠️  High-current relay outputs (fan, EWP, AC) CANNOT route through this connector.
+        ⚠️  Route +12V Fan, +12V Cond Fan, +12V EWP, +12V AC through dedicated bulkhead fittings.
+            Recommended: Deutsch DT 2-pin connectors (each rated for 25A with 12 AWG contact)
+            or a single DT 4-pin through a separate weatherproof grommet nearby.
+        Size-16 positions assigned: A1 (+12V 8HP Main) → position 4;
+          A3 (8HP TCU GND) → position 7; A8 (Chassis GND) → position 12.
+
       CAN H/L (A4/A5) must be twisted pair. 120Ω termination at MaxxECU end (cabin)
       and at 8HP TCU end (engine bay). DCTShifter and Gauge.S tap cabin-side CAN bus
       before the bulkhead — no extra pins needed.
@@ -152,30 +187,30 @@ connectors:
     subtype: "Connector A engine side — permanent (never swapped)."
     pincount: 35
     pinlabels:
-      - "+12V 8HP Main → TCU pin 13 (constant)"       # A1
-      - "+12V 8HP Wakeup → TCU pin 9 (IGN)"           # A2
-      - "8HP TCU GND → chassis GND"                    # A3
-      - "CAN H → 8HP TCU pin 5"                        # A4
-      - "CAN L → 8HP TCU pin 6"                        # A5
-      - "+12V Fan → RELAY_FAN motor"                    # A6
-      - "+12V Condenser fan → CONDENSER_FAN motor"     # A7
-      - "+12V EWP → CWA400 pin 3"                      # A8
-      - "+12V AC → AC inverter +12V"                   # A9
-      - "EWP PWM → CWA400 pin 1 (680 Hz)"              # A10
-      - "AC enable → RELAY_AC coil 86"                 # A11
-      - "Chassis GND engine bay (solenoids/actuators)" # A12
-      - "WBO2 VS → LSU 4.9 pin 2"                      # A13
-      - "WBO2 VREF → LSU 4.9 pin 1"                    # A14
-      - "WBO2 IP → LSU 4.9 pin 6"                      # A15
-      - "WBO2 RCAL → LSU 4.9 pin 5"                    # A16
-      - "WBO2 Heater- → LSU 4.9 pin 3"                 # A17
-      - "APS GND 1 → MaxxECU SGND"                     # A18  Phase 3
-      - "APS GND 2 → MaxxECU SGND"                     # A19  Phase 3
-      - "APS VCC2 → MaxxECU +5V SENS OUT"              # A20  Phase 3
-      - "APS1 signal → MaxxECU APS1 AIN"               # A21  Phase 3
-      - "APS VCC1 → MaxxECU +5V SENS OUT"              # A22  Phase 3
-      - "APS2 signal → MaxxECU APS2 AIN"               # A23  Phase 3
-      - "Boost solenoid → firewall bracket Superseal pin 2"  # A24
+      - "+12V 8HP Main → TCU pin 13 (constant)"           # A1   physical position 4 (size-16)
+      - "+12V 8HP Wakeup → TCU pin 9 (IGN)"               # A2
+      - "8HP TCU GND → chassis GND"                        # A3   physical position 7 (size-16)
+      - "CAN H → 8HP TCU pin 5"                            # A4
+      - "CAN L → 8HP TCU pin 6"                            # A5
+      - "EWP PWM → CWA400 pin 1 (680 Hz)"                  # A6
+      - "AC enable → RELAY_AC coil 86"                     # A7
+      - "Chassis GND engine bay (solenoids/actuators)"     # A8   physical position 12 (size-16)
+      - "WBO2 VS → LSU 4.9 pin 2"                          # A9
+      - "WBO2 VREF → LSU 4.9 pin 1"                        # A10
+      - "WBO2 IP → LSU 4.9 pin 6"                          # A11
+      - "WBO2 RCAL → LSU 4.9 pin 5"                        # A12
+      - "WBO2 Heater- → LSU 4.9 pin 3"                     # A13
+      - "APS GND 1 → MaxxECU SGND"                         # A14  Phase 3
+      - "APS GND 2 → MaxxECU SGND"                         # A15  Phase 3
+      - "APS VCC2 → MaxxECU +5V SENS OUT"                  # A16  Phase 3
+      - "APS1 signal → MaxxECU APS1 AIN"                   # A17  Phase 3
+      - "APS VCC1 → MaxxECU +5V SENS OUT"                  # A18  Phase 3
+      - "APS2 signal → MaxxECU APS2 AIN"                   # A19  Phase 3
+      - "Boost solenoid → firewall bracket Superseal pin 2" # A20
+      - "SPARE — cavity plug"   # A21
+      - "SPARE — cavity plug"   # A22
+      - "SPARE — cavity plug"   # A23
+      - "SPARE — cavity plug"   # A24
       - "SPARE — cavity plug"   # A25
       - "SPARE — cavity plug"   # A26
       - "SPARE — cavity plug"   # A27
@@ -188,9 +223,12 @@ connectors:
       - "SPARE — cavity plug"   # A34
       - "SPARE — cavity plug"   # A35
     notes: >-
-      Connector A engine side is permanent — never replaced. The WBO2 Heater+ (LSU 4.9 pin 4)
-      connects to engine-bay +12V coil/inj rail (Connector B engine side, pin B1) via
-      local splice — no extra bulkhead pin needed (same arrangement as AS79 baseline).
+      Connector A engine side is permanent — never replaced.
+      WBO2 Heater+ (LSU 4.9 pin 4): splice locally to AS79 engine-connector +12V coil/inj rail.
+      HIGH-CURRENT BYPASS: +12V Fan, +12V Cond Fan, +12V EWP (CWA400 36.3A max), +12V AC relay out
+      do NOT pass through this connector — route via dedicated Deutsch DT 2-pin connectors through
+      separate grommet alongside bulkhead plate. Physical contact positions 4, 7, 12 are size-16
+      (13A max) — all sufficient for 8HP power, TCU GND, and chassis GND at their actual load.
 
 
   # ══════════════════════════════════════════════════════════════════════
@@ -368,36 +406,28 @@ cables:
   # ── Connector A cable bundle ──────────────────────────────────────────
 
   W_BULKHEAD_A:
-    wirecount: 18
+    wirecount: 14
     colors:
-      - RD   # A1  +12V 8HP Main
+      - RD   # A1  +12V 8HP Main   (physical pos 4, size-16)
       - RD   # A2  +12V 8HP Wakeup
-      - BK   # A3  8HP TCU GND
+      - BK   # A3  8HP TCU GND     (physical pos 7, size-16)
       - WH   # A4  CAN H
       - BU   # A5  CAN L
-      - RD   # A6  +12V Fan
-      - RD   # A7  +12V Condenser fan
-      - RD   # A8  +12V EWP
-      - RD   # A9  +12V AC relay
-      - GN   # A10 EWP PWM
-      - GN   # A11 AC enable
-      - BK   # A12 Chassis GND
-      - WH   # A13 WBO2 VS
-      - WH   # A14 WBO2 VREF
-      - WH   # A15 WBO2 IP
-      - WH   # A16 WBO2 RCAL
-      - BK   # A17 WBO2 Heater-
-      - GN   # A24 GPO1 Boost solenoid
+      - GN   # A6  EWP PWM
+      - GN   # A7  AC enable
+      - BK   # A8  Chassis GND     (physical pos 12, size-16)
+      - WH   # A9  WBO2 VS
+      - WH   # A10 WBO2 VREF
+      - WH   # A11 WBO2 IP
+      - WH   # A12 WBO2 RCAL
+      - BK   # A13 WBO2 Heater-
+      - GN   # A20 GPO1 Boost solenoid
     wirelabels:
       - "+12V 8HP Main (14 AWG CONST)"
       - "+12V 8HP Wake (18 AWG IGN)"
       - "8HP GND (14 AWG)"
       - "CAN H (22 AWG TP)"
       - "CAN L (22 AWG TP)"
-      - "+12V Fan (12 AWG)"
-      - "+12V Cond Fan (12 AWG)"
-      - "+12V EWP (10 AWG)"
-      - "+12V AC (8 AWG)"
       - "EWP PWM (20 AWG)"
       - "AC enable (18 AWG)"
       - "Chas GND (14 AWG)"
@@ -409,9 +439,13 @@ cables:
       - "GPO1 Boost (20 AWG)"
     notes: >-
       CAN H/L (A4/A5) must be twisted pair. 120Ω at MaxxECU end and 8HP TCU end.
-      APS wires (A18–A23) are added at Phase 3 as a separate cabin cable run
-      (pedal → Connector A cabin face, 0.8m, 24 AWG shielded 6-conductor).
+      APS wires (A14–A19) are added at Phase 3 as a separate cabin cable run
+      (pedal → Connector A cabin face, ~0.8m, 24 AWG shielded 6-conductor).
       WBO2 bundle: shielded 5-conductor preferred. Drain at MaxxECU end only.
+      HIGH-CURRENT lines bypassed: +12V Fan/Cond Fan/EWP/AC relay each route through
+      their own Deutsch DT 2-pin connector via a separate grommet. Crimp 12 AWG contacts
+      for fan relays; 10 AWG for EWP. DT 2-pin rated 25A/contact — use 2× in parallel
+      for EWP (2×25A = 50A > 36.3A max).
 
   # ── Connector B cable bundle ──────────────────────────────────────────
 
@@ -500,11 +534,11 @@ cables:
 
 connections:
 
-  # Connector A: pins 1–17 active M52 phase + pin 24 (boost solenoid, always active)
-  # Wire 18 in W_BULKHEAD_A carries pin A24 (boost solenoid)
-  - - BULKHEAD_A_CABIN: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24]
-    - W_BULKHEAD_A: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
-    - BULKHEAD_A_ENGINE: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24]
+  # Connector A: pins 1–13 active M52 phase + pin 20 (boost solenoid, always active)
+  # Wire 14 in W_BULKHEAD_A carries pin A20 (boost solenoid, jumps over A14–A19 APS cavity-plugs)
+  - - BULKHEAD_A_CABIN: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 20]
+    - W_BULKHEAD_A: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+    - BULKHEAD_A_ENGINE: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 20]
 
   # Connector B: pins 1–36 minus B30 (spare). W_BULKHEAD_B wires 1–35 map sequentially,
   # skipping the B30 spare cavity: B1–B29 → wires 1–29, B31–B36 → wires 30–35.

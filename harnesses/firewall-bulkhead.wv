@@ -1,39 +1,75 @@
 # firewall-bulkhead.wv
-# E36 Firewall Bulkhead Connector — Deutsch Autosport AS79 (or Souriau 8STA 79-way)
+# E36 Firewall Bulkhead — Hybrid design: Deutsch Autosport AS79 (engine) + Maven HD30 35-pin (accessories)
 #
 # Sources:
 #   MaxxECU GEN1 pinout:     maxxecu.com/webhelp/wirings-maxxecu_pinout.html
 #   M50 terminated harness:  maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html
 #   8HP wiring:              maxxecu.com/webhelp/advanced-8hp-wiring_information.html
 #   DCTShifter:              dctshifter.com/pages/installation
-#   Connector supplier:      racespeconline.com (Deutsch AS / Souriau 8STA)
+#   AS79 connector:          racespeconline.com (Deutsch Autosport AS / Souriau 8STA 79-way)
+#   Maven 35-pin:            mavenspeed.com/products/single-connector-bulkhead-s24 (35-pin option)
+#   G35/20-35 pin layout:    Amphenol MIL-DTL-38999 Series III catalog, INSERT ARRANGEMENT #20-35 / 21-35
+#   HD30 24-35 layout:       Deutsch HD30 & HDP20 Series Technical Manual (Edition 2007), p.9
 #
-# Architecture:
-#   CABIN SIDE (permanent — never changes through swaps):
-#     MaxxECU Race (48-pin CMC Molex + 12-pin + 16-pin breakouts)
-#     Relay board (ECU main, coil/inj, fan, condenser fan, EWP, AC relays)
-#     10-slot fuse block
-#     8HP powerhold relay (constant +12V to TCU)
-#     DCTShifter module → MaxxECU DIN 1/DIN 2 (cabin-to-cabin, no bulkhead pins)
-#     Drive mode selector → MaxxECU AIN (cabin-to-cabin, no bulkhead pins)
-#     DBW e-pedal → MaxxECU AIN 5/AIN 6 (cabin-to-cabin, no bulkhead pins)
+# Architecture (HYBRID):
+#   This file covers the Deutsch Autosport AS79 engine connector only.
+#   For the accessories/permanent connector (Maven HD30 35-pin), see firewall-bulkhead-dual.wv
+#   Connector A section.
 #
-#   ENGINE SIDE (unplugs as one unit per swap — M52 Phase 1, 07K Phase 3):
-#     All engine sensors, actuators, coils, injectors, solenoids
-#     8HP TCU (in transmission tunnel / engine bay)
-#     Wideband LSU 4.2 bung sensor
-#     EWP (Pierburg CWA400), AC compressor inverter, fan motors
+#   AS79 (ENGINE — this file):
+#     Engine power and GND (coils/inj rail, engine head stud GND)
+#     Ignition outputs (IGN 1–5 common; IGN 6 M52-only; IGN 7 07K stub)
+#     Injector outputs (INJ 1–5 common; INJ 6 M52-only; INJ 7 07K stub)
+#     Crank/cam triggers (M52 and 07K CMC inputs)
+#     All engine sensors (CLT, IAT, TPS, MAP, PST-F1, flex fuel, sensor GND)
+#     GPO actuators (VANOS + ICV M52-only, starter trigger, alt D+)
+#     07K expansion stubs (cam, crank, DBW throttle body, knock sensors)
 #
-# Pin assignment grouped by function.
-# Contact size: Size 12 (23A / 12-14 AWG), Size 16 (13A / 16-20 AWG), Size 20 (7.5A / 20-24 AWG)
-# Pins 60–71: expansion stubs (07K phase; blank/sealed on M52 harness side)
-# Pins 72–79: true spares (cavity plugs)
+#   Maven HD30 35-pin (ACCESSORIES — see firewall-bulkhead-dual.wv Connector A):
+#     8HP TCU power + GND + wakeup
+#     CAN H/L (MaxxECU ↔ 8HP TCU)
+#     Fan relays, EWP signal, AC enable
+#     WBO2 (LSU 4.9 wideband — bung welded in exhaust, stays across swaps)
+#     Boost solenoid (firewall-bracket mounted, stays across swaps)
+#     APS e-pedal (Phase 3; pedal and ECU both stay at swap)
+#     Chassis GND engine bay
 #
-# Critical 8HP note (MaxxECU docs):
-#   Main power (pins 1) must be live continuously — use a powerhold relay.
-#   Wakeup (pin 2) is IGN-switched. Main power must be active ≥10-15s before
-#   wakeup is applied; failure to observe this prevents TCU initialization
-#   and manual mode will not function.
+#   Engine-bay high-current power (EWP 36.3A, fan relays) routes through dedicated
+#   bulkhead fittings (grommet/DT 2-pin), NOT through either HD30 or AS79.
+#   The HD30 24-35 maximum is size-16 (13A) — insufficient for EWP or fan relay lines.
+#
+# AS79 SECTOR-OPTIMIZED PIN LAYOUT:
+#   Contact sizes: ALL size-22D (Deutsch Autosport), 5A max per contact.
+#   High-current lines (+12V Coils/Inj 20A, Engine GND 14 AWG) use 4+3 contacts
+#   in parallel respectively — or route separately via dedicated bulkhead fitting
+#   (Option A, preferred for clean installation).
+#
+#   EMI sector strategy — G35/20-35 insert, 5 rings, pin face view, clockwise from pin 1 at 12 o'clock:
+#     Sector 1 (12→3 o'clock): Power rails + IGN outputs
+#     Sector 2 (3→6 o'clock): INJ outputs + GPO actuators
+#     Sector 3 (6→9 o'clock): Crank/cam triggers + knock (most sensitive — max distance from IGN)
+#     Sector 4 (9→12 o'clock): Engine sensors
+#     Center pin 79:           Sensor GND (innermost pin, per HPA convention)
+#
+#   Ring structure (from Amphenol INSERT ARRANGEMENT #20-35 / 21-35, all r in inches from center):
+#     R1 outer (r≈0.430): pins 1–28   28 contacts  7 per quadrant
+#     R2       (r≈0.335): pins 29–50  22 contacts  ~5–6 per quadrant
+#     R3       (r≈0.243): pins 51–66  16 contacts  4 per quadrant
+#     R4       (r≈0.155): pins 67–76  10 contacts  2–3 per quadrant
+#     Center   (r≈0.055): pins 77–79   3 contacts  triangle: 77@12, 78@4, 79@8
+#
+# Power rail note:
+#   Option A (preferred): Route +12V Coils/Inj and Engine GND through a separate
+#     2-pin Deutsch DT/weatherpack connector via dedicated firewall grommet. Free
+#     pins 1–3, 29–31, 52 for expansion.
+#   Option B (documented below): Use 4 contacts in parallel for +12V (20A ÷ 5A = 4)
+#     and 3 contacts in parallel for Engine GND. Pins 1–3, 29–31, 52 are used.
+#
+# Connector hardware:
+#   AS79 flange receptacle:  Deutsch Autosport AS616-79PN or Souriau 8STA79PN equiv.
+#   AS79 jam-nut plug:       Per-harness mating plug (M52 Phase 1, 07K Phase 3)
+#   Maven 35-pin:            Maven Speed single connector bulkhead, 35-pin, SS24
+#                            mavenspeed.com/products/single-connector-bulkhead-s24
 #
 # ──────────────────────────────────────────────────────────────────────────
 
@@ -42,341 +78,344 @@ connectors:
   # ── Cabin side (permanent) ───────────────────────────────────────────────
 
   BULKHEAD_CABIN:
-    type: "Deutsch AS79 / Souriau 8STA 79-way flange receptacle"
+    type: "Deutsch Autosport AS79 / Souriau 8STA 79-way flange receptacle"
     subtype: "Cabin side — permanent. Deutsch p/n AS616-79PN or Souriau 8STA79PN equiv."
     pincount: 79
     pinlabels:
-      # ── GROUP A: Power (cabin relay board → engine bay) ──────────────────
-      - "+12V Coils/Inj (20A relay)"       # 1  Size 12  12 AWG
-      - "+12V 8HP Main (powerhold relay)"  # 2  Size 12  14 AWG  MUST BE CONSTANT
-      - "+12V 8HP Wakeup (IGN switched)"   # 3  Size 20  18 AWG
-      - "+12V Fan relay out"               # 4  Size 12  12 AWG
-      - "+12V Condenser fan relay out"     # 5  Size 12  12 AWG
-      - "+12V EWP relay out"               # 6  Size 8   10 AWG  (CWA400 36.3A max -- Size 12 23A insufficient)
-      - "+12V AC relay out"                # 7  Size 12  8 AWG
-      # ── GROUP B: Grounds ────────────────────────────────────────────────
-      - "Engine GND (cyl head stud)"       # 8  Size 12  14 AWG  DO NOT OMIT
-      - "8HP TCU GND"                      # 9  Size 12  14 AWG
-      # ── GROUP C: Ignition outputs (CMC A2/A3/B2/B3/C2/C3) ───────────────
-      - "IGN 1 (CMC A2)"                   # 10 Size 20  18 AWG
-      - "IGN 2 (CMC A3)"                   # 11 Size 20  18 AWG
-      - "IGN 3 (CMC B2)"                   # 12 Size 20  18 AWG
-      - "IGN 4 (CMC B3)"                   # 13 Size 20  18 AWG
-      - "IGN 5 (CMC C2)"                   # 14 Size 20  18 AWG
-      - "IGN 6 (CMC C3) [M52; stub 07K]"  # 15 Size 20  18 AWG
-      # ── GROUP D: Injector outputs (CMC K1/K2/M1/M2/M3/L3) ───────────────
-      - "INJ 1 (CMC K1)"                   # 16 Size 20  20 AWG
-      - "INJ 2 (CMC K2)"                   # 17 Size 20  20 AWG
-      - "INJ 3 (CMC M1)"                   # 18 Size 20  20 AWG
-      - "INJ 4 (CMC M2)"                   # 19 Size 20  20 AWG
-      - "INJ 5 (CMC M3)"                   # 20 Size 20  20 AWG
-      - "INJ 6 (CMC L3) [M52; stub 07K]"  # 21 Size 20  20 AWG
-      # ── GROUP E: Crank / Cam triggers ───────────────────────────────────
-      - "TRIGGER / Crank VR+ (CMC H3)"     # 22 Size 20  22 AWG shielded
-      - "Trigger GND / Crank VR- (CMC H2)" # 23 Size 20  22 AWG  DEDICATED GND
-      - "Crank shield (drain)"             # 24 Size 20  22 AWG
-      - "HOME / Cam Hall signal (CMC H4)"  # 25 Size 20  22 AWG
-      - "(spare — BMW 12141726590 needs no +12V)"  # 26
-      # ── GROUP F: General engine sensors ──────────────────────────────────
-      - "Sensor GND shared (CLT/IAT/TPS/MAP/PST-F1/Cam)" # 27 Size 20  22 AWG
-      - "CLT signal (CMC F1)"              # 28 Size 20  22 AWG
-      - "IAT signal (CMC F2)"              # 29 Size 20  22 AWG
-      - "+5V sensor supply (CMC G1)"       # 30 Size 20  22 AWG  (TPS/MAP/PST-F1)
-      - "TPS signal (CMC G2)"              # 31 Size 20  22 AWG
-      - "MAP signal → AIN 4"              # 32 Size 20  22 AWG
-      - "PST-F1 pressure → AIN 3 (CMC J3)" # 33 Size 20  22 AWG
-      - "PST-F1 temp → AIN 1 (CMC J1)"    # 34 Size 20  22 AWG
-      - "Flex fuel signal → DIN3 (CMC C1)" # 35 Size 20  22 AWG
-      - "Flex fuel +12V"                   # 36 Size 20  22 AWG
-      # ── GROUP G: Wideband O2 (CMC → LSU 4.9) ──────────────────────────────
-      - "WBO2 VS (CMC F4)"                 # 37 Size 20  22 AWG
-      - "WBO2 VREF (CMC F3)"               # 38 Size 20  22 AWG
-      - "WBO2 IP (CMC G3)"                 # 39 Size 20  22 AWG
-      - "WBO2 RCAL (CMC G4)"               # 40 Size 20  22 AWG
-      - "WBO2 Heater- (CMC D1)"            # 41 Size 20  20 AWG
-      # ── GROUP H: GPO actuators (MaxxECU → solenoids/EWP) ────────────────
-      - "GPO 1 → Boost solenoid (CMC B4)"  # 42 Size 20  20 AWG
-      - "GPO 3 → VANOS (CMC D4) [M52 only]" # 43 Size 20  20 AWG
-      - "GPO 4 → ICV coil A (CMC E4) [M52]" # 44 Size 20  20 AWG
-      - "GPO 5 → ICV coil B (CMC A1) [M52]" # 45 Size 20  20 AWG
-      - "EWP PWM (GPO spare → CWA400 pin 1)" # 46 Size 20  20 AWG  680 Hz
-      # ── GROUP I: CAN bus (MaxxECU ↔ 8HP TCU) ────────────────────────────
-      # DCTShifter and Gauge.S tap cabin-side of this bus; no extra pins needed.
-      - "CAN H (CMC E1)"                   # 47 Size 20  22 AWG twisted pair
-      - "CAN L (CMC E2)"                   # 48 Size 20  22 AWG twisted pair
-      # ── GROUP J: Misc ────────────────────────────────────────────────────
-      - "Starter trigger (12-pin pin 6)"   # 49 Size 20  18 AWG
-      - "Alternator D+ excitation (12-pin M)" # 50 Size 20  18 AWG  in series w/ charge bulb cabin side
-      # ── GROUP K: AIN 2 (spare temp input) ───────────────────────────────
-      - "AIN 2 (CMC J2) — spare temp"      # 51 Size 20  22 AWG
-      # ── GROUP L: AC control ──────────────────────────────────────────────
-      - "AC enable signal (MaxxECU GPO → AC relay coil) [see power-distribution.wv]" # 52 Size 20 18 AWG
-      # ── GROUP M: Solenoid/sensor common GND (engine bay chassis GND) ─────
-      - "Chassis GND engine bay (solenoids/actuators)" # 53 Size 12  14 AWG
-      # ── GROUP N: Expansion stubs — 07K phase (blank on M52 harness) ──────
-      - "EXP: INJ 7 (07K 5th cyl) → CMC L2"   # 54
-      - "EXP: IGN 7 (07K 5th cyl) → CMC D2"   # 55
-      - "EXP: DIN 4 / VR 1 (CMC K3) — future" # 56
-      - "EXP: DIN 5 / VR 2 (CMC K4) — future" # 57
-      - "EXP: AIN 6 (0-5V spare)"              # 58
-      - "EXP: GPO 8 / TACHO output"            # 59
-      - "EXP: +5V supply 2 (expansion sensors)" # 60
-      - "EXP: Sensor GND 2"                    # 61
-      - "EXP: +12V switched spare"             # 62
-      - "EXP: 07K cam signal (different type)" # 63
-      - "EXP: 07K crank signal"                # 64
-      - "EXP: DBW throttle body signal (07K)"  # 65
-      - "EXP: DBW throttle body +5V (07K)"     # 66
-      - "EXP: DBW throttle body GND (07K)"     # 67
-      - "EXP: MAP 2 / boost ref spare"         # 68
-      - "EXP: Knock sensor 1"                  # 69
-      - "EXP: Knock sensor 2"                  # 70
-      - "EXP: Knock GND"                       # 71
-      # ── Pins 72–77: E-pedal APS (added Phase 3, 07K swap) ──────────────────
-      # These 6 pins are cavity-plugged in Phase 1 (M52) and wired at Phase 3
-      # when the BMW E46 DBW accelerator pedal is installed. The cabin-side
-      # cable run (pedal → bulkhead) is the ONE cabin-side addition at 07K swap.
-      - "APS GND 1 (E46 pedal pin 1 → MaxxECU SGND)"   # 72  Phase 3
-      - "APS GND 2 (E46 pedal pin 2 → MaxxECU SGND)"   # 73  Phase 3
-      - "APS VCC2 (+5V circ 2, pedal pin 3)"            # 74  Phase 3
-      - "APS1 signal (pedal pin 4 → MaxxECU APS1 AIN)" # 75  Phase 3
-      - "APS VCC1 (+5V circ 1, pedal pin 5)"            # 76  Phase 3
-      - "APS2 signal (pedal pin 6 → MaxxECU APS2 AIN)" # 77  Phase 3
-      # ── Pins 78–79: True spares (cavity plugs) ────────────────────────────────
-      - "SPARE"   # 78
-      - "SPARE"   # 79
+      # ══ SECTOR 1 (12→3 o'clock) — Power rails + IGN noise zone ════════════
+      # R1 outer, pins 1–7
+      - "+12V Coils/Inj [‖1/4] (20A relay)"    # 1   R1  Size 22D  Option A: spare
+      - "+12V Coils/Inj [‖2/4]"                # 2   R1  Size 22D  Option A: spare
+      - "Engine GND (cyl head stud) [‖1/3]"    # 3   R1  Size 22D  Option A: spare
+      - "IGN 1 (CMC A2)"                        # 4   R1  Size 22D  18 AWG
+      - "IGN 2 (CMC A3)"                        # 5   R1  Size 22D  18 AWG
+      - "IGN 3 (CMC B2)"                        # 6   R1  Size 22D  18 AWG
+      - "IGN 4 (CMC B3)"                        # 7   R1  Size 22D  18 AWG
+      # ══ SECTOR 2 (3→6 o'clock) — INJ outputs + GPO actuators ═══════════
+      # R1 outer, pins 8–14
+      - "INJ 1 (CMC K1)"                        # 8   R1  Size 22D  20 AWG
+      - "INJ 2 (CMC K2)"                        # 9   R1  Size 22D  20 AWG
+      - "INJ 3 (CMC M1)"                        # 10  R1  Size 22D  20 AWG
+      - "INJ 4 (CMC M2)"                        # 11  R1  Size 22D  20 AWG
+      - "INJ 5 (CMC M3)"                        # 12  R1  Size 22D  20 AWG
+      - "INJ 6 (CMC L3) [M52; cavity-plug 07K]" # 13  R1  Size 22D  20 AWG
+      - "EXP: INJ 7 (07K 5th cyl, CMC L2)"     # 14  R1  Size 22D  20 AWG  cavity-plug on M52
+      # ══ SECTOR 3 (6→9 o'clock) — Triggers + knock (max distance from IGN) ═
+      # R1 outer, pins 15–21
+      - "SPARE — S2→S3 boundary buffer"         # 15  R1  do not populate without review
+      - "Crank VR+ (CMC H3) [M52]"              # 16  R1  Size 22D  22 AWG shielded pair with 17
+      - "Crank VR- (CMC H2) [M52]"              # 17  R1  Size 22D  22 AWG shielded pair with 16
+      - "Crank shield drain [M52]"              # 18  R1  Size 22D  22 AWG  float engine side; tie cabin→CMC H1
+      - "Cam Hall signal (CMC H4) [M52]"        # 19  R1  Size 22D  22 AWG
+      - "EXP: 07K cam signal"                   # 20  R1  Size 22D  22 AWG  cavity-plug on M52; verify Hall vs VR type at install
+      - "SPARE — S3→S4 boundary buffer"         # 21  R1  do not populate without review
+      # ══ SECTOR 4 (9→12 o'clock) — Engine sensors ════════════════════════
+      # R1 outer, pins 22–28
+      - "EXP: DBW throttle body signal (07K)"   # 22  R1  Size 22D  22 AWG  cavity-plug on M52
+      - "EXP: DBW throttle body +5V (07K)"      # 23  R1  Size 22D  22 AWG  cavity-plug on M52
+      - "EXP: DBW throttle body GND (07K)"      # 24  R1  Size 22D  22 AWG  cavity-plug on M52
+      - "CLT signal (CMC F1)"                   # 25  R1  Size 22D  22 AWG
+      - "IAT signal (CMC F2)"                   # 26  R1  Size 22D  22 AWG
+      - "Flex fuel +12V"                        # 27  R1  Size 22D  22 AWG
+      - "SPARE — S4→S1 boundary buffer"         # 28  R1  do not populate without review
+      # ══ SECTOR 1 R2 — Power rail continuation + IGN R2 ═════════════════
+      # R2 ring 2, pins 29–34
+      - "+12V Coils/Inj [‖3/4]"                # 29  R2  Size 22D  Option A: spare
+      - "+12V Coils/Inj [‖4/4]"                # 30  R2  Size 22D  Option A: spare
+      - "Engine GND [‖2/3]"                    # 31  R2  Size 22D  Option A: spare
+      - "IGN 5 (CMC C2)"                        # 32  R2  Size 22D  18 AWG
+      - "IGN 6 (CMC C3) [M52; cavity-plug 07K]" # 33  R2  Size 22D  18 AWG
+      - "EXP: IGN 7 (07K 5th cyl, CMC D2)"     # 34  R2  Size 22D  18 AWG  cavity-plug on M52
+      # ══ SECTOR 2 R2 — INJ overflow + GPO actuators ══════════════════════
+      # R2 ring 2, pins 35–40
+      - "GPO 3 → VANOS (CMC D4) [M52 only]"    # 35  R2  Size 22D  20 AWG
+      - "GPO 4 → ICV coil A (CMC E4) [M52]"    # 36  R2  Size 22D  20 AWG
+      - "GPO 5 → ICV coil B (CMC A1) [M52]"    # 37  R2  Size 22D  20 AWG
+      - "Starter trigger (12-pin pin 6)"        # 38  R2  Size 22D  18 AWG
+      - "Alt D+ excitation (12-pin M)"          # 39  R2  Size 22D  18 AWG
+      - "SPARE — S2→S3 boundary (6 o'clock)"   # 40  R2  do not populate without review
+      # ══ SECTOR 3 R2 — Crank/cam R2 + knock expansion ════════════════════
+      # R2 ring 2, pins 41–46
+      - "EXP: 07K crank signal"                 # 41  R2  Size 22D  22 AWG  cavity-plug on M52
+      - "SPARE — trigger zone buffer"           # 42  R2
+      - "EXP: Knock sensor 1 (CMC K3) [07K]"   # 43  R2  Size 22D  22 AWG  cavity-plug on M52; shielded
+      - "EXP: Knock sensor 2 (CMC K4) [07K]"   # 44  R2  Size 22D  22 AWG  cavity-plug on M52; shielded
+      - "EXP: Knock GND [07K]"                  # 45  R2  Size 22D  22 AWG  cavity-plug on M52
+      - "SPARE — S3→S4 boundary (9 o'clock)"   # 46  R2  do not populate without review
+      # ══ SECTOR 4 R2 — Engine sensors R2 ═════════════════════════════════
+      # R2 ring 2, pins 47–50
+      - "+5V sensor supply (CMC G1)"            # 47  R2  Size 22D  22 AWG  TPS/MAP/PST-F1/(07K cam Hall if needed)
+      - "TPS signal (CMC G2)"                   # 48  R2  Size 22D  22 AWG
+      - "MAP signal (AIN 4)"                    # 49  R2  Size 22D  22 AWG
+      - "PST-F1 pressure (AIN 3, CMC J3)"       # 50  R2  Size 22D  22 AWG
+      # ══ SECTOR 4 R3 — Sensors R3 ═════════════════════════════════════════
+      # R3 ring 3, sector 4, pin 51
+      - "PST-F1 temp (AIN 1, CMC J1)"           # 51  R3  Size 22D  22 AWG  sector 4, ~11:36 position
+      # ══ SECTOR 1 R3 — Power GND continuation ═════════════════════════════
+      - "Engine GND [‖3/3]"                    # 52  R3  Size 22D  Option A: spare
+      # ══ SECTOR 1/2/3/4 R3/R4/Center — Spares ═════════════════════════════
+      - "SPARE"                                 # 53  R3 S1
+      - "SPARE"                                 # 54  R3 S1
+      - "SPARE"                                 # 55  R3 S1
+      - "AIN 2 (CMC J2) — ATF temp / spare"    # 56  R3 S2  moderate signal; ring3 S2 OK
+      - "SPARE"                                 # 57  R3 S2
+      - "SPARE"                                 # 58  R3 S2
+      - "SPARE"                                 # 59  R3 S2
+      - "SPARE"                                 # 60  R3 S3
+      - "SPARE"                                 # 61  R3 S3
+      - "SPARE"                                 # 62  R3 S3
+      - "SPARE"                                 # 63  R3 S3
+      - "Flex fuel signal (CMC C1, DIN3)"       # 64  R3 S4  ~9:22 position
+      - "SPARE"                                 # 65  R3 S4
+      - "SPARE"                                 # 66  R3 S4
+      - "SPARE"                                 # 67  R4 S4
+      - "SPARE"                                 # 68  R4 S1
+      - "SPARE"                                 # 69  R4 S1
+      - "SPARE"                                 # 70  R4 S2 boundary (exactly 3 o'clock)
+      - "SPARE"                                 # 71  R4 S2
+      - "SPARE"                                 # 72  R4 S2
+      - "SPARE"                                 # 73  R4 S3
+      - "SPARE"                                 # 74  R4 S3
+      - "SPARE"                                 # 75  R4 S3 boundary (exactly 9 o'clock)
+      - "SPARE"                                 # 76  R4 S4
+      - "SPARE"                                 # 77  Ctr  12 o'clock position
+      - "SPARE"                                 # 78  Ctr  ~4 o'clock position
+      - "Sensor GND shared (CMC H1 ref)"        # 79  Ctr  ~8 o'clock — center pin, per HPA convention
     notes: >-
-      Cabin side is permanent. Engine-side mating plug (Deutsch AS79 jam nut plug) is
-      per-harness: M52 harness Phase 1, 07K harness Phase 3 (same pin numbers → plug-and-play swap).
-      EXCEPTION — pins 72-77 (APS e-pedal): cavity-plugged in Phase 1; the cabin-side
-      cable run from the E46 pedal module to the bulkhead face is the ONE cabin-side
-      harness addition performed at the M52 → 07K swap. Engine-side of 72-77 wires
-      into the 07K mating plug (to MaxxECU APS1/APS2 CMC pins).
-      AS79 contact sizes: Size 12 (23A) for most power/GND pins, Size 20 (7.5A) for signals.
-      Pin 6 (EWP +12V): Size 8 (45A) -- CWA400 draws 36.3A max, exceeds Size 12 23A rating.
-      Souriau 8STA Size 8 contacts (45A) also available for pin 7 (AC relay out) if needed.
-      120Ω CAN terminator: one end at MaxxECU (cabin side); one end at 8HP TCU (engine bay).
-      120Ω at firewall bulkhead pins 47/48 ONLY if 8HP is stub-terminated here (not recommended).
+      Cabin side is permanent. Engine-side mating plug (AS79 jam-nut plug) swaps per harness:
+      M52 Phase 1 plug, 07K Phase 3 plug. Same pin numbers → plug-and-play swap.
+
+      SECTOR LAYOUT (G35/20-35 insert, Amphenol INSERT ARRANGEMENT #20-35 / 21-35):
+        All views are pin face. Pin 1 at 12 o'clock, clockwise numbering.
+        S1 (12→3): power + IGN noise zone.
+        S2 (3→6):  INJ + actuators.
+        S3 (6→9):  triggers + knock — maximum angular distance from IGN.
+        S4 (9→12): engine sensors.
+        Pin 79 (center, ~8 o'clock): Sensor GND — innermost cavity, per HPA build convention.
+
+      POWER RAILS:
+        Option A (preferred): +12V Coils/Inj and Engine GND bypass the AS79 entirely.
+          Use a dedicated 2-pin Deutsch DT or weatherpack connector through a separate
+          firewall grommet (or alongside the AS79 plate). Pins 1–3, 29–31, 52 become spares.
+        Option B (documented): 4× contacts in parallel for +12V (5A each = 20A), 3× for GND.
+          Pins 1, 2, 29, 30 join at a splice to a single 12 AWG supply wire.
+          Pins 3, 31, 52 join at a splice to a single 14 AWG GND wire.
+
+      CONTACT SIZE: All AS79 size-22D contacts, 5A max each. Use 22–26 AWG wire.
+        Souriau 8STA accepts same wire range. HDT-48-00 crimp tool required (or JRready NEW-DT2).
+
+      CRANK SHIELDED PAIR: Pins 16/17 must be shielded twisted pair. Shield drain (pin 18)
+        terminates at cabin-side sensor GND (CMC H1) via pin 79. Float at engine side.
+
+      07K CAM SIGNAL (pin 20): Verify Hall vs VR type at install.
+        If 07K cam Hall sensor cannot share +5V rail (pin 47), migrate to first available
+        S4 spare and add dedicated +5V leg.
+
+      KNOCK SIGNALS (pins 43/44): 07K knock sensors should use shielded wire.
+        Shield terminates at Sensor GND (CMC H1, pin 79).
+
+      BUFFER PINS (15, 21, 28, 40, 42, 46): Intentionally empty. These sit at sector
+        boundaries to maximize angular separation between noise zones. Do not populate
+        without a specific assignment review.
+
 
   # ── Engine side mating plug (M52 Phase 1) ───────────────────────────────
 
   BULKHEAD_ENGINE_M52:
-    type: "Deutsch AS79 / Souriau 8STA 79-way jam nut plug"
-    subtype: "Engine side — M52 Phase 1 harness. Unplugs at swap."
+    type: "Deutsch Autosport AS79 / Souriau 8STA 79-way jam-nut plug"
+    subtype: "Engine side — M52 Phase 1 harness. Unplugs at 07K swap."
     pincount: 79
     pinlabels:
-      - "+12V Coils/Inj → engine harness common rail"  # 1
-      - "+12V 8HP Main → TCU pin 13 (constant)"        # 2
-      - "+12V 8HP Wakeup → TCU pin 9 (IGN)"            # 3
-      - "+12V Fan → RELAY_FAN motor"                   # 4
-      - "+12V Condenser fan → CONDENSER_FAN motor"     # 5
-      - "+12V EWP → CWA400 pin 3"                      # 6
-      - "+12V AC → AC inverter +12V"                   # 7
-      - "Engine GND → cylinder head stud"              # 8
-      - "8HP TCU GND → chassis GND"                    # 9
-      - "IGN 1 → coil 1"                               # 10
-      - "IGN 2 → coil 2"                               # 11
-      - "IGN 3 → coil 3"                               # 12
-      - "IGN 4 → coil 4"                               # 13
-      - "IGN 5 → coil 5"                               # 14
-      - "IGN 6 → coil 6"                               # 15  (07K: cavity plug)
-      - "INJ 1 → injector 1"                           # 16
-      - "INJ 2 → injector 2"                           # 17
-      - "INJ 3 → injector 3"                           # 18
-      - "INJ 4 → injector 4"                           # 19
-      - "INJ 5 → injector 5"                           # 20
-      - "INJ 6 → injector 6"                           # 21  (07K: cavity plug)
-      - "Crank VR+ → M52 crank sensor pin 1"           # 22
-      - "Crank VR- → M52 crank sensor pin 2"           # 23
-      - "Crank shield → sensor shell"                  # 24
-      - "Cam Hall signal → BMW 12141726590 pin 2"      # 25
-      - "(spare — cavity plug; BMW 12141726590 no +12V)"  # 26
-      - "Sensor GND → CLT/IAT/TPS/MAP/PST-F1 GND"     # 27
-      - "CLT → Bosch JPT 2-way pin 1"                  # 28
-      - "IAT → OEM M52 pin 1"                          # 29
-      - "+5V → TPS pin 1 / MAP / PST-F1"              # 30
-      - "TPS signal → OEM TPS pin 2"                   # 31
-      - "MAP signal → MAP sensor"                      # 32
-      - "PST-F1 pressure → sensor pin 3"               # 33
-      - "PST-F1 temp → sensor pin 4"                   # 34
-      - "Flex fuel → Continental sensor signal"         # 35
-      - "Flex fuel +12V → Continental sensor +12V"     # 36
-      - "WBO2 VS → LSU 4.9 pin 2"                      # 37
-      - "WBO2 VREF → LSU 4.9 pin 1"                    # 38
-      - "WBO2 IP → LSU 4.9 pin 6"                      # 39
-      - "WBO2 RCAL → LSU 4.9 pin 5"                    # 40
-      - "WBO2 Heater- → LSU 4.9 pin 3"                 # 41
-      - "GPO 1 → boost solenoid Superseal pin 2"       # 42
-      - "GPO 3 → VANOS solenoid pin 2"                 # 43
-      - "GPO 4 → ICV coil A (JPT 3-way pin 2)"         # 44
-      - "GPO 5 → ICV coil B (JPT 3-way pin 3)"         # 45
-      - "EWP PWM → CWA400 pin 1 (680 Hz)"              # 46
-      - "CAN H → 8HP TCU pin 5"                        # 47
-      - "CAN L → 8HP TCU pin 6"                        # 48
-      - "Starter trigger → starter solenoid"            # 49
-      - "Alt D+ → alternator excitation terminal"      # 50
-      - "AIN 2 — STUB (sealed)"                        # 51
-      - "AC enable → RELAY_AC coil 86"                 # 52
-      - "Chassis GND engine bay"                       # 53
-      - "STUB — sealed"   # 54
-      - "STUB — sealed"   # 55
-      - "STUB — sealed"   # 56
-      - "STUB — sealed"   # 57
-      - "STUB — sealed"   # 58
-      - "STUB — sealed"   # 59
-      - "STUB — sealed"   # 60
-      - "STUB — sealed"   # 61
-      - "STUB — sealed"   # 62
-      - "STUB — sealed"   # 63
-      - "STUB — sealed"   # 64
-      - "STUB — sealed"   # 65
-      - "STUB — sealed"   # 66
-      - "STUB — sealed"   # 67
-      - "STUB — sealed"   # 68
-      - "STUB — sealed"   # 69
-      - "STUB — sealed"   # 70
-      - "STUB — sealed"   # 71
-      - "SPARE — cavity plug"  # 72
-      - "SPARE — cavity plug"  # 73
-      - "SPARE — cavity plug"  # 74
-      - "SPARE — cavity plug"  # 75
-      - "SPARE — cavity plug"  # 76
-      - "SPARE — cavity plug"  # 77
-      - "SPARE — cavity plug"  # 78
-      - "SPARE — cavity plug"  # 79
+      - "+12V Coils/Inj → engine harness common rail [‖1/4]" # 1
+      - "+12V Coils/Inj → engine harness common rail [‖2/4]" # 2
+      - "Engine GND → cylinder head stud [‖1/3]"            # 3
+      - "IGN 1 → coil 1"                                     # 4
+      - "IGN 2 → coil 2"                                     # 5
+      - "IGN 3 → coil 3"                                     # 6
+      - "IGN 4 → coil 4"                                     # 7
+      - "INJ 1 → injector 1"                                 # 8
+      - "INJ 2 → injector 2"                                 # 9
+      - "INJ 3 → injector 3"                                 # 10
+      - "INJ 4 → injector 4"                                 # 11
+      - "INJ 5 → injector 5"                                 # 12
+      - "INJ 6 → injector 6"                                 # 13  M52 only
+      - "STUB — cavity plug (07K INJ 7)"                     # 14
+      - "STUB — cavity plug (S2→S3 buffer)"                  # 15
+      - "Crank VR+ → M52 crank sensor pin 1"                 # 16
+      - "Crank VR- → M52 crank sensor pin 2"                 # 17
+      - "Crank shield → sensor shell (float)"                # 18
+      - "Cam Hall signal → BMW 12141726590 pin 2"            # 19
+      - "STUB — cavity plug (07K cam)"                       # 20
+      - "STUB — cavity plug (S3→S4 buffer)"                  # 21
+      - "STUB — cavity plug (07K DBW signal)"                # 22
+      - "STUB — cavity plug (07K DBW +5V)"                   # 23
+      - "STUB — cavity plug (07K DBW GND)"                   # 24
+      - "CLT → Bosch JPT 2-way pin 1"                        # 25
+      - "IAT → OEM M52 pin 1"                                # 26
+      - "Flex fuel +12V → Continental sensor +12V"           # 27
+      - "STUB — cavity plug (S4→S1 buffer)"                  # 28
+      - "+12V Coils/Inj → engine harness common rail [‖3/4]" # 29
+      - "+12V Coils/Inj → engine harness common rail [‖4/4]" # 30
+      - "Engine GND → cylinder head stud [‖2/3]"            # 31
+      - "IGN 5 → coil 5"                                     # 32
+      - "IGN 6 → coil 6"                                     # 33  M52 only
+      - "STUB — cavity plug (07K IGN 7)"                     # 34
+      - "GPO 3 → VANOS solenoid pin 2"                       # 35  M52 only
+      - "GPO 4 → ICV coil A (JPT 3-way pin 2)"               # 36  M52 only
+      - "GPO 5 → ICV coil B (JPT 3-way pin 3)"               # 37  M52 only
+      - "Starter trigger → starter solenoid"                 # 38
+      - "Alt D+ → alternator excitation terminal"            # 39
+      - "STUB — cavity plug (S2→S3 boundary)"                # 40
+      - "STUB — cavity plug (07K crank)"                     # 41
+      - "STUB — cavity plug (trigger buffer)"                # 42
+      - "STUB — cavity plug (Knock 1)"                       # 43
+      - "STUB — cavity plug (Knock 2)"                       # 44
+      - "STUB — cavity plug (Knock GND)"                     # 45
+      - "STUB — cavity plug (S3→S4 boundary)"                # 46
+      - "+5V → TPS pin 1 / MAP / PST-F1"                    # 47
+      - "TPS signal → OEM TPS pin 2"                         # 48
+      - "MAP signal → MAP sensor"                            # 49
+      - "PST-F1 pressure → sensor pin 3"                     # 50
+      - "PST-F1 temp → sensor pin 4"                         # 51
+      - "Engine GND → cylinder head stud [‖3/3]"            # 52
+      - "SPARE — cavity plug"   # 53
+      - "SPARE — cavity plug"   # 54
+      - "SPARE — cavity plug"   # 55
+      - "AIN 2 — STUB / ATF temp if fitted"                  # 56
+      - "SPARE — cavity plug"   # 57
+      - "SPARE — cavity plug"   # 58
+      - "SPARE — cavity plug"   # 59
+      - "SPARE — cavity plug"   # 60
+      - "SPARE — cavity plug"   # 61
+      - "SPARE — cavity plug"   # 62
+      - "SPARE — cavity plug"   # 63
+      - "Flex fuel signal → Continental sensor signal"        # 64
+      - "SPARE — cavity plug"   # 65
+      - "SPARE — cavity plug"   # 66
+      - "SPARE — cavity plug"   # 67
+      - "SPARE — cavity plug"   # 68
+      - "SPARE — cavity plug"   # 69
+      - "SPARE — cavity plug"   # 70
+      - "SPARE — cavity plug"   # 71
+      - "SPARE — cavity plug"   # 72
+      - "SPARE — cavity plug"   # 73
+      - "SPARE — cavity plug"   # 74
+      - "SPARE — cavity plug"   # 75
+      - "SPARE — cavity plug"   # 76
+      - "SPARE — cavity plug"   # 77
+      - "SPARE — cavity plug"   # 78
+      - "Sensor GND → CMC H1 (sensor GND rail)"              # 79
     notes: >-
-      M52 Phase 1 engine-side mating plug. Stubs on pins 54-71 are sealed with
-      Deutsch cavity plugs. Pins 72-77 are also cavity-plugged on M52 — they
-      become APS1/APS2 e-pedal pass-through on the 07K mating plug (Phase 3).
-      Pin assignments 1-53 are identical between M52 and 07K harnesses; the
-      cabin-side cable (pedal run, pins 72-77) is the ONE cabin-side addition
-      at the swap. See maxxecu-07k.wv and epedal-bmw-e46.wv for full routing.
+      M52 Phase 1 engine-side mating plug. Pins 14, 20–24, 28, 34, 40–46 are cavity-plugged.
+      Pins 53–75, 77–78 are cavity-plugged spares.
+      At 07K swap: unplug this, build and install 07K Phase 3 plug.
+      07K plug populates: all M52 pins unchanged + 14 (INJ 7), 20 (07K cam), 22–24 (DBW),
+        34 (IGN 7), 41 (07K crank), 43–45 (knock), 56 (ATF/AIN2 if fitted).
+      Pins 15, 21, 28, 40, 42, 46 (boundary buffers) remain cavity-plugged on both M52 and 07K.
 
 
 cables:
 
-  W_BULKHEAD:
-    wirecount: 53
+  W_BULKHEAD_ENGINE:
+    # Sub-loom groupings (engine side — apply before Techflex sleeving):
+    #   COILS sub-loom (1/4" Techflex):    wires 1-7, 14-17  (+12V rails, IGN 1-6)
+    #   INJECTORS sub-loom (1/4" Techflex): wires 8-13        (INJ 1-6)
+    #   TRIGGER sub-loom (1/4" Techflex):  wires 18-21       (Crank VR+/VR-/shield, Cam Hall) — shielded, own sleeve, away from coil primaries
+    #   ACTUATORS sub-loom (1/4" Techflex): wires 15, 26-31  (Eng GND ‖2/‖3, VANOS/ICV/Starter/AltD+)
+    #   SENSORS sub-loom (1/4" Techflex):  wires 22-26, 32-35 (CLT/IAT/Flex fuel/+5V/TPS/MAP/SensorGND)
+    # All wires 22 AWG TXL. All fit AS79 size-22D solid barrel contacts (5A max, 22-24 AWG range).
+    wirecount: 35
     colors:
-      - RD   # 1  +12V Coils/Inj
-      - RD   # 2  +12V 8HP Main
-      - RD   # 3  +12V 8HP Wakeup
-      - RD   # 4  +12V Fan
-      - RD   # 5  +12V Condenser fan
-      - RD   # 6  +12V EWP
-      - RD   # 7  +12V AC
-      - BK   # 8  Engine GND
-      - BK   # 9  8HP GND
-      - GY   # 10 IGN 1
-      - GY   # 11 IGN 2
-      - GY   # 12 IGN 3
-      - GY   # 13 IGN 4
-      - GY   # 14 IGN 5
-      - GY   # 15 IGN 6
-      - GN   # 16 INJ 1
-      - GN   # 17 INJ 2
-      - GN   # 18 INJ 3
-      - GN   # 19 INJ 4
-      - GN   # 20 INJ 5
-      - GN   # 21 INJ 6
-      - WH   # 22 Crank VR+
-      - BK   # 23 Crank VR-
-      - GY   # 24 Crank shield
-      - WH   # 25 Cam Hall signal
-      - GY   # 26 (spare)
-      - BK   # 27 Sensor GND shared
-      - WH   # 28 CLT
-      - WH   # 29 IAT
-      - RD   # 30 +5V sensor
-      - WH   # 31 TPS signal
-      - WH   # 32 MAP signal
-      - WH   # 33 PST-F1 pressure
-      - WH   # 34 PST-F1 temp
-      - WH   # 35 Flex fuel signal
-      - RD   # 36 Flex fuel +12V
-      - WH   # 37 WBO2 VS
-      - WH   # 38 WBO2 VREF
-      - WH   # 39 WBO2 IP
-      - WH   # 40 WBO2 RCAL
-      - BK   # 41 WBO2 Heater-
-      - GN   # 42 GPO 1 boost
-      - GN   # 43 GPO 3 VANOS
-      - GN   # 44 GPO 4 ICV A
-      - GN   # 45 GPO 5 ICV B
-      - GN   # 46 EWP PWM
-      - WH   # 47 CAN H
-      - BU   # 48 CAN L
-      - YE   # 49 Starter trigger
-      - YE   # 50 Alt D+
-      - WH   # 51 AIN 2 spare
-      - GN   # 52 AC enable
-      - BK   # 53 Chassis GND engine bay
+      # === COILS sub-loom ===
+      - RD   # 1  +12V Coils/Inj [‖1]
+      - RD   # 2  +12V Coils/Inj [‖2]
+      - BK   # 3  Engine GND [‖1]
+      - GY   # 4  IGN 1
+      - GY   # 5  IGN 2
+      - GY   # 6  IGN 3
+      - GY   # 7  IGN 4
+      # === INJECTORS sub-loom ===
+      - GN   # 8  INJ 1
+      - GN   # 9  INJ 2
+      - GN   # 10 INJ 3
+      - GN   # 11 INJ 4
+      - GN   # 12 INJ 5
+      - GN   # 13 INJ 6
+      # === COILS sub-loom (continued) ===
+      - RD   # 14 +12V [‖3]
+      - BK   # 15 Engine GND [‖2]
+      - GY   # 16 IGN 5
+      - GY   # 17 IGN 6
+      # === TRIGGER sub-loom (shielded STP — own sleeve, away from coil primaries) ===
+      - WH   # 18 Crank VR+
+      - BK   # 19 Crank VR-
+      - GY   # 20 Crank shield
+      - WH   # 21 Cam Hall M52
+      # === SENSORS sub-loom ===
+      - WH   # 22 CLT
+      - WH   # 23 IAT
+      - RD   # 24 Flex fuel +12V
+      - RD   # 25 +5V sensor
+      - BK   # 26 Engine GND [‖3]
+      # === ACTUATORS sub-loom ===
+      - GN   # 27 GPO3 VANOS
+      - GN   # 28 GPO4 ICV-A
+      - GN   # 29 GPO5 ICV-B
+      - YE   # 30 Starter trigger
+      - YE   # 31 Alt D+
+      # === SENSORS sub-loom (continued) ===
+      - RD   # 32 +5V sensor [‖2]
+      - WH   # 33 TPS signal
+      - WH   # 34 MAP
+      - BK   # 35 Sensor GND
     wirelabels:
-      - "+12V Coils/Inj (12 AWG)"
-      - "+12V 8HP Main (14 AWG CONST)"
-      - "+12V 8HP Wakeup (18 AWG IGN)"
-      - "+12V Fan (12 AWG)"
-      - "+12V Cond Fan (12 AWG)"
-      - "+12V EWP (10 AWG)"
-      - "+12V AC (8 AWG)"
-      - "Eng GND (14 AWG)"
-      - "8HP GND (14 AWG)"
+      - "+12V Coils [‖1]"
+      - "+12V Coils [‖2]"
+      - "Eng GND [‖1]"
       - "IGN 1 (18 AWG)"
       - "IGN 2"
       - "IGN 3"
       - "IGN 4"
-      - "IGN 5"
-      - "IGN 6 [M52]"
       - "INJ 1 (20 AWG)"
       - "INJ 2"
       - "INJ 3"
       - "INJ 4"
       - "INJ 5"
-      - "INJ 6 [M52]"
-      - "Crank VR+ (22 AWG)"
+      - "IGN 6 [M52]"
+      - "+12V Coils [‖3]"
+      - "Eng GND [‖2]"
+      - "IGN 5"
+      - "IGN 6 [M52]"
+      - "Crank VR+ (22 AWG shld)"
       - "Crank VR-"
-      - "Crank shld"
-      - "Cam signal"
-      - "(spare)"
-      - "Sensor GND"
+      - "Crank shld drain"
+      - "Cam Hall M52"
       - "CLT"
       - "IAT"
-      - "+5V sens"
-      - "TPS sig"
-      - "MAP"
-      - "PST pres"
-      - "PST temp"
-      - "Flex sig"
       - "Flex +12V"
-      - "WBO2 VS"
-      - "WBO2 VREF"
-      - "WBO2 IP"
-      - "WBO2 RCAL"
-      - "WBO2 Htr-"
-      - "GPO1 Boost"
+      - "+12V Coils [‖4]"
+      - "Eng GND [‖3]"
       - "GPO3 VANOS"
       - "GPO4 ICV-A"
       - "GPO5 ICV-B"
-      - "EWP PWM"
-      - "CAN H (22 AWG TP)"
-      - "CAN L (22 AWG TP)"
       - "Starter"
       - "Alt D+"
-      - "AIN2 spare"
-      - "AC enable"
-      - "Chas GND"
+      - "+5V sens"
+      - "TPS sig"
+      - "MAP"
+      - "Sensor GND (22 AWG)"
     notes: >-
-      CAN H/L (pins 47-48) must be twisted pair, 120ohm termination at MaxxECU end (cabin)
-      and at 8HP TCU end (engine bay). DCTShifter and Gauge.S tap cabin-side CAN bus
-      before the bulkhead — no additional bulkhead pins required for either device.
-      WBO2 Heater+ (LSU 4.9 pin 4) connects to engine bay +12V coil/inj rail (pin 1)
-      via local splice — no separate bulkhead pin needed.
-      Crank VR+/VR-/Shield (pins 22-24) should be shielded twisted pair; shield terminates
-      at cabin-side sensor GND (CMC H1), floating at engine-side.
+      PST-F1 and flex fuel signal wires (pins 50, 51, 64) routed separately — add to cable
+      or route as individual labeled wires depending on loom layout.
+      Crank VR+/VR-/shield (pins 16–18) must be shielded twisted pair.
+      Shield (pin 18) connects at cabin side to Sensor GND (CMC H1) via pin 79.
+      Float at engine side.
+      WBO2 Heater+ (LSU 4.9 pin 4) splices locally to +12V coil/inj rail (from pins 1+2+29+30)
+      on the engine side — no separate bulkhead pin needed.
 
 
 connections:
 
-  - - BULKHEAD_CABIN: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53]
-    - W_BULKHEAD: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53]
-    - BULKHEAD_ENGINE_M52: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53]
+  - - BULKHEAD_CABIN: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, 25, 26, 27, 29, 30, 31, 32, 33, 35, 36, 37, 38, 39, 47, 48, 49, 50, 79]
+    - W_BULKHEAD_ENGINE: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 18, 19, 20, 21, 22, 23, 24, 14, 15, 16, 17, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+    - BULKHEAD_ENGINE_M52: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, 25, 26, 27, 29, 30, 31, 32, 33, 35, 36, 37, 38, 39, 47, 48, 49, 50, 79]
