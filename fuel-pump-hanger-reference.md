@@ -91,22 +91,42 @@ outputs PWM on O4. No separate SSR or relay needed. Source: `harnesses/power-dis
 | PWM frequency | 100–500 Hz (set in PMU software on O4) |
 | MTune path | Outputs → Output config → Function: PWM fuel pump control |
 
-**Recommended duty table:**
+**Phase 3 PWM duty table** (PMU16 O4; not applicable to Phase 1 relay):
 
 | Operating condition | Duty Cycle | Notes |
 | :--- | :--- | :--- |
 | Key-on / pre-crank | 100% (brief) | Prime the rail — 2-3 seconds at startup |
-| Idle / low load (Phase 1) | 65% | Adequate flow for M52 NA at ~200hp |
-| Cruise (Phase 1) | 75% | Normal road load |
-| WOT NA (Phase 1) | 90–95% | M52 / Turbo M50 high demand |
 | Idle / low boost (Phase 3) | 75% | 07K at part load |
 | Full boost / WOT (Phase 3) | 100% | 07K 600whp E85 — full duty |
 
-> ⚠️ **Duty cycle floor:** Do not run a brushed pump below ~50% duty continuously — insufficient flow through the pump body causes heat buildup. At idle, 65% is the safe floor.
+> ⚠️ **Duty cycle floor:** Do not run a brushed pump below ~50% duty continuously — insufficient flow through the pump body causes heat buildup. At idle, 75% is the safe floor.
+
+Phase 1 (relay, no PWM): pump runs at 100% whenever key is on. This is fine for the F90000267 at M52 NA fuel demand (~14.1A continuous is within the pump's rated duty).
 
 ---
 
-## Power Wiring
+## Power Wiring — Phase 1 (M52, M50 harness, no PMU16)
+
+Phase 1 uses a standard 30A automotive relay. MaxxECU GPO 2 (ECU_16PIN pin 4) sinks the relay coil.
+The Walbro F90000267 draws 14.1A — well within relay spec. No PWM in Phase 1; pump runs at full
+speed whenever the relay closes. Full-speed continuous operation is safe for the Walbro.
+
+| Wire | Spec | Notes |
+| :--- | :--- | :--- |
+| BATT+ to relay pin 30 | 12 AWG RED, fused 20A within 12" of battery | Always-on feed |
+| Relay pin 87 to pump(+) stud | 12 AWG RED | Switched pump supply |
+| Pump(-) stud to chassis GND | 12 AWG BLACK | Dedicated GND stud — not shared |
+| IGN +12V to relay coil pin 86 | 18 AWG | Key-switched supply |
+| MaxxECU GPO 2 to relay coil pin 85 | 18 AWG | GPO 2 = ECU_16PIN pin 4 (GND-sink) |
+
+**Relay:** Bosch 0 332 002 150 or equivalent 4-pin 30A automotive relay.
+
+---
+
+## Power Wiring — Phase 3 (07K, PMU16)
+
+Phase 3 replaces the relay with **PMU16 O4** (25A, PWM-capable). MaxxECU commands pump speed
+via CAN → PMU16 maps to O4 PWM. No physical relay. Source: `harnesses/power-distribution.wv`.
 
 | Wire | Spec | Notes |
 | :--- | :--- | :--- |
