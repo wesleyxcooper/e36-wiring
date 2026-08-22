@@ -2,12 +2,15 @@ metadata:
   project: E36 Restomod -- Hella 6PV010946-141 Accelerator Pedal (DBW) Wiring
   description: >-
     Hella 6PV010946-141 standalone floor-mount accelerator pedal wired to
-    MaxxECU RACE via Deutsch Autosport AS-series firewall bulkhead.
-    Phase 3 (07K engine). RHD fallback option -- use this harness if the BMW
-    E46 pedal bracket (epedal-bmw-e46.wv) does not fit the RHD pedal box.
+    MaxxECU RACE. Phase 3 (07K engine). RHD fallback option -- use this harness
+    if the BMW E46 pedal bracket (epedal-bmw-e46.wv) does not fit the RHD pedal box.
     Hella pedal is a universal floor-mount module with no OEM bracket dependency;
     mount position is fully custom-fabricated (aluminum plate + 3x M6 studs).
     MaxxECU has a native pre-defined profile for this pedal.
+    APS wiring is CABIN-TO-CABIN ONLY -- no firewall bulkhead crossing required
+    (same as E46 variant). MaxxECU is cabin-mounted.
+    Confirmed C2 pin assignments: APS1 → C2 E4 (AIN 6), APS2 → C2 F1 (AIN 7).
+    Source: MaxxECU RACE GEN1 C2 pinout (maxxecu.com/webhelp/wirings-maxxecu_pinout.html).
     Cross-reference docs/dbw-pinouts.md for specs and comparison.
 
 # ── TODO list ──────────────────────────────────────────────────────────────────
@@ -17,9 +20,10 @@ metadata:
 #       for natural foot travel and return spring clearance
 #   [ ] Source Hella 6PV010946-141 connector + terminals
 #       (Hella part or pigtail from donor application)
-#   [ ] Assign final bulkhead pin numbers (same 6 pins as e46 variant -- bulkhead
-#       is pedal-agnostic; only the cabin connector changes)
-#   [ ] Confirm MaxxECU AIN pin numbers for APS1 and APS2
+#   [x] Confirm MaxxECU AIN pin numbers for APS1 and APS2
+#       CONFIRMED: APS1 → C2 E4 (AIN 6), APS2 → C2 F1 (AIN 7)
+#       Source: MaxxECU RACE GEN1 C2 pinout — maxxecu.com/webhelp/wirings-maxxecu_pinout.html
+#   [x] APS routing confirmed cabin-to-cabin; AS79 bulkhead NOT used for APS
 #   [ ] Verify bench: APS1 and APS2 idle/WOT voltages before installing in car
 #   [ ] Load MaxxECU native Hella profile in MTune before calibration wizard
 #   [ ] Run e-throttle calibration wizard after wiring
@@ -47,98 +51,77 @@ connectors:
       Used in Porsche 944/914 swaps and kit cars for exactly this reason.
       Source: Hella OEM supply or from a donor application. ~$80-120 new.
       Pinout source: MaxxECU E-Pedals Wiring Docs (maxxecu.se/webhelp/wirings-e_pedals.html).
+      Note: Hella pin order differs from E46 pedal — signal wires are 6/3, not 4/6.
 
-  BULKHEAD_CABIN:
-    type: "Deutsch Autosport AS-series firewall bulkhead -- CABIN SIDE"
-    subtype: "Size 20 contacts -- 6 pins reserved for e-pedal (pins TBD)"
-    pincount: 6
+  MAXXECU_C2:
+    type: "MaxxECU RACE GEN1 C2 connector (32-pin Molex CMC)"
+    subtype: "Cabin-mounted ECU -- APS signal inputs at C2 E4 (AIN 6) and C2 F1 (AIN 7)"
+    pincount: 2
     pinlabels:
-      - "TBD-A (APS GND 1 pass-through)"
-      - "TBD-B (APS GND 2 pass-through)"
-      - "TBD-C (+5V 1 pass-through)"
-      - "TBD-D (APS1 signal pass-through)"
-      - "TBD-E (+5V 2 pass-through)"
-      - "TBD-F (APS2 signal pass-through)"
+      - "C2 E4 (AIN 6) — APS1 signal input"
+      - "C2 F1 (AIN 7) — APS2 signal input"
     notes: >-
-      Identical bulkhead pin allocation to epedal-bmw-e46.wv.
-      The bulkhead is pedal-agnostic -- only the cabin connector and pin mapping
-      within the pedal-side cable changes. Engine side and MaxxECU side are identical.
-      This lets you swap between E46 and Hella pedals without touching the bulkhead.
+      Confirmed from MaxxECU RACE GEN1 C2 pinout:
+        C2 E4 = AIN 6 (0-5V analog input)
+        C2 F1 = AIN 7 (0-5V analog input)
+      Source: maxxecu.com/webhelp/wirings-maxxecu_pinout.html
+      AIN 5 (C2 G3) is occupied by the virtual clutch position sensor.
+      MTune path: Settings → E-Throttle → Pedal position → load Hella 6PV010946-141
+      native profile, then assign AIN 6 (APS1) and AIN 7 (APS2).
 
-  BULKHEAD_ENGINE:
-    type: "Deutsch Autosport AS-series firewall bulkhead -- ENGINE SIDE"
-    subtype: "Size 20 contacts -- 6 pins reserved for e-pedal (pins TBD)"
-    pincount: 6
+  MAXXECU_SUPPLY:
+    type: "MaxxECU RACE main CMC supply rails"
+    subtype: "+5V sensor supply (CMC G1) and Sensor GND (CMC H1) -- shared bus"
+    pincount: 2
     pinlabels:
-      - "TBD-A (APS GND 1 pass-through)"
-      - "TBD-B (APS GND 2 pass-through)"
-      - "TBD-C (+5V 1 pass-through)"
-      - "TBD-D (APS1 signal pass-through)"
-      - "TBD-E (+5V 2 pass-through)"
-      - "TBD-F (APS2 signal pass-through)"
+      - "CMC G1 (+5V sensor supply) — shared with TPS/MAP/CLT/CAM"
+      - "CMC H1 (Sensor GND) — shared sensor ground bus"
     notes: >-
-      Mating plug, engine side. Identical to epedal-bmw-e46.wv engine side.
-      Pedal choice does not affect this connector or the MaxxECU side -- only the
-      cabin-side cable and the Hella connector itself differ from the E46 variant.
-
-  MAXXECU_APS:
-    type: "MaxxECU RACE -- Analog Inputs + Sensor Supply + Sensor GND"
-    subtype: "CMC connector -- AIN pins TBD, 5V SENS OUT, SGND"
-    pincount: 6
-    pinlabels:
-      - "SGND 1 (sensor ground bus)"
-      - "+5V SENS OUT 2 (sensor reference)"
-      - "AIN x (APS2 signal input)"
-      - "SGND 2 (sensor ground bus)"
-      - "+5V SENS OUT 1 (sensor reference)"
-      - "AIN y (APS1 signal input)"
-    notes: >-
-      Same MaxxECU connector as epedal-bmw-e46.wv -- this side is identical.
-      Pin order within the MaxxECU connector is re-mapped from the Hella pin order.
-      Load MaxxECU native Hella 6PV010946-141 profile before calibration wizard.
-      MTune path: Settings, E-Throttle, Pedal position.
+      Both APS circuits tap the same MaxxECU +5V sensor supply rail (CMC G1).
+      Both APS sensor grounds return to the sensor GND bus (CMC H1).
+      Do NOT connect APS GND to chassis GND or engine GND (C2 G4). Must go to sensor GND bus.
+      Same supply points as E46 variant (epedal-bmw-e46.wv).
 
 # ── Cables ─────────────────────────────────────────────────────────────────────
 
 cables:
 
-  CABLE_PEDAL_TO_BULKHEAD:
+  CABLE_PEDAL_TO_MAXXECU:
     gauge: "24 AWG"
-    length: "0.8 m"
+    length: "1.5 m"
     wirecount: 6
     colors: [BK, RD, YE, BK, RD, GN]
     shield: true
     notes: >-
-      Cabin-side cable: Hella pedal connector to bulkhead cabin face.
+      Cabin-only run: Hella pedal connector (footwell) → MaxxECU connector area (firewall).
+      No firewall crossing. Route along tunnel/sill, away from audio wiring.
       24 AWG sufficient -- low-current sensor signals only.
-      Shielded 6-conductor; drain shield to MaxxECU SGND at MaxxECU end only.
-      Wire 1 BK: GND1 (Pin 1). Wire 2 RD: +5V2 (Pin 2).
-      Wire 3 YE: TPS2/APS2 signal (Pin 3). Wire 4 BK: GND2 (Pin 4).
-      Wire 5 RD: +5V1 (Pin 5). Wire 6 GN: TPS1/APS1 signal (Pin 6).
+      Shielded 6-conductor; drain shield at MaxxECU end only (single-end drain).
+      Tie drain wire to CMC H1 (Sensor GND).
+      Wire 1 BK: GND1 (pedal pin 1) → MAXXECU_SUPPLY GND bus (CMC H1).
+      Wire 2 RD: +5V2 (pedal pin 2) → MAXXECU_SUPPLY +5V rail (CMC G1).
+      Wire 3 YE: TPS2/APS2 signal (pedal pin 3) → MAXXECU_C2 F1 (AIN 7).
+      Wire 4 BK: GND2 (pedal pin 4) → MAXXECU_SUPPLY GND bus (CMC H1).
+      Wire 5 RD: +5V1 (pedal pin 5) → MAXXECU_SUPPLY +5V rail (CMC G1).
+      Wire 6 GN: TPS1/APS1 signal (pedal pin 6) → MAXXECU_C2 E4 (AIN 6).
       Note: wire-color order differs from E46 variant -- label both ends clearly.
-
-  CABLE_BULKHEAD_TO_MAXXECU:
-    gauge: "24 AWG"
-    length: "0.4 m"
-    wirecount: 6
-    colors: [BK, RD, YE, BK, RD, GN]
-    shield: true
-    notes: >-
-      Engine-side cable: bulkhead engine face to MaxxECU CMC connector.
-      Short run -- MaxxECU is mounted on firewall in engine bay.
-      Drain shield here to MaxxECU SGND (single drain point for full signal path).
-      Identical to E46 variant engine-side cable -- same bulkhead pin mapping.
+      AS79 bulkhead NOT used for APS -- cabin-to-cabin direct run.
 
 # ── Connections ────────────────────────────────────────────────────────────────
 
 connections:
-  # Hella pedal → bulkhead cabin side
+  # APS signals: Hella pedal → MaxxECU C2 (AIN 6 / AIN 7)
   -
-    - HELLA_PEDAL: [1, 2, 3, 4, 5, 6]
-    - CABLE_PEDAL_TO_BULKHEAD: [1, 2, 3, 4, 5, 6]
-    - BULKHEAD_CABIN: [1, 2, 3, 4, 5, 6]
-  # Bulkhead engine side → MaxxECU
+    - HELLA_PEDAL: [6, 3]
+    - CABLE_PEDAL_TO_MAXXECU: [6, 3]
+    - MAXXECU_C2: [1, 2]
+  # APS supplies: Hella pedal → MaxxECU CMC +5V rail
   -
-    - BULKHEAD_ENGINE: [1, 2, 3, 4, 5, 6]
-    - CABLE_BULKHEAD_TO_MAXXECU: [1, 2, 3, 4, 5, 6]
-    - MAXXECU_APS: [1, 2, 3, 4, 5, 6]
+    - HELLA_PEDAL: [5, 2]
+    - CABLE_PEDAL_TO_MAXXECU: [5, 2]
+    - MAXXECU_SUPPLY: [1, 1]
+  # APS grounds: Hella pedal → MaxxECU CMC sensor GND bus
+  -
+    - HELLA_PEDAL: [1, 4]
+    - CABLE_PEDAL_TO_MAXXECU: [1, 4]
+    - MAXXECU_SUPPLY: [2, 2]

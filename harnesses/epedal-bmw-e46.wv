@@ -2,10 +2,13 @@ metadata:
   project: E36 Restomod -- BMW E46 Accelerator Pedal (DBW) Wiring
   description: >-
     BMW E46 accelerator pedal module (35426786282 manual / 35426786281 auto)
-    wired to MaxxECU RACE via Deutsch Autosport AS-series firewall bulkhead.
-    Phase 3 (07K engine). Six wires cross the firewall: dual APS signals,
-    dual 5V supplies, dual sensor grounds. Pedal is in cabin; MaxxECU is in
-    engine bay on firewall. All six cross through reserved bulkhead pins.
+    wired to MaxxECU RACE. Phase 3 (07K engine). MaxxECU is cabin-mounted on the
+    interior firewall face. APS wiring is CABIN-TO-CABIN ONLY -- no firewall
+    bulkhead crossing required. Six wires run from pedal (footwell) to MaxxECU
+    C2 connector and the main CMC sensor supply rail. AS79 bulkhead pins 72-77
+    are NOT used for APS; they remain spare.
+    Confirmed C2 pin assignments: APS1 → C2 E4 (AIN 6), APS2 → C2 F1 (AIN 7).
+    Source: MaxxECU RACE GEN1 C2 pinout (maxxecu.com/webhelp/wirings-maxxecu_pinout.html).
     Cross-reference docs/dbw-pinouts.md for full specs and TB pinouts.
     Pedal PN is manual vs auto -- NOT LHD vs RHD. Same part in any market.
 
@@ -14,12 +17,12 @@ metadata:
 #   [ ] Confirm RHD E36 pedal box bracket fitment (Strom / Garagistic / Drift HQ)
 #       -- LHD brackets may need carpet trim at transmission tunnel edge in RHD
 #       -- If bracket won't fit, switch to harnesses/epedal-hella-6pv.wv instead
-#   [x] Assign bulkhead pin numbers for APS1/APS2/VCC1/VCC2/GND1/GND2
-#       Assigned: pins 72 (GND1), 73 (GND2), 74 (VCC2), 75 (APS1), 76 (VCC1), 77 (APS2)
-#   [ ] Confirm MaxxECU AIN pin numbers for APS1 and APS2
+#   [x] Confirm MaxxECU AIN pin numbers for APS1 and APS2
+#       CONFIRMED: APS1 → C2 E4 (AIN 6), APS2 → C2 F1 (AIN 7)
+#       Source: MaxxECU RACE GEN1 C2 pinout — maxxecu.com/webhelp/wirings-maxxecu_pinout.html
+#   [x] APS routing confirmed cabin-to-cabin; AS79 bulkhead NOT used for APS
 #   [ ] Source and crimp BMW E46 pedal OEM connector + terminals
 #       (54-way Molex MX150L series or pigtail from donor harness)
-#   [ ] Source and crimp Deutsch AS-series contacts for bulkhead (Size 20)
 #   [ ] Verify bench: APS1 idle ~0.70V, WOT ~4.50V; APS2 idle ~0.36V, WOT ~2.20V
 #   [ ] Activate MTune E-Throttle, run pedal calibration wizard, verify dual-track ratio
 #   [ ] Confirm shielded wire routed away from ignition coil/injector wiring
@@ -43,111 +46,83 @@ connectors:
       6-pin dual-track hall-effect sensor. Two fully independent circuits.
       Total current draw: ~20 mA. 24 AWG wire sufficient on all pins.
       APS2 voltage is intentionally ~half APS1 at every pedal position.
-      MaxxECU cross-checks ratio -- disagrement triggers e-throttle shutdown.
+      MaxxECU cross-checks ratio -- disagreement triggers e-throttle shutdown.
       Bench-verified pinout: HP Academy forum + openinverter.org BMW pedal wiki.
       Source used E46 pedal: eBay $30-80. New OEM: ~$130-140.
       Adapter bracket: Strom Motorsports / Garagistic / Boost Monkey / Drift HQ
       (~$40-60 each). RHD fitment unconfirmed -- contact vendor before ordering.
 
-  BULKHEAD_CABIN:
-    type: "Deutsch Autosport AS-series firewall bulkhead -- CABIN SIDE"
-    subtype: "Size 20 contacts -- pins 72-77 assigned to e-pedal APS signals"
-    pincount: 6
+  MAXXECU_C2:
+    type: "MaxxECU RACE GEN1 C2 connector (32-pin Molex CMC)"
+    subtype: "Cabin-mounted ECU -- APS signal inputs at C2 E4 (AIN 6) and C2 F1 (AIN 7)"
+    pincount: 2
     pinlabels:
-      - "Pin 72 (APS GND 1 pass-through)"
-      - "Pin 73 (APS GND 2 pass-through)"
-      - "Pin 74 (VCC 2 pass-through)"
-      - "Pin 75 (APS1 signal pass-through)"
-      - "Pin 76 (VCC 1 pass-through)"
-      - "Pin 77 (APS2 signal pass-through)"
+      - "C2 E4 (AIN 6) — APS1 signal input"
+      - "C2 F1 (AIN 7) — APS2 signal input"
     notes: >-
-      Panel-mount receptacle, cabin side. Pins 72-77 are cavity-plugged in Phase 1
-      (M52 has no DBW pedal) and wired at Phase 3 (07K swap). The cabin-side cable
-      run (E46 pedal :: bulkhead face) is the ONE cabin-side harness addition at swap.
-      Size 20 contacts rated 7.5A continuous -- more than sufficient for 20mA.
-      Use Size 20 sockets (cable side) with 22-24 AWG range crimp tooling.
-      Bulkhead backshell: Raychem DR-25 over strain relief on cabin side.
+      Confirmed from MaxxECU RACE GEN1 C2 pinout:
+        C2 E4 = AIN 6 (0-5V analog input)
+        C2 F1 = AIN 7 (0-5V analog input)
+      Source: maxxecu.com/webhelp/wirings-maxxecu_pinout.html
+      AIN 5 (C2 G3) is already occupied by the virtual clutch position sensor
+      (see maxxecu-m52.wv ECU_C2). AIN 6 and AIN 7 are the next available inputs.
+      MTune path: Settings → E-Throttle → Pedal position → assign AIN 6 (APS1) and
+      AIN 7 (APS2). Run e-throttle calibration wizard after wiring.
 
-  BULKHEAD_ENGINE:
-    type: "Deutsch Autosport AS-series firewall bulkhead -- ENGINE SIDE"
-    subtype: "Size 20 contacts -- pins 72-77 assigned to e-pedal APS signals"
-    pincount: 6
+  MAXXECU_SUPPLY:
+    type: "MaxxECU RACE main CMC supply rails"
+    subtype: "+5V sensor supply (CMC G1) and Sensor GND (CMC H1) -- shared bus"
+    pincount: 2
     pinlabels:
-      - "Pin 72 (APS GND 1 :: MaxxECU SGND)"
-      - "Pin 73 (APS GND 2 :: MaxxECU SGND)"
-      - "Pin 74 (VCC 2 :: MaxxECU +5V sensor supply)"
-      - "Pin 75 (APS1 signal :: MaxxECU APS1 AIN)"
-      - "Pin 76 (VCC 1 :: MaxxECU +5V sensor supply)"
-      - "Pin 77 (APS2 signal :: MaxxECU APS2 AIN)"
+      - "CMC G1 (+5V sensor supply) — shared with TPS/MAP/CLT/CAM"
+      - "CMC H1 (Sensor GND) — shared sensor ground bus"
     notes: >-
-      Part of the 07K engine harness plug (maxxecu-07k.wv BULKHEAD_ENGINE_07K).
-      Cavity-plugged on M52 engine-side plug -- M52 swap does not require
-      touching these pins. Engine side of 72-77 wires to MaxxECU CMC APS inputs.
-      AIN channel numbers for APS1/APS2 TBD -- assign in MTune and document
-      in maxxecu-07k.wv once confirmed.
-
-  MAXXECU_APS:
-    type: "MaxxECU RACE -- Analog Inputs + Sensor Supply + Sensor GND"
-    subtype: "CMC connector -- AIN pins TBD, 5V SENS OUT, SGND"
-    pincount: 6
-    pinlabels:
-      - "SGND 1 (sensor ground bus)"
-      - "SGND 2 (sensor ground bus)"
-      - "+5V SENS OUT 2 (sensor reference)"
-      - "AIN x (APS1 signal input)"
-      - "+5V SENS OUT 1 (sensor reference)"
-      - "AIN y (APS2 signal input)"
-    notes: >-
-      Assign lowest available AIN numbers for APS1 and APS2 (e.g. AIN 5 / AIN 6).
-      MaxxECU has two independent +5V sensor supply outputs -- use separate ones
-      for each pedal circuit if available; tie to same output only if MaxxECU
-      current budget allows (check MaxxECU Race +5V sensor supply max load).
-      MTune path: Settings, E-Throttle, Pedal position.
-      Run e-throttle calibration wizard after wiring -- captures min/max automatically.
+      Both APS circuits (VCC1 and VCC2) tap the same MaxxECU +5V sensor supply rail (CMC G1).
+      Both APS sensor grounds (GND1 and GND2) return to the sensor GND bus (CMC H1).
+      The ECU_16PIN aux breakout (pin 1 = +5V, pin 2 = Sensor GND) is an equivalent tap point
+      if routing from the breakout connector is more convenient.
+      MaxxECU +5V rail is rated 150 mA continuous (from ECU_16PIN note). APS draws ~20 mA total
+      -- well within budget shared with other sensors.
+      Do NOT connect APS GND to chassis GND or engine GND (C2 G4). Must go to sensor GND bus.
 
 # ── Cables ─────────────────────────────────────────────────────────────────────
 
 cables:
 
-  CABLE_PEDAL_TO_BULKHEAD:
+  CABLE_PEDAL_TO_MAXXECU:
     gauge: "24 AWG"
-    length: "0.8 m"
+    length: "1.5 m"
     wirecount: 6
     colors: [BK, BK, RD, GN, RD, YE]
     shield: true
     notes: >-
-      Cabin-side cable: E46 pedal connector to bulkhead cabin face.
+      Cabin-only run: E46 pedal connector (footwell) → MaxxECU connector area (firewall).
+      No firewall crossing. Route along the tunnel/sill, away from audio wiring.
       24 AWG sufficient -- total circuit draw ~20 mA.
-      Shielded 6-conductor; drain shield to chassis GND at MaxxECU end only
-      (single-end drain prevents ground loops).
-      Wire 1 BK: APS1 GND (Pin 1). Wire 2 BK: APS2 GND (Pin 2).
-      Wire 3 RD: VCC2 (Pin 3). Wire 4 GN: APS1 signal (Pin 4).
-      Wire 5 RD: VCC1 (Pin 5). Wire 6 YE: APS2 signal (Pin 6).
-      Route through cabin, away from audio wiring. No high-current sharing.
-
-  CABLE_BULKHEAD_TO_MAXXECU:
-    gauge: "24 AWG"
-    length: "0.4 m"
-    wirecount: 6
-    colors: [BK, BK, RD, GN, RD, YE]
-    shield: true
-    notes: >-
-      Engine-side cable: bulkhead engine face to MaxxECU CMC connector.
-      Short run -- MaxxECU is mounted on firewall in engine bay.
-      Same color coding as cabin side for traceability.
-      Drain shield here (to MaxxECU SGND or chassis GND) -- this is the
-      single shield drain point for the entire pedal signal path.
+      Shielded 6-conductor; drain shield at MaxxECU end only (single-end drain prevents
+      ground loops). Tie drain wire to CMC H1 (Sensor GND).
+      Wire 1 BK: APS1 GND (pedal pin 1) → MAXXECU_SUPPLY GND bus (CMC H1).
+      Wire 2 BK: APS2 GND (pedal pin 2) → MAXXECU_SUPPLY GND bus (CMC H1).
+      Wire 3 RD: VCC2 (pedal pin 3) → MAXXECU_SUPPLY +5V rail (CMC G1).
+      Wire 4 GN: APS1 signal (pedal pin 4) → MAXXECU_C2 E4 (AIN 6).
+      Wire 5 RD: VCC1 (pedal pin 5) → MAXXECU_SUPPLY +5V rail (CMC G1).
+      Wire 6 YE: APS2 signal (pedal pin 6) → MAXXECU_C2 F1 (AIN 7).
 
 # ── Connections ────────────────────────────────────────────────────────────────
 
 connections:
-  # E46 pedal → bulkhead cabin side
+  # APS signals: E46 pedal → MaxxECU C2 (AIN 6 / AIN 7)
   -
-    - E46_PEDAL: [1, 2, 3, 4, 5, 6]
-    - CABLE_PEDAL_TO_BULKHEAD: [1, 2, 3, 4, 5, 6]
-    - BULKHEAD_CABIN: [1, 2, 3, 4, 5, 6]
-  # Bulkhead engine side → MaxxECU
+    - E46_PEDAL: [4, 6]
+    - CABLE_PEDAL_TO_MAXXECU: [4, 6]
+    - MAXXECU_C2: [1, 2]
+  # APS supplies: E46 pedal → MaxxECU CMC +5V rail (VCC1 and VCC2 share same bus)
   -
-    - BULKHEAD_ENGINE: [1, 2, 3, 4, 5, 6]
-    - CABLE_BULKHEAD_TO_MAXXECU: [1, 2, 3, 4, 5, 6]
-    - MAXXECU_APS: [1, 2, 3, 4, 5, 6]
+    - E46_PEDAL: [3, 5]
+    - CABLE_PEDAL_TO_MAXXECU: [3, 5]
+    - MAXXECU_SUPPLY: [1, 1]
+  # APS grounds: E46 pedal → MaxxECU CMC sensor GND bus (GND1 and GND2 share same bus)
+  -
+    - E46_PEDAL: [1, 2]
+    - CABLE_PEDAL_TO_MAXXECU: [1, 2]
+    - MAXXECU_SUPPLY: [2, 2]

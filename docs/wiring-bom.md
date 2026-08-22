@@ -9,6 +9,97 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 
 ---
 
+## Wire Specification — Bulk Wire Purchasing
+
+**Standard spec for all signal and low-current wiring in this build: TXL, 105°C, SAE J1128.**
+
+TXL (thin-wall cross-linked polyethylene) is the consensus choice for custom automotive harness work. It has the same 105°C temperature rating and electrical properties as the common GXL spec, but thinner insulation wall — 22 AWG TXL is ~2.1mm OD vs ~2.7mm for GXL. On a 79-pin connector the difference is the loom fitting through a grommet without a fight. Every HPA course, StreetCarJoe, and Rywire build guide uses TXL. GXL is fine if TXL is unavailable locally, but buy TXL if you have the choice.
+
+Do **not** use GPT (PVC insulation) — it is rated only 80°C and is not suitable for engine bay temperatures near turbocharged exhaust.
+
+Mil-spec M22759 is what race teams use. It's fine but costs 5–10× more and is hard to source in the full color range you need. Not worth it here.
+
+**Bulk spool shopping list (all 22 AWG TXL unless noted):**
+
+| Color | Use in harness | Suggested qty | Notes |
+|-------|---------------|---------------|-------|
+| Red | +12V power, sensor +5V | 50m | Most frequently used power color |
+| Black | All grounds | 50m | — |
+| White | Sensor signal inputs (analog) | 100m | Highest volume — sensors, triggers, cam, crank |
+| Grey | Ignition outputs (coil drives) | 25m | — |
+| Green | Injector outputs, GPO actuators | 25m | — |
+| Yellow | Starter trigger, alt D+ | 10m | Short runs only |
+| White + Blue (WH/BU twisted pair) | CAN H / CAN L | 10m | Buy as pre-twisted pair (WiringPros sells by the foot). WH = CAN H, BU = CAN L — matches all .wv harness files. |
+
+Heavier gauge for specific runs (buy short lengths, not full spools):
+
+| Gauge | Use | Length |
+|-------|-----|--------|
+| 18 AWG GXL/TXL grey | Coil pigtail tails (engine side of splice, if you want heavier gauge at coil) | 3m |
+| 20 AWG GXL/TXL green | Injector pigtail tails (engine side of splice) | 3m |
+| 12 AWG GXL red/black | Fan relay output runs (after DT bypass connector, to fan motor) | 5m |
+| 10 AWG GXL red | EWP output run (after DT bypass connector, to CWA400) | 2m |
+
+**Supplier:** [WiringPros.com](https://www.wiringpros.com) — TXL by the foot in any color; also sells CAN twisted pair pre-twisted. [Del City](https://www.delcity.net) — bulk spools. Do not buy from generic electronics suppliers (not automotive-spec insulation).
+
+---
+
+---
+
+---
+
+## Harness Consumables — Sleeving, Splices, and Boots
+
+Required to build and finish the engine harness. Separate from connectors, contacts, and wire.
+
+### Sleeving
+
+| Item | Spec | Use | Qty (engine harness) |
+|------|------|-----|--------------------|
+| Techflex F6 expandable braided sleeving — 1/2" | 13mm nominal OD | Main trunk | 2m |
+| Techflex F6 expandable braided sleeving — 1/4" | 6mm nominal OD | Injector, coil, sensor, knock, trigger, WBO2 sub-looms (6× sub-looms ~300–500mm each) | 5m |
+| Techflex F6 expandable braided sleeving — 1/8" | 3mm nominal OD | Individual shielded runs (crank/cam twisted pair, knock, WBO2) inside the trigger/knock sub-looms | 2m |
+
+> Techflex nominal diameter = open/relaxed OD.
+
+### Heat-zone sleeving (exhaust manifold / turbo proximity)
+
+The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent to the exhaust manifold. The knock sensors are on the exhaust side of the block. Standard Techflex F6 (PET braid) is not rated for sustained high-temperature exposure — add purpose-built heat sleeve before final looming. Sources: DEI product specs; `maxxecu-07k.wv` W_WBO2 and W_KNOCK notes.
+
+| Item | Spec | Use | Qty |
+|------|------|-----|-----|
+| DEI Fire Sleeve — 3/8" ID × 36" kit | silicone-over-fiberglass, 500°F (260°C) continuous / 2000°F (1093°C) intermittent — **DEI p/n 010470, $26.99** — [designengineering.com](https://www.designengineering.com/fire-sleeve-tape-kit-0-375-id-x-36/) — includes 36" sleeve + 16" Fire Tape | WBO2 cable: first 300 mm (12 in) from sensor bung outward. CLT pigtail: first 150 mm (6 in) from sensor body. Both cables fit the 3/8" ID (10 mm). One 36" kit covers both runs (450 mm total needed). Applied over the bare cable before main loom assembly. | 1 kit |
+| DEI Reflect-A-Gold — 1-1/2" × 15' roll | Metalized polyimide laminated glass cloth, 800°F continuous (adhesive rated to 325°F) — **DEI p/n 010394, $42.99** — [designengineering.com](https://www.designengineering.com/reflect-a-gold-heat-reflective-tape-1-5-x-15/) — NOT Reflect-A-Cool (different product, 400°F limit) | KNOCK sub-loom: wrap any section that routes within 100 mm (4 in) of exhaust manifold, over the Techflex sleeve. Applied after routing is confirmed. | 1 roll |
+
+### Splice consumables
+
+| Item | Use | Notes |
+|------|-----|-------|
+| Raychem SRGB solder sleeves — 22–26 AWG (small, blue band) | All pigtail-to-harness splices on 22 AWG signal wires | Search "Raychem SRGB 22 AWG" or "TE Connectivity solder sleeve" on Amazon/Mouser/DigiKey. Qty needed: ~20 per engine harness (6 inj + 5 coil + 10 sensors/triggers). Buy a box of 25. |
+| Raychem SRGB solder sleeves — 18–20 AWG (medium, red band) | Any heavier-gauge splice at coil or injector exit if using 18/20 AWG pigtail stubs | Buy a small pack of 10 |
+| Non-insulated butt splice + 3:1 adhesive-lined heat-shrink (alternative) | Same joints as Raychem — purely mechanical crimp splice | Use IWISS IWS-2820M open-barrel crimper. Cover with ≥25mm of adhesive-lined heat-shrink. |
+
+> **Raychem SRGB use:** Overlap bare wire ends 5–10mm inside the sleeve, heat gun at 50–75mm standoff, move slowly — solder ring melts and wicks, sleeve shrinks. No iron. Fully encapsulated result. Do NOT use a soldering iron on wires in the loom — rigid joint at flex point fails under vibration.
+
+### Breakout boots and end caps
+
+| Item | Use | Source |
+|------|-----|--------|
+| 3:1 adhesive-lined heat-shrink, assorted sizes (1/4", 3/8", 1/2") | Trunk breakout transitions, sub-loom end terminations | Amazon — buy an assortment kit |
+| Techflex split-loom conduit (optional) | Alternative to expandable braid where loom needs to be retrofitted to existing wiring without pre-threading | Same as Techflex F6 but pre-split — easier install on pre-run wires |
+
+### Loom-level labels (in addition to wire-level PermaSleeve)
+
+| Item | Cartridge PN | Use |
+|------|-------------|-----|
+| Brady M210 | — | Same label maker used for all wire labels |
+| PermaSleeve — 3/8" cartridge | M21-375-C-342 | Sub-loom breakout labels (slides over 1/4" sub-loom before Techflex goes on). Print: `INJECTORS`, `COILS`, `SENSORS`, `TRIGGER`, `KNOCK`, `WBO2` |
+| PermaSleeve — 1/2" cartridge | M21-500-C-342 | Main trunk label at AS79 exit. Print: `ENGINE M52 PH1` or `ENGINE 07K PH3` |
+
+> Do NOT use zip-tie flags for loom labeling. They rotate, collect oil, and protrude visually. PermaSleeve heat-shrink labels shrink flush to the loom surface — identical result to an OEM factory harness label.
+
+---
+
 ## System 1 — Power Distribution
 
 *Source: `power-distribution.wv`*
@@ -90,7 +181,7 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 
 | Run | Color(s) | Type | WV Total | Notes |
 |-----|----------|------|----------|-------|
-| W_CAN, W_CAN_8HP, W_CAN_GAUGES | YE/GN (CAN H/L convention) | 2-wire twisted | 6.9 m total across all 2-wire runs | Use shielded twisted pair for CAN runs |
+| W_CAN, W_CAN_8HP, W_CAN_GAUGES | WH/BU (CAN H/L — WH=H, BU=L) | 2-wire twisted | 6.9 m total across all 2-wire runs | Use shielded twisted pair for CAN runs |
 | W_CLT, W_IAT, W_VANOS, W_FAN, W_FUELPUMP, W_BOOST | RD/BK or signal-specific | 2-wire | included in above total | |
 | W_CRANK, W_CAM, W_TPS | varies | 3-wire | 3.3 m total | |
 | W_FLEXFUEL | — | 3-wire | included above | |
@@ -202,7 +293,7 @@ Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv`
 | W_OIL_PRESS | — | 22 AWG (TBD) | ~0.5 m | No | OEM oil pressure switch signal |
 | W_IGN_POWER | — | 22 AWG (TBD) | ~0.5 m | No | IGN-switched power reference |
 | W_ALT_D_PLUS | — | 22 AWG (TBD) | ~0.6 m | No | Alternator D+ charge excite |
-| W_GAUGES_CAN (CAN H/L) | YE/GN | 22 AWG | 2.5 m | Preferred | MaxxECU CAN → Gauge.S cluster. Twisted pair. |
+| W_GAUGES_CAN (CAN H/L) | WH/BU | 22 AWG | 2.5 m | Preferred | MaxxECU CAN → Gauge.S cluster. Twisted pair. |
 
 ---
 
@@ -258,20 +349,46 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 ## System 8 — Firewall Bulkhead
 
-*Source: `firewall-bulkhead.wv`*
+*Sources: `firewall-bulkhead.wv` (AS79 engine connector) · `firewall-bulkhead-dual.wv` Connector A (Maven 35-pin accessories connector)*
 
-> Deutsch Autosport AS79 79-way firewall pass-through. Cabin side is permanent. M52 and 07K each have their own engine-side mating plug.
+> **Hybrid design — two separate connectors:**
+> - **AS79 (engine):** engine power, IGN/INJ outputs, crank/cam triggers, all engine sensors, VANOS/ICV actuators, starter, alt excitation. Engine-side mating plug swaps at M52→07K engine swap.
+> - **Maven HD30 35-pin (accessories):** 8HP CAN + power, WBO2, boost solenoid, EWP PWM, AC enable, APS e-pedal (Phase 3). Never disconnected.
+> - **4× DT 2-pin bypass connectors (separate grommet):** +12V Fan, +12V Condenser fan, +12V EWP (36.3A), +12V AC relay out. The HD30 24-35 insert has no contact rated above 13A (size-16) — all relay power outputs bypass both main connectors entirely.
 
-### Connectors
+### 8A — AS79 Engine Connector
 
 | Qty | Item | Notes |
 |-----|------|-------|
-| 1 | Deutsch Autosport AS79 panel-mount receptacle | Cabin side — permanent installation |
-| 1 | Deutsch AS79 jam nut plug — M52 engine side | Phase 1 mating plug; ~59 pins assigned, remainder cavity-plugged |
-| 1 | Deutsch AS79 jam nut plug — 07K engine side | Phase 3 mating plug; same pin numbers as M52 for pins 1-53 + adds pins 72-77 (APS) |
-| — | Deutsch AS79 size-20 contacts (sockets) | Cabin side contacts — source with AS79 housing kit |
-| — | Deutsch AS79 size-20 contacts (pins) | Engine-side mating plug contacts |
-| — | Deutsch AS79 cavity plugs | Seal unused pins on both sides — required for IP67 rating |
+| 1 | Deutsch Autosport AS79 / Souriau 8STA 79-way flange receptacle | Cabin side — permanent. Deutsch p/n AS616-79PN or Souriau 8STA79PN |
+| 1 | Deutsch AS79 / Souriau 8STA 79-way jam nut plug — M52 engine side | Phase 1 mating plug. Sector-optimized layout per `firewall-bulkhead.wv`. ~38 active pins, remainder cavity-plugged |
+| 1 | Deutsch AS79 / Souriau 8STA 79-way jam nut plug — 07K engine side | Phase 3 mating plug. Same pin numbers as M52 plug + adds 07K-only stubs (IGN 7, INJ 7, cam, crank, DBW, knock) |
+| — | AS79 / 8STA **size-22** solid barrel sockets (38943-22) | Cabin side contacts — order with housing kit or separately. 5A max, 22–26 AWG. Source: m-cal.com AS020-35SN product data ("Primary Contacts Size: 22 AWG"); ecuplus.de AS620-35PN ("79x 22 AWG"). |
+| — | AS79 / 8STA **size-22** solid barrel pins (38941-22) | Engine-side mating plug contacts. 5A max, 22–26 AWG. |
+| — | AS79 / 8STA cavity plugs (size 22) | Seal all unused cavities on both sides — required for IP67. ~41 unused on M52 side, ~34 on 07K side |
+
+> ⚠️ **Crimping tool:** AS79 size-22 contacts require **Daniels AFM8 (M22520/2-01)** handle ($601.65 — [dmctools.com](https://dmctools.com/afm8)) + **K42 positioner (M22520/2-09)** for pin contacts ($112.64 — [deltaintl.com](https://deltaintl.com/products/k42)) + **K40 positioner (M22520/2-07)** for socket contacts ($93.86 — [dmctools.com](https://dmctools.com/k40)). NOT the HDT-48-00 (DT/DTM only). NOT K43 (that is for size-20 contacts). Fischer Motorsports kit labeled "DMC Deutsch Size 20 AS Tool Kit" is for a different contact size — do not use for this AS79 build.
+
+### 8B — Maven HD30 35-pin Accessories Connector
+
+| Qty | Item | Notes |
+|-----|------|-------|
+| 1 | Maven Speed single connector bulkhead, **35-pin** (HD30 shell-size-24, arrangement 24-35) | [mavenspeed.com](https://mavenspeed.com/products/single-connector-bulkhead-s24) — select "35 PIN" ~$156. Includes both sides (flange receptacle + jam nut plug) + all contacts |
+| — | HD30 size-16 contacts × 3 (included in Maven kit) | Physical positions **4, 7, 12** — verify cavity size visually before inserting. Assign: pos 4 = +12V 8HP Main; pos 7 = 8HP TCU GND; pos 12 = Chassis GND |
+| — | HD30 size-20 contacts × 32 (included in Maven kit) | All other 32 positions |
+| — | HD30 cavity plugs | Seal all unused positions — ~15 spare cavities at 07K phase |
+
+> Source for size-16 positions: Deutsch HD30 & HDP20 Series Technical Manual, Edition 2007, p.9.
+> ⚠️ **Crimping tool:** Deutsch HDT-48-00 (~$350–465) or JRready NEW-DT2 (~$169) — covers HD30 size-16 and size-20 contacts.
+
+### 8C — High-Current Relay Bypass (DT 2-pin, ×4)
+
+| Qty | Item | Notes |
+|-----|------|-------|
+| 4 | Deutsch DT 2-pin connector pair (DT06-2S receptacle + DT04-2P plug + W2S wedge) | One per relay output: +12V Fan · +12V Cond Fan · +12V EWP · +12V AC. Rated 25A/contact. DT connector max per contact = 25A; for EWP use 10 AWG and derate — 36.3A peak is within short-term rating |
+| — | DT size-16 contacts (12 AWG) | Fan relay outputs — 12 AWG fits size-16 DT contact |
+| — | DT size-12 contacts (10 AWG) | EWP output only — 10 AWG, 36.3A max |
+| 1 | Weatherproof firewall grommet, ~25mm | For the 4× DT wire bundles through firewall alongside main connector plate |
 
 ---
 
@@ -281,7 +398,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 | Qty | Item | Notes |
 |-----|------|-------|
-| 1 | MaxxECU 8HP GEN1 CAN harness | Ships from MaxxECU — covers TCU power/GND/CAN. Bulkhead pins 2/3/9/47/48 |
+| 1 | MaxxECU 8HP GEN1 CAN harness | Ships from MaxxECU — covers TCU power/GND/CAN. These signals now cross via the **Maven HD30 35-pin** (System 8B pins A1–A5), not the AS79. The MaxxECU harness terminates in the engine bay at the TCU; the cabin-side splice mates at the Maven 35-pin connector |
 
 > Harness sourced as a unit from MaxxECU — no individual cable spec needed.
 
@@ -289,8 +406,8 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 | Run | Color | Gauge | Length | Shielded | Notes |
 |-----|-------|-------|--------|----------|-------|
-| MaxxECU CAN 1 → Gauge.S, CAN H | YE | 22 AWG | ~0.5 m | Preferred — STP | 500 kbps, Default 1.3 protocol. Cabin-to-cabin, no bulkhead crossing. |
-| MaxxECU CAN 1 → Gauge.S, CAN L | GN | 22 AWG | ~0.5 m | Preferred — STP | Twisted pair with CAN H above. |
+| MaxxECU CAN 1 → Gauge.S, CAN H | WH | 22 AWG | ~0.5 m | Preferred — STP | 500 kbps, Default 1.3 protocol. Cabin-to-cabin, no bulkhead crossing. |
+| MaxxECU CAN 1 → Gauge.S, CAN L | BU | 22 AWG | ~0.5 m | Preferred — STP | Twisted pair with CAN H above. |
 
 ### 9C — DCT Shifter Paddle (`dct-shifter.wv`)
 
@@ -383,7 +500,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | 10 AWG | BK (black) | 1.5 m | 2.0 m | EWP (ground) |
 | 12 AWG | RD (red) | 4.0 m | 5.0 m | Fuel pump (PMU16 O4 → Radium hanger pump+ stud, full tunnel run) |
 | 12 AWG | BK (black) | 0.5 m | 0.7 m | Fuel pump (ground) |
-| 22 AWG | YE/GN (CAN) | 2.5 m | 3.0 m | Body/Gauge.S CAN twisted pair — shielded |
+| 22 AWG | WH/BU (CAN) | 2.5 m | 3.0 m | Body/Gauge.S CAN twisted pair — shielded |
 | 24 AWG | BK (black) | 2.4 m (×2 conductors) | 3.0 m | E-pedal GND1 + GND2 both runs |
 | 24 AWG | RD (red) | 2.4 m (×2 conductors) | 3.0 m | E-pedal VCC1 + VCC2 both runs |
 | 24 AWG | GN (green) | 1.2 m (×1 conductor) | 1.5 m | E-pedal APS1 signal |
@@ -406,7 +523,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 > | Knock sensor 1 + 2 signal wires | 07K (Sys 7) |
 > | DBW TB TPS 4-wire | 07K (Sys 7) |
 > | EWP PWM control (MaxxECU GPO → CWA400 Pin 1) | EWP (Sys 5) |
-> | Fuel pump SSR ctrl− (MaxxECU GPO → SSR) | Fuel pump (Sys 4) |
+> | Fuel pump PWM ctrl (MaxxECU GPO → PMU16 CAN cmd; Phase 1: GPO → relay coil) | Fuel pump (Sys 4) |
 > | ATF temp sensor signal *(optional system)* | Sys 9E |
 >
 > **Explicitly NOT shielded (confirm this is still correct, don't shield by default):**
@@ -454,7 +571,7 @@ One-time tooling purchase — covers all connector families in this build. See [
 | VAG 1.5mm sensor contact crimper | **IWISS IWS-2820M** ([Amazon](https://www.amazon.com/dp/B078WNZ9FW) $19.99) | ~$20 | VAG 1.5mm sealed-series contacts (TE MCP 1.5) in sensor pigtail housings (3B0973703G cam/crank/MAP, 1J0973702 CLT/IAT). Wire range 28–20 AWG (0.08–0.5mm²) — matches the 0.35–0.5mm² signal wires in these connectors. Two-pass operation: conductor crimp first, then insulation crimp. Also handles general small open-barrel contacts, ring terminals, and relay socket contacts in this AWG range. |
 | VAG 2.8mm COP contact crimper | **IWISS IWS-2412M** ([Amazon](https://www.amazon.com/dp/B07G98DLB8) $19.99) | ~$20 | VAG 2.8mm JPT-series contacts in COP coil pigtail housings (4B0973724 — 4-pin coil-on-plug connector, 0.5–1.0mm² / 18–20 AWG coil primary wires). Die widths: 2.2 / 2.5 / **2.8** / 3.1 / 3.4mm — the 2.8mm die is a direct match for VAG JPT contacts. Also covers any other open-barrel contact in AWG 24–12 range. Companion to IWS-2820M: together the two IWISS tools span AWG 28–12 with no gap. |
 | Open-barrel engine bay (general) | _(use IWS-2820M or IWS-2412M above per AWG)_ | — | **In the engine bay and anywhere exposed to moisture/vibration: use non-insulated barrel + adhesive-lined heat shrink** over every crimp. Adhesive liner seals against capillary wicking that pre-insulated connectors allow. Interior/cabin: pre-insulated nylon-sleeve crimps acceptable with the correct ratcheting tool. Source: StreetCarJoe Race Car Wiring Pt.1. |
-| **AS solid barrel crimper** | **Daniels M22520/2-01 (AFM8)** handle + **K43 positioner (M22520/2-10)** | ~$426 kit / ~$570+ separate | **Required for Deutsch Autosport AS79 size-20 solid barrel contacts** (firewall bulkhead). TE-specified mil-spec tooling per Autosport technical datasheet 1-1773721-9 — NOT the HDT-48-00 or any clone (HDT-48-00 and JRready NEW-DT2 cover DT/DTM/DTP contacts only; AS contacts use different geometry and different part numbers). Best value: Fischer Motorsports ["DMC Deutsch Size 20 AS Tool Kit"](https://www.fischermotorsports.com/fm-store/electrical-systems/dmc-tooling/dmc-crimpers/dmc-deutsch-size-20-as-tool-kit/) (~$426, includes M22520/2-01 handle + K43 positioner for pin and socket). Handle alone: ~$495 (EMH Motorsports). K43 positioner alone: ~$80–94 surplus (dmctools.com). No cheap substitute: wrong die geometry produces cold crimps that pass initial pull-test but fail under vibration. |
+| **AS solid barrel crimper** | **Daniels M22520/2-01 (AFM8)** handle + **K42 positioner (M22520/2-09)** (pin contacts) + **K40 positioner (M22520/2-07)** (socket contacts) | AFM8: **$601.65** ([dmctools.com](https://dmctools.com/afm8)) · K42: **$112.64** ([deltaintl.com](https://deltaintl.com/products/k42)) · K40: **$93.86** ([dmctools.com](https://dmctools.com/k40)) — total ~$808 | **Required for Deutsch Autosport AS79 size-22 solid barrel contacts** (firewall bulkhead). Source: m-cal.com AS020-35SN "Primary Contacts Size: 22 AWG"; ecuplus.de AS620-35PN "79x 22 AWG, Required Positioner for DMC AFM8: K40". NOT the HDT-48-00 or clones (DT/DTM/DTP only, different contact geometry). NOT K43 (size-20 positioner — wrong for this build). No cheap substitute: wrong die geometry produces cold crimps that pass initial pull-test but fail under vibration. |
 | Ferrule crimper | **IWISS IWS-10** | ~$25 | Stranded wire ends into screw-clamp terminals (ECU power/ground, DIN rail fuse block). Covers 0.5–10mm² ferrules. |
 | Deutsch contact extraction | **Deutsch 1680-73-01** | ~$15 | AS bulkhead size 20 contact removal — push in, releases retention lock cleanly. Do not use a screwdriver. |
 | VW/Bosch connector de-pinning picks | **Lisle 57750** | ~$20 | Sensor pigtails (3B0973703G, 1J0973702, 1J0973712), COP connectors — push-to-release housings. |
@@ -476,7 +593,7 @@ One-time tooling purchase — covers all connector families in this build. See [
 | 1 set | P-clamps — 1/4", 3/8", 1/2", 5/8" | Secure main power cables every 12 inches minimum. |
 | 1 bag | M4 / M6 rivnuts (steel or zinc) — assorted | Used with rivnut tool for PMU16 bracket and ECU bracket mounting. |
 
-> **Total non-Molex tools: ~$186** (flush cutters $20 + wire stripper $30 + IWS-2820M $20 + IWS-2412M $20 + Lisle $20 + rivnut tool ~$71 + Deutsch extraction $15 + ferrule crimper $25). Add ~$426 for the Fischer Motorsports DMC AS size-20 kit (M22520/2-01 handle + K43 positioner — the correct tool for AS79 contacts; HDT-48-00 and JRready clones are DT/DTM/DTP only). Total with AS crimper: **~$612** one-time purchase.
+> **Total non-Molex tools: ~$186** (flush cutters $20 + wire stripper $30 + IWS-2820M $20 + IWS-2412M $20 + Lisle $20 + rivnut tool ~$71 + Deutsch extraction $15 + ferrule crimper $25). Add **~$808** for the AS79 crimp set: AFM8 handle $601.65 + K42 pin positioner $112.64 + K40 socket positioner $93.86 — all at verified prices (dmctools.com / deltaintl.com). HDT-48-00 and JRready NEW-DT2 are for Maven HD30 (size-16/20) and DT bypass only — not for AS79 size-22 contacts. Total with AS crimper: **~$994** one-time purchase.
 >
 > **Budget tracking:** Key tools above are also tracked in `e36-docs/E36_CSVs/E36_Phase1_Foundation.csv` (Tooling category) with purchase links and price ranges for build cost rollup.
 > If using Souriau 8STA for the bulkhead instead of Deutsch AS, confirm the correct positioner for Souriau contacts at purchase — Souriau uses compatible tooling but a different positioner.

@@ -67,18 +67,18 @@
 
 ---
 
-## SSR — DC Solid State Relay
+## PMU16 Output — O4
+
+The Crydom D1D40 SSR from earlier design revisions has been removed. The Ecumaster PMU16 output O4
+(25A, PWM-capable) drives the pump directly. MaxxECU commands pump speed via CAN to the PMU16, which
+outputs PWM on O4. No separate SSR or relay needed. Source: `harnesses/power-distribution.wv`.
 
 | Item | Value |
 | :--- | :--- |
-| Recommended part | Crydom D1D40 |
-| Alternative | Generic 40A DC-DC SSR (opto-isolated, 0-60V load, 3-32V control) |
-| Control input | 3–32V DC, ~10–15mA |
-| Load rating | 0–60V DC, 40A continuous |
-| Max switching freq | 1kHz (Crydom D1D40) |
-| Used PWM frequency | 100–500Hz (recommended for this circuit) |
-| Why SSR not relay | Mechanical relays cannot switch PWM at 100Hz+ — contacts arc and weld |
-| Heatsink | Required if sustained duty > 80% at high current |
+| PMU16 output | O4 (25A max) |
+| PWM-capable | Yes — software-configurable PWM on O4 |
+| BATT+ path | PMU16 M6 stud (always-on) → O4 switches load |
+| Load wire gauge | 12 AWG (14.1A draw well within O4 25A rating) |
 
 ---
 
@@ -87,35 +87,51 @@
 | Parameter | Value |
 | :--- | :--- |
 | Output function | PWM fuel pump control |
-| GPO type | GEN1 low-drive (GND-sinking), max 2A |
-| PWM frequency | 100–500 Hz |
+| Control method | MaxxECU CAN broadcast → PMU16 maps to O4 PWM |
+| PWM frequency | 100–500 Hz (set in PMU software on O4) |
 | MTune path | Outputs → Output config → Function: PWM fuel pump control |
-| SSR control wiring | GPO sinks Ctrl(-) to GND when active; IGN +12V feeds Ctrl(+) |
 
-**Recommended duty table:**
+**Phase 3 PWM duty table** (PMU16 O4; not applicable to Phase 1 relay):
 
 | Operating condition | Duty Cycle | Notes |
 | :--- | :--- | :--- |
 | Key-on / pre-crank | 100% (brief) | Prime the rail — 2-3 seconds at startup |
-| Idle / low load (Phase 1) | 65% | Adequate flow for M52 NA at ~200hp |
-| Cruise (Phase 1) | 75% | Normal road load |
-| WOT NA (Phase 1) | 90–95% | M52 / Turbo M50 high demand |
 | Idle / low boost (Phase 3) | 75% | 07K at part load |
 | Full boost / WOT (Phase 3) | 100% | 07K 600whp E85 — full duty |
 
-> ⚠️ **Duty cycle floor:** Do not run a brushed pump below ~50% duty continuously — insufficient flow through the pump body causes heat buildup. At idle, 65% is the safe floor.
+> ⚠️ **Duty cycle floor:** Do not run a brushed pump below ~50% duty continuously — insufficient flow through the pump body causes heat buildup. At idle, 75% is the safe floor.
+
+Phase 1 (relay, no PWM): pump runs at 100% whenever key is on. This is fine for the F90000267 at M52 NA fuel demand (~14.1A continuous is within the pump's rated duty).
 
 ---
 
-## Power Wiring
+## Power Wiring — Phase 1 (M52, M50 harness, no PMU16)
+
+Phase 1 uses a standard 30A automotive relay. MaxxECU GPO 2 (ECU_16PIN pin 4) sinks the relay coil.
+The Walbro F90000267 draws 14.1A — well within relay spec. No PWM in Phase 1; pump runs at full
+speed whenever the relay closes. Full-speed continuous operation is safe for the Walbro.
 
 | Wire | Spec | Notes |
 | :--- | :--- | :--- |
-| BATT+ to SSR Load(+) | 12 AWG RED, fused 25A within 12" of battery | Always-on feed |
-| SSR Load(-) to pump(+) stud | 12 AWG RED | Switched pump supply |
+| BATT+ to relay pin 30 | 12 AWG RED, fused 20A within 12" of battery | Always-on feed |
+| Relay pin 87 to pump(+) stud | 12 AWG RED | Switched pump supply |
 | Pump(-) stud to chassis GND | 12 AWG BLACK | Dedicated GND stud — not shared |
-| IGN +12V to SSR Ctrl(+) | 22 AWG GREEN | Low current (~15mA) |
-| MaxxECU GPO to SSR Ctrl(-) | 22 AWG VIOLET, shielded | PWM signal — drain at ECU end only |
+| IGN +12V to relay coil pin 86 | 18 AWG | Key-switched supply |
+| MaxxECU GPO 2 to relay coil pin 85 | 18 AWG | GPO 2 = ECU_16PIN pin 4 (GND-sink) |
+
+**Relay:** Bosch 0 332 002 150 or equivalent 4-pin 30A automotive relay.
+
+---
+
+## Power Wiring — Phase 3 (07K, PMU16)
+
+Phase 3 replaces the relay with **PMU16 O4** (25A, PWM-capable). MaxxECU commands pump speed
+via CAN → PMU16 maps to O4 PWM. No physical relay. Source: `harnesses/power-distribution.wv`.
+
+| Wire | Spec | Notes |
+| :--- | :--- | :--- |
+| PMU16 O4 to pump(+) stud | 12 AWG RED | Switched pump supply from PMU16 |
+| Pump(-) stud to chassis GND | 12 AWG BLACK | Dedicated GND stud — not shared |
 
 **Ground rule:** Pump(-) must go to a dedicated chassis bolt/stud. Mixing pump ground with ECU sensor grounds injects pump switching noise into the analog signal bus — causes erratic MAP, TPS, wideband readings at high RPM/duty.
 
@@ -148,6 +164,5 @@ If future dual-pump is ever needed (e.g., wet nitrous or methanol injection): Ra
 | Radium Low Profile Swiveling Fittings | [radiumauto.com/products/low-profile-swiveling-banjo-fittings](https://www.radiumauto.com/products/low-profile-swiveling-banjo-fittings) |
 | Walbro F90000267 (pump only) | [realstreetperformance.com](https://www.realstreetperformance.com/walbro-universal-450lph-in-tank-fuel-pump-e85-version.html) |
 | MaxxECU PWM fuel pump control | [maxxecu.se/webhelp/output_functions-pwm_fuel_pump_control.html](https://www.maxxecu.se/webhelp/output_functions-pwm_fuel_pump_control.html) |
-| MaxxECU GEN1 GPO pinout | [maxxecu.com/webhelp/wirings-gpo.html](https://www.maxxecu.com/webhelp/wirings-gpo.html) |
+| PMU16 power distribution | `harnesses/power-distribution.wv` |
 | WireViz harness | `harnesses/fuel-pump-hanger.wv` |
-| Circuit schematic | `schematics/fuel-pump-pwm.py` (run to generate SVG) |

@@ -1,6 +1,8 @@
 # pst-f1-sensor.wv
 # Bosch PST-F1 dual oil temp+pressure sensor → MaxxECU AIN
-# Signals cross firewall via bulkhead pins 27, 30, 33, 34.
+# Signals cross firewall via AS79 bulkhead: SensorGND=pin 79, +5V=pin 47,
+# Pressure/AIN3=pin 50, Temp/AIN1=pin 51.
+# Source: harnesses/firewall-bulkhead.wv pins 47/50/51/79.
 #
 # Mount: M52 VANOS banjo bolt path (M14x1.5 → M10x1.0 adapter → PST-F1).
 # Phase 3: moves to iABED 07K oil housing M10x1.0 port — no wiring changes needed.
@@ -27,23 +29,23 @@ connectors:
   # Full 79-pin diagram: harnesses/firewall-bulkhead.wv
   BULKHEAD_ENGINE:
     type: "Deutsch AS79 bulkhead — engine side (PST-F1 pins)"
-    subtype: "Pins 27/30/33/34 of 79-way engine mating plug"
+    subtype: "Pins 79/47/50/51 of 79-way engine mating plug"
     pincount: 4
     pinlabels:
-      - "Sensor GND (pin 27)"        # 1
-      - "+5V sensor (pin 30)"         # 2
-      - "PST-F1 pressure (pin 33)"   # 3
-      - "PST-F1 temp (pin 34)"       # 4
+      - "Sensor GND (pin 79)"        # 1 — center pin, ~8 o'clock
+      - "+5V sensor (pin 47)"        # 2 — shared TPS/MAP/PST-F1 supply
+      - "PST-F1 pressure (pin 50)"   # 3 — AIN 3 (CMC J3)
+      - "PST-F1 temp (pin 51)"       # 4 — AIN 1 (CMC J1)
 
   BULKHEAD_CABIN:
     type: "Deutsch AS79 bulkhead — cabin side (PST-F1 pins)"
-    subtype: "Pins 27/30/33/34 of 79-way cabin flange receptacle"
+    subtype: "Pins 79/47/50/51 of 79-way cabin flange receptacle"
     pincount: 4
     pinlabels:
-      - "Sensor GND (pin 27)"        # 1
-      - "+5V sensor (pin 30)"         # 2
-      - "PST-F1 pressure (pin 33)"   # 3
-      - "PST-F1 temp (pin 34)"       # 4
+      - "Sensor GND (pin 79)"        # 1 — center pin, ~8 o'clock
+      - "+5V sensor (pin 47)"        # 2 — shared TPS/MAP/PST-F1 supply
+      - "PST-F1 pressure (pin 50)"   # 3 — AIN 3 (CMC J3)
+      - "PST-F1 temp (pin 51)"       # 4 — AIN 1 (CMC J1)
 
   ECU_16PIN:
     type: "MaxxECU M50 terminated harness — 16-pin aux breakout"

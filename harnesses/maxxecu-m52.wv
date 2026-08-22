@@ -73,18 +73,11 @@
 #       Confirm MAP sensor connector type, hose routing to intake manifold.
 #       Tee into intake manifold vacuum port before throttle body.
 #
-# TODO: Wideband O2 (LSU 4.2) harness is UNMODELED — bigger gap than a missing
-#       shield flag. ECU_CMC pin labels reserve D1/F3/F4/G3/G4 for WBO2
-#       (Heater-/VREF/VS/IP/RCAL), but there is no WIDEBAND connector, no
-#       W_WBO2 cable, and no connections block here — unlike maxxecu-07k.wv,
-#       which has all three. Author this properly before Phase 1 harness build:
-#       (1) add a WIDEBAND connector (Bosch LSU 4.2 6-way, not 4.9 — confirm
-#           pin numbering differs from the LSU 4.9 block in maxxecu-07k.wv
-#           before copying it verbatim), (2) add W_WBO2 cable with shield: true
-#           (VS/VREF/IP/RCAL are low-level analog, noise-sensitive — same
-#           reasoning as the 07K version), (3) wire the connections block to
-#           the reserved ECU_CMC pins above. Do not assume LSU 4.2 and 4.9
-#           share a pinout — verify against the Bosch LSU 4.2 datasheet.
+# DONE: Wideband O2 harness — LSU 4.9 (not 4.2). WIDEBAND connector (line ~299),
+#       W_WBO2 cable with shield: true (line ~697), W_WBO2_HTR heater+ stub
+#       (line ~703), and connections block (line ~981) are all present.
+#       Sensor: Bosch LSU 4.9 (same as 07K). The previous TODO incorrectly
+#       said LSU 4.2 — that was never confirmed and the implementation uses 4.9.
 # ─────────────────────────────────────────────────────────────────────────────
 #
 # This build adds to the base harness:
@@ -701,6 +694,13 @@ cables:
     length: 1.0 m
     shield: true
 
+  W_WBO2_HTR:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["WBO2 Hs+ (heater+)"]
+    length: 0.3 m
+    notes: "Splices to +12V coil/inj rail (ECU_12PIN[1]). Short stub — splice at rail, no ECU termination. Required: without Hs+ the heater circuit is open and the LSU 4.9 throws a heater fault."
+
   # Boost solenoid
   W_BOOST:
     wirecount: 2
@@ -980,6 +980,18 @@ connections:
 
   # ── Wideband O2 (LSU 4.9) ────────────────────────────────────────────────────
   # VS=F4/CMC24, VREF=F3/CMC23, IP=G3/CMC27, RCAL=G4/CMC28, Htr-=D1/CMC13
-  - - WIDEBAND: [2, 1, 6, 5, 6]
+  # Pin mapping (matches maxxecu-07k.wv — "same wiring as M52"):
+  #   W_WBO2[1]=VS   → WIDEBAND[2](VS)    → ECU_CMC[24](F4)
+  #   W_WBO2[2]=VREF → WIDEBAND[3](APE)   → ECU_CMC[23](F3)
+  #   W_WBO2[3]=IP   → WIDEBAND[1](IP)    → ECU_CMC[27](G3)
+  #   W_WBO2[4]=RCAL → WIDEBAND[4](Trim)  → ECU_CMC[28](G4)
+  #   W_WBO2[5]=Htr- → WIDEBAND[6](Hs-)   → ECU_CMC[13](D1)
+  #   W_WBO2_HTR[1]=Hs+ → WIDEBAND[5](Hs+) → ECU_12PIN[1] (+12V splice)
+  - - WIDEBAND: [2, 3, 1, 4, 6]
     - W_WBO2: [1, 2, 3, 4, 5]
     - ECU_CMC: [24, 23, 27, 28, 13]
+
+  # WBO2 heater positive: WIDEBAND pin 5 (Hs+) → splice to +12V coil/inj rail
+  - - WIDEBAND: [5]
+    - W_WBO2_HTR: [1]
+    - ECU_12PIN: [1]

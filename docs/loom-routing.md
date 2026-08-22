@@ -57,7 +57,7 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 | Sub-loom | Harness file | Notes |
 |----------|-------------|-------|
 | Fuel pump (full run, ~3.5–4m estimated) | `harnesses/fuel-pump-hanger.wv` | 12 AWG min; run separately from CAN to avoid PWM noise on bus |
-| ATF temp sensor (inline -8AN adapter) | `harnesses/atf-temp-sensor.wv` | Short stub from tunnel to bulkhead pin 51 |
+| ATF temp sensor (inline -8AN adapter) | `harnesses/atf-temp-sensor.wv` | Short stub from tunnel to bulkhead pin 56 |
 | 8HP CAN + power (engine bay → ZF 8HP) | `harnesses/8hp-can.wv` | Twisted pair — must maintain twist all the way to TCU plug |
 
 ---

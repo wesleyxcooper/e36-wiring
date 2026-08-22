@@ -63,8 +63,9 @@ metadata:
 #   DOWNSTREAM HARNESS UPDATES NEEDED:
 #   [x] ewp-controller.wv: MAIN_RELAY removed. PMU16 O5+O14 parallel feeds CWA400 Pin 3
 #       directly via 8 AWG. Post-shutdown cooling now PMU16-managed (no power-hold relay).
-#   [ ] fuel-pump-hanger.wv: SSR (Crydom D1D40) is replaced by PMU16 O4 PWM output.
-#       Update SSR section -- PMU16 O4 wire goes directly to pump(+) stud on hanger.
+#   [x] fuel-pump-hanger.wv: SSR (Crydom D1D40) replaced by PMU16 O4 PWM output.
+#       fuel-pump-hanger.wv already updated: lines 5-7 confirm "powered directly by
+#       Ecumaster PMU16 output O4 (25A, PWM-capable) ... no external SSR needed."
 #   [x] ac-compressor.wv: AC switch now feeds MaxxECU DIN directly. PMU16 O7 drives
 #       AC_RELAY coil pin 86 via CAN command from MaxxECU. Coil pin 85 to chassis GND.
 
@@ -327,9 +328,8 @@ connectors:
     notes: >-
       PMU16 O4 (25A, PWM-capable) output connects to pump positive stud on
       Radium 20-1170 hanger, replacing the Crydom D1D40 DC SSR.
-      TODO: update fuel-pump-hanger.wv to remove SSR -- wire PMU16 O4 directly
-        to pump+ stud. The Ctrl+/Ctrl- SSR wires to MaxxECU GPO are eliminated;
-        PWM duty is now commanded by MaxxECU over CAN to PMU16 channel O4.
+      DONE: fuel-pump-hanger.wv updated -- PMU16 O4 wire goes directly to pump+
+        stud. No SSR. PWM duty commanded by MaxxECU over CAN to PMU16 O4.
       Wire gauge: 12 AWG (Walbro F90000267 draws 14.1A max).
       See fuel-pump-hanger.wv for full hanger pinout and return wiring.
 
