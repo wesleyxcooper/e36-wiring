@@ -189,6 +189,17 @@ DENYLIST: list[DenyRule] = [
         source="https://dmctools.com/afm8",
         exclude=r"(?i)(NOT|cannot|does not|CANNOT|not support)",
     ),
+
+    # ── Wire gauge / contact compatibility ───────────────────────────────────
+    DenyRule(
+        pattern=r"Size\s+22D\s+20\s+AWG",
+        message="Size-22D solid barrel contacts accept 22–26 AWG only. "
+                "20 AWG will not seat correctly in the barrel and will produce a cold crimp. "
+                "Use 22 AWG for the main harness wire through the contact; pigtail stubs "
+                "on the engine side (after the splice) may be heavier gauge.",
+        source="https://www.ecuplus.de/en/deutsch-autosport-as620-35pn-79x-22-awg.html",
+        exclude=r"(?i)(NOT|cannot|does not|incompatible|too large|will not fit)",
+    ),
 ]
 
 # ---------------------------------------------------------------------------

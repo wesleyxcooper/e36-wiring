@@ -29,7 +29,7 @@ Mil-spec M22759 is what race teams use. It's fine but costs 5–10× more and is
 | Grey | Ignition outputs (coil drives) | 25m | — |
 | Green | Injector outputs, GPO actuators | 25m | — |
 | Yellow | Starter trigger, alt D+ | 10m | Short runs only |
-| Yellow + Blue (twisted pair) | CAN H / CAN L | 10m | Buy as pre-twisted pair (WiringPros sells by the foot) |
+| White + Blue (WH/BU twisted pair) | CAN H / CAN L | 10m | Buy as pre-twisted pair (WiringPros sells by the foot). WH = CAN H, BU = CAN L — matches all .wv harness files. |
 
 Heavier gauge for specific runs (buy short lengths, not full spools):
 
@@ -181,7 +181,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 
 | Run | Color(s) | Type | WV Total | Notes |
 |-----|----------|------|----------|-------|
-| W_CAN, W_CAN_8HP, W_CAN_GAUGES | YE/GN (CAN H/L convention) | 2-wire twisted | 6.9 m total across all 2-wire runs | Use shielded twisted pair for CAN runs |
+| W_CAN, W_CAN_8HP, W_CAN_GAUGES | WH/BU (CAN H/L — WH=H, BU=L) | 2-wire twisted | 6.9 m total across all 2-wire runs | Use shielded twisted pair for CAN runs |
 | W_CLT, W_IAT, W_VANOS, W_FAN, W_FUELPUMP, W_BOOST | RD/BK or signal-specific | 2-wire | included in above total | |
 | W_CRANK, W_CAM, W_TPS | varies | 3-wire | 3.3 m total | |
 | W_FLEXFUEL | — | 3-wire | included above | |
@@ -293,7 +293,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 | W_OIL_PRESS | — | 22 AWG (TBD) | ~0.5 m | No | OEM oil pressure switch signal |
 | W_IGN_POWER | — | 22 AWG (TBD) | ~0.5 m | No | IGN-switched power reference |
 | W_ALT_D_PLUS | — | 22 AWG (TBD) | ~0.6 m | No | Alternator D+ charge excite |
-| W_GAUGES_CAN (CAN H/L) | YE/GN | 22 AWG | 2.5 m | Preferred | MaxxECU CAN → Gauge.S cluster. Twisted pair. |
+| W_GAUGES_CAN (CAN H/L) | WH/BU | 22 AWG | 2.5 m | Preferred | MaxxECU CAN → Gauge.S cluster. Twisted pair. |
 
 ---
 
@@ -406,8 +406,8 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 | Run | Color | Gauge | Length | Shielded | Notes |
 |-----|-------|-------|--------|----------|-------|
-| MaxxECU CAN 1 → Gauge.S, CAN H | YE | 22 AWG | ~0.5 m | Preferred — STP | 500 kbps, Default 1.3 protocol. Cabin-to-cabin, no bulkhead crossing. |
-| MaxxECU CAN 1 → Gauge.S, CAN L | GN | 22 AWG | ~0.5 m | Preferred — STP | Twisted pair with CAN H above. |
+| MaxxECU CAN 1 → Gauge.S, CAN H | WH | 22 AWG | ~0.5 m | Preferred — STP | 500 kbps, Default 1.3 protocol. Cabin-to-cabin, no bulkhead crossing. |
+| MaxxECU CAN 1 → Gauge.S, CAN L | BU | 22 AWG | ~0.5 m | Preferred — STP | Twisted pair with CAN H above. |
 
 ### 9C — DCT Shifter Paddle (`dct-shifter.wv`)
 
@@ -500,7 +500,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | 10 AWG | BK (black) | 1.5 m | 2.0 m | EWP (ground) |
 | 12 AWG | RD (red) | 4.0 m | 5.0 m | Fuel pump (PMU16 O4 → Radium hanger pump+ stud, full tunnel run) |
 | 12 AWG | BK (black) | 0.5 m | 0.7 m | Fuel pump (ground) |
-| 22 AWG | YE/GN (CAN) | 2.5 m | 3.0 m | Body/Gauge.S CAN twisted pair — shielded |
+| 22 AWG | WH/BU (CAN) | 2.5 m | 3.0 m | Body/Gauge.S CAN twisted pair — shielded |
 | 24 AWG | BK (black) | 2.4 m (×2 conductors) | 3.0 m | E-pedal GND1 + GND2 both runs |
 | 24 AWG | RD (red) | 2.4 m (×2 conductors) | 3.0 m | E-pedal VCC1 + VCC2 both runs |
 | 24 AWG | GN (green) | 1.2 m (×1 conductor) | 1.5 m | E-pedal APS1 signal |

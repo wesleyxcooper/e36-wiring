@@ -300,7 +300,7 @@ connectors:
   #   Ignition outputs (22 AWG max per size-22D contact):
   #     4: IGN 1 (CMC A2)   5: IGN 2 (CMC A3)   6: IGN 3 (CMC B2)   7: IGN 4 (CMC B3)
   #     32: IGN 5 (CMC C2)  33: IGN 6 [M52 only, cavity-plug 07K]    34: EXP IGN 7
-  #   Injector outputs (20 AWG):
+  #   Injector outputs (22 AWG main harness through size-22D contact; pigtail stub engine-side can be 20 AWG after splice):
   #     8: INJ 1 (CMC K1)   9: INJ 2 (CMC K2)   10: INJ 3 (CMC M1)
   #     11: INJ 4 (CMC M2)  12: INJ 5 (CMC M3)  13: INJ 6 [M52 only, cavity-plug 07K]
   #   Crank / Cam triggers:
@@ -612,7 +612,7 @@ cables:
     wirelabels: ["Motor+ (C2 H4 MOTOR 1+)", "Motor- (C2 H2 MOTOR 1-)"]
     length: 0.5 m
     notes: >-
-      20 AWG minimum (H-bridge output, ~3A peak). Verify polarity at TB before final crimp.
+      22 AWG (size-22D contact accepts 22–26 AWG only; 3A peak, 0.5 m — 22 AWG adequate). Verify polarity at TB before final crimp.
       Engine-side wires terminate at throttle body motor leads (OE ref: pin 84 Mot+, pin 92 Mot-).
       Cabin side of this wire goes to MaxxECU C2 H4/H2 via AS79 pins 22/23.
 
@@ -778,7 +778,7 @@ cables:
     colors: [RD, GN]
     wirelabels: ["+12V", "GPO 3 (VVT)"]
     length: 0.6 m
-    notes: "20 AWG minimum. Flyback diode at solenoid connector. Route in actuators sub-loom with boost solenoid."
+    notes: "22 AWG (size-22D contact; 22 AWG adequate for solenoid drive current). Flyback diode at solenoid connector. Route in actuators sub-loom with boost solenoid."
 
   W_WBO2_HTR:
     wirecount: 1

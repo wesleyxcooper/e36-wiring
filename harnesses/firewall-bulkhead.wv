@@ -1,4 +1,10 @@
 # firewall-bulkhead.wv
+# ⚠️  SUPERSEDED — see firewall-bulkhead-dual.wv for the active dual-bulkhead design.
+#     This file documents the single AS79 architecture (AS79 engine connector only, no Maven HD30).
+#     It is retained as a reference for single-connector builds but is NOT the build target for this project.
+#     Key gap: WBO2 signals (VS/VREF/IP/RCAL/Htr-) have no firewall crossing path in this design;
+#     in the active dual-bulkhead design they route through Maven HD30 A9–A13.
+#
 # E36 Firewall Bulkhead — Hybrid design: Deutsch Autosport AS79 (engine) + Maven HD30 35-pin (accessories)
 #
 # Sources:
@@ -93,13 +99,13 @@ connectors:
       - "IGN 4 (CMC B3)"                        # 7   R1  Size 22D  22 AWG
       # ══ SECTOR 2 (3→6 o'clock) — INJ outputs + GPO actuators ═══════════
       # R1 outer, pins 8–14
-      - "INJ 1 (CMC K1)"                        # 8   R1  Size 22D  20 AWG
-      - "INJ 2 (CMC K2)"                        # 9   R1  Size 22D  20 AWG
-      - "INJ 3 (CMC M1)"                        # 10  R1  Size 22D  20 AWG
-      - "INJ 4 (CMC M2)"                        # 11  R1  Size 22D  20 AWG
-      - "INJ 5 (CMC M3)"                        # 12  R1  Size 22D  20 AWG
-      - "INJ 6 (CMC L3) [M52; cavity-plug 07K]" # 13  R1  Size 22D  20 AWG
-      - "EXP: INJ 7 (07K 5th cyl, CMC L2)"     # 14  R1  Size 22D  20 AWG  cavity-plug on M52
+      - "INJ 1 (CMC K1)"                        # 8   R1  Size 22D  22 AWG  (pigtail stub engine-side can be 20 AWG after splice)
+      - "INJ 2 (CMC K2)"                        # 9   R1  Size 22D  22 AWG
+      - "INJ 3 (CMC M1)"                        # 10  R1  Size 22D  22 AWG
+      - "INJ 4 (CMC M2)"                        # 11  R1  Size 22D  22 AWG
+      - "INJ 5 (CMC M3)"                        # 12  R1  Size 22D  22 AWG
+      - "INJ 6 (CMC L3) [M52; cavity-plug 07K]" # 13  R1  Size 22D  22 AWG
+      - "EXP: INJ 7 (07K 5th cyl, CMC L2)"     # 14  R1  Size 22D  22 AWG  cavity-plug on M52
       # ══ SECTOR 3 (6→9 o'clock) — Triggers + knock (max distance from IGN) ═
       # R1 outer, pins 15–21
       - "SPARE — S2→S3 boundary buffer"         # 15  R1  do not populate without review
@@ -111,8 +117,8 @@ connectors:
       - "SPARE — S3→S4 boundary buffer"         # 21  R1  do not populate without review
       # ══ SECTOR 4 (9→12 o'clock) — Engine sensors ════════════════════════
       # R1 outer, pins 22–28
-      - "EXP: ETh Motor+ → MaxxECU C2 H4 (MOTOR 1+) [07K; cabin-side wire only; cavity-plug M52]"  # 22  R1  Size 22D  20 AWG
-      - "EXP: ETh Motor- → MaxxECU C2 H2 (MOTOR 1-) [07K; cabin-side wire only; cavity-plug M52]"  # 23  R1  Size 22D  20 AWG
+      - "EXP: ETh Motor+ → MaxxECU C2 H4 (MOTOR 1+) [07K; cabin-side wire only; cavity-plug M52]"  # 22  R1  Size 22D  22 AWG  (3A peak, 22 AWG adequate; size-22D contact cannot accept 20 AWG)
+      - "EXP: ETh Motor- → MaxxECU C2 H2 (MOTOR 1-) [07K; cabin-side wire only; cavity-plug M52]"  # 23  R1  Size 22D  22 AWG
       - "SPARE — DBW +5V/GND use existing pins 47 (+5V) and 79 (SGND)"                           # 24  R1  do not populate
       - "CLT signal (CMC F1)"                   # 25  R1  Size 22D  22 AWG
       - "IAT signal (CMC F2)"                   # 26  R1  Size 22D  22 AWG
@@ -128,9 +134,9 @@ connectors:
       - "EXP: IGN 7 (07K 5th cyl, CMC D2)"     # 34  R2  Size 22D  22 AWG  cavity-plug on M52
       # ══ SECTOR 2 R2 — INJ overflow + GPO actuators ══════════════════════
       # R2 ring 2, pins 35–40
-      - "GPO 3 → VANOS (CMC D4 = pin 16) [M52] / VVT actuator [07K]"  # 35  R2  Size 22D  20 AWG
-      - "GPO 4 → ICV coil A (CMC E4 = pin 20) [M52] / SPARE [07K — freed, not used for Motor+]"  # 36  R2  Size 22D  20 AWG
-      - "GPO 5 → ICV coil B (CMC A1) [M52]"    # 37  R2  Size 22D  20 AWG
+      - "GPO 3 → VANOS (CMC D4 = pin 16) [M52] / VVT actuator [07K]"  # 35  R2  Size 22D  22 AWG  (solenoid pigtail stub engine-side can be heavier after splice)
+      - "GPO 4 → ICV coil A (CMC E4 = pin 20) [M52] / SPARE [07K — freed, not used for Motor+]"  # 36  R2  Size 22D  22 AWG
+      - "GPO 5 → ICV coil B (CMC A1) [M52]"    # 37  R2  Size 22D  22 AWG
       - "Starter trigger (12-pin pin 6)"        # 38  R2  Size 22D  22 AWG
       - "Alt D+ excitation (12-pin M)"          # 39  R2  Size 22D  22 AWG
       - "SPARE — S2→S3 boundary (6 o'clock)"   # 40  R2  do not populate without review
@@ -415,7 +421,7 @@ cables:
       - "IGN 2"
       - "IGN 3"
       - "IGN 4"
-      - "INJ 1 (20 AWG)"
+      - "INJ 1 (22 AWG)"
       - "INJ 2"
       - "INJ 3"
       - "INJ 4"
