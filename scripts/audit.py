@@ -200,6 +200,27 @@ DENYLIST: list[DenyRule] = [
         source="https://www.ecuplus.de/en/deutsch-autosport-as620-35pn-79x-22-awg.html",
         exclude=r"(?i)(NOT|cannot|does not|incompatible|too large|will not fit)",
     ),
+
+    # ── Cross-file pin number consistency ────────────────────────────────────
+    DenyRule(
+        pattern=r"(?i)(AIN\s*2|pin\s*J2).{0,40}pin\s+51\b|pin\s+51\b.{0,40}(AIN\s*2|pin\s*J2)",
+        message="AIN 2 (CMC J2) crosses the AS79 firewall bulkhead at pin 56, not pin 51. "
+                "Pin 51 = PST-F1 temp (AIN 1 / CMC J1). "
+                "Source: firewall-bulkhead.wv — pin 51 = PST-F1 temp (AIN 1); pin 56 = AIN 2.",
+        source="harnesses/firewall-bulkhead.wv",
+        exclude=r"(?i)(NOT|wrong|error|was.*51|previously|51.*was|correct.*56|56.*correct)",
+    ),
+
+    # ── EPS controller capability ─────────────────────────────────────────────
+    DenyRule(
+        pattern=r"(?i)(EPS|electric\s+power\s+steering).{0,80}(VSS\s+input|GPO\s*→\s*EPS|wire.*MaxxECU.*EPS|EPS.*VSS)",
+        message="The EPowerSteering.com KIT-33 Basic EPS Controller has no VSS or external "
+                "signal input. Assist is fixed via dashboard potentiometer only — there is no "
+                "port to wire MaxxECU into. Speed-sensitive assist is not supported by this product. "
+                "Source: harnesses/eps-column.wv; E36_9000RPM_Project_Plan_Verified.md (recommendation struck).",
+        source="harnesses/eps-column.wv",
+        exclude=r"(?i)(no\s+VSS|not\s+supported|has\s+no|does\s+not\s+have|no\s+external|no\s+port|cannot|removed|struck)",
+    ),
 ]
 
 # ---------------------------------------------------------------------------
@@ -249,6 +270,70 @@ def audit_file(path: Path, verbose: bool) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
+# Structural checks (require parsing, not just regex)
+# ---------------------------------------------------------------------------
+
+def check_duplicate_pins_in_connections(path: Path) -> list[str]:
+    """
+    In .wv connections blocks, each entry is a YAML list of connector:pin-list pairs.
+    A duplicate pin index within the SAME connector reference in one entry means
+    two different signals are mapped to the same physical pin — e.g. [2, 1, 6, 5, 6]
+    has pin 6 twice.  This check catches that class of error.
+
+    Exemption: connectors whose name contains BUS/SUPPLY/RAIL/GND/PWR/BATT are
+    intentional fan-in points (e.g. VCC1 + VCC2 both → same +5V bus pin).
+    Duplicate pins on those connectors are valid and are not flagged.
+    """
+    if path.suffix != ".wv":
+        return []
+    errors = []
+    try:
+        text = path.read_text(encoding="utf-8")
+    except Exception:
+        return []
+
+    rel = str(path.relative_to(ROOT))
+    # Match lines like:   - - CONNECTOR: [1, 2, 3, 4, 5]
+    #                     - - CONNECTOR: [2, 1, 6, 5, 6]   ← pin 6 twice
+    # Connector name is the word before the colon.
+    _BUS_NAMES = re.compile(r"(?i)(SUPPLY|BUS|RAIL|GND|PWR|BATT)")
+    pin_list_re = re.compile(r"-\s*-?\s*(\w+):\s*\[([^\]]+)\]")
+    for lineno, line in enumerate(text.splitlines(), 1):
+        m = pin_list_re.search(line)
+        if not m:
+            continue
+        connector_name, raw = m.group(1), m.group(2)
+        # Skip bus/supply connectors — intentional many-to-one termination.
+        if _BUS_NAMES.search(connector_name):
+            continue
+        try:
+            pins = [int(p.strip()) for p in raw.split(",") if p.strip().lstrip("-").isdigit()]
+        except ValueError:
+            continue
+        if len(pins) != len(set(pins)):
+            seen, dupes = set(), set()
+            for p in pins:
+                if p in seen:
+                    dupes.add(p)
+                seen.add(p)
+            errors.append(f"\n  {rel}:{lineno}")
+            errors.append(
+                f"  ERROR: Duplicate pin index(es) {sorted(dupes)} in connections entry "
+                f"for {connector_name} — two signals mapped to the same physical pin. "
+                f"Check connector wiring against its pincount. "
+                f"(If this is an intentional bus fan-in, add SUPPLY/BUS/RAIL to the connector name.)"
+            )
+            errors.append(f"  LINE:   {line.strip()[:140]}")
+    return errors
+
+
+def structural_audit_file(path: Path) -> list[str]:
+    errors = []
+    errors.extend(check_duplicate_pins_in_connections(path))
+    return errors
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
@@ -269,6 +354,7 @@ def main() -> None:
     all_errors: list[str] = []
     for f in sorted(files):
         all_errors.extend(audit_file(f, verbose))
+        all_errors.extend(structural_audit_file(f))
 
     if all_errors:
         print("\n\033[31m✗ Harness doc audit FAILED\033[0m")
