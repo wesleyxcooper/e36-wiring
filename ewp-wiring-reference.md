@@ -96,16 +96,18 @@ The CWA400 uses a Kostal 2+2 connector. Pins 1–2 are small (2.8mm) for signal/
 
 The CWA400 draws up to 35.5A — requires heavier wiring than the EWP150 setup.
 
+Power is supplied by **Ecumaster PMU16 outputs O5 + O14 wired in parallel** (25A each, 50A combined).
+No separate relay is needed — the PMU16 M6 BATT+ stud is always-on and O5/O14 switch the load directly.
+Source: `harnesses/ewp-controller.wv`, `harnesses/power-distribution.wv`.
+
 | Wire | Spec | Notes |
 | :--- | :--- | :--- |
-| BATT+ to relay pin 30 | 10 AWG, fused 40A within 12" of battery | Always-on feed to relay |
-| Relay pin 87 to pump Pin 3 | 10 AWG | Switched pump power |
+| PMU16 O5 to pump Pin 3 | 8 AWG, parallel A | Run both wires to same Pin 3 terminal — balance length |
+| PMU16 O14 to pump Pin 3 | 8 AWG, parallel B | Join to O5 wire at Pin 3 terminal |
 | Pump Pin 4 to chassis GND | 10 AWG | Dedicated ground stud — do not share with signal grounds |
-| MaxxECU GPO to pump Pin 1 | 22 AWG | PWM signal — short run preferred |
-| Relay coil (pin 86) | Switched +12V IGN source (via MaxxECU relay output or IGN relay) | |
-| Relay coil (pin 85) | Chassis GND | |
+| MaxxECU GPO to pump Pin 1 | 22 AWG shielded | PWM signal — drain shield at ECU end only |
 
-**Relay:** Use a 40A automotive relay (Bosch 0 332 002 150 or equivalent). Standard 4- or 5-pin relay.
+Configure PMU16 O5 and O14 as a **parallel output pair** in PMU software (combined 50A rating > 35.5A nominal draw).
 
 ---
 
@@ -121,15 +123,17 @@ One sensor only — **MaxxECU CLT sensor** controls everything. No separate Davi
 
 ## Post-Shutdown Cooling
 
-MaxxECU handles post-shutdown pump operation via its power hold relay output:
+Post-shutdown cooling is managed by the **Ecumaster PMU16** — no separate MaxxECU power hold relay needed.
 
-1. Key-off → MaxxECU power hold relay keeps ECU powered
-2. MaxxECU continues commanding CWA400 via PWM until CLT drops below setpoint (configurable threshold)
-3. MaxxECU powers down → relay releases → pump stops
+The PMU16 M6 stud is always-on BATT+. After key-off the PMU16 continues to receive CLT data via CAN from
+MaxxECU (or a fallback timer) and keeps O5+O14 active until coolant drops below the configured threshold.
 
-Configure in MaxxECU: **Outputs → Power Hold Relay** — set condition to CLT < target temp (e.g., 70°C) AND engine-off. This replaces the Davies Craig controller's autonomous post-shutdown logic.
+Configure in PMU software: keep O5+O14 active after IGN-off until MaxxECU CAN CLT < 70°C OR 3-minute
+fallback timer — whichever comes first. Source: `harnesses/ewp-controller.wv`.
 
-> ⚠️ A dedicated power hold relay is **required** for post-shutdown pump operation. Without it, MaxxECU shuts off at key-off and the pump stops immediately (no soak protection). Wire relay coil to MaxxECU power hold output; relay pin 87 to MaxxECU main 12V feed.
+1. Key-off → PMU16 holds O5+O14 on (BATT+ path stays live, no relay needed)
+2. PMU16 monitors CLT via MaxxECU CAN broadcast
+3. CLT drops below 70°C (or timer expires) → PMU16 deactivates O5+O14 → pump stops
 
 ---
 
@@ -153,7 +157,7 @@ OEM impeller removal / housing-in-place approach (this build retains heater core
 Advantage of electric pump: test and bleed before engine ever fires.
 
 1. Fill cooling system with coolant
-2. Wire CWA400 Pin 3 to battery +VE and Pin 4 to earth directly (bypassing relay)
+2. Wire CWA400 Pin 3 to battery +VE and Pin 4 to earth directly (bypassing PMU16)
 3. Connect MaxxECU GPO or a signal generator to Pin 1 at ~50% duty / 680 Hz — pump runs
 4. Alternatively: tie Pin 1 to +12V (forces emergency run / full speed) for bleed-only use
 5. With radiator cap off, run 5–10 minutes — purge all air, top up coolant as air escapes

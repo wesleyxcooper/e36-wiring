@@ -523,7 +523,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 > | Knock sensor 1 + 2 signal wires | 07K (Sys 7) |
 > | DBW TB TPS 4-wire | 07K (Sys 7) |
 > | EWP PWM control (MaxxECU GPO → CWA400 Pin 1) | EWP (Sys 5) |
-> | Fuel pump SSR ctrl− (MaxxECU GPO → SSR) | Fuel pump (Sys 4) |
+> | Fuel pump PWM ctrl (MaxxECU GPO → PMU16 CAN cmd; Phase 1: GPO → relay coil) | Fuel pump (Sys 4) |
 > | ATF temp sensor signal *(optional system)* | Sys 9E |
 >
 > **Explicitly NOT shielded (confirm this is still correct, don't shield by default):**

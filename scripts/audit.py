@@ -221,6 +221,70 @@ DENYLIST: list[DenyRule] = [
         source="harnesses/eps-column.wv",
         exclude=r"(?i)(no\s+VSS|not\s+supported|has\s+no|does\s+not\s+have|no\s+external|no\s+port|cannot|removed|struck)",
     ),
+
+    # ── PST-F1 bulkhead pin numbers ───────────────────────────────────────────
+    DenyRule(
+        pattern=r"(?i)PST.{0,20}(pin\s+27|pin\s+30|pin\s+33|pin\s+34)",
+        message="PST-F1 crosses the AS79 bulkhead at pins 79 (SensorGND), 47 (+5V), 50 (pressure/AIN3), "
+                "51 (temp/AIN1). Pins 27/30/33/34 are flex fuel +12V, coil/inj +12V, IGN6, and IGN7 — "
+                "completely wrong. Source: harnesses/firewall-bulkhead.wv pins 47/50/51/79.",
+        source="harnesses/firewall-bulkhead.wv",
+        exclude=r"(?i)(NOT|wrong|error|correct|was\s+pin)",
+    ),
+
+    # ── TB motor output — GPO3/4 is wrong ────────────────────────────────────
+    DenyRule(
+        pattern=r"(?i)(Motor\+|Motor-|ETh.*Motor|DBW.*Motor).{0,60}(GPO\s*[34]|GPO3|GPO4)",
+        message="The 07K DBW throttle body motor connects to MaxxECU C2 H4 (MOTOR 1+) and C2 H2 (MOTOR 1−), "
+                "NOT GPO 3 or GPO 4. GPO 3 = VVT solenoid; GPO 4 = spare. Using GPO for H-bridge motor "
+                "drive would damage the output. Source: harnesses/maxxecu-07k.wv.",
+        source="harnesses/maxxecu-07k.wv",
+        exclude=r"(?i)(NOT\s+GPO|do\s+not\s+use\s+GPO|GPO.*wrong|not\s+Motor)",
+    ),
+
+    # ── APS through AS79 pins 72-77 ───────────────────────────────────────────
+    # Only flag when a line specifically routes APS *through the bulkhead* on pins 72-77.
+    # ME7.1.1 OEM connector reference tables (e.g. "APS 1 GND | pin 72 | A14") are fine.
+    DenyRule(
+        pattern=r"(?i)(APS.{0,40}(bulkhead|AS79).{0,40}pin\s+7[2-7]|bulkhead.{0,40}APS.{0,40}pin\s+7[2-7]|APS.{0,20}pins?\s+72.{0,10}77.{0,40}(bulkhead|reserved|crossing|firewall))",
+        message="APS (e-pedal) does not use AS79 pins 72–77. APS is cabin-to-cabin via Maven HD30 "
+                "Connector A cabin face pins A14–A19. AS79 pins 72–77 remain spare. "
+                "Source: harnesses/firewall-bulkhead-dual.wv, harnesses/epedal-bmw-e46.wv.",
+        source="harnesses/firewall-bulkhead-dual.wv",
+        exclude=r"(?i)(NOT|spare|not\s+used|remain\s+spare|AS79.*not|no.*bulkhead|cabin-to-cabin)",
+    ),
+
+    # ── TB wiring stays engine side — wrong claim ─────────────────────────────
+    DenyRule(
+        pattern=r"(?i)(Motor\+.*Motor.{0,30}|TB\s+wiring.{0,50})(stay|stays|remain|engine\s+side).{0,60}(bulkhead|firewall|not\s+cross)",
+        message="TB wiring (Motor+/−, TPS1, TPS2, +5V, GND) crosses the AS79 firewall bulkhead — "
+                "MaxxECU is cabin-mounted. Motor+/− via pins 22/23; TPS1/TPS2 via pins 48/56; "
+                "+5V/GND via pins 47/79. Source: harnesses/maxxecu-07k.wv.",
+        source="harnesses/maxxecu-07k.wv",
+        exclude=r"(?i)(NOT|wrong|does\s+not\s+stay|incorrect)",
+    ),
+
+    # ── EWP SSR / relay — replaced by PMU16 ──────────────────────────────────
+    DenyRule(
+        pattern=r"(?i)(CWA400|EWP|electric\s+water\s+pump).{0,80}(Crydom|D1D40|40A\s+relay|power\s+hold\s+relay)",
+        message="The Crydom D1D40 SSR and separate 40A relay have been removed from the EWP circuit. "
+                "PMU16 O5+O14 (parallel, 50A combined) drives the CWA400 directly. PMU16 handles "
+                "post-shutdown cooling — no MaxxECU power hold relay needed. "
+                "Source: harnesses/ewp-controller.wv, harnesses/power-distribution.wv.",
+        source="harnesses/ewp-controller.wv",
+        exclude=r"(?i)(removed|replaced|no\s+longer|NOT|obsolete|superseded)",
+    ),
+
+    # ── Fuel pump SSR — replaced by PMU16 O4 ─────────────────────────────────
+    DenyRule(
+        pattern=r"(?i)(fuel\s+pump|F90000267).{0,80}(Crydom|D1D40|SSR\s+Load|SSR\s+Ctrl)",
+        message="The Crydom D1D40 SSR has been removed from the fuel pump circuit. "
+                "Phase 3: PMU16 O4 (25A, PWM-capable) drives the pump directly via CAN command from MaxxECU. "
+                "Phase 1 (M52): standard relay, MaxxECU GPO 2 → relay coil — no SSR. "
+                "Source: harnesses/power-distribution.wv, harnesses/fuel-pump-hanger.wv.",
+        source="harnesses/power-distribution.wv",
+        exclude=r"(?i)(removed|replaced|replaces|no\s+longer|NOT|obsolete|superseded)",
+    ),
 ]
 
 # ---------------------------------------------------------------------------

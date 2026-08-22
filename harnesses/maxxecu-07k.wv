@@ -348,7 +348,7 @@ connectors:
     pinlabels: ["+5V", "Sensor GND", Signal]
     notes: >
       TODO: Confirm exact VW connector body type at install.
-      ME7.1.1 harness ref: pin 86. +5V supply shared with MAP/TPS/PST-F1 (bulkhead pin 30).
+      ME7.1.1 harness ref: pin 86. +5V supply shared with MAP/TPS/PST-F1 (bulkhead pin 47).
       Signal → HOME input (CMC H4 = pin 32). Same bulkhead pin 25 as M52 cam.
 
   CLT:

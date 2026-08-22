@@ -138,15 +138,37 @@ MaxxECU has pre-defined profiles for this family. Use the identification method 
 
 ## Firewall Bulkhead Pin Allocation (DBW)
 
-These 12 pins must be allocated in `harnesses/firewall-bulkhead.wv` before the Phase 1 bulkhead is built.
+### APS e-pedal — cabin-to-cabin via Maven HD30 Connector A
 
-| Signal | From | To | Wire | Bulkhead Pin (TBD) |
-|---|---|---|---|---|
-| APS1 signal | E-pedal pin 4 | MaxxECU AIN x | 24 AWG shielded | reserve |
-| APS2 signal | E-pedal pin 6 | MaxxECU AIN x | 24 AWG shielded | reserve |
-| APS VCC 1 | MaxxECU +5V | E-pedal pin 5 | 24 AWG | reserve |
-| APS VCC 2 | MaxxECU +5V | E-pedal pin 3 | 24 AWG | reserve |
-| APS GND 1 | MaxxECU SGND | E-pedal pin 1 | 24 AWG | reserve |
-| APS GND 2 | MaxxECU SGND | E-pedal pin 2 | 24 AWG | reserve |
+APS is **cabin-to-cabin only** — the E46 pedal is footwell-mounted, MaxxECU is cabin-mounted.
+No signal crosses to the engine side of the firewall.
 
-TB wiring (Motor+, Motor−, TPS1, TPS2, 5V, GND) stays on the engine side of the bulkhead within the 07K harness — does not cross the firewall.
+The 6 APS wires terminate at **Maven HD30 Connector A cabin face (pins A14–A19)**, which acts
+as a cabin-side junction block. The engine side of these pins is cavity-plugged.
+AS79 (Connector B) is not used for APS.
+
+| Signal | From | HD30 A pin | To |
+|---|---|---|---|
+| APS GND 1 | E-pedal pin 1 | A14 | MaxxECU SGND (CMC H1) |
+| APS GND 2 | E-pedal pin 2 | A15 | MaxxECU SGND (CMC H1) |
+| APS VCC 2 | E-pedal pin 3 | A16 | MaxxECU +5V SENS OUT |
+| APS1 signal | E-pedal pin 4 | A17 | MaxxECU C2 E4 (AIN 6) |
+| APS VCC 1 | E-pedal pin 5 | A18 | MaxxECU +5V SENS OUT |
+| APS2 signal | E-pedal pin 6 | A19 | MaxxECU C2 F1 (AIN 7) |
+
+Pins A14–A19 are cavity-plugged in Phase 1 (M52); the cabin cable run (pedal → HD30 A cabin face)
+is added at Phase 3. Source: `harnesses/firewall-bulkhead-dual.wv`, `harnesses/epedal-bmw-e46.wv`.
+
+### TB motor and sensors — all cross the AS79 firewall bulkhead
+
+TB wiring **does** cross the firewall — MaxxECU is cabin-mounted, the TB is engine-side.
+Source: `harnesses/maxxecu-07k.wv` lines confirming Motor+/− via AS79 pins 22/23.
+
+| Signal | AS79 pin | MaxxECU terminal | Wire |
+|---|---|---|---|
+| ETh Motor+ | 22 | C2 H4 (MOTOR 1+) | 20 AWG |
+| ETh Motor− | 23 | C2 H2 (MOTOR 1−) | 20 AWG |
+| TPS1 | 48 | CMC G2 (AIN 5 / was M52 TPS) | 22 AWG shielded |
+| TPS2 | 56 | CMC J2 (AIN 2) | 22 AWG shielded |
+| +5V sensor supply | 47 | CMC G1 (+5V SENS OUT) | 22 AWG |
+| Sensor GND | 79 | CMC H1 (SGND) | 22 AWG |
