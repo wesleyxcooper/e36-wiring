@@ -455,7 +455,7 @@ cables:
       Crank VR+/VR-/shield (pins 16–18) must be shielded twisted pair.
       Shield (pin 18) connects at cabin side to Sensor GND (CMC H1) via pin 79.
       Float at engine side.
-      WBO2 Heater+ (LSU 4.9 pin 5 / Hs+) splices locally to +12V coil/inj rail (from pins 1+2+29+30)
+      WBO2 Heater+ (LSU 4.9 pin 4 / H+) splices locally to +12V coil/inj rail (from pins 1+2+29+30)
       on the engine side — no separate bulkhead pin needed.
 
 

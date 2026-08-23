@@ -296,11 +296,14 @@ connectors:
     type: "Bosch LSU 4.2 6-way"
     subtype: "Wideband lambda sensor"
     pincount: 6
-    pinlabels: ["IP", "VS", "APE", "Trim", "Hs+", "Hs-"]
+    pinlabels: ["VS", "RCAL", "H+", "H-", "VREF", "IP"]
     notes: >
       MaxxECU M50 terminated harness includes built-in wideband controller and LSU 4.2 connector.
       Sensor: Bosch LSU 4.2 (e.g. 0 258 007 057 universal pigtail version).
       Source: maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html — "Wideband LSU connector: LSU 4.2".
+      Pin numbering source: maxxecu.com/webhelp/wirings-lambda_sensors.html (LSU 4.2 table).
+      Wire colors: black=VS(1), green=RCAL(2), grey=H+(3), white=H-(4), yellow=VREF(5), red=IP(6).
+      Phase 1: This is a TERMINATED harness — sensor connector is pre-wired by MaxxECU. Do not re-pin.
       Bung: 18mm×1.5 welded in exhaust.
       ⚠️ Phase 3 (07K) uses LSU 4.9 — different pinout. Do NOT substitute sensors between phases.
       At Phase 3, install new LSU 4.9 bung in 07K exhaust header.
@@ -988,18 +991,18 @@ connections:
 
   # ── Wideband O2 (LSU 4.2) ────────────────────────────────────────────────────
   # VS=F4/CMC24, VREF=F3/CMC23, IP=G3/CMC27, RCAL=G4/CMC28, Htr-=D1/CMC13
-  # Pin mapping (matches maxxecu-07k.wv — "same wiring as M52"):
-  #   W_WBO2[1]=VS   → WIDEBAND[2](VS)    → ECU_CMC[24](F4)
-  #   W_WBO2[2]=VREF → WIDEBAND[3](APE)   → ECU_CMC[23](F3)
-  #   W_WBO2[3]=IP   → WIDEBAND[1](IP)    → ECU_CMC[27](G3)
-  #   W_WBO2[4]=RCAL → WIDEBAND[4](Trim)  → ECU_CMC[28](G4)
-  #   W_WBO2[5]=Htr- → WIDEBAND[6](Hs-)   → ECU_CMC[13](D1)
-  #   W_WBO2_HTR[1]=Hs+ → WIDEBAND[5](Hs+) → ECU_12PIN[1] (+12V splice)
-  - - WIDEBAND: [2, 3, 1, 4, 6]
+  # Pin numbering per maxxecu.com/webhelp/wirings-lambda_sensors.html (LSU 4.2):
+  #   W_WBO2[1]=VS   → WIDEBAND[1](VS)    → ECU_CMC[24](F4)
+  #   W_WBO2[2]=VREF → WIDEBAND[5](VREF)  → ECU_CMC[23](F3)
+  #   W_WBO2[3]=IP   → WIDEBAND[6](IP)    → ECU_CMC[27](G3)
+  #   W_WBO2[4]=RCAL → WIDEBAND[2](RCAL)  → ECU_CMC[28](G4)
+  #   W_WBO2[5]=Htr- → WIDEBAND[4](H-)    → ECU_CMC[13](D1)
+  #   W_WBO2_HTR[1]=H+ → WIDEBAND[3](H+)  → ECU_12PIN[1] (+12V splice)
+  - - WIDEBAND: [1, 5, 6, 2, 4]
     - W_WBO2: [1, 2, 3, 4, 5]
     - ECU_CMC: [24, 23, 27, 28, 13]
 
-  # WBO2 heater positive: WIDEBAND pin 5 (Hs+) → splice to +12V coil/inj rail
-  - - WIDEBAND: [5]
+  # WBO2 heater positive: WIDEBAND pin 3 (H+) → splice to +12V coil/inj rail
+  - - WIDEBAND: [3]
     - W_WBO2_HTR: [1]
     - ECU_12PIN: [1]

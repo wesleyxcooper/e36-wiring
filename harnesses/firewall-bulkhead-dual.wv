@@ -97,7 +97,7 @@ connectors:
   #  HIGH-CURRENT POWER LINES (fan relays, EWP, AC relay) CANNOT route through this connector:
   #    +12V Fan (20A fuse, 12 AWG)      → exceeds size-16 13A → bypass via dedicated fitting
   #    +12V Condenser fan (20A, 12 AWG) → same
-  #    +12V EWP (35.5A max, 10 AWG per leg, O5+O14) → far exceeds size-16 → bypass via dedicated fitting
+  #    +12V EWP (35.5A nom / 36.3A max, 10 AWG per leg, O5+O14) → far exceeds size-16 → bypass via dedicated fitting
   #    +12V AC (20A, 8 AWG)            → exceeds size-16 → bypass via dedicated fitting
   #  Route those 4 relay outputs through individual Deutsch DT 2-pin connectors (or a DT 4-pin)
   #  through a separate weatherproof grommet alongside the HD30 bulkhead plate.
@@ -195,9 +195,9 @@ connectors:
       - "EWP PWM → CWA400 pin 1 (680 Hz)"                  # A6
       - "AC enable → RELAY_AC coil 86"                     # A7
       - "Chassis GND engine bay (solenoids/actuators)"     # A8   physical position 12 (size-16)
-      - "WBO2 VS → LSU 4.9 pin 2"                          # A9
-      - "WBO2 VREF → LSU 4.9 pin 1"                        # A10
-      - "WBO2 IP → LSU 4.9 pin 6"                          # A11
+      - "WBO2 VS → LSU 4.9 pin 6"                          # A9
+      - "WBO2 VREF → LSU 4.9 pin 2"                        # A10
+      - "WBO2 IP → LSU 4.9 pin 1"                          # A11
       - "WBO2 RCAL → LSU 4.9 pin 5"                        # A12
       - "WBO2 Heater- → LSU 4.9 pin 3"                     # A13
       - "APS GND 1 → MaxxECU SGND"                         # A14  Phase 3

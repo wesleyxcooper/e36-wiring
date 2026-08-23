@@ -510,12 +510,16 @@ connectors:
     type: "Bosch LSU 4.9 6-way"
     subtype: "Wideband lambda sensor"
     pincount: 6
-    pinlabels: ["IP", "VS", "APE", "Trim", "Hs+", "Hs-"]
+    pinlabels: ["IP", "VREF", "H-", "H+", "RCAL", "VS"]
     notes: >
-      Same harness wiring as M52. Bung: weld 18mm x1.5 in 07K custom top-mount
-      exhaust manifold, min 6in from collector, upstream of turbo.
+      Same ECU-side cable structure as M52 (same 5-wire cable, same CMC channels).
+      Sensor-side pin numbers differ from LSU 4.2 — use pinlabels above, not M52 diagram.
+      Bung: weld 18mm x1.5 in 07K custom top-mount exhaust manifold, min 6in from collector, upstream of turbo.
       Sensor: Bosch 0 258 017 025 (LSU 4.9).
       Product: https://www.bosch-motorsport.com/products/sensors/lambda/lambda-sensor-lsu-4-9/
+      Pin numbering source: maxxecu.com/webhelp/wirings-lambda_sensors.html (LSU 4.9 table).
+      Wire colors: red=IP(1), yellow=VREF(2), white=H-(3), grey=H+(4), green=RCAL(5), black=VS(6).
+      Always verify by wire color — do not rely on pin number alone.
 
   VVT_SOL:
     type: "VW 07K intake cam VVT solenoid — connector TBD"
@@ -763,7 +767,7 @@ cables:
     length: 1.5 m
     shield: true
     notes: >-
-      Same wiring as M52. Heater+ (LSU 4.9 pin 5 / Hs+) splices to local +12V coil rail — see W_WBO2_HTR.
+      Same wiring as M52. Heater+ (LSU 4.9 pin 4 / H+) splices to local +12V coil rail — see W_WBO2_HTR.
       Shielded — VS/VREF/IP/RCAL are low-level analog signals susceptible to
       injector/coil noise. Single-end drain at ECU end only.
       HEAT MANAGEMENT: Bung is on the custom top-mount exhaust manifold. Sleeve the
@@ -946,14 +950,15 @@ connections:
     - ECU_CMC: [25, 29, 35, 33]
 
   # ── Wideband O2 (LSU 4.9) ─────────────────────────────────────────────────────
-  # ECU inputs: VS(2)→F4[24], APE(3)→F3[23], IP(1)→G3[27], Trim(4)→G4[28], Hs-(6)→D1[13]
-  # Hs+ (pin 5) splices to local +12V coil rail — separate connection below
-  - - WIDEBAND: [2, 3, 1, 4, 6]
+  # Pin numbering per maxxecu.com/webhelp/wirings-lambda_sensors.html (LSU 4.9):
+  # ECU inputs: VS(6)→F4[24], VREF(2)→F3[23], IP(1)→G3[27], RCAL(5)→G4[28], H-(3)→D1[13]
+  # H+ (pin 4) splices to local +12V coil rail — separate connection below
+  - - WIDEBAND: [6, 2, 1, 5, 3]
     - W_WBO2: [1, 2, 3, 4, 5]
     - ECU_CMC: [24, 23, 27, 28, 13]
 
-  # WBO2 heater positive: WIDEBAND pin 5 (Hs+) → splice to +12V coil/inj rail
-  - - WIDEBAND: [5]
+  # WBO2 heater positive: WIDEBAND pin 4 (H+) → splice to +12V coil/inj rail
+  - - WIDEBAND: [4]
     - W_WBO2_HTR: [1]
     - ECU_12PIN: [1]
 
