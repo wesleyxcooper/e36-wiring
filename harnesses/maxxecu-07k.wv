@@ -26,7 +26,7 @@
 #   + Bosch EV14 injectors (ID1050x x5): M50 harness ships with EV1 pigtails —
 #     replace with EV14 pigtail ends at engine-side harness build.
 #   + 2x Bosch flat knock sensors: route through AS79 expansion pins 43/44/45.
-#   + NO VANOS solenoid. NO ICV. GPO 5 freed. GPO 3 → VVT solenoid.
+#   + NO VANOS solenoid. NO ICV. GPO 3 → VVT solenoid. GPO 5 freed from ICV B → reassigned to reverse light relay (MTune change only — no rewiring). GPO 4 → spare.
 #   + PST-F1: same wiring, new mount (iABED M10x1.0 port) — no wiring change.
 #   + WBO2 LSU 4.9: same wiring, new bung in 07K top-mount exhaust manifold.
 #   + CABIN-SIDE ADDITION: BMW E46 DBW accelerator pedal installed.
@@ -118,7 +118,7 @@ connectors:
       - "GPO 8 / TACHO"     # 4
       - "GPO 7 / DIN 3"     # 5  — Flex fuel (if retained)
       - "GPO 6 (FAN — CAN cmd → PMU16 O3)"       # 6  — no physical relay wire; MaxxECU broadcasts over CAN1
-      - "GPO 3 (ETh Mot+)"                       # 7  — 07K: e-throttle motor+ (freed from VANOS)
+      - "GPO 3 (VVT solenoid — via CMC D4 direct; ETh motor = C2 H4/H2, NOT GPO)"  # 7  — 07K: VVT actuator (freed from VANOS). ECU_16PIN pin 7 not used for ETh motor.
       - "GPO 2 (Fuel pump — CAN cmd → PMU16 O4)" # 8  — no physical relay wire; MaxxECU broadcasts over CAN1
       - "CAN L"             # 9
       - "CAN H"             # 10
@@ -151,7 +151,9 @@ connectors:
   # Source: maxxecu.com/webhelp/wirings-maxxecu_pinout.html
   # GPO 3 (D4/pin 16): freed from VANOS → VVT actuator (07K intake cam)
   # GPO 4 (E4/pin 20): freed from ICV A → SPARE (NOT Motor- — see C2 below)
-  # GPO 5 (A1/pin 1):  freed from ICV B → spare / future actuator
+  # GPO 5 (A1/pin 1):  freed from ICV B → reassigned to reverse light relay (Phase 3).
+  #                    MTune change only: remap GPO 5 to reverse lights output. No rewiring needed.
+  #                    Source: 34-ecu-harness-final.md line 23, 8hp-body-integrations.wv lines 40-41.
   # ETh Motor+/Motor-: MaxxECU C2 H4 (MOTOR 1+) and C2 H2 (MOTOR 1-). NOT GPO3/GPO4.
   #   C2 has dedicated H-bridge outputs for e-throttle.
   #   Motor+ (C2 H4) → AS79 cabin pin 22 → TB motor lead.
@@ -165,7 +167,7 @@ connectors:
     subtype: "Source: maxxecu.com/webhelp/wirings-maxxecu_pinout.html"
     pincount: 48
     pinlabels:
-      - "A1: GPO 5 (spare — ICV freed)" # 1
+      - "A1: GPO 5 (Rev light relay — Ph3 reassignment; ICV B freed)" # 1
       - "A2: IGN 1"                      # 2
       - "A3: IGN 2"                      # 3
       - "A4: GPO 8 / TACHO"             # 4
@@ -315,7 +317,7 @@ connectors:
   #     48: TPS1 signal (CMC G2)   49: MAP signal (AIN 4)   79: Sensor GND (CMC H1, center pin)
   #   GPO actuators:
   #     35: GPO 3 → VANOS (M52) / VVT solenoid (07K)   36: GPO 4 → ICV-A (M52) / SPARE (07K)
-  #     37: GPO 5 → ICV-B (M52)   38: Starter trigger   39: Alt D+
+  #     37: GPO 5 → ICV-B (M52) / Rev light relay (07K — MTune reassignment, no rewiring)   38: Starter trigger   39: Alt D+
   #   Knock sensors (07K only; cavity-plug on M52):
   #     43: Knock 1 signal (CMC K3)   44: Knock 2 signal (CMC K4)   45: Knock GND / shield drain
   #   Misc:

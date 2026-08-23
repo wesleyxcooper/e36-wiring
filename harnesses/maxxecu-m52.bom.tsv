@@ -1,5 +1,5 @@
 Id	Description	Qty	Unit	Designators
-1	Cable, 1 wires	1.8	m	W_COIL_PWR, W_ECU_PWR, W_ENGINE_GND, W_FAN, W_FUELPUMP
+1	Cable, 1 wires	2.1	m	W_COIL_PWR, W_ECU_PWR, W_ENGINE_GND, W_FAN, W_FUELPUMP, W_WBO2_HTR
 2	Cable, 2 wires	7.5	m	W_BOOST, W_CAN, W_CAN_8HP, W_CAN_GAUGES, W_CLT, W_IAT, W_INJ_1, W_INJ_2, W_INJ_3, W_INJ_4, W_INJ_5, W_INJ_6, W_VANOS
 3	Cable, 3 wires	6	m	W_CAM, W_CLUTCH_POS, W_CRANK, W_FLEXFUEL, W_ICV, W_SHIFTER, W_TPS
 4	Cable, 4 wires	3.6	m	W_IGN_1, W_IGN_2, W_IGN_3, W_IGN_4, W_IGN_5, W_IGN_6, W_PST_F1
@@ -15,7 +15,7 @@ Id	Description	Qty	Unit	Designators
 14	Connector, Bosch JPT 2-way, M52 coolant temp (NTC), 2 pins	1		CLT
 15	Connector, Bosch JPT 3-way, M52 60-2 VR crank trigger, 3 pins	1		CRANK_VR
 16	Connector, Bosch JPT 3-way, M52 idle air control valve, 3 pins	1		IDLE_VALVE
-17	Connector, Bosch LSU 4.9 6-way, Wideband lambda sensor, 6 pins	1		WIDEBAND
+17	Connector, Bosch LSU 4.2 6-way, Wideband lambda sensor, 6 pins	1		WIDEBAND
 18	Connector, Bosch PST-F1 4-pin, Dual oil temp+pressure sensor, 4 pins	1		PST_F1
 19	Connector, Cinch 12-pin power/chassis, 12 pins	1		ECU_12PIN
 20	Connector, Cinch 16-pin auxiliary, 16 pins	1		ECU_16PIN
@@ -34,7 +34,7 @@ Id	Description	Qty	Unit	Designators
 33	Connector, SPDT relay, SPAL fan relay, 4 pins	1		FAN_RELAY
 34	Connector, SPDT relay, Walbro 255LPH pump relay, 4 pins	1		FUEL_PUMP_RELAY
 35	Connector, Splice / junction, CAN H/L shared bus junction, 4 pins	1		CAN_BUS_JUNCTION
-36	Connector, Superseal 2-way, Turbosmart boost solenoid (2-port PWM), 2 pins	1		BOOST_SOL
+36	Connector, Superseal 2-way, GPO 1 access — Rev light relay (Ph1) / Boost solenoid (Ph3), 2 pins	1		BOOST_SOL
 37	Connector, VAG 4-way COP, Coil 1 (BMW S54 COP), 4 pins	1		IGN_1
 38	Connector, VAG 4-way COP, Coil 2, 4 pins	1		IGN_2
 39	Connector, VAG 4-way COP, Coil 3, 4 pins	1		IGN_3

@@ -97,7 +97,7 @@ connectors:
   #  HIGH-CURRENT POWER LINES (fan relays, EWP, AC relay) CANNOT route through this connector:
   #    +12V Fan (20A fuse, 12 AWG)      → exceeds size-16 13A → bypass via dedicated fitting
   #    +12V Condenser fan (20A, 12 AWG) → same
-  #    +12V EWP (36.3A max, 10 AWG)    → far exceeds size-16 → bypass via dedicated fitting
+  #    +12V EWP (35.5A max, 10 AWG per leg, O5+O14) → far exceeds size-16 → bypass via dedicated fitting
   #    +12V AC (20A, 8 AWG)            → exceeds size-16 → bypass via dedicated fitting
   #  Route those 4 relay outputs through individual Deutsch DT 2-pin connectors (or a DT 4-pin)
   #  through a separate weatherproof grommet alongside the HD30 bulkhead plate.
@@ -167,7 +167,7 @@ connectors:
       APS pins A14–A19 are cavity-plugged in Phase 1 (M52); the cabin-side cable run
       (E46 pedal → A cabin face) is the one cabin-side harness addition at Phase 3.
 
-      HD30 24-35 CONTACT SIZE CONSTRAINT (source: Deutsch HD30 & HDP20 Technical Manual, Ed.2007, p.9):
+      HD30 24-35 CONTACT SIZE CONSTRAINT (source: Deutsch HD30 and HDP20 Technical Manual, Ed.2007, p.9):
         The 24-35 insert contains only size-16 (13A max) and size-20 (7.5A max) contacts.
         Size-16 positions: 4 (inner ring ~6 o'clock), 7 (middle ring 12 o'clock), 12 (middle ring ~4 o'clock).
         All other positions are size-20. There are NO size-12 or size-8 positions in this insert.
@@ -225,7 +225,7 @@ connectors:
     notes: >-
       Connector A engine side is permanent — never replaced.
       WBO2 Heater+ (LSU 4.9 pin 4): splice locally to AS79 engine-connector +12V coil/inj rail.
-      HIGH-CURRENT BYPASS: +12V Fan, +12V Cond Fan, +12V EWP (CWA400 36.3A max), +12V AC relay out
+      HIGH-CURRENT BYPASS: +12V Fan, +12V Cond Fan, +12V EWP (CWA400 36A max), +12V AC relay out
       do NOT pass through this connector — route via dedicated Deutsch DT 2-pin connectors through
       separate grommet alongside bulkhead plate. Physical contact positions 4, 7, 12 are size-16
       (13A max) — all sufficient for 8HP power, TCU GND, and chassis GND at their actual load.
@@ -445,7 +445,7 @@ cables:
       HIGH-CURRENT lines bypassed: +12V Fan/Cond Fan/EWP/AC relay each route through
       their own Deutsch DT 2-pin connector via a separate grommet. Crimp 12 AWG contacts
       for fan relays; 10 AWG for EWP. DT 2-pin rated 25A/contact — use 2× in parallel
-      for EWP (2×25A = 50A > 36.3A max).
+      for EWP (2x25A = 50A combined, exceeds 36A max draw).
 
   # ── Connector B cable bundle ──────────────────────────────────────────
 
