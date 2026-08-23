@@ -522,20 +522,30 @@ connectors:
       Always verify by wire color — do not rely on pin number alone.
 
   VVT_SOL:
-    type: "VW 07K intake cam VVT solenoid — connector TBD"
-    subtype: "2-pin. ME7.1.1 ref: cam actuator pin 115. MaxxECU GPO 3 (CMC D4 = pin 16)."
+    type: "VW/Tyco Micro Timer 1.5mm Sealed — 2-pin (1J0 973 802 male on solenoid)"
+    subtype: "N205 camshaft adjustment valve. OEM solenoid: 06E 109 257 P. MaxxECU GPO 3 (CMC D4 = pin 16)."
     pincount: 2
-    pinlabels: ["+12V", "GPO 3 signal"]
+    pinlabels: ["+12V", "GPO 3 (low-side)"]
     notes: >
-      07K intake cam VVT actuator solenoid. MaxxECU GPO 3 (CMC D4/pin 16) drives this.
+      07K intake cam VVT actuator solenoid (N205 — camshaft adjustment valve 1).
+      Solenoid OEM PN: 06E 109 257 P (covers 06E109257F/J/AA). Resistance: 5–9 Ω at 20°C.
+      Connector series: VW/Tyco "Micro Timer" 1.5mm Sealed.
+        Solenoid side (male): 1J0 973 802 (FEP 42062500 / TE 1-966701-1).
+        Harness side (female pigtail): 1J0 973 702 (FEP 42121600 / TE 1-969850-1).
+        Pre-made pigtail: automotive-connectors.com 42121600-PT (~30 cm leads)
+                          or Amazon B0D8FH4S8T (~170 mm leads, fits Jetta 2.5L).
+        Terminals: 0.35–0.5 mm² → VW N 10335706 / Tyco 969019-2; 0.5–1.0 mm² → N 10335807 / Tyco 964275-2.
+        Wire size: 22 AWG (0.35 mm²) adequate for solenoid drive current.
+      Pin 1 (+12V): switched +12V from coil/inj relay (ECU_12PIN[1]).
+      Pin 2 (control): MaxxECU GPO 3 (CMC D4/pin 16) — LOW-SIDE switch (ECM grounds pin 2 to actuate).
+        MTune: Settings → Outputs → GPO 3 → Output type: Negative (low-side) → Function: PWM Solenoid
+               → assign to Cam VVT control. Duty cycle 0% = cam retarded; higher DC = more advance.
+               Max advance: ~42° crank degrees. PWM frequency: 100–200 Hz.
       AS79 bulkhead: GPO 3 signal crosses via CABIN pin 35 (engine-side 07K plug pin 35).
-      +12V from coil/inj relay (ECU_12PIN[1]).
-      Flyback diode: 1N4007 at solenoid connector, cathode (banded end) to +12V pin, anode to GPO 3 pin.
-      MTune: Settings → Outputs → GPO 3 → Function: PWM Solenoid → assign to Cam VVT control.
-      Closed-loop cam timing target map: RPM vs load.
-      TODO: Confirm VW 07K VVT solenoid connector body at install.
-        TTRS/CEPA intake cam VVT actuator is typically a 2-pin vertical-latch connector
-        on the intake cam cap at the cylinder-5 end of the head. Verify at engine.
+      Flyback diode: 1N4007 at solenoid connector, cathode (banded end) to +12V pin (1), anode to GPO pin (2).
+      Source: VW BGP/BGQ workshop manual (solenoid resistance, pin function);
+              automotivetechinfo.com 2010 Golf valve timing repair (connector PN confirmation);
+              automotive-connectors.com (pigtail PN).
 
   BOOST_SOL:
     type: "Superseal 2-way"
