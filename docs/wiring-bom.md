@@ -333,6 +333,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | 1 | Bosch LSU 4.9 6-way connector | WBO2 — same as M52 harness (new bung in 07K manifold) |
 | 1 | Bosch PST-F1 4-pin | 🔁 Same as M52 — new mount on 07K oil housing iABED M10×1.0 port |
 | 1 | Superseal 2-way | 🔁 Same boost solenoid as M52 |
+| 1 | VW/Tyco Micro Timer 1.5mm Sealed, 2-pin — `1J0 973 702` female pigtail | N205 VVT solenoid (cam adjustment valve). Solenoid male body: `1J0 973 802`. Pre-made pigtail: automotive-connectors.com `42121600-PT` (~30 cm leads) or Amazon B0D8FH4S8T (~170 mm leads). Terminals 0.35–0.5 mm² (22 AWG) — crimp with IWISS IWS-2820M. Source: VW BGP/BGQ workshop manual + automotivetechinfo.com 2010 Golf valve timing repair. |
 | 1 | 3-pin inline | 🔁 Same Continental flex fuel sensor as M52 |
 
 ### Cables (additions over M52)
@@ -557,6 +558,7 @@ Only items not already included with their respective purchased components (e.g.
 | 1 | Bosch JPT 3-way | M52 crank VR trigger | M52 harness |
 | 1 | BMW `12141726590` 3-pin | M52 VANOS cam Hall sensor | M52 harness |
 | 1 | Superseal 2-way | Turbosmart boost solenoid | M52 harness |
+| 1 | VW `1J0 973 702` 2-pin Micro Timer pigtail | N205 VVT solenoid — automotive-connectors.com `42121600-PT` or Amazon B0D8FH4S8T | 07K harness |
 
 ---
 
