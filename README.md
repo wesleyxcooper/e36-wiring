@@ -173,7 +173,8 @@ The M52 and 07K share MaxxECU trigger type (`N-1 missing tooth`, 60-2 wheel). Si
 | TPS | BMW M52 TPS | VR6 throttle body | Different connector, same 0–5V signal |
 | Injectors | Bosch JPT ×6 (EV1) | Bosch EV14 ×5 | Different connector end, 5-cyl |
 | VANOS solenoid | GPO 3 active | Not applicable | Disable in tune |
-| Wideband O2 | LSU 4.2 | Same | Nothing |
+| VVT solenoid (N205) | Not applicable | GPO 3 active — 1J0 973 702 connector | Enable in tune (PWM, low-side, Negative output) |
+| Wideband O2 | LSU 4.2 (terminated harness, built-in controller) | LSU 4.9 (custom harness, MaxxECU built-in controller) | Different sensor + connector pinout — do not substitute |
 | MAP sensor | Same | Same | Nothing |
 | Flex fuel | Digital input | Same | Nothing |
 | 8HP CAN | Connected | Still connected | Nothing |
