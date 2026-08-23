@@ -851,24 +851,23 @@
 <!-- RADIUM_HANGER_STUB -->
 <g id="node12" class="node">
 <title>RADIUM_HANGER_STUB</title>
-<polygon fill="#ffffff" stroke="black" points="19852.5,-1033.5 18527.5,-1033.5 18527.5,-891.25 19852.5,-891.25 19852.5,-1033.5"/>
-<polygon fill="none" stroke="black" points="18527.5,-1009.75 18527.5,-1033.5 19852.5,-1033.5 19852.5,-1009.75 18527.5,-1009.75"/>
-<text xml:space="preserve" text-anchor="start" x="19108.25" y="-1016.75" font-family="arial" font-size="14.00">RADIUM_HANGER_STUB</text>
-<polygon fill="none" stroke="black" points="18527.5,-986 18527.5,-1009.75 19045.67,-1009.75 19045.67,-986 18527.5,-986"/>
-<text xml:space="preserve" text-anchor="start" x="18617.46" y="-993" font-family="arial" font-size="14.00">Stub: PMU16 O4 → Radium 20&#45;1170 hanger pump stud</text>
-<polygon fill="none" stroke="black" points="19045.67,-986 19045.67,-1009.75 19642.58,-1009.75 19642.58,-986 19045.67,-986"/>
-<text xml:space="preserve" text-anchor="start" x="19135.62" y="-993" font-family="arial" font-size="14.00">See harnesses/fuel&#45;pump&#45;hanger.wv &#45;&#45; replaces Crydom D1D40 SSR</text>
-<polygon fill="none" stroke="black" points="19642.58,-986 19642.58,-1009.75 19852.5,-1009.75 19852.5,-986 19642.58,-986"/>
-<text xml:space="preserve" text-anchor="start" x="19732.54" y="-993" font-family="arial" font-size="14.00">1&#45;pin</text>
-<polygon fill="none" stroke="black" points="18527.5,-962.25 18527.5,-986 19061,-986 19061,-962.25 18527.5,-962.25"/>
-<text xml:space="preserve" text-anchor="start" x="18790.5" y="-969.25" font-family="arial" font-size="14.00">1</text>
-<polygon fill="none" stroke="black" points="19061,-962.25 19061,-986 19852.5,-986 19852.5,-962.25 19061,-962.25"/>
-<text xml:space="preserve" text-anchor="start" x="19324" y="-969.25" font-family="arial" font-size="14.00">Pump+ stud (from PMU16 O4 PWM output)</text>
-<polygon fill="none" stroke="black" points="18527.5,-891.25 18527.5,-962.25 19852.5,-962.25 19852.5,-891.25 18527.5,-891.25"/>
-<text xml:space="preserve" text-anchor="start" x="18531.5" y="-945.5" font-family="arial" font-size="14.00">PMU16 O4 (25A, PWM&#45;capable) output connects to pump positive stud on Radium 20&#45;1170 hanger, replacing the Crydom D1D40 DC SSR. TODO: update fuel&#45;pump&#45;hanger.wv to remove SSR &#45;&#45; wire PMU16 O4 directly</text>
-<text xml:space="preserve" text-anchor="start" x="18531.5" y="-929.75" font-family="arial" font-size="14.00"> &#160;to pump+ stud. The Ctrl+/Ctrl&#45; SSR wires to MaxxECU GPO are eliminated;</text>
-<text xml:space="preserve" text-anchor="start" x="18531.5" y="-914" font-family="arial" font-size="14.00"> &#160;PWM duty is now commanded by MaxxECU over CAN to PMU16 channel O4.</text>
-<text xml:space="preserve" text-anchor="start" x="18531.5" y="-898.25" font-family="arial" font-size="14.00">Wire gauge: 12 AWG (Walbro F90000267 draws 14.1A max). See fuel&#45;pump&#45;hanger.wv for full hanger pinout and return wiring.</text>
+<polygon fill="#ffffff" stroke="black" points="19855.12,-1033.62 18524.88,-1033.62 18524.88,-907.12 19855.12,-907.12 19855.12,-1033.62"/>
+<polygon fill="none" stroke="black" points="18524.88,-1009.88 18524.88,-1033.62 19855.12,-1033.62 19855.12,-1009.88 18524.88,-1009.88"/>
+<text xml:space="preserve" text-anchor="start" x="19108.25" y="-1016.88" font-family="arial" font-size="14.00">RADIUM_HANGER_STUB</text>
+<polygon fill="none" stroke="black" points="18524.88,-986.12 18524.88,-1009.88 19044.79,-1009.88 19044.79,-986.12 18524.88,-986.12"/>
+<text xml:space="preserve" text-anchor="start" x="18615.71" y="-993.12" font-family="arial" font-size="14.00">Stub: PMU16 O4 → Radium 20&#45;1170 hanger pump stud</text>
+<polygon fill="none" stroke="black" points="19044.79,-986.12 19044.79,-1009.88 19643.46,-1009.88 19643.46,-986.12 19044.79,-986.12"/>
+<text xml:space="preserve" text-anchor="start" x="19135.62" y="-993.12" font-family="arial" font-size="14.00">See harnesses/fuel&#45;pump&#45;hanger.wv &#45;&#45; replaces Crydom D1D40 SSR</text>
+<polygon fill="none" stroke="black" points="19643.46,-986.12 19643.46,-1009.88 19855.12,-1009.88 19855.12,-986.12 19643.46,-986.12"/>
+<text xml:space="preserve" text-anchor="start" x="19734.29" y="-993.12" font-family="arial" font-size="14.00">1&#45;pin</text>
+<polygon fill="none" stroke="black" points="18524.88,-962.38 18524.88,-986.12 19061,-986.12 19061,-962.38 18524.88,-962.38"/>
+<text xml:space="preserve" text-anchor="start" x="18789.19" y="-969.38" font-family="arial" font-size="14.00">1</text>
+<polygon fill="none" stroke="black" points="19061,-962.38 19061,-986.12 19855.12,-986.12 19855.12,-962.38 19061,-962.38"/>
+<text xml:space="preserve" text-anchor="start" x="19325.31" y="-969.38" font-family="arial" font-size="14.00">Pump+ stud (from PMU16 O4 PWM output)</text>
+<polygon fill="none" stroke="black" points="18524.88,-907.12 18524.88,-962.38 19855.12,-962.38 19855.12,-907.12 18524.88,-907.12"/>
+<text xml:space="preserve" text-anchor="start" x="18528.88" y="-945.62" font-family="arial" font-size="14.00">PMU16 O4 (25A, PWM&#45;capable) output connects to pump positive stud on Radium 20&#45;1170 hanger, replacing the Crydom D1D40 DC SSR. DONE: fuel&#45;pump&#45;hanger.wv updated &#45;&#45; PMU16 O4 wire goes directly to pump+</text>
+<text xml:space="preserve" text-anchor="start" x="18528.88" y="-929.88" font-family="arial" font-size="14.00"> &#160;stud. No SSR. PWM duty commanded by MaxxECU over CAN to PMU16 O4.</text>
+<text xml:space="preserve" text-anchor="start" x="18528.88" y="-914.12" font-family="arial" font-size="14.00">Wire gauge: 12 AWG (Walbro F90000267 draws 14.1A max). See fuel&#45;pump&#45;hanger.wv for full hanger pinout and return wiring.</text>
 </g>
 <!-- EWP_OUTPUT_STUB -->
 <g id="node13" class="node">
@@ -1027,9 +1026,9 @@
 <!-- W_PMU16_O4_PUMP&#45;&#45;RADIUM_HANGER_STUB -->
 <g id="edge26" class="edge">
 <title>W_PMU16_O4_PUMP:e&#45;&#45;RADIUM_HANGER_STUB:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M17264,-971.63C17825.12,-971.63 17965.4,-972.13 18526.5,-972.13"/>
-<path fill="none" stroke="#ff0000" stroke-width="2" d="M17264,-973.62C17825.11,-973.62 17965.39,-974.12 18526.5,-974.12"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M17264,-975.62C17825.1,-975.62 17965.38,-976.12 18526.5,-976.12"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M17264,-971.63C17823.95,-971.63 17963.94,-972.25 18523.88,-972.25"/>
+<path fill="none" stroke="#ff0000" stroke-width="2" d="M17264,-973.63C17823.94,-973.63 17963.93,-974.25 18523.88,-974.25"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M17264,-975.62C17823.94,-975.62 17963.92,-976.25 18523.88,-976.25"/>
 </g>
 <!-- W_PMU16_O5_EWP&#45;&#45;EWP_OUTPUT_STUB -->
 <g id="edge28" class="edge">

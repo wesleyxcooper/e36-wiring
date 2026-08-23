@@ -1,0 +1,4 @@
+Id	Description	Qty	Unit	Designators
+1	Cable, 53 wires	0	m	W_BULKHEAD
+2	Connector, Deutsch AS79 / Souriau 8STA 79-way flange receptacle, Cabin side — permanent. Deutsch p/n AS616-79PN or Souriau 8STA79PN equiv., 79 pins	1		BULKHEAD_CABIN
+3	Connector, Deutsch AS79 / Souriau 8STA 79-way jam nut plug, Engine side — M52 Phase 1 harness. Unplugs at swap., 79 pins	1		BULKHEAD_ENGINE_M52

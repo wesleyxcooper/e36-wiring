@@ -52,25 +52,25 @@
 <text xml:space="preserve" text-anchor="start" x="2644.75" y="-151.5" font-family="arial" font-size="14.00"> </text>
 <text xml:space="preserve" text-anchor="start" x="2599" y="-131.75" font-family="arial" font-size="14.00">PST_F1:2:GND</text>
 <text xml:space="preserve" text-anchor="start" x="2766.88" y="-131.75" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;1:BK:GND &#160;&#160;&#160;</text>
-<text xml:space="preserve" text-anchor="start" x="2917.12" y="-131.75" font-family="arial" font-size="14.00">BULKHEAD_ENGINE:1:Sensor GND (pin 27)</text>
+<text xml:space="preserve" text-anchor="start" x="2917.12" y="-131.75" font-family="arial" font-size="14.00">BULKHEAD_ENGINE:1:Sensor GND (pin 79)</text>
 <polygon fill="#000000" stroke="none" points="2564.75,-124.75 2564.75,-126.75 3206,-126.75 3206,-124.75 2564.75,-124.75"/>
 <polygon fill="#000000" stroke="none" points="2564.75,-122.75 2564.75,-124.75 3206,-124.75 3206,-122.75 2564.75,-122.75"/>
 <polygon fill="#000000" stroke="none" points="2564.75,-120.75 2564.75,-122.75 3206,-122.75 3206,-120.75 2564.75,-120.75"/>
 <text xml:space="preserve" text-anchor="start" x="2602" y="-106" font-family="arial" font-size="14.00">PST_F1:1:+5V</text>
 <text xml:space="preserve" text-anchor="start" x="2769.12" y="-106" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;2:RD:+5V &#160;&#160;&#160;</text>
-<text xml:space="preserve" text-anchor="start" x="2921.25" y="-106" font-family="arial" font-size="14.00">BULKHEAD_ENGINE:2:+5V sensor (pin 30)</text>
+<text xml:space="preserve" text-anchor="start" x="2921.25" y="-106" font-family="arial" font-size="14.00">BULKHEAD_ENGINE:2:+5V sensor (pin 47)</text>
 <polygon fill="#000000" stroke="none" points="2564.75,-99 2564.75,-101 3206,-101 3206,-99 2564.75,-99"/>
 <polygon fill="#ff0000" stroke="none" points="2564.75,-97 2564.75,-99 3206,-99 3206,-97 2564.75,-97"/>
 <polygon fill="#000000" stroke="none" points="2564.75,-95 2564.75,-97 3206,-97 3206,-95 2564.75,-95"/>
 <text xml:space="preserve" text-anchor="start" x="2566.75" y="-80.25" font-family="arial" font-size="14.00">PST_F1:3:Pressure (0&#45;5V)</text>
 <text xml:space="preserve" text-anchor="start" x="2730.5" y="-80.25" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;3:GN:Pressure (AIN 3) &#160;&#160;&#160;</text>
-<text xml:space="preserve" text-anchor="start" x="2904.75" y="-80.25" font-family="arial" font-size="14.00">BULKHEAD_ENGINE:3:PST&#45;F1 pressure (pin 33)</text>
+<text xml:space="preserve" text-anchor="start" x="2904.75" y="-80.25" font-family="arial" font-size="14.00">BULKHEAD_ENGINE:3:PST&#45;F1 pressure (pin 50)</text>
 <polygon fill="#000000" stroke="none" points="2564.75,-73.25 2564.75,-75.25 3206,-75.25 3206,-73.25 2564.75,-73.25"/>
 <polygon fill="#00ff00" stroke="none" points="2564.75,-71.25 2564.75,-73.25 3206,-73.25 3206,-71.25 2564.75,-71.25"/>
 <polygon fill="#000000" stroke="none" points="2564.75,-69.25 2564.75,-71.25 3206,-71.25 3206,-69.25 2564.75,-69.25"/>
 <text xml:space="preserve" text-anchor="start" x="2577.25" y="-54.5" font-family="arial" font-size="14.00">PST_F1:4:Temp (NTC)</text>
 <text xml:space="preserve" text-anchor="start" x="2742.12" y="-54.5" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;4:YE:Temp (AIN 1) &#160;&#160;&#160;</text>
-<text xml:space="preserve" text-anchor="start" x="2915.62" y="-54.5" font-family="arial" font-size="14.00">BULKHEAD_ENGINE:4:PST&#45;F1 temp (pin 34)</text>
+<text xml:space="preserve" text-anchor="start" x="2915.62" y="-54.5" font-family="arial" font-size="14.00">BULKHEAD_ENGINE:4:PST&#45;F1 temp (pin 51)</text>
 <polygon fill="#000000" stroke="none" points="2564.75,-47.5 2564.75,-49.5 3206,-49.5 3206,-47.5 2564.75,-47.5"/>
 <polygon fill="#ffff00" stroke="none" points="2564.75,-45.5 2564.75,-47.5 3206,-47.5 3206,-45.5 2564.75,-45.5"/>
 <polygon fill="#000000" stroke="none" points="2564.75,-43.5 2564.75,-45.5 3206,-45.5 3206,-43.5 2564.75,-43.5"/>
@@ -115,25 +115,25 @@
 <polygon fill="none" stroke="black" points="3502.62,-132.62 3502.62,-156.38 3832.38,-156.38 3832.38,-132.62 3502.62,-132.62"/>
 <text xml:space="preserve" text-anchor="start" x="3506.62" y="-139.62" font-family="arial" font-size="14.00">Deutsch AS79 bulkhead — engine side (PST&#45;F1 pins)</text>
 <polygon fill="none" stroke="black" points="3832.38,-132.62 3832.38,-156.38 4122.38,-156.38 4122.38,-132.62 3832.38,-132.62"/>
-<text xml:space="preserve" text-anchor="start" x="3836.38" y="-139.62" font-family="arial" font-size="14.00">Pins 27/30/33/34 of 79&#45;way engine mating plug</text>
+<text xml:space="preserve" text-anchor="start" x="3836.38" y="-139.62" font-family="arial" font-size="14.00">Pins 79/47/50/51 of 79&#45;way engine mating plug</text>
 <polygon fill="none" stroke="black" points="4122.38,-132.62 4122.38,-156.38 4160.38,-156.38 4160.38,-132.62 4122.38,-132.62"/>
 <text xml:space="preserve" text-anchor="start" x="4126.38" y="-139.62" font-family="arial" font-size="14.00">4&#45;pin</text>
 <polygon fill="none" stroke="black" points="3502.62,-108.88 3502.62,-132.62 3759.5,-132.62 3759.5,-108.88 3502.62,-108.88"/>
 <text xml:space="preserve" text-anchor="start" x="3627.31" y="-115.88" font-family="arial" font-size="14.00">1</text>
 <polygon fill="none" stroke="black" points="3759.5,-108.88 3759.5,-132.62 4160.38,-132.62 4160.38,-108.88 3759.5,-108.88"/>
-<text xml:space="preserve" text-anchor="start" x="3896.56" y="-115.88" font-family="arial" font-size="14.00">Sensor GND (pin 27)</text>
+<text xml:space="preserve" text-anchor="start" x="3896.56" y="-115.88" font-family="arial" font-size="14.00">Sensor GND (pin 79)</text>
 <polygon fill="none" stroke="black" points="3502.62,-85.12 3502.62,-108.88 3759.5,-108.88 3759.5,-85.12 3502.62,-85.12"/>
 <text xml:space="preserve" text-anchor="start" x="3627.31" y="-92.12" font-family="arial" font-size="14.00">2</text>
 <polygon fill="none" stroke="black" points="3759.5,-85.12 3759.5,-108.88 4160.38,-108.88 4160.38,-85.12 3759.5,-85.12"/>
-<text xml:space="preserve" text-anchor="start" x="3900.69" y="-92.12" font-family="arial" font-size="14.00">+5V sensor (pin 30)</text>
+<text xml:space="preserve" text-anchor="start" x="3900.69" y="-92.12" font-family="arial" font-size="14.00">+5V sensor (pin 47)</text>
 <polygon fill="none" stroke="black" points="3502.62,-61.38 3502.62,-85.12 3759.5,-85.12 3759.5,-61.38 3502.62,-61.38"/>
 <text xml:space="preserve" text-anchor="start" x="3627.31" y="-68.38" font-family="arial" font-size="14.00">3</text>
 <polygon fill="none" stroke="black" points="3759.5,-61.38 3759.5,-85.12 4160.38,-85.12 4160.38,-61.38 3759.5,-61.38"/>
-<text xml:space="preserve" text-anchor="start" x="3884.19" y="-68.38" font-family="arial" font-size="14.00">PST&#45;F1 pressure (pin 33)</text>
+<text xml:space="preserve" text-anchor="start" x="3884.19" y="-68.38" font-family="arial" font-size="14.00">PST&#45;F1 pressure (pin 50)</text>
 <polygon fill="none" stroke="black" points="3502.62,-37.62 3502.62,-61.38 3759.5,-61.38 3759.5,-37.62 3502.62,-37.62"/>
 <text xml:space="preserve" text-anchor="start" x="3627.31" y="-44.62" font-family="arial" font-size="14.00">4</text>
 <polygon fill="none" stroke="black" points="3759.5,-37.62 3759.5,-61.38 4160.38,-61.38 4160.38,-37.62 3759.5,-37.62"/>
-<text xml:space="preserve" text-anchor="start" x="3895.06" y="-44.62" font-family="arial" font-size="14.00">PST&#45;F1 temp (pin 34)</text>
+<text xml:space="preserve" text-anchor="start" x="3895.06" y="-44.62" font-family="arial" font-size="14.00">PST&#45;F1 temp (pin 51)</text>
 </g>
 <!-- BULKHEAD_CABIN -->
 <g id="node3" class="node">
@@ -144,23 +144,23 @@
 <polygon fill="none" stroke="black" points="873.62,-462.62 873.62,-486.38 1195.12,-486.38 1195.12,-462.62 873.62,-462.62"/>
 <text xml:space="preserve" text-anchor="start" x="877.62" y="-469.62" font-family="arial" font-size="14.00">Deutsch AS79 bulkhead — cabin side (PST&#45;F1 pins)</text>
 <polygon fill="none" stroke="black" points="1195.12,-462.62 1195.12,-486.38 1509.12,-486.38 1509.12,-462.62 1195.12,-462.62"/>
-<text xml:space="preserve" text-anchor="start" x="1199.12" y="-469.62" font-family="arial" font-size="14.00">Pins 27/30/33/34 of 79&#45;way cabin flange receptacle</text>
+<text xml:space="preserve" text-anchor="start" x="1199.12" y="-469.62" font-family="arial" font-size="14.00">Pins 79/47/50/51 of 79&#45;way cabin flange receptacle</text>
 <polygon fill="none" stroke="black" points="1509.12,-462.62 1509.12,-486.38 1547.12,-486.38 1547.12,-462.62 1509.12,-462.62"/>
 <text xml:space="preserve" text-anchor="start" x="1513.12" y="-469.62" font-family="arial" font-size="14.00">4&#45;pin</text>
 <polygon fill="none" stroke="black" points="873.62,-438.88 873.62,-462.62 1282.38,-462.62 1282.38,-438.88 873.62,-438.88"/>
-<text xml:space="preserve" text-anchor="start" x="1014.62" y="-445.88" font-family="arial" font-size="14.00">Sensor GND (pin 27)</text>
+<text xml:space="preserve" text-anchor="start" x="1014.62" y="-445.88" font-family="arial" font-size="14.00">Sensor GND (pin 79)</text>
 <polygon fill="none" stroke="black" points="1282.38,-438.88 1282.38,-462.62 1547.12,-462.62 1547.12,-438.88 1282.38,-438.88"/>
 <text xml:space="preserve" text-anchor="start" x="1411" y="-445.88" font-family="arial" font-size="14.00">1</text>
 <polygon fill="none" stroke="black" points="873.62,-415.12 873.62,-438.88 1282.38,-438.88 1282.38,-415.12 873.62,-415.12"/>
-<text xml:space="preserve" text-anchor="start" x="1018.75" y="-422.12" font-family="arial" font-size="14.00">+5V sensor (pin 30)</text>
+<text xml:space="preserve" text-anchor="start" x="1018.75" y="-422.12" font-family="arial" font-size="14.00">+5V sensor (pin 47)</text>
 <polygon fill="none" stroke="black" points="1282.38,-415.12 1282.38,-438.88 1547.12,-438.88 1547.12,-415.12 1282.38,-415.12"/>
 <text xml:space="preserve" text-anchor="start" x="1411" y="-422.12" font-family="arial" font-size="14.00">2</text>
 <polygon fill="none" stroke="black" points="873.62,-391.38 873.62,-415.12 1282.38,-415.12 1282.38,-391.38 873.62,-391.38"/>
-<text xml:space="preserve" text-anchor="start" x="1002.25" y="-398.38" font-family="arial" font-size="14.00">PST&#45;F1 pressure (pin 33)</text>
+<text xml:space="preserve" text-anchor="start" x="1002.25" y="-398.38" font-family="arial" font-size="14.00">PST&#45;F1 pressure (pin 50)</text>
 <polygon fill="none" stroke="black" points="1282.38,-391.38 1282.38,-415.12 1547.12,-415.12 1547.12,-391.38 1282.38,-391.38"/>
 <text xml:space="preserve" text-anchor="start" x="1411" y="-398.38" font-family="arial" font-size="14.00">3</text>
 <polygon fill="none" stroke="black" points="873.62,-367.62 873.62,-391.38 1282.38,-391.38 1282.38,-367.62 873.62,-367.62"/>
-<text xml:space="preserve" text-anchor="start" x="1013.12" y="-374.62" font-family="arial" font-size="14.00">PST&#45;F1 temp (pin 34)</text>
+<text xml:space="preserve" text-anchor="start" x="1013.12" y="-374.62" font-family="arial" font-size="14.00">PST&#45;F1 temp (pin 51)</text>
 <polygon fill="none" stroke="black" points="1282.38,-367.62 1282.38,-391.38 1547.12,-391.38 1547.12,-367.62 1282.38,-367.62"/>
 <text xml:space="preserve" text-anchor="start" x="1411" y="-374.62" font-family="arial" font-size="14.00">4</text>
 </g>
@@ -175,25 +175,25 @@
 <polygon fill="none" stroke="black" points="2875.25,-496.25 2875.25,-520 3203.38,-520 3203.38,-496.25 2875.25,-496.25"/>
 <text xml:space="preserve" text-anchor="start" x="3022.06" y="-503.25" font-family="arial" font-size="14.00">0.4 m</text>
 <text xml:space="preserve" text-anchor="start" x="2711.5" y="-481.5" font-family="arial" font-size="14.00"> </text>
-<text xml:space="preserve" text-anchor="start" x="2581.75" y="-461.75" font-family="arial" font-size="14.00">BULKHEAD_CABIN:1:Sensor GND (pin 27)</text>
+<text xml:space="preserve" text-anchor="start" x="2581.75" y="-461.75" font-family="arial" font-size="14.00">BULKHEAD_CABIN:1:Sensor GND (pin 79)</text>
 <text xml:space="preserve" text-anchor="start" x="2897.75" y="-461.75" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;1:BK:GND &#160;&#160;&#160;</text>
 <text xml:space="preserve" text-anchor="start" x="3035.62" y="-461.75" font-family="arial" font-size="14.00">ECU_16PIN:2:Sensor GND</text>
 <polygon fill="#000000" stroke="none" points="2567.38,-454.75 2567.38,-456.75 3203.38,-456.75 3203.38,-454.75 2567.38,-454.75"/>
 <polygon fill="#000000" stroke="none" points="2567.38,-452.75 2567.38,-454.75 3203.38,-454.75 3203.38,-452.75 2567.38,-452.75"/>
 <polygon fill="#000000" stroke="none" points="2567.38,-450.75 2567.38,-452.75 3203.38,-452.75 3203.38,-450.75 2567.38,-450.75"/>
-<text xml:space="preserve" text-anchor="start" x="2585.88" y="-436" font-family="arial" font-size="14.00">BULKHEAD_CABIN:2:+5V sensor (pin 30)</text>
+<text xml:space="preserve" text-anchor="start" x="2585.88" y="-436" font-family="arial" font-size="14.00">BULKHEAD_CABIN:2:+5V sensor (pin 47)</text>
 <text xml:space="preserve" text-anchor="start" x="2900" y="-436" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;2:RD:+5V &#160;&#160;&#160;</text>
 <text xml:space="preserve" text-anchor="start" x="3045.38" y="-436" font-family="arial" font-size="14.00">ECU_16PIN:1:+5V OUT</text>
 <polygon fill="#000000" stroke="none" points="2567.38,-429 2567.38,-431 3203.38,-431 3203.38,-429 2567.38,-429"/>
 <polygon fill="#ff0000" stroke="none" points="2567.38,-427 2567.38,-429 3203.38,-429 3203.38,-427 2567.38,-427"/>
 <polygon fill="#000000" stroke="none" points="2567.38,-425 2567.38,-427 3203.38,-427 3203.38,-425 2567.38,-425"/>
-<text xml:space="preserve" text-anchor="start" x="2569.38" y="-410.25" font-family="arial" font-size="14.00">BULKHEAD_CABIN:3:PST&#45;F1 pressure (pin 33)</text>
+<text xml:space="preserve" text-anchor="start" x="2569.38" y="-410.25" font-family="arial" font-size="14.00">BULKHEAD_CABIN:3:PST&#45;F1 pressure (pin 50)</text>
 <text xml:space="preserve" text-anchor="start" x="2861.38" y="-410.25" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;3:GN:Pressure (AIN 3) &#160;&#160;&#160;</text>
 <text xml:space="preserve" text-anchor="start" x="3053.62" y="-410.25" font-family="arial" font-size="14.00">ECU_16PIN:12:AIN 3</text>
 <polygon fill="#000000" stroke="none" points="2567.38,-403.25 2567.38,-405.25 3203.38,-405.25 3203.38,-403.25 2567.38,-403.25"/>
 <polygon fill="#00ff00" stroke="none" points="2567.38,-401.25 2567.38,-403.25 3203.38,-403.25 3203.38,-401.25 2567.38,-401.25"/>
 <polygon fill="#000000" stroke="none" points="2567.38,-399.25 2567.38,-401.25 3203.38,-401.25 3203.38,-399.25 2567.38,-399.25"/>
-<text xml:space="preserve" text-anchor="start" x="2580.25" y="-384.5" font-family="arial" font-size="14.00">BULKHEAD_CABIN:4:PST&#45;F1 temp (pin 34)</text>
+<text xml:space="preserve" text-anchor="start" x="2580.25" y="-384.5" font-family="arial" font-size="14.00">BULKHEAD_CABIN:4:PST&#45;F1 temp (pin 51)</text>
 <text xml:space="preserve" text-anchor="start" x="2873" y="-384.5" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;4:YE:Temp (AIN 1) &#160;&#160;&#160;</text>
 <text xml:space="preserve" text-anchor="start" x="3053.62" y="-384.5" font-family="arial" font-size="14.00">ECU_16PIN:14:AIN 1</text>
 <polygon fill="#000000" stroke="none" points="2567.38,-377.5 2567.38,-379.5 3203.38,-379.5 3203.38,-377.5 2567.38,-377.5"/>

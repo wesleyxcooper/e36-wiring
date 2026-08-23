@@ -46,9 +46,11 @@
 #       GPO 5 = A1 = CMC pin 1  (ICV coil B).
 #       Both hardwired within terminated harness to ICV connector (not on 16-pin breakout).
 #
-# DONE: GPO 1 (boost solenoid) CMC pin = B4 = CMC pin 8.
-#       +12V for solenoid comes from coil/inj rail (ECU_12PIN[1]).
-#       GPO 1 = low-side switch from CMC pin 8.
+# DONE: GPO 1 (M50 harness BOOST_SOL connector stub, Superseal 2-way) = CMC pin B4 = CMC pin 8.
+#       Phase 1 (M52 NA): GPO 1 drives the reverse light relay low-side. The BOOST_SOL
+#       connector stub is repurposed as the relay coil low-side access point (no boost solenoid
+#       in Phase 1). Phase 3 (07K): GPO 1 drives the boost solenoid.
+#       +12V for solenoid/relay comes from coil/inj rail (ECU_12PIN[1]).
 #
 # DONE: Firewall bulkhead connector — 79-way decided (Deutsch AS79 / Souriau 8STA).
 #       ~59 pins used/reserved; ~20 true spares for expansion.
@@ -73,18 +75,12 @@
 #       Confirm MAP sensor connector type, hose routing to intake manifold.
 #       Tee into intake manifold vacuum port before throttle body.
 #
-# TODO: Wideband O2 (LSU 4.2) harness is UNMODELED — bigger gap than a missing
-#       shield flag. ECU_CMC pin labels reserve D1/F3/F4/G3/G4 for WBO2
-#       (Heater-/VREF/VS/IP/RCAL), but there is no WIDEBAND connector, no
-#       W_WBO2 cable, and no connections block here — unlike maxxecu-07k.wv,
-#       which has all three. Author this properly before Phase 1 harness build:
-#       (1) add a WIDEBAND connector (Bosch LSU 4.2 6-way, not 4.9 — confirm
-#           pin numbering differs from the LSU 4.9 block in maxxecu-07k.wv
-#           before copying it verbatim), (2) add W_WBO2 cable with shield: true
-#           (VS/VREF/IP/RCAL are low-level analog, noise-sensitive — same
-#           reasoning as the 07K version), (3) wire the connections block to
-#           the reserved ECU_CMC pins above. Do not assume LSU 4.2 and 4.9
-#           share a pinout — verify against the Bosch LSU 4.2 datasheet.
+# DONE: Wideband O2 harness — LSU 4.2. WIDEBAND connector (line ~299),
+#       W_WBO2 cable with shield: true (line ~697), W_WBO2_HTR heater+ stub
+#       (line ~703), and connections block (line ~981) are all present.
+#       Sensor: Bosch LSU 4.2. MaxxECU M50 terminated harness explicitly specifies
+#       LSU 4.2 connector (source: maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html).
+#       Phase 3 (07K) uses LSU 4.9 — different pinout; do NOT substitute sensors between phases.
 # ─────────────────────────────────────────────────────────────────────────────
 #
 # This build adds to the base harness:
@@ -297,26 +293,34 @@ connectors:
   # ── Wideband O2 ─────────────────────────────────────────────────────────────
 
   WIDEBAND:
-    type: "Bosch LSU 4.9 6-way"
+    type: "Bosch LSU 4.2 6-way"
     subtype: "Wideband lambda sensor"
     pincount: 6
-    pinlabels: ["IP", "VS", "APE", "Trim", "Hs+", "Hs-"]
+    pinlabels: ["VS", "RCAL", "H+", "H-", "VREF", "IP"]
     notes: >
-      MaxxECU M50 terminated harness includes built-in wideband controller and LSU 4.9 connector.
-      Sensor: Bosch 0 258 017 025 (LSU 4.9). Bung: 18mm×1.5 welded in exhaust.
-      Carries to 07K phase — re-weld bung in new exhaust header.
-      Product: https://www.bosch-motorsport.com/products/sensors/lambda/lambda-sensor-lsu-4-9/
+      MaxxECU M50 terminated harness includes built-in wideband controller and LSU 4.2 connector.
+      Sensor: Bosch LSU 4.2 (e.g. 0 258 007 057 universal pigtail version).
+      Source: maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html — "Wideband LSU connector: LSU 4.2".
+      Pin numbering source: maxxecu.com/webhelp/wirings-lambda_sensors.html (LSU 4.2 table).
+      Wire colors: black=VS(1), green=RCAL(2), grey=H+(3), white=H-(4), yellow=VREF(5), red=IP(6).
+      Phase 1: This is a TERMINATED harness — sensor connector is pre-wired by MaxxECU. Do not re-pin.
+      Bung: 18mm×1.5 welded in exhaust.
+      ⚠️ Phase 3 (07K) uses LSU 4.9 — different pinout. Do NOT substitute sensors between phases.
+      At Phase 3, install new LSU 4.9 bung in 07K exhaust header.
 
   # ── Boost ────────────────────────────────────────────────────────────────────
 
   BOOST_SOL:
     type: "Superseal 2-way"
-    subtype: "Turbosmart boost solenoid (2-port PWM)"
+    subtype: "GPO 1 access — Rev light relay (Ph1) / Boost solenoid (Ph3)"
     pincount: 2
     pinlabels: ["+12V", "GPO 1 signal"]
     notes: >-
-      MaxxECU GPO 1 :: PWM duty control. Budget alt: Bosch N75 0280142431.
-      Solenoid: https://www.turbosmart.com/product/eb2-ebs-spare-3-port-solenoid-kit/
+      Phase 1 (M52 NA): connector stub is repurposed as the reverse light relay low-side access point.
+      Pin 1 (+12V) to relay coil +12V; Pin 2 (GPO 1) to relay coil GND/signal side.
+      No boost solenoid installed in Phase 1 — NA engine. GPO 1 = reverse light trigger.
+      Phase 3 (07K turbo): GPO 1 drives boost solenoid. MaxxECU GPO 1 :: PWM duty control.
+      Boost solenoid budget alt: Bosch N75 0280142431.
       Flyback diode: 1N4007 at connector, cathode (banded end) to +12V pin, anode to GPO signal pin.
 
   # ── Cooling ─────────────────────────────────────────────────────────────────
@@ -443,7 +447,7 @@ connectors:
       - "B1: GPO 6 (FAN)"                 # 5
       - "B2: IGN 3"                        # 6
       - "B3: IGN 4"                        # 7
-      - "B4: GPO 1 (Boost)"               # 8
+      - "B4: GPO 1 (Rev light relay Ph1 / Boost solenoid Ph3)"  # 8
       - "C1: GPO 7 / DIN3 (Flex fuel)"    # 9
       - "C2: IGN 5"                        # 10
       - "C3: IGN 6"                        # 11
@@ -693,13 +697,20 @@ cables:
     wirelabels: ["+12V", GND, "IGN 6", Shield]
     length: 0.5 m
 
-  # Wideband O2 — LSU 4.9. M50 terminated harness includes built-in WBO2 circuit.
+  # Wideband O2 — LSU 4.2. M50 terminated harness includes built-in WBO2 circuit.
   W_WBO2:
     wirecount: 5
     colors: [WH, WH, WH, WH, BK]
     wirelabels: ["WBO2 VS", "WBO2 VREF", "WBO2 IP", "WBO2 RCAL", "WBO2 Htr-"]
     length: 1.0 m
     shield: true
+
+  W_WBO2_HTR:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["WBO2 Hs+ (heater+)"]
+    length: 0.3 m
+    notes: "Splices to +12V coil/inj rail (ECU_12PIN[1]). Short stub — splice at rail, no ECU termination. Required: without Hs+ the heater circuit is open and the LSU 4.2 throws a heater fault."
 
   # Boost solenoid
   W_BOOST:
@@ -978,8 +989,20 @@ connections:
     - W_IGN_6: [2, 3, 4]
     - ECU_CMC: [44, 11, 19]
 
-  # ── Wideband O2 (LSU 4.9) ────────────────────────────────────────────────────
+  # ── Wideband O2 (LSU 4.2) ────────────────────────────────────────────────────
   # VS=F4/CMC24, VREF=F3/CMC23, IP=G3/CMC27, RCAL=G4/CMC28, Htr-=D1/CMC13
-  - - WIDEBAND: [2, 1, 6, 5, 6]
+  # Pin numbering per maxxecu.com/webhelp/wirings-lambda_sensors.html (LSU 4.2):
+  #   W_WBO2[1]=VS   → WIDEBAND[1](VS)    → ECU_CMC[24](F4)
+  #   W_WBO2[2]=VREF → WIDEBAND[5](VREF)  → ECU_CMC[23](F3)
+  #   W_WBO2[3]=IP   → WIDEBAND[6](IP)    → ECU_CMC[27](G3)
+  #   W_WBO2[4]=RCAL → WIDEBAND[2](RCAL)  → ECU_CMC[28](G4)
+  #   W_WBO2[5]=Htr- → WIDEBAND[4](H-)    → ECU_CMC[13](D1)
+  #   W_WBO2_HTR[1]=H+ → WIDEBAND[3](H+)  → ECU_12PIN[1] (+12V splice)
+  - - WIDEBAND: [1, 5, 6, 2, 4]
     - W_WBO2: [1, 2, 3, 4, 5]
     - ECU_CMC: [24, 23, 27, 28, 13]
+
+  # WBO2 heater positive: WIDEBAND pin 3 (H+) → splice to +12V coil/inj rail
+  - - WIDEBAND: [3]
+    - W_WBO2_HTR: [1]
+    - ECU_12PIN: [1]

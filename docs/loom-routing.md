@@ -21,7 +21,8 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 | Injector bundle (INJ 1–5/6) | TODO | `maxxecu-07k.wv` |
 | Coil bundle (IGN 1–5/6) | TODO | `maxxecu-07k.wv` |
 | EWP harness (CWA400) | TODO — near water pump mounting location | `ewp-controller.wv` |
-| Wideband O2 (LSU 4.9) | TODO — route toward exhaust bung, DR-25 sleeve near turbo | `maxxecu-m52.wv` / `maxxecu-07k.wv` |
+| Wideband O2 — Ph1 (LSU 4.2, terminated harness) | TODO — route toward exhaust bung | `maxxecu-m52.wv` |
+| Wideband O2 — Ph3 (LSU 4.9, custom harness) | TODO — route toward exhaust bung, DR-25 sleeve near turbo | `maxxecu-07k.wv` |
 | Boost solenoid | TODO | `maxxecu-07k.wv` |
 
 > **Isolation rule:** Injector and coil sub-looms get their own sleeve sleeves even where they run alongside the sensor trunk. Do not co-sleeve sensor signals with injector/coil wires — switching noise corrupts crank/knock signals.
@@ -57,7 +58,7 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 | Sub-loom | Harness file | Notes |
 |----------|-------------|-------|
 | Fuel pump (full run, ~3.5–4m estimated) | `harnesses/fuel-pump-hanger.wv` | 12 AWG min; run separately from CAN to avoid PWM noise on bus |
-| ATF temp sensor (inline -8AN adapter) | `harnesses/atf-temp-sensor.wv` | Short stub from tunnel to bulkhead pin 51 |
+| ATF temp sensor (inline -8AN adapter) | `harnesses/atf-temp-sensor.wv` | Short stub from tunnel to bulkhead pin 56 |
 | 8HP CAN + power (engine bay → ZF 8HP) | `harnesses/8hp-can.wv` | Twisted pair — must maintain twist all the way to TCU plug |
 
 ---

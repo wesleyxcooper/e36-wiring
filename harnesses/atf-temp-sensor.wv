@@ -1,13 +1,15 @@
 # atf-temp-sensor.wv
 # MaxxECU 1/8 NPT NTC temp sensor → MaxxECU AIN 2 (CMC J2)
-# Signal crosses firewall via bulkhead pin 51 (AIN 2 spare temp).
+# Signal crosses firewall via bulkhead pin 56 (AIN 2 spare temp).
+# Canonical pin map (firewall-bulkhead.wv): AIN 1 / J1 → pin 51 (PST-F1 temp, occupied).
+#   AIN 2 / J2 → pin 56 (ATF temp spare — this signal).
 #
 # OPTIONAL — mechanical thermostat (TCH-102-T2) handles overcooling
 # protection without ECU input. This sensor adds ATF temp to MaxxECU
 # real-time data for logging and cold-shift map conditioning only.
 #
 # NOTE — Phase 3 (07K swap) pin conflict:
-#   Bulkhead pin 51 (AIN 2) is reassigned to DBW TPS2 in maxxecu-07k.wv.
+#   Bulkhead pin 56 (AIN 2) is reassigned to DBW TPS2 in maxxecu-07k.wv.
 #   If retaining ATF temp sensor at Phase 3, reassign to a free AIN and
 #   a free expansion bulkhead pin (e.g., pin 58 / expansion stub AIN 6).
 #   Update both this file and maxxecu-07k.wv at Phase 3 harness build.
@@ -40,19 +42,19 @@ connectors:
 
   BULKHEAD_ENGINE:
     type: "Deutsch AS79 bulkhead — engine side (ATF temp pin)"
-    subtype: "Pin 51 of 79-way engine mating plug"
+    subtype: "Pin 56 of 79-way engine mating plug"
     pincount: 2
     pinlabels:
       - "Sensor GND (pin 27)"       # shared sensor GND — same group K
-      - "AIN 2 spare temp (pin 51)"
+      - "AIN 2 spare temp (pin 56)"
 
   BULKHEAD_CABIN:
     type: "Deutsch AS79 bulkhead — cabin side (ATF temp pin)"
-    subtype: "Pin 51 of 79-way cabin flange receptacle"
+    subtype: "Pin 56 of 79-way cabin flange receptacle"
     pincount: 2
     pinlabels:
       - "Sensor GND (pin 27)"
-      - "AIN 2 spare temp (pin 51)"
+      - "AIN 2 spare temp (pin 56)"
 
   ECU_CMC:
     type: "MaxxECU RACE — Molex CMC 48-pin (C1)"

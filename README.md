@@ -94,7 +94,7 @@ Posung PD2-18012AJA (18cc, 3.65 kW / 12,454 BTU, Three-phase PMSM) + included 3-
 
 ![ATF Temp Sensor Harness](output/atf-temp-sensor.svg)
 
-MaxxECU 1/8 NPT NTC sensor (ID 1280) threaded into Vibrant 16488 inline -8AN adapter on the ATF return line. Signal crosses firewall via bulkhead pin 51 (AIN 2 spare temp) to MaxxECU CMC J2. Mechanical thermostat (TCH-102-T2) provides overcooling protection independently — this sensor is logging/cold-shift map only. Cross-reference `harnesses/atf-temp-sensor.wv`.
+MaxxECU 1/8 NPT NTC sensor (ID 1280) threaded into Vibrant 16488 inline -8AN adapter on the ATF return line. Signal crosses firewall via bulkhead pin 56 (AIN 2 spare temp) to MaxxECU CMC J2. Mechanical thermostat (TCH-102-T2) provides overcooling protection independently — this sensor is logging/cold-shift map only. Cross-reference `harnesses/atf-temp-sensor.wv`.
 
 ## Harnesses
 
@@ -113,7 +113,7 @@ MaxxECU 1/8 NPT NTC sensor (ID 1280) threaded into Vibrant 16488 inline -8AN ada
 | `harnesses/body-x20.wv` | E36 X20 body connector interface (MaxxECU outputs → dash/instruments) | 1 | [§ X20 note L527](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L527) |
 | `harnesses/dct-shifter.wv` | DCT Shifter paddle → MaxxECU DIN 1/DIN 2 (cabin-to-cabin, 3-wire, no bulkhead) | 1 | [§ Shifter row L93](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L93) |
 | `harnesses/pst-f1-sensor.wv` | Bosch PST-F1 oil temp+pressure → MaxxECU AIN 1/AIN 3 (through bulkhead pins 27/30/33/34) | 1 | [§ PST-F1 row L67](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L67) |
-| `harnesses/atf-temp-sensor.wv` | ATF temp sensor — MaxxECU NTC 1/8 NPT in Vibrant 16488 inline -8AN adapter, bulkhead pin 51, AIN 2 CMC J2 (**optional**) | 1 | [§ Cooling row L96](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L96) |
+| `harnesses/atf-temp-sensor.wv` | ATF temp sensor — MaxxECU NTC 1/8 NPT in Vibrant 16488 inline -8AN adapter, bulkhead pin 56, AIN 2 CMC J2 (**optional**) | 1 | [§ Cooling row L96](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L96) |
 | `harnesses/eps-column.wv` | EPowerSteering.com e36 column-assist EPS — Steering ECU + EPS Controller + Adjustment Knob + Motor Assembly, cabin-only, no MaxxECU/CAN interface | 3 | [§ Power Steering row L369](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L369) |
 | `harnesses/8hp-body-integrations.wv` | 8HP → E36 body harness: reverse light relay (GPO 1 → relay → X20 pin 10); starter inhibit note (MTune software-only, no relay). PMU16-agnostic. | 1 | — |
 
