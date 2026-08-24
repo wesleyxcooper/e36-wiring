@@ -272,10 +272,11 @@ A service loop is a small coil of extra wire (1–2 turns, ~30–50mm diameter) 
 
 | Connector | Method | Rationale |
 |-----------|--------|-----------|
-| AS79 engine-side mating plug | No individual loops — leave 200–300mm of harness slack near the connector exit, route with a gentle curve before the first P-clip | 35 wires all enter the back simultaneously through individual grommets; individual loops inside the backshell are not practical. Bundle-level slack provides the same function |
+| AS79 engine-side mating plug | No individual loops — leave 200–300mm of harness slack near the connector exit, route with a gentle curve before the first P-clip | ~38 active wires (M52) / ~45 active wires (07K) through a 79-pin shell; individual loops inside the backshell are not practical at that density. Bundle-level slack provides the same function |
+| Maven HD30 35-pin accessories | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before boot | 35 wires. Loop each wire, wrap the coiled bundle in 3:1 adhesive heat-shrink before sliding the boot on — holds loops organized and gives the boot a clean round profile to seat against |
 | Crank VR+/VR− pigtail end | ✓ Individual loop, 1–2 turns | Most vibration-sensitive signal; crank sensor at front of block sees belt-drive vibration |
 | CAM sensor pigtail end | ✓ Individual loop, 1–2 turns | Same rationale |
-| MaxxECU C1/C2 | ✓ Individual loop per wire inside the backshell | Molex backshell has enough internal volume; loop protects terminals during ECU removal/reinstall |
+| MaxxECU C1/C2 | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before backshell | Molex backshell has enough internal volume; intermediate wrap holds loops organized during backshell installation. Loop protects terminals during ECU removal/reinstall |
 | EV14 injector pigtails | No | The ~50mm bare wire between sub-loom exit and connector already provides compliant slack |
 | CLT / IAT / MAP pigtails | Optional | Same — bare wire section is usually sufficient |
 
@@ -286,10 +287,11 @@ A service loop is a small coil of extra wire (1–2 turns, ~30–50mm diameter) 
 1. **Slide the heat-shrink boot onto the wire before any terminal work** — the boot cannot pass over a terminated connector body after the fact. Do this at the same time as PermaSleeve label sleeves.
 2. Crimp contacts onto the pigtail wires
 3. Insert contacts into connector body — verify seating click on each
-4. Coil 1–2 turns around a Sharpie body or finger — wire holds shape on its own
-5. Slide the boot forward to cover the connector body exit AND the coiled loops
-6. Shrink the boot with a heat gun — loops permanently captured inside
-7. The connector is complete. **Plug into the component sensor last** — after the boot is fully shrunk.
+4. Coil 1–2 turns per wire around a Sharpie body or finger — wire holds shape on its own
+5. **For multi-wire connectors (Maven 35-pin, MaxxECU C1/C2): wrap the entire coiled bundle in a single piece of 3:1 adhesive-lined heat-shrink and shrink it** — locks all loops in their organized shape and gives the boot a clean round profile to seat against. Skip for single/dual-wire pigtails (crank, cam).
+6. Slide the boot forward to cover the connector body exit AND the wrapped loops
+7. Shrink the boot with a heat gun — loops permanently captured inside
+8. The connector is complete. **Plug into the component sensor last** — after the boot is fully shrunk.
 
 The finished result looks identical to a boot with no loop. The loop is visible only during build, before the boot is shrunk.
 
@@ -539,3 +541,31 @@ All four checks must pass before sleeving begins:
 | Pull-test | No terminal movement under hand tug | Depin, inspect, re-crimp |
 
 **Only after all four checks pass → sleeve → route → install.**
+
+---
+
+## External References
+
+### Workbench jig / harness template method
+**[@cabellomotorsportwiring](https://www.instagram.com/cabellomotorsportwiring/) — Instagram reel**
+https://www.instagram.com/p/DcJ6gkXySDT/
+
+Brazilian motorsport wiring shop (Fueltech / Motec work). Reel shows each harness segment printed as a physical diagram, cut out, and pinned/taped to the workbench surface. Connector photos for each segment are mounted alongside the diagram. Every wire run is physically mapped to scale before a single wire is cut.
+
+Caption (translated from Portuguese): *"Template/jig idea for building harnesses in series. The more details on the workbench, the easier and faster the construction. Planning is the most important part of the process."*
+
+Notable comment (translated): *"I used to do it on a board with nails"* — the classic low-tech version of the same concept.
+
+**Relevance for this build:** The video shows the same documentation approach used in this project — per-segment diagrams, pinouts, wire routing detail — but physically laid out on the workbench. The one thing they have that this project does not: a physical connector reference for each sub-loom/harness segment (the actual connector body, pinout card, and wire termination shown together). That gap is worth closing — adding a connector photo + pinout card per segment to the build docs would replicate what they show here.
+
+---
+
+### Service loops — individual wire loops before boot
+**[@oshin_prowiring](https://www.instagram.com/oshin_prowiring/) (collab @afterfix.pro) — Instagram reel**
+https://www.instagram.com/p/Dcat40oslGu/
+
+Mil-spec wiring shop. Reel shows the full service loop sequence on a multi-wire connector: each wire labeled before looping, individual wire coiled around a pin/mandrel, all loops heat-shrunk together as a bundle, then the boot slid over and shrunk. Tags: #raychem #milspecwiring #autosportwiring.
+
+Notable comment: *"Did you add RT125 or other types of epoxy around the boots?"* — RT125 is Raychem adhesive-lined compound; gives the boot a fused/OEM appearance vs. just slipped on.
+
+**Relevance:** Confirms and visually demonstrates the technique described in the service loops section above, including the intermediate heat-shrink-over-bundle step added after seeing this reel.
