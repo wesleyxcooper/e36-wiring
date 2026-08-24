@@ -45,14 +45,14 @@ hard-to-trace shorts and intermittent sensor faults.
 | AS crimper positioner — pin | Daniels **K42** (M22520/2-09) — $112.64 ([deltaintl.com](https://deltaintl.com/products/k42)) | Size-22 **pin** contacts (38941-22), 22–26 AWG. Use with AFM8 frame for all AS79 pin crimps (engine-side plug). NOT K43 — that is for size-20 contacts. |
 | AS crimper positioner — socket | Daniels **K40** (M22520/2-07) — $93.86 ([dmctools.com](https://dmctools.com/k40)) | Size-22 **socket** contacts (38943-22), 22–26 AWG. Use with AFM8 frame for all AS79 socket crimps (cabin-side receptacle). |
 | Open-barrel crimper | IWISS IWS-2820M | Ring terminals, relay contacts, general non-insulated open-barrel splices. Use non-insulated + adhesive-lined heat shrink — never pre-insulated crimps. |
-| Ferrule crimper | IWISS IWS-10 | Screw-clamp terminals (ECU power/GND strands) |
-| Wire stripper | **Southwire 45578001** (~$30) — adjustable-tension auto-strip, 22–10 AWG | Adjustable tension avoids nicking strands on thin-sheathed TXL wire — do not use fixed-tension strippers on 22 AWG TXL |
+| Ferrule crimper | **iCrimp AWG23-10** (HSC8 6-4A, ~$25 — [amazon.com/dp/B00XVB6B1C](https://www.amazon.com/dp/B00XVB6B1C)) — self-adjusting ratchet, 0.25–6mm² (AWG 23–10) | Screw-clamp terminals (ECU power/GND strands) |
+| Wire stripper | **Ideal Stripmaster 45-097** (~$60–90, [Amazon](https://www.amazon.com/dp/B000RFSWF8)) with included **L4994 blades** (16–26 AWG) — community standard for motorsport harness work (HPA, StreetCarJoe, Rywire). Fixed-notch blades sized so the 22 AWG hole (0.039") stops physically before reaching the conductor — works correctly on TXL and GXL. | Primary gauge is 22 AWG TXL. Do NOT use auto-adjusting or general-purpose electrician strippers on 22 AWG TXL — thin insulation wall means wrong-geometry blades nick strands even with careful technique. |
 | Flush cutters | Milwaukee 48-22-6106 or equiv | In-car wire trimming, flush cuts near connector bodies. Buy before starting any connector work. Source: StreetCarJoe Race Car Wiring Pt.1. |
 | Rivnut tool | Astro Pneumatic 1442 or equiv manual tool | M4/M6 rivnuts for PMU16 bracket and ECU bracket mounting to thin sheetmetal / carbon panels (no backside access needed). Source: StreetCarJoe Race Car Wiring Pt.3. |
 | **Depin — Molex small terminals** | 638132400 | C1/C2 small-pin extraction |
 | **Depin — Molex big terminals** | 638132300 | C1/C2 large-pin extraction |
 | **Depin — VW/Bosch PTS connectors** | Lisle 57750 | All VAG push-to-seat pigtails (sensor, COP, injector) |
-| **Depin — Deutsch AS size 20** | Deutsch 1680-73-01 | Firewall bulkhead contacts |
+| **Depin — Deutsch AS size 20** | Deutsch **0411-240-2005** (~$15 — [deutschconnector.com](https://www.deutschconnector.com/products/deutsch_connector_tools/deutsch_connector_removal_tools/0411-240-2005/)) | Firewall bulkhead contacts — note: AS79 connector ships with one insertion/extraction tool included |
 
 > ⚠️ **Depin tool matters:** Lisle 57750 works on push-to-seat (PTS) bodies only.
 > Do NOT use it on pull-to-seat (PTLS) or Molex contacts — different locking geometry.
@@ -110,7 +110,7 @@ Follow this order on every connector. Do not deviate for speed.
 2. Depress the locking lance while pulling the wire from the rear
 3. The terminal slides out the back of the connector — do not pull from the front
 
-**Deutsch AS size 20 (Deutsch 1680-73-01):**
+**Deutsch AS size 20 (Deutsch 0411-240-2005):**
 1. Insert extraction tool into the front face of the bulkhead
 2. Tool depresses the collet; pull wire from rear while holding tool engaged
 3. Contact exits from the rear

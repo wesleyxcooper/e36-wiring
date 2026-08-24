@@ -16,6 +16,8 @@
 #     (cam · crank · MAP · CLT · IAT · knock · EV14 injector · 07K COP)
 #   MaxxECU C1/C2 Molex contacts    → Molex 63811-9200 (small) / 63811-8900 (large)
 #
+#   Wire stripper                   → Ideal Stripmaster 45-097 + L4994 blades, 16–26 AWG fixed-notch (do not use auto-adjusting strippers on 22 AWG TXL)
+#
 # Full tool-to-connector reference: e36-wiring/docs/harness-build.md § Tools
 # ─────────────────────────────────────────────────────────────────────────────
 #

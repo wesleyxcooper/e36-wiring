@@ -19,6 +19,8 @@ metadata:
 #   MaxxECU C2 Molex contacts (APS1 · APS2 · +5V · GND) → Molex 63811-9200 (small)
 #   BMW E46 pedal connector contacts                   → Engineer PA-09
 #
+#   Wire stripper                   → Ideal Stripmaster 45-097 + L4994 blades, 16–26 AWG fixed-notch (do not use auto-adjusting strippers on 22 AWG TXL)
+#
 # Full tool-to-connector reference: e36-wiring/docs/harness-build.md § Tools
 # ─────────────────────────────────────────────────────────────────────────────
 #
