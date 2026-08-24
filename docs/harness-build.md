@@ -46,6 +46,7 @@ hard-to-trace shorts and intermittent sensor faults.
 | AS crimper positioner — socket | Daniels **K40** (M22520/2-07) — $93.86 ([dmctools.com](https://dmctools.com/k40)) | Size-22 **socket** contacts (38943-22), 22–26 AWG. Use with AFM8 frame for all AS79 socket crimps (cabin-side receptacle). |
 | Open-barrel crimper | IWISS IWS-2820M | Ring terminals, relay contacts, general non-insulated open-barrel splices. Use non-insulated + adhesive-lined heat shrink — never pre-insulated crimps. |
 | Ferrule crimper | IWISS IWS-10 | Screw-clamp terminals (ECU power/GND strands) |
+| Wire stripper | **Southwire 45578001** (~$30) — adjustable-tension auto-strip, 22–10 AWG | Adjustable tension avoids nicking strands on thin-sheathed TXL wire — do not use fixed-tension strippers on 22 AWG TXL |
 | Flush cutters | Milwaukee 48-22-6106 or equiv | In-car wire trimming, flush cuts near connector bodies. Buy before starting any connector work. Source: StreetCarJoe Race Car Wiring Pt.1. |
 | Rivnut tool | Astro Pneumatic 1442 or equiv manual tool | M4/M6 rivnuts for PMU16 bracket and ECU bracket mounting to thin sheetmetal / carbon panels (no backside access needed). Source: StreetCarJoe Race Car Wiring Pt.3. |
 | **Depin — Molex small terminals** | 638132400 | C1/C2 small-pin extraction |

@@ -12,6 +12,16 @@
 #   Connector supplier:      mavenspeed.com/products/single-connector-bulkhead-s24 (35-pin)
 #   HD30 24-35 layout:       Deutsch HD30 & HDP20 Series Technical Manual (Edition 2007), p.9
 #
+# ─────────────────────────────────────────────────────────────────────────────
+# CRIMP TOOLS — which tool for which contact in this harness:
+#
+#   AS79 size-22 contacts (Connector B — engine side)  → Daniels AFM8 (M22520/2-01) + K42 (pin) / K40 (socket)
+#   Maven HD30 size-16/20 contacts (Connector A — accessories) → Deutsch HDT-48-00 (or JRready NEW-DT2)
+#   DT 2-pin bypass contacts (fan / EWP / AC relay outputs) → Deutsch HDT-48-00 (or JRready NEW-DT2)
+#
+# Full tool-to-connector reference: e36-wiring/docs/harness-build.md § Tools
+# ─────────────────────────────────────────────────────────────────────────────
+#
 # Architecture:
 #   See firewall-bulkhead.wv for the baseline AS79 single-connector design.
 #

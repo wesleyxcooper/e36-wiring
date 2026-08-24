@@ -8,6 +8,17 @@
 #         MaxxECU pinout: maxxecu.com/webhelp/wirings-maxxecu_pinout.html
 #         MaxxECU e-throttle: maxxecu.com/webhelp/settings-ethrottle.html
 #
+# ─────────────────────────────────────────────────────────────────────────────
+# CRIMP TOOLS — which tool for which contact in this harness:
+#
+#   AS79 size-22 contacts           → Daniels AFM8 (M22520/2-01) + K42 positioner (pin) / K40 (socket)
+#   VAG JMT/JPT pigtail contacts    → Engineer PA-09
+#     (cam · crank · MAP · CLT · IAT · knock · EV14 injector · 07K COP)
+#   MaxxECU C1/C2 Molex contacts    → Molex 63811-9200 (small) / 63811-8900 (large)
+#
+# Full tool-to-connector reference: e36-wiring/docs/harness-build.md § Tools
+# ─────────────────────────────────────────────────────────────────────────────
+#
 # CABIN UNCHANGED: virtual clutch position sensor (C2 AIN 5) carries from M52 phase
 #   with zero re-work. Pedal, sensor, and C2 wiring are cabin-side and engine-agnostic.
 #   See maxxecu-m52.wv CLUTCH_POS_SENSOR / ECU_C2 for sensor wiring detail.

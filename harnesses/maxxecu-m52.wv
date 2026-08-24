@@ -7,6 +7,15 @@
 #       M52 VANOS cam sensor requires sensor swap to BMW 12141726590.
 #
 # ─────────────────────────────────────────────────────────────────────────────
+# CRIMP TOOLS — which tool for which contact in this harness:
+#
+#   AS79 size-22 contacts           → Daniels AFM8 (M22520/2-01) + K42 positioner (pin) / K40 (socket)
+#   VAG/Bosch JMT/JPT pigtail contacts → Engineer PA-09
+#     (cam · crank · MAP · CLT · IAT · injector · M52 pencil coil pigtails)
+#   MaxxECU C1/C2 Molex contacts    → Molex 63811-9200 (small) / 63811-8900 (large)
+#
+# Full tool-to-connector reference: e36-wiring/docs/harness-build.md § Tools
+# ─────────────────────────────────────────────────────────────────────────────
 # TODOs — data needed before this diagram is build-ready:
 #
 # DONE: MaxxECU CMC main connector pin assignments

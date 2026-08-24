@@ -12,6 +12,16 @@ metadata:
     Cross-reference docs/dbw-pinouts.md for full specs and TB pinouts.
     Pedal PN is manual vs auto -- NOT LHD vs RHD. Same part in any market.
 
+# ─────────────────────────────────────────────────────────────────────────────
+# CRIMP TOOLS — which tool for which contact in this harness:
+#
+#   Maven HD30 size-20 contacts (A14–A19, cabin face) → Deutsch HDT-48-00 (or JRready NEW-DT2)
+#   MaxxECU C2 Molex contacts (APS1 · APS2 · +5V · GND) → Molex 63811-9200 (small)
+#   BMW E46 pedal connector contacts                   → Engineer PA-09
+#
+# Full tool-to-connector reference: e36-wiring/docs/harness-build.md § Tools
+# ─────────────────────────────────────────────────────────────────────────────
+#
 # ── TODO list ──────────────────────────────────────────────────────────────────
 #
 #   [ ] Confirm RHD E36 pedal box bracket fitment (Strom / Garagistic / Drift HQ)
