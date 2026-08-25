@@ -31,6 +31,30 @@ Saved so the correct version is accessible without internet on the bench.
 
 ---
 
+## Video & Community Resources
+
+Build videos and reference sheets from similar MaxxECU standalone harness builds. Saved here for reference even where the engine differs — the methodology (wire selection, connector sourcing, build sequence, labeling) is directly transferable.
+
+All three are from the same builder (Drive, Revive, Tinker) documenting a Volvo 242 T5 swap with MaxxECU Race. Same ECU family, same 55-pin mil-spec bulkhead connector strategy, same Raychem heat-shrink hierarchy as this build.
+
+| Resource | Type | URL | Key takeaways for this build |
+|----------|------|-----|------------------------------|
+| "Everything I Wish I Knew Before My First ECU Harness" | YouTube (40 min) | [youtube.com/watch?v=Z3hmNz64Gw8](https://www.youtube.com/watch?v=Z3hmNz64Gw8) | **Do not source connectors or wire from Amazon** (quality unverifiable). Preferred suppliers: ProWire USA, Waytek, Del City — same three already in this BOM. TXL is the right choice. **Minimize joints = minimize failure points** — each pigtail splice is an extra joint. Cost reality: ~$3,000 for a complete harness + front-half rewire; savings from DIY are smaller than expected, especially on first build. |
+| "Custom Wiring Harness Build for the Volvo 242 T5 5 Cyl Turbo Swap" | YouTube (28 min) | [youtube.com/watch?v=G3fSqfpBi1U](https://www.youtube.com/watch?v=G3fSqfpBi1U) | Build-video companion to the above. **String template before cutting any wire** (confirms routing lengths first). Builds harness in two halves split at the 55-pin bulkhead — same architecture as this build. Start from center pins of bulkhead and radiate outward. **Kapton tape before adhesive heat-shrink** on wire bundles (adhesive won't bond permanently to bundle; eases future service). Label every connector with heat-shrink labels + clear overwrap. Spare wires terminated at accessible stub under coil cover for future use. |
+| "Volvo 242 /// T5 Engine /// MaxxECU Race Wiring" Google Sheet | Public spreadsheet | [docs.google.com/spreadsheets/d/1Dwv_uEoKL6w67gxhPlAi09J_1L7u3MWiEvI8ZP8SWDo](https://docs.google.com/spreadsheets/d/1Dwv_uEoKL6w67gxhPlAi09J_1L7u3MWiEvI8ZP8SWDo) | Spreadsheet companion to the build videos (linked from Video 1 description). Tabs: ECU pin assignments by component, bulkhead pin map, 12-pin connector, 12V/5V/sensor GND distribution. Functionally the same data model as this build's `.wv` files — useful cross-reference for knock sensor grounding policy (shields drain to ECU only, never chassis), WBO2 wiring, and sensor GND star topology. |
+
+### Key cross-references from this resource set
+
+**Knock sensor shield drain:** Both the Google Sheet notes and this build's `.wv` files confirm the same policy: knock shield drain wires terminate inside the ECU only — no chassis termination. The Volvo build splices both knock GND wires to a shared pin; this build stars them separately to the same H1 pin. Either approach is valid for knock sensors specifically.
+
+**Shield drain policy (general):** For all shielded cables (crank, cam, WBO2, knock), drain the shield at the ECU end only. Never at both ends — ground loop introduces exactly the noise you are trying to suppress.
+
+**Heatshrink hierarchy (confirmed matches this build):** Raychem DR-25 (non-adhesive, main body) → Raychem ATUM or SCL (adhesive, joints and ends) → 90° Raychem boot at bulkhead connector. Apply Kapton tape first whenever adhesive shrink contacts wire bundles directly.
+
+**DBW e-throttle:** The Volvo build runs MaxxECU Race with full e-throttle (Saab/Hella pedal, Volvo ETB) — confirms the same ECU family supports DBW, though pedal and TB sourcing differ from this build's E46 APS + 07K ETB path.
+
+---
+
 ## Ecumaster PMU16 (`ecumaster/`)
 
 | File | Source URL | Notes |

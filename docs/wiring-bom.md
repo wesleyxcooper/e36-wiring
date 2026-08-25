@@ -35,10 +35,10 @@ Heavier gauge for specific runs (buy short lengths, not full spools):
 
 | Gauge | Use | Length |
 |-------|-----|--------|
-| 18 AWG GXL/TXL grey | Coil pigtail tails (engine side of splice, if you want heavier gauge at coil) | 3m |
-| 20 AWG GXL/TXL green | Injector pigtail tails (engine side of splice) | 3m |
 | 12 AWG GXL red/black | Fan relay output runs (after DT bypass connector, to fan motor) | 5m |
 | 10 AWG GXL red | EWP output run (after DT bypass connector, to CWA400) | 2m |
+
+> **Pigtail tail wire removed.** Previous BOM listed 18 AWG coil tails and 20 AWG injector tails for pigtail-to-harness splices. The build now uses direct termination — TXL 22 AWG runs end-to-end from the AS79 to the sensor connector terminal; no intermediate splice and no heavier-gauge stub. See `walkthroughs/26-07k-harness.md` connector sourcing section.
 
 **Supplier:** [WiringPros.com](https://www.wiringpros.com) — TXL by the foot in any color; also sells CAN twisted pair pre-twisted. [Del City](https://www.delcity.net) — bulk spools. Do not buy from generic electronics suppliers (not automotive-spec insulation).
 
@@ -75,11 +75,12 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 
 | Item | Use | Notes |
 |------|-----|-------|
-| Raychem SRGB solder sleeves — 22–26 AWG (small, blue band) | All pigtail-to-harness splices on 22 AWG signal wires | Search "Raychem SRGB 22 AWG" or "TE Connectivity solder sleeve" on Amazon/Mouser/DigiKey. Qty needed: ~20 per engine harness (6 inj + 5 coil + 10 sensors/triggers). Buy a box of 25. |
-| Raychem SRGB solder sleeves — 18–20 AWG (medium, red band) | Any heavier-gauge splice at coil or injector exit if using 18/20 AWG pigtail stubs | Buy a small pack of 10 |
-| Non-insulated butt splice + 3:1 adhesive-lined heat-shrink (alternative) | Same joints as Raychem — purely mechanical crimp splice | Use IWISS IWS-2820M open-barrel crimper. Cover with ≥25mm of adhesive-lined heat-shrink. |
+| Raychem SRGB solder sleeves — 22–26 AWG (small, blue band) | Sensors with integral moulded pigtails only (e.g. E46 APS pedal donor connector if sourced from a car rather than as a housing+terminal kit) | Buy Mouser/DigiKey — not Amazon. Qty: ~5 (not 25 — direct-terminated connectors need no splice). |
+| Non-insulated butt splice + 3:1 adhesive-lined heat-shrink | Same application as SRGB — alternative for integral-pigtail sensors | IWISS IWS-2820M + ≥25mm adhesive-lined heat-shrink. |
 
-> **Raychem SRGB use:** Overlap bare wire ends 5–10mm inside the sleeve, heat gun at 50–75mm standoff, move slowly — solder ring melts and wicks, sleeve shrinks. No iron. Fully encapsulated result. Do NOT use a soldering iron on wires in the loom — rigid joint at flex point fails under vibration.
+> **Direct termination eliminates most pigtail splices.** Previous BOM specified ~20 SRGB solder sleeves for pigtail-to-harness splices at every injector, coil, and sensor connector. With direct termination (TXL runs end-to-end from AS79 to sensor connector terminal), those joints are eliminated. Only sensors that ship with an integral moulded wire pigtail require a splice. See `walkthroughs/26-07k-harness.md` connector sourcing section.
+
+> **Raychem SRGB technique (for any remaining integral-pigtail splices):** Overlap bare wire ends 5–10mm inside the sleeve. Heat gun at 50–75mm standoff, move slowly — solder ring melts and wicks, sleeve shrinks. No iron. Do NOT use a soldering iron on wires in the loom — rigid joint at the flex point fails under vibration.
 
 ### Breakout boots and end caps
 

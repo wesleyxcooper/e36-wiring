@@ -11,15 +11,15 @@ Reference for connector pinning, depinning, and harness assembly across all e36-
 | MaxxECU RACE C1 | Molex 48-pin | ~40 (varies by harness) | 63811-9200 (small) · 63811-8900/9000 (big) |
 | MaxxECU RACE C2 | Molex 32-pin | 0 (Phase 1/3) — defer | Same as C1 |
 | Deutsch AS firewall bulkhead | AS series, **size 22** | Up to 79 | Daniels M22520/2-01 (AFM8) + **K42** positioner (pin) / **K40** positioner (socket). Source: m-cal.com AS020-35SN; ecuplus.de AS620-35PN. |
-| 07K cam sensor pigtail | 3B0973703G (3-pin VAG JMT) | 3 | Engineer PA-09 |
-| 07K crank sensor pigtail | 3B0973703G (3-pin VAG JMT) | 3 | Engineer PA-09 |
-| 07K MAP sensor pigtail | 3B0973703G (3-pin VAG JMT) | 3 | Engineer PA-09 |
-| CLT sensor pigtail | 1J0973702 (2-pin NTC JPT) | 2 | Engineer PA-09 |
-| IAT sensor pigtail | 1J0973702 (2-pin NTC JPT) | 2 | Engineer PA-09 |
-| Knock sensor pigtail | 1J0973712 (2-pin flat) | 2 | Engineer PA-09 |
-| EV14 injector pigtails ×5 | USCAR EV14 | 2 each | Engineer PA-09 |
-| M52 coil pigtails ×6 | ⚠️ TODO — BMW 2-pin pencil coil connector PN to verify at build; common source: BMW e36 coil pigtail from ECS/FCP or aftermarket | 2 each | Engineer PA-09 |
-| 07K COP pigtails ×5 | 4B0973724 (4-pin COP) | 4 each | Engineer PA-09 |
+| 07K cam sensor connector | 3B0973703G (3-pin VAG JMT) | 3 | Engineer PA-09 |
+| 07K crank sensor connector | 3B0973703G (3-pin VAG JMT) | 3 | Engineer PA-09 |
+| 07K MAP sensor connector | 3B0973703G (3-pin VAG JMT) | 3 | Engineer PA-09 |
+| CLT sensor connector | 1J0973702 (2-pin NTC JPT) | 2 | Engineer PA-09 |
+| IAT sensor connector | 1J0973702 (2-pin NTC JPT) | 2 | Engineer PA-09 |
+| Knock sensor connector | 1J0973712 (2-pin flat) | 2 | Engineer PA-09 |
+| EV14 injector connectors ×5 | USCAR EV14 | 2 each | Engineer PA-09 |
+| M52 coil connectors ×6 | ⚠️ TODO — BMW 2-pin pencil coil connector PN to verify at build; common source: BMW e36 coil pigtail from ECS/FCP or aftermarket | 2 each | Engineer PA-09 |
+| 07K COP connectors ×5 | 4B0973724 (4-pin COP) | 4 each | Engineer PA-09 |
 | EWP controller | Kostal 2+2 (4-pin) | 4 | Engineer PA-09 |
 | PST-F1 sensor | BSP M10×1.0 pigtail | 2 | Engineer PA-09 |
 | ATF temp sensor | 2-pin spliced to C1 | 2 | Engineer PA-09 |
@@ -29,6 +29,16 @@ Reference for connector pinning, depinning, and harness assembly across all e36-
 **Estimated total pin insertions: ~200–230.** Budget at least one full day per major harness
 (engine harness, bulkhead, cabin loom) — rushing pin work is the primary cause of
 hard-to-trace shorts and intermittent sensor faults.
+
+### Direct termination — no pigtail splices
+
+All sensor connectors in the engine harness (injector, COP coil, cam/crank/MAP 3-pin, CLT/IAT 2-pin, knock 2-pin) use **direct termination**: the build TXL wire runs end-to-end from the AS79 contact to the sensor connector terminal. There is no intermediate pigtail wire and no splice joint.
+
+**Why:** Every splice is a potential failure point. Pigtail assemblies add one extra joint per connector — ~17 connectors across the engine harness. Direct termination eliminates those joints entirely. Source: Drive, Revive, Tinker harness build series ([youtube.com/watch?v=Z3hmNz64Gw8](https://www.youtube.com/watch?v=Z3hmNz64Gw8)) — "minimize joints = minimize failure points."
+
+**What to buy:** Connector housings + individual terminals only, sourced from ProWire USA, Del City, Waytek, ECS Tuning, or FCP Euro. Do not buy pre-made pigtail assemblies from Amazon. See `walkthroughs/26-07k-harness.md` Parts section for connector families and OE part numbers.
+
+**When a splice is unavoidable:** Sensors that ship with an integral moulded pigtail (wire bonded to sensor body, no removable connector housing) require one splice to join the sensor's pigtail wire to the build harness. Use a Raychem SRGB heat-activated solder sleeve — heat gun only, not iron. A soldering iron creates a rigid joint at the flex point that cracks under vibration.
 
 ---
 
