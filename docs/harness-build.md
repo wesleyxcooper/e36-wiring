@@ -251,7 +251,7 @@ Individual wires within a sub-loom run **side-by-side in parallel**. Do not twis
 | Core + 2 layers | 19 (1 + 6 + 12) |
 | Core + 3 layers | 37 (1 + 6 + 12 + 18) |
 
-**Real advantages** (from professional harness practice, confirmed by [Rennacs harness build video](https://www.youtube.com/watch?v=K12VFuqbeD4)):
+**Real advantages** (from professional harness practice, confirmed by [High Performance Academy — "You Don't Need 'PRO' Level Wiring....Do You?"](https://www.youtube.com/watch?v=K12VFuqbeD4)):
 - Maintains flexibility along the harness run — opposite-direction layers allow the bundle to bend without individual wires buckling or kinking
 - Smaller bundle OD than loosely parallel wires — mathematically optimal round-wire packing reduces diameter under the Techflex
 - **Thicker wires belong in the center.** High-gauge power and ground wires at the core provide a rigid center spine; lighter sensor wires in the outer layers are also the ones most likely to exit early along the route — natural organization
