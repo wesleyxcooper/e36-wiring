@@ -147,6 +147,33 @@ Sensor GND and power GND use **different wire colors**:
 
 The color difference enforces correct routing — a Brown wire on a chassis GND lug or a Black wire at a MaxxECU Sensor GND pin is visually wrong and catchable at bench continuity check. No label gymnastics required; the colors tell the story.
 
+### Sensor GND trunk topology — star, not shared bus
+
+Each sensor gets its own individual Brown (BN) Sensor GND wire in its branch cable. Those individual wires **run separately through the trunk** all the way to the ECU's Sensor GND pin. They do not splice together mid-loom.
+
+**Why — common-impedance coupling:**
+If multiple sensor GND wires share a common return conductor in the trunk, each sensor's return current flows through that shared impedance before reaching the ECU reference. The resulting voltage drop appears as a ground-offset error on every other sensor sharing the wire:
+
+```
+V_error = I_other_sensor × R_shared_trunk
+```
+
+For slow NTC sensors (CLT, IAT) this error is negligible. For the knock sensors, crank VR, or wideband O2 — all high-frequency or precision signals — shared ground return impedance injects measurable noise into the reference.
+
+**How the `.wv` model reflects this:**
+Each sensor cable has its own BN wire (e.g., `W_CLT`, `W_IAT`, `W_TPS`, `W_CAM` all have a discrete BN "Sensor GND" wire). In the `connections:` blocks, all of them individually target `ECU_CMC: [29]` (H1 — Sensor GND) or `ECU_16PIN: [2]` (aux Sensor GND). This models star topology: each return path is independent from sensor to ECU. No trunk-level splice node is modeled.
+
+**Physical implementation note:**
+The MaxxECU CMC connector has one physical Sensor GND pin (H1 = pin 29). All the individual BN wires from CLT, IAT, TPS, CAM, crank shield, and knock shields need to join somewhere before that pin. The correct approach:
+
+- Run individual BN wires separately through the trunk bundle (they are separate conductors, just co-routed)
+- Join them at a short Raychem or solder-and-shrink splice **within 150 mm of the ECU connector** (AS79 bulkhead cavity or ECU connector area)
+- A single short stub then runs to CMC pin 29
+
+The shared segment is at most 150 mm — negligible impedance. The long trunk runs remain independent. This is the same approach used in MaxxECU's own pre-terminated RACE harnesses (source: `docs/vendor/maxxecu/MaxxECU_RACE_REV9plus_Wiring.pdf`, sensor GND routing).
+
+> ⚠️ **Never** splice all sensor GNDs together mid-loom at a Sector 1/Sector 2 branch point and run a single BN wire to the ECU. That creates the shared-impedance problem across the longest and noisiest part of the run.
+
 ---
 
 ## Connector Families — Pinout Critical Warnings

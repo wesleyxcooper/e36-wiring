@@ -45,10 +45,10 @@
 <text xml:space="preserve" text-anchor="start" x="2738.79" y="-163.25" font-family="arial" font-size="14.00">2.5 m</text>
 <text xml:space="preserve" text-anchor="start" x="1835.33" y="-141.5" font-family="arial" font-size="14.00"> </text>
 <text xml:space="preserve" text-anchor="start" x="1769.33" y="-121.75" font-family="arial" font-size="14.00">ATF_SENSOR:2:GND</text>
-<text xml:space="preserve" text-anchor="start" x="2160.75" y="-121.75" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;1:BK:Sensor GND &#160;&#160;&#160;</text>
+<text xml:space="preserve" text-anchor="start" x="2160.38" y="-121.75" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;1:BN:Sensor GND &#160;&#160;&#160;</text>
 <text xml:space="preserve" text-anchor="start" x="2571.29" y="-121.75" font-family="arial" font-size="14.00">BULKHEAD_ENGINE:1:Sensor GND (pin 27)</text>
 <polygon fill="#000000" stroke="none" points="1640,-114.75 1640,-116.75 2986,-116.75 2986,-114.75 1640,-114.75"/>
-<polygon fill="#000000" stroke="none" points="1640,-112.75 1640,-114.75 2986,-114.75 2986,-112.75 1640,-112.75"/>
+<polygon fill="#895956" stroke="none" points="1640,-112.75 1640,-114.75 2986,-114.75 2986,-112.75 1640,-112.75"/>
 <polygon fill="#000000" stroke="none" points="1640,-110.75 1640,-112.75 2986,-112.75 2986,-110.75 1640,-110.75"/>
 <text xml:space="preserve" text-anchor="start" x="1765.96" y="-96" font-family="arial" font-size="14.00">ATF_SENSOR:1:Signal</text>
 <text xml:space="preserve" text-anchor="start" x="2160.38" y="-96" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;2:WH:AIN 2 signal &#160;&#160;&#160;</text>
@@ -74,7 +74,7 @@
 <g id="edge3" class="edge">
 <title>ATF_SENSOR:e&#45;&#45;W_ATF_TEMP_ENGINE:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M1496,-87.13C1562.66,-88.13 1576.81,-112.75 1640,-111.75"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M1496,-89.12C1560.93,-89.12 1575.07,-113.75 1640,-113.75"/>
+<path fill="none" stroke="#895956" stroke-width="2" d="M1496,-89.12C1560.93,-89.12 1575.07,-113.75 1640,-113.75"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M1496,-91.12C1559.19,-90.12 1573.34,-114.75 1640,-115.75"/>
 </g>
 <!-- BULKHEAD_ENGINE -->
@@ -131,10 +131,10 @@
 <text xml:space="preserve" text-anchor="start" x="2474.25" y="-349.5" font-family="arial" font-size="14.00">0.4 m</text>
 <text xml:space="preserve" text-anchor="start" x="2091.88" y="-327.75" font-family="arial" font-size="14.00"> </text>
 <text xml:space="preserve" text-anchor="start" x="1962.12" y="-308" font-family="arial" font-size="14.00">BULKHEAD_CABIN:1:Sensor GND (pin 27)</text>
-<text xml:space="preserve" text-anchor="start" x="2244" y="-308" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;1:BK:Sensor GND &#160;&#160;&#160;</text>
+<text xml:space="preserve" text-anchor="start" x="2243.62" y="-308" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;1:BN:Sensor GND &#160;&#160;&#160;</text>
 <text xml:space="preserve" text-anchor="start" x="2455.38" y="-308" font-family="arial" font-size="14.00">ECU_CMC:1:Sensor GND</text>
 <polygon fill="#000000" stroke="none" points="1945.88,-301 1945.88,-303 2680.12,-303 2680.12,-301 1945.88,-301"/>
-<polygon fill="#000000" stroke="none" points="1945.88,-299 1945.88,-301 2680.12,-301 2680.12,-299 1945.88,-299"/>
+<polygon fill="#895956" stroke="none" points="1945.88,-299 1945.88,-301 2680.12,-301 2680.12,-299 1945.88,-299"/>
 <polygon fill="#000000" stroke="none" points="1945.88,-297 1945.88,-299 2680.12,-299 2680.12,-297 1945.88,-297"/>
 <text xml:space="preserve" text-anchor="start" x="1947.88" y="-282.25" font-family="arial" font-size="14.00">BULKHEAD_CABIN:2:AIN 2 spare temp (pin 56)</text>
 <text xml:space="preserve" text-anchor="start" x="2243.62" y="-282.25" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;2:WH:AIN 2 signal &#160;&#160;&#160;</text>
@@ -157,7 +157,7 @@
 <g id="edge7" class="edge">
 <title>BULKHEAD_CABIN:e&#45;&#45;W_ATF_TEMP_CABIN:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M1057.62,-297C1451.98,-297 1550.56,-298 1944.88,-298"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M1057.62,-299C1451.96,-299 1550.54,-300 1944.88,-300"/>
+<path fill="none" stroke="#895956" stroke-width="2" d="M1057.62,-299C1451.96,-299 1550.54,-300 1944.88,-300"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M1057.62,-301C1451.94,-301 1550.52,-302 1944.88,-302"/>
 </g>
 <!-- ECU_CMC -->
@@ -194,7 +194,7 @@
 <g id="edge4" class="edge">
 <title>W_ATF_TEMP_ENGINE:e&#45;&#45;BULKHEAD_ENGINE:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M2986,-111.75C3296.79,-111.75 3374.5,-110 3685.38,-110"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2986,-113.75C3296.83,-113.75 3374.54,-112 3685.38,-112"/>
+<path fill="none" stroke="#895956" stroke-width="2" d="M2986,-113.75C3296.83,-113.75 3374.54,-112 3685.38,-112"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M2986,-115.75C3296.88,-115.75 3374.59,-114 3685.38,-114"/>
 </g>
 <!-- W_ATF_TEMP_CABIN&#45;&#45;ECU_CMC -->
@@ -208,7 +208,7 @@
 <g id="edge8" class="edge">
 <title>W_ATF_TEMP_CABIN:e&#45;&#45;ECU_CMC:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M2681.12,-298C2880.62,-298 2930.49,-297.88 3130,-297.88"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M2681.12,-300C2880.63,-300 2930.5,-299.88 3130,-299.88"/>
+<path fill="none" stroke="#895956" stroke-width="2" d="M2681.12,-300C2880.63,-300 2930.5,-299.88 3130,-299.88"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M2681.12,-302C2880.63,-302 2930.51,-301.87 3130,-301.87"/>
 </g>
 </g>
