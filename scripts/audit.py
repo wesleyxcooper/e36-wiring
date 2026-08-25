@@ -391,9 +391,132 @@ def check_duplicate_pins_in_connections(path: Path) -> list[str]:
     return errors
 
 
+def check_wire_color_convention(path: Path) -> list[str]:
+    """
+    For each cable definition in a .wv file, correlate the colors: list with
+    the wirelabels: list and flag wires whose color violates the build convention.
+
+    Convention source: docs/vendor/maxxecu/MaxxECU_RACE_REV9plus_Wiring.pdf
+    (aligned build doc: docs/harness-build.md § Wire Color Convention)
+
+      BU  — Ignition coil drive signals (IGN N)
+      GY  — Injector drive signals (INJ N)
+      GN  — GPO outputs (GPO N / actuator drives)
+      BN  — Sensor GND; VR trigger return (Signal-); switch/paddle GND
+      YE  — Shield GND drain wire
+      WH  — Analog sensor signals; CAN H in WH/BU pair
+      BK  — Power/chassis GND only (never sensor GND)
+      RD  — +12V, +5V sensor supply
+
+    Only checks labels that are unambiguous enough to enforce by regex.
+    Excludes cables whose name contains OEM / BODY / X20 (body harness interface
+    wires intentionally follow OEM colors) and PMU16_CAN (GY is CAN H there).
+    """
+    if path.suffix != ".wv":
+        return []
+    errors = []
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except Exception:
+        return []
+
+    rel = str(path.relative_to(ROOT))
+
+    # Patterns for wirelabels that identify specific signal types
+    _IGN_LABEL   = re.compile(r"IGN\s*\d", re.IGNORECASE)
+    _INJ_LABEL   = re.compile(r"INJ\s*\d", re.IGNORECASE)
+    _GPO_LABEL   = re.compile(r"GPO\s*\d", re.IGNORECASE)
+    _SGND_LABEL  = re.compile(
+        r"(Sensor\s*GND|SGND|Signal-|Signal\s*-|Trigger\s*GND)", re.IGNORECASE
+    )
+    _SHIELD_LABEL = re.compile(r"\bShield\b", re.IGNORECASE)
+
+    # OEM-interface and PMU CAN cables are exempt from convention enforcement
+    _EXEMPT_CABLE = re.compile(r"(?i)(OEM|BODY|X20|PMU.*CAN|CAN.*PMU)")
+
+    colors_re    = re.compile(r"^\s+colors:\s*\[([^\]]+)\]")
+    wirelabels_re = re.compile(r"^\s+wirelabels:\s*\[(.+)\]")
+    cable_name_re = re.compile(r"^\s{2}(\w+):\s*$")  # top-level cable name
+
+    current_cable = ""
+    cable_lineno  = 0
+    pending_colors: list[str] = []
+    colors_lineno = 0
+
+    def _check(cable: str, c_lineno: int, colors: list[str],
+                labels: list[str], lbl_lineno: int) -> list[str]:
+        if _EXEMPT_CABLE.search(cable):
+            return []
+        errs = []
+        for i, (color, label) in enumerate(zip(colors, labels)):
+            color = color.strip()
+            label = label.strip().strip('"').strip("'")
+            w_pos = f"wire {i+1} ({label!r})"
+            loc = f"\n  {rel}:{lbl_lineno}  cable={cable}"
+
+            if _IGN_LABEL.search(label) and color != "BU":
+                errs += [loc,
+                    f"  ERROR: {w_pos} — IGN drive must be BU (Blue). Got {color!r}.",
+                    f"  SOURCE: docs/vendor/maxxecu/MaxxECU_RACE_REV9plus_Wiring.pdf",
+                    f"  LINE:   colors: {colors}"]
+            elif _INJ_LABEL.search(label) and color != "GY":
+                errs += [loc,
+                    f"  ERROR: {w_pos} — INJ drive must be GY (Grey). Got {color!r}.",
+                    f"  SOURCE: docs/vendor/maxxecu/MaxxECU_RACE_REV9plus_Wiring.pdf",
+                    f"  LINE:   colors: {colors}"]
+            elif _GPO_LABEL.search(label) and color != "GN":
+                errs += [loc,
+                    f"  ERROR: {w_pos} — GPO output must be GN (Green). Got {color!r}.",
+                    f"  SOURCE: docs/vendor/maxxecu/MaxxECU_RACE_REV9plus_Wiring.pdf",
+                    f"  LINE:   colors: {colors}"]
+            elif _SGND_LABEL.search(label) and color != "BN":
+                errs += [loc,
+                    f"  ERROR: {w_pos} — Sensor GND / trigger return must be BN (Brown). Got {color!r}.",
+                    f"  SOURCE: docs/vendor/maxxecu/MaxxECU_RACE_REV9plus_Wiring.pdf",
+                    f"  LINE:   colors: {colors}"]
+            elif _SHIELD_LABEL.search(label) and color != "YE":
+                errs += [loc,
+                    f"  ERROR: {w_pos} — Shield drain wire must be YE (Yellow). Got {color!r}.",
+                    f"  SOURCE: docs/vendor/maxxecu/MaxxECU_RACE_REV9plus_Wiring.pdf",
+                    f"  LINE:   colors: {colors}"]
+        return errs
+
+    for lineno, line in enumerate(lines, 1):
+        # Track current top-level cable name
+        m = cable_name_re.match(line)
+        if m:
+            current_cable = m.group(1)
+            cable_lineno = lineno
+            pending_colors = []
+            continue
+
+        # Capture colors list
+        m = colors_re.match(line)
+        if m:
+            raw = m.group(1)
+            pending_colors = [c.strip() for c in raw.split(",")]
+            colors_lineno = lineno
+            continue
+
+        # When we hit wirelabels, run the check
+        m = wirelabels_re.match(line)
+        if m and pending_colors:
+            raw = m.group(1)
+            # Simple split on commas (labels may be quoted; strip quotes after)
+            labels = [lbl.strip() for lbl in raw.split(",")]
+            errors.extend(_check(
+                current_cable, cable_lineno,
+                pending_colors, labels, lineno
+            ))
+            pending_colors = []
+
+    return errors
+
+
 def structural_audit_file(path: Path) -> list[str]:
     errors = []
     errors.extend(check_duplicate_pins_in_connections(path))
+    errors.extend(check_wire_color_convention(path))
     return errors
 
 

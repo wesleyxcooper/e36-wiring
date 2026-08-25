@@ -564,43 +564,43 @@ cables:
     wirecount: 1
     colors: [BK]
     wirelabels: ["Engine GND"]
-    notes: "Brown wire :: cylinder head ground stud. Do not omit."
+    notes: "Black wire (power GND) to cylinder head ground stud. Do not omit."
 
   # Sensors
   W_CRANK:
     wirecount: 3
-    colors: [WH, BK, GY]
+    colors: [WH, BN, YE]
     wirelabels: [Signal+, Signal-, Shield]
     length: 1.2 m
 
   W_CAM:
     wirecount: 3
-    colors: [WH, BK, GY]
+    colors: [WH, BN, YE]
     wirelabels: [Signal, "Sensor GND", Shield]
     length: 0.8 m
     notes: "BMW 12141726590 (non-VANOS type) — 3-wire: signal, GND, shield. No +12V supply."
 
   W_CLT:
     wirecount: 2
-    colors: [WH, BK]
-    wirelabels: [Signal, GND]
+    colors: [WH, BN]
+    wirelabels: [Signal, "Sensor GND"]
     length: 0.5 m
 
   W_IAT:
     wirecount: 2
-    colors: [WH, BK]
-    wirelabels: [Signal, GND]
+    colors: [WH, BN]
+    wirelabels: [Signal, "Sensor GND"]
     length: 0.6 m
 
   W_TPS:
     wirecount: 3
-    colors: [RD, WH, BK]
-    wirelabels: ["+5V", Signal, GND]
+    colors: [RD, WH, BN]
+    wirelabels: ["+5V", Signal, "Sensor GND"]
     length: 0.5 m
 
   W_VANOS:
     wirecount: 2
-    colors: [RD, BK]
+    colors: [RD, GN]
     wirelabels: ["+12V", "GPO 3"]
     length: 0.6 m
 
@@ -629,8 +629,8 @@ cables:
   # PST-F1
   W_PST_F1:
     wirecount: 4
-    colors: [RD, BK, GN, YE]
-    wirelabels: ["+5V", GND, "Pressure (AIN 3)", "Temp (AIN 1)"]
+    colors: [RD, BN, WH, WH]
+    wirelabels: ["+5V", "Sensor GND", "Pressure (AIN 3)", "Temp (AIN 1)"]
     length: 0.6 m
 
   # M52 Idle air control valve (ICV / stepper)
@@ -638,7 +638,7 @@ cables:
   # GPO 4 (E4/CMC 20) = Coil A, GPO 5 (A1/CMC 1) = Coil B.
   W_ICV:
     wirecount: 3
-    colors: [BK, WH, GN]
+    colors: [BK, GN, GN]
     wirelabels: [GND, "Coil A (GPO 4)", "Coil B (GPO 5)"]
     length: 0.4 m
     notes: "Flyback diode 1N4007 across each coil at ICV connector, cathode toward +12V rail."
@@ -646,32 +646,32 @@ cables:
   # Injectors (6×2-wire; +12V rail + ECU driver). Inside M50 terminated harness.
   W_INJ_1:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 1"]
     length: 0.4 m
   W_INJ_2:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 2"]
     length: 0.4 m
   W_INJ_3:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 3"]
     length: 0.4 m
   W_INJ_4:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 4"]
     length: 0.4 m
   W_INJ_5:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 5"]
     length: 0.4 m
   W_INJ_6:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 6"]
     length: 0.4 m
 
@@ -679,32 +679,32 @@ cables:
   # +12V from coil/inj relay (ECU_12PIN[1]), GND = L4/CMC44, Signal per cyl, Shield = E3/CMC19.
   W_IGN_1:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, "IGN 1", Shield]
     length: 0.5 m
   W_IGN_2:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, "IGN 2", Shield]
     length: 0.5 m
   W_IGN_3:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, "IGN 3", Shield]
     length: 0.5 m
   W_IGN_4:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, "IGN 4", Shield]
     length: 0.5 m
   W_IGN_5:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, "IGN 5", Shield]
     length: 0.5 m
   W_IGN_6:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, "IGN 6", Shield]
     length: 0.5 m
 
@@ -726,7 +726,7 @@ cables:
   # Boost solenoid
   W_BOOST:
     wirecount: 2
-    colors: [RD, BK]
+    colors: [RD, GN]
     wirelabels: ["+12V", "GPO 1"]
     length: 0.8 m
 
@@ -747,8 +747,8 @@ cables:
   # Virtual clutch position sensor — cabin-side, no bulkhead crossing
   W_CLUTCH_POS:
     wirecount: 3
-    colors: [RD, WH, BK]
-    wirelabels: ["+5V", "AIN 5 signal", GND]
+    colors: [RD, WH, BN]
+    wirelabels: ["+5V", "AIN 5 signal", "Sensor GND"]
     length: 0.8 m
     notes: >
       All cabin-side. 22 AWG, no shield required (short run, low-frequency signal).

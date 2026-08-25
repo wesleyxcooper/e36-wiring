@@ -68,19 +68,21 @@ Wire colors in this build are a consistent, intentional scheme. They do **not** 
 
 ### Definitive color table for this build
 
+Source: `docs/vendor/maxxecu/MaxxECU_RACE_REV9plus_Wiring.pdf` — aligned where possible. See cross-reference below for the two intentional divergences.
+
 | Color | Code | Circuit types | Example runs |
 |-------|------|--------------|--------------|
-| **Red** | RD | +12V power — all rails, all harnesses | ECU power, coil/inj rail, fuel pump supply, PMU16 outputs, WBO2 heater+, relay supply wires, battery+ |
-| **Black** | BK | Ground — all types | Engine GND, chassis GND, battery −, sensor GND return, relay coil return, fuel pump GND |
-| **White** | WH | Analog sensor signal | CLT signal, IAT signal, TPS signal, crank VR+ (signal+), cam Hall signal, flex fuel signal, knock signal, WBO2 signals, DBW TPS1/TPS2, ATF temp, clutch position signal |
-| **White + Blue** | WH/BU | CAN bus twisted pair — **WH = CAN H, BU = CAN L** | MaxxECU CAN1 ↔ 8HP TCU, MaxxECU CAN1 ↔ Gauge.S, PMU16 CAN2 trunk — every CAN run in the build |
-| **Grey** | GY | Ignition coil drive outputs; shield drain wire | IGN 1–6 (MaxxECU IGN outputs to COP/pencil coil pin 3); crank VR shield drain wire |
-| **Green** | GN | Injector drive outputs; actuator/relay GPOs | INJ 1–6 (MaxxECU INJ outputs); fan relay GPO; fuel pump relay GPO; ICV solenoid; VVT solenoid (N205); DBW TPS2 signal (second conductor) |
-| **Yellow** | YE | Secondary analog signal channels | PST-F1 pressure output (2nd channel); e-pedal APS2 signal |
-| **Blue** | BU | CAN L on standalone segment runs; digital inputs | DCT shifter DOWN paddle signal; alternator D+ excite (body-x20); standalone CAN L segment wires (non-twisted-pair legs) |
-| **Brown** | BN | Digital input / switch signals | DCT shifter GND (sensor GND at paddle); oil pressure switch signal (body-x20) |
-| **Orange** | OG | H-bridge motor drive + | DBW throttle body motor+ (MaxxECU DBW output) |
-| **Violet** | VT | H-bridge motor drive −; PWM control signals | DBW throttle body motor−; EWP (CWA400) PWM signal; AC compressor enable; one conductor of PMU16 CAN2 twisted pair |
+| **Red** | RD | +12V power — all rails; +5V sensor supply | ECU power, coil/inj rail, +5V to sensors, fuel pump supply, PMU16 outputs, WBO2 heater+, relay supply wires, battery+ |
+| **Black** | BK | **Power / chassis GND only — not sensor GND** | Engine GND, chassis GND, battery −, coil power return, ICV coil return, WBO2 heater−, relay coil return, fuel pump GND |
+| **Brown** | BN | **Sensor GND**; VR trigger return (Signal−); switch / paddle GND | All sensor GND runs to MaxxECU Sensor GND pins (CLT, IAT, TPS, MAP, CAM, PST-F1, APS, ATF temp, clutch pos); crank VR− wire; DCT shifter paddle GND |
+| **White** | WH | Analog sensor signals; CAN H (in WH/BU twisted pair) | CLT, IAT, TPS1/TPS2, crank VR+, cam Hall, knock signal, WBO2 signals, APS1/APS2, ATF temp, flex fuel signal, clutch position; CAM/HOME trigger |
+| **White + Blue** | WH/BU | CAN bus twisted pair — **WH = CAN H, BU = CAN L** | MaxxECU CAN1 ↔ 8HP TCU, MaxxECU CAN1 ↔ Gauge.S — every CAN trunk run in the build |
+| **Blue** | BU | **Ignition coil drive outputs** | IGN 1–6 (MaxxECU IGN outputs to COP/pencil coil signal pin); also CAN L conductor in WH/BU twisted pair |
+| **Grey** | GY | **Injector drive outputs**; PMU16 CAN2 H | INJ 1–6 (MaxxECU INJ outputs to injector signal pin); PMU16 CAN2 H conductor (in GY/VT pair) |
+| **Green** | GN | GPO outputs — actuator / relay / solenoid drives | Fan relay GPO; fuel pump relay GPO; VANOS solenoid; boost solenoid; ICV coil drives (GPO 4/5); VVT solenoid N205 |
+| **Yellow** | YE | **Shield GND drain wire** | Crank VR shield drain; cam sensor shield drain (m52); knock sensor shield drain; all shielded cable drain wires |
+| **Orange** | OG | H-bridge motor drive + | DBW throttle body motor+ (MaxxECU C2 H4 MOTOR 1+) |
+| **Violet** | VT | H-bridge motor drive −; PWM control signals | DBW throttle body motor−; EWP (CWA400) PWM signal; AC compressor enable; PMU16 CAN2 L conductor (in GY/VT pair) |
 | **Grey + Violet** | GY/VT | PMU16 CAN2 twisted pair (GY = H, VT = L) | PMU16 CAN2 H/L → MaxxECU CAN1 H/L — separate from the main WH/BU CAN trunk |
 | **Pink** | PK | Serial control link | EPS column CTRL_LINK (one conductor of 2-wire EPS serial bus) |
 
@@ -88,22 +90,21 @@ Wire colors in this build are a consistent, intentional scheme. They do **not** 
 
 #### MaxxECU RACE REV9+ wiring diagram (archived: `docs/vendor/maxxecu/MaxxECU_RACE_REV9plus_Wiring.pdf`)
 
-MaxxECU's official RACE wiring diagram specifies the following colors for their pre-terminated harnesses. This build's `.wv` convention was established before this PDF was consulted; the divergences are documented and intentional.
+MaxxECU's official RACE wiring diagram specifies the following colors for their pre-terminated harnesses. The `.wv` files have been updated to align where practical; two divergences remain intentional.
 
-| Signal type | MaxxECU RACE official | **This build** | Notes |
-|-------------|----------------------|---------------|-------|
-| +12V power rails | Red | **Red** ✓ | Agree |
-| Analog sensor signals (TPS, CLT, IAT, AIN, DIN) | **Black** | **White** | MaxxECU uses Black for all sensor signal wires. This build uses White. Black-for-signal conflicts with the universal convention of Black = ground and would confuse any technician tracing the harness. White is retained. |
-| Sensor GND | **Brown** | **Black** | MaxxECU uses Brown for dedicated sensor GND wires. This build uses Black for all ground types (distinguished by label: `SEN GND` vs `PWR GND`). A second color for sensor GND is worth reconsidering if the build is ever extended significantly — but changing it now requires touching every `.wv` file. |
-| CAM / HOME trigger signal | White | **White** ✓ | Agree |
-| Shield GND drain wire | Yellow | **Grey** | MaxxECU uses Yellow for shield drain. This build uses Yellow for secondary analog signals and Grey for shield drain / coil drives. |
-| Ignition coil drives (IGN 1–6) | **Blue** | **Grey** | MaxxECU uses Blue for coil drives. This build uses Grey. Blue is reserved for CAN L in this build. |
-| Injector drives (INJ 1–6) | **Grey** | **Green** | MaxxECU uses Grey for injectors. This build uses Green. If coil drives were changed to Blue and injectors to Grey, this build would match MaxxECU — but both GPOs (also Green here) would need rethinking. |
-| GPO outputs (GP OUT 2–8) | **Green** | **Green** ✓ | Agree |
-| CAN H | Grey | **White** (in WH/BU pair) | MaxxECU uses Grey for CAN H. This build uses White. WH=H / BU=L is more widely used across aftermarket ECU and CAN peripheral vendors than MaxxECU's pink/grey. |
-| CAN L | Pink | **Blue** (in WH/BU pair) | MaxxECU uses Pink for CAN L. This build uses Blue. Same rationale as CAN H. |
+| Signal type | MaxxECU RACE official | **This build** | Status |
+|-------------|----------------------|---------------|--------|
+| +12V power rails | Red | **Red** | ✓ Aligned |
+| Sensor GND | **Brown** | **Brown** | ✓ Aligned |
+| CAM / HOME trigger signal | White | **White** | ✓ Aligned |
+| Shield GND drain wire | Yellow | **Yellow** | ✓ Aligned |
+| Ignition coil drives (IGN 1–6) | **Blue** | **Blue** | ✓ Aligned |
+| Injector drives (INJ 1–6) | **Grey** | **Grey** | ✓ Aligned |
+| GPO outputs (GP OUT 2–8) | **Green** | **Green** | ✓ Aligned |
+| Analog sensor signals (TPS, CLT, IAT, AIN) | **Black** | **White** | ✗ Diverges — Black-for-signal conflicts with the universal Black = ground safety convention. White is retained for technician legibility. |
+| CAN H / CAN L | Grey / Pink | **White / Blue** | ✗ Diverges — WH=H / BU=L is the industry-standard aftermarket CAN convention (Motec, Haltech, AEM, etc.) and is more widely understood than MaxxECU's grey/pink. Retained for compatibility with other CAN devices on the bus. |
 
-**Bottom line:** Red/+12V, White/sensor signal (CAM trigger and analog), and Green/GPO all agree. The significant mismatches are Black-vs-White for sensor signals, Blue-vs-Grey for ignition, and Grey-vs-Green for injectors. Changing the build's convention to match MaxxECU would require updating every `.wv` harness file and is deferred unless a rebuild is warranted. **If you ever splice into or extend this harness with a MaxxECU pre-terminated pigtail, expect a color conflict — the MaxxECU wire colors will be different from the convention in this loom.**
+**Two remaining mismatches:** sensor signal color (White vs MaxxECU's Black) and CAN bus colors (WH/BU vs MaxxECU's GY/PK). All other MaxxECU RACE color assignments are now reflected in the `.wv` files. If you ever splice a MaxxECU pre-terminated pigtail into this loom, the signal wire colors will differ — MaxxECU's signal wires are Black; this build's are White.
 
 #### Rob Dahm — *"Building a race car harness from scratch"* ([YouTube](https://www.youtube.com/watch?v=EA-oVJCnjZM))
 
@@ -113,8 +114,8 @@ Rob Dahm's convention on his four-rotor build (Haltech + Ecumaster PDM):
 |-------------|----------|---------------|-------|
 | Sensor signals | White | **White** ✓ | Agree |
 | Power (+12V, 5V ref) | Red | **Red** ✓ | Agree |
-| Ignition coil drives | **Yellow** | **Grey** | Rob uses Yellow for coil drives; this build reserves Yellow for secondary analog signals and uses Grey for IGN outputs |
-| Injector drives | **Blue** | **Green** | Rob uses Blue for injectors; this build uses Green for INJ outputs and Blue for CAN L — two different functional priorities |
+| Ignition coil drives | **Yellow** | **Blue** | Rob uses Yellow for coil drives; this build uses Blue (aligned with MaxxECU RACE convention) |
+| Injector drives | **Blue** | **Grey** | Rob uses Blue for injectors; this build uses Grey (aligned with MaxxECU RACE convention) |
 | Actuator GPOs | Green | **Green** ✓ | Agree (broadly) |
 
 Neither convention is wrong — the critical requirement is **internal consistency**. Do not mix the two schemes within this build.
@@ -126,7 +127,7 @@ SAE J1128 specifies wire insulation materials and temperature ratings; it does n
 | Color | SAE/OEM automotive typical use | **This build** | Why different |
 |-------|-------------------------------|---------------|---------------|
 | Yellow | Constant battery power / keep-alive / airbag SRS | Secondary analog signals | Motorsport builds rarely route constant-battery keep-alive lines; Yellow freed for signal use |
-| Green | Exterior lighting circuits | Injector drives, actuator GPOs | OEM lighting convention irrelevant in a custom standalone ECU harness |
+| Green | Exterior lighting circuits | GPO outputs, actuator drives | OEM lighting convention irrelevant in a custom standalone ECU harness |
 | White | Speaker / audio signals (consumer electronics) | Analog sensor signals | Sensor-signal convention is universal in standalone ECU community (HPA, StreetCarJoe, Rywire) |
 | Blue | Antenna / amplifier remote turn-on | CAN L, digital inputs | CAN bus convention overrides OEM antenna use in ECU harness context |
 | Orange | Interior illumination / dimmer | DBW motor+ (H-bridge) | OEM dimmer convention irrelevant here |
@@ -137,14 +138,14 @@ SAE J1128 specifies wire insulation materials and temperature ratings; it does n
 
 High Performance Academy does not prescribe a mandatory color standard in their harness courses. One specific note from their course material: **Violet is used for filler wires** in concentric twist layer design (wires added to complete a layer with no electrical function). This build **diverges**: violet is used here for functional circuits (DBW motor−, EWP PWM, AC enable, PMU16 CAN2). If concentric twist is ever adopted for a trunk segment in this build, choose a different color for filler wires — suggest Pink (PK) or Turquoise (TQ), which are otherwise unused in this harness.
 
-### Sensor GND vs. power GND — same color (Black), different bus
+### Sensor GND vs. power GND — distinct colors (BN vs BK)
 
-Both sensor GND and power GND are Black in this build. They are **electrically distinct buses** — do not confuse them:
+Sensor GND and power GND use **different wire colors**:
 
-- **Power GND (BK):** High-current return path. Terminates at engine block M8 GND stud or chassis stud. Carries injector, coil, relay return currents.
-- **Sensor GND (BK):** Low-current, noise-sensitive return. Terminates at MaxxECU dedicated SGND pins only — never share with power GND on the ECU connector. See `maxxecu-m52.wv` / `maxxecu-07k.wv` for which pins are SGND.
+- **Power GND (BK — Black):** High-current return path. Terminates at engine block M8 GND stud or chassis stud. Carries coil power return, ICV coil return, WBO2 heater−, relay return currents. Never connects to MaxxECU Sensor GND pins.
+- **Sensor GND (BN — Brown):** Low-current, noise-sensitive return. Terminates at MaxxECU dedicated Sensor GND pins only — never share with power GND on the ECU connector. See `maxxecu-m52.wv` / `maxxecu-07k.wv` for which ECU pins are Sensor GND.
 
-The `.wv` files distinguish these in the pin label (SGND vs GND). During build, mark both wire ends with PermaSleeve labels `PWR GND` and `SEN GND` before routing — both are black wire, both run near each other. A wrong-bus connection at the ECU is difficult to debug after loom is sealed.
+The color difference enforces correct routing — a Brown wire on a chassis GND lug or a Black wire at a MaxxECU Sensor GND pin is visually wrong and catchable at bench continuity check. No label gymnastics required; the colors tell the story.
 
 ---
 

@@ -27,7 +27,7 @@ Saved so the correct version is accessible without internet on the bench.
 | Green | GPO outputs — GP OUT 2–8 (C4, D4, E4, A1, B1, C1, A4) |
 | Pink | CAN L (E2) |
 
-> ⚠️ **This build's `.wv` files do not match MaxxECU's color convention.** See `docs/harness-build.md § Wire Color Convention` for the full divergence table and rationale. The `.wv` convention was established before the MaxxECU wiring diagram was consulted.
+> ⚠️ **This build's `.wv` files diverge from MaxxECU's color convention — intentionally.** The MaxxECU RACE wiring diagram was reviewed and the divergences were evaluated; the build's convention was retained for reasons documented in `docs/harness-build.md § Wire Color Convention`. If you ever splice a MaxxECU pre-terminated pigtail into this loom, expect a color conflict.
 
 ---
 
@@ -38,7 +38,8 @@ Saved so the correct version is accessible without internet on the bench.
 | `PMU16_Manual_v101.pdf` | https://www.ecumaster.com/files/PMU/PMU_Manual.pdf | Current manual — v101.2.1 (April 2026). Full pinout, wiring schematics, CAN configuration, output specs. **No wire color convention specified.** |
 | `PMU16_Manual_v1.04.pdf` | https://www.ecumaster.com/files/PMU/PMU_Manual_1_04.pdf | Older manual — v1.04. Contains basic wiring diagrams and wire size recommendations by current rating. |
 | `PMU16_Pinout_v1.1.pdf` | https://www.ecumaster.com/files/PMU/PMU-16_Pinout_v1.1.pdf | Standard PMU16 pinout — Sicma/FCI 39-pos connector. Power pins, CAN1/2 H/L, analog inputs A1–A16, outputs O1–O16. |
-| `PMU16-AS_Pinout_v1.3.pdf` | https://www.ecumaster.com/files/PMU/PMU-16AS_Pinout_v1.3.pdf | PMU16-AS variant — uses Deutsch AS + Radlok connectors (37-pin signal + 19-pin high-current). Keep for reference if connector variant changes. |
+
+> **PMU16 variant note:** This build uses the standard PMU16 (39-pin Sicma/FCI connector). The PMU16-AS variant uses Deutsch AS connectors (same family as the firewall bulkhead) and would reuse the AFM8 + K40/K42 tooling already in the build. The standard PMU16 Sicma contacts require a separate crimp tool **not yet in the BOM** — see `docs/harness-build.md § Tools` and `docs/wiring-bom.md`. If the PMU16 has not been purchased yet, the PMU16-AS is worth evaluating. PMU16-AS pinout: https://www.ecumaster.com/files/PMU/PMU-16AS_Pinout_v1.3.pdf
 
 **Wire color convention:** Ecumaster does not specify wire colors in any PMU16 document. Pin functions and current ratings only. Color choice is entirely up to the builder.
 

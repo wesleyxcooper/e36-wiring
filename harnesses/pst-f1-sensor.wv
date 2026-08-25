@@ -73,15 +73,15 @@ cables:
 
   W_PST_F1:
     wirecount: 4
-    colors: [BK, RD, GN, YE]
-    wirelabels: [GND, "+5V", "Pressure (AIN 3)", "Temp (AIN 1)"]
+    colors: [BN, RD, WH, WH]
+    wirelabels: ["Sensor GND", "+5V", "Pressure (AIN 3)", "Temp (AIN 1)"]
     length: 0.6 m
     notes: "Engine-side sensor to bulkhead engine plug. Keep away from ignition/coil wires."
 
   W_PST_F1_CABIN:
     wirecount: 4
-    colors: [BK, RD, GN, YE]
-    wirelabels: [GND, "+5V", "Pressure (AIN 3)", "Temp (AIN 1)"]
+    colors: [BN, RD, WH, WH]
+    wirelabels: ["Sensor GND", "+5V", "Pressure (AIN 3)", "Temp (AIN 1)"]
     length: 0.4 m
     notes: "Bulkhead cabin plug to MaxxECU 16-pin aux breakout."
 

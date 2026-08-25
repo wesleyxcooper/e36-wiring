@@ -586,14 +586,14 @@ cables:
   # ── Crank / Cam ───────────────────────────────────────────────────────────────
   W_CRANK:
     wirecount: 3
-    colors: [WH, BK, GY]
+    colors: [WH, BN, YE]
     wirelabels: [Signal+, Signal-, Shield]
     length: 1.0 m
     notes: "Shielded twisted pair. Shield terminates at CMC E3 (GND Shield, pin 19) — dedicated shield ground, not sensor GND bus."
 
   W_CAM:
     wirecount: 3
-    colors: [RD, BK, WH]
+    colors: [RD, BN, WH]
     wirelabels: ["+5V", "Sensor GND", Signal]
     length: 0.8 m
     shield: true
@@ -605,34 +605,34 @@ cables:
   # ── Temperature / pressure sensors ────────────────────────────────────────────
   W_CLT:
     wirecount: 2
-    colors: [WH, BK]
-    wirelabels: [Signal, GND]
+    colors: [WH, BN]
+    wirelabels: [Signal, "Sensor GND"]
     length: 0.5 m
 
   W_IAT:
     wirecount: 2
-    colors: [WH, BK]
-    wirelabels: [Signal, GND]
+    colors: [WH, BN]
+    wirelabels: [Signal, "Sensor GND"]
     length: 0.5 m
 
   W_MAP:
     wirecount: 3
-    colors: [RD, WH, BK]
-    wirelabels: ["+5V", Signal, GND]
+    colors: [RD, WH, BN]
+    wirelabels: ["+5V", Signal, "Sensor GND"]
     length: 0.5 m
 
   W_PST_F1:
     wirecount: 4
-    colors: [RD, BK, GN, YE]
-    wirelabels: ["+5V", GND, "Pressure (AIN 3)", "Temp (AIN 1)"]
+    colors: [RD, BN, WH, WH]
+    wirelabels: ["+5V", "Sensor GND", "Pressure (AIN 3)", "Temp (AIN 1)"]
     length: 0.6 m
     notes: "Same cable as M52 build — no change."
 
   # ── DBW throttle body ────────────────────────────────────────────────────────
   W_DBW_TPS:
     wirecount: 4
-    colors: [RD, BK, WH, GN]
-    wirelabels: ["+5V", GND, "TPS1 signal", "TPS2 signal"]
+    colors: [RD, BN, WH, WH]
+    wirelabels: ["+5V", "Sensor GND", "TPS1 signal", "TPS2 signal"]
     length: 0.5 m
 
   W_DBW_MOTOR:
@@ -648,7 +648,7 @@ cables:
   # ── Knock sensors ─────────────────────────────────────────────────────────────
   W_KNOCK_1:
     wirecount: 2
-    colors: [WH, GY]
+    colors: [WH, YE]
     wirelabels: ["KS1 signal", "Shield drain"]
     length: 0.4 m
     shield: true
@@ -667,7 +667,7 @@ cables:
 
   W_KNOCK_2:
     wirecount: 2
-    colors: [WH, GY]
+    colors: [WH, YE]
     wirelabels: ["KS2 signal", "Shield drain"]
     length: 0.4 m
     shield: true
@@ -678,70 +678,70 @@ cables:
   # ── Ignition coils (5-cyl) ────────────────────────────────────────────────────
   W_IGN_1:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, Signal, Shield]
     length: 0.5 m
 
   W_IGN_2:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, Signal, Shield]
     length: 0.5 m
 
   W_IGN_3:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, Signal, Shield]
     length: 0.5 m
 
   W_IGN_4:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, Signal, Shield]
     length: 0.5 m
 
   W_IGN_5:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, Signal, Shield]
     length: 0.5 m
 
   # ── Injectors (EV14; 5-cyl) ───────────────────────────────────────────────────
   W_INJ_1:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 1"]
     length: 0.4 m
 
   W_INJ_2:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 2"]
     length: 0.4 m
 
   W_INJ_3:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 3"]
     length: 0.4 m
 
   W_INJ_4:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 4"]
     length: 0.4 m
 
   W_INJ_5:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 5"]
     length: 0.4 m
 
   # Virtual clutch position sensor — cabin-side, carries unchanged from M52
   W_CLUTCH_POS:
     wirecount: 3
-    colors: [RD, WH, BK]
-    wirelabels: ["+5V", "AIN 5 signal", GND]
+    colors: [RD, WH, BN]
+    wirelabels: ["+5V", "AIN 5 signal", "Sensor GND"]
     length: 0.8 m
     notes: "Unchanged from M52 phase. See maxxecu-m52.wv W_CLUTCH_POS for full notes."
 
