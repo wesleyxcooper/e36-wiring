@@ -60,6 +60,94 @@ hard-to-trace shorts and intermittent sensor faults.
 
 ---
 
+## Wire Color Convention
+
+Wire colors in this build are a consistent, intentional scheme. They do **not** follow SAE J1128 consumer-automotive conventions or any single OEM scheme — they follow the motorsport/standalone-ECU convention used by HPA, StreetCarJoe, Rywire, and others for aftermarket ECU installs. Every color meaning below is verified against the actual `.wv` source files.
+
+> **Source-of-truth priority for color decisions:** (1) MaxxECU RACE wiring diagram PDF, (2) Ecumaster PMU16 manual, (3) internal `.wv` files, (4) other references (Rob Dahm, HPA, etc.). Both manufacturer documents have been archived locally — see `docs/vendor/`. **Ecumaster publishes no wire color convention for the PMU16** (pin functions and current ratings only). The MaxxECU RACE REV9+ wiring diagram does publish colors for their pre-made harnesses; where this build diverges, the divergence is documented in the cross-reference table below.
+
+### Definitive color table for this build
+
+| Color | Code | Circuit types | Example runs |
+|-------|------|--------------|--------------|
+| **Red** | RD | +12V power — all rails, all harnesses | ECU power, coil/inj rail, fuel pump supply, PMU16 outputs, WBO2 heater+, relay supply wires, battery+ |
+| **Black** | BK | Ground — all types | Engine GND, chassis GND, battery −, sensor GND return, relay coil return, fuel pump GND |
+| **White** | WH | Analog sensor signal | CLT signal, IAT signal, TPS signal, crank VR+ (signal+), cam Hall signal, flex fuel signal, knock signal, WBO2 signals, DBW TPS1/TPS2, ATF temp, clutch position signal |
+| **White + Blue** | WH/BU | CAN bus twisted pair — **WH = CAN H, BU = CAN L** | MaxxECU CAN1 ↔ 8HP TCU, MaxxECU CAN1 ↔ Gauge.S, PMU16 CAN2 trunk — every CAN run in the build |
+| **Grey** | GY | Ignition coil drive outputs; shield drain wire | IGN 1–6 (MaxxECU IGN outputs to COP/pencil coil pin 3); crank VR shield drain wire |
+| **Green** | GN | Injector drive outputs; actuator/relay GPOs | INJ 1–6 (MaxxECU INJ outputs); fan relay GPO; fuel pump relay GPO; ICV solenoid; VVT solenoid (N205); DBW TPS2 signal (second conductor) |
+| **Yellow** | YE | Secondary analog signal channels | PST-F1 pressure output (2nd channel); e-pedal APS2 signal |
+| **Blue** | BU | CAN L on standalone segment runs; digital inputs | DCT shifter DOWN paddle signal; alternator D+ excite (body-x20); standalone CAN L segment wires (non-twisted-pair legs) |
+| **Brown** | BN | Digital input / switch signals | DCT shifter GND (sensor GND at paddle); oil pressure switch signal (body-x20) |
+| **Orange** | OG | H-bridge motor drive + | DBW throttle body motor+ (MaxxECU DBW output) |
+| **Violet** | VT | H-bridge motor drive −; PWM control signals | DBW throttle body motor−; EWP (CWA400) PWM signal; AC compressor enable; one conductor of PMU16 CAN2 twisted pair |
+| **Grey + Violet** | GY/VT | PMU16 CAN2 twisted pair (GY = H, VT = L) | PMU16 CAN2 H/L → MaxxECU CAN1 H/L — separate from the main WH/BU CAN trunk |
+| **Pink** | PK | Serial control link | EPS column CTRL_LINK (one conductor of 2-wire EPS serial bus) |
+
+### Cross-reference — where this build diverges from other sources
+
+#### MaxxECU RACE REV9+ wiring diagram (archived: `docs/vendor/maxxecu/MaxxECU_RACE_REV9plus_Wiring.pdf`)
+
+MaxxECU's official RACE wiring diagram specifies the following colors for their pre-terminated harnesses. This build's `.wv` convention was established before this PDF was consulted; the divergences are documented and intentional.
+
+| Signal type | MaxxECU RACE official | **This build** | Notes |
+|-------------|----------------------|---------------|-------|
+| +12V power rails | Red | **Red** ✓ | Agree |
+| Analog sensor signals (TPS, CLT, IAT, AIN, DIN) | **Black** | **White** | MaxxECU uses Black for all sensor signal wires. This build uses White. Black-for-signal conflicts with the universal convention of Black = ground and would confuse any technician tracing the harness. White is retained. |
+| Sensor GND | **Brown** | **Black** | MaxxECU uses Brown for dedicated sensor GND wires. This build uses Black for all ground types (distinguished by label: `SEN GND` vs `PWR GND`). A second color for sensor GND is worth reconsidering if the build is ever extended significantly — but changing it now requires touching every `.wv` file. |
+| CAM / HOME trigger signal | White | **White** ✓ | Agree |
+| Shield GND drain wire | Yellow | **Grey** | MaxxECU uses Yellow for shield drain. This build uses Yellow for secondary analog signals and Grey for shield drain / coil drives. |
+| Ignition coil drives (IGN 1–6) | **Blue** | **Grey** | MaxxECU uses Blue for coil drives. This build uses Grey. Blue is reserved for CAN L in this build. |
+| Injector drives (INJ 1–6) | **Grey** | **Green** | MaxxECU uses Grey for injectors. This build uses Green. If coil drives were changed to Blue and injectors to Grey, this build would match MaxxECU — but both GPOs (also Green here) would need rethinking. |
+| GPO outputs (GP OUT 2–8) | **Green** | **Green** ✓ | Agree |
+| CAN H | Grey | **White** (in WH/BU pair) | MaxxECU uses Grey for CAN H. This build uses White. WH=H / BU=L is more widely used across aftermarket ECU and CAN peripheral vendors than MaxxECU's pink/grey. |
+| CAN L | Pink | **Blue** (in WH/BU pair) | MaxxECU uses Pink for CAN L. This build uses Blue. Same rationale as CAN H. |
+
+**Bottom line:** Red/+12V, White/sensor signal (CAM trigger and analog), and Green/GPO all agree. The significant mismatches are Black-vs-White for sensor signals, Blue-vs-Grey for ignition, and Grey-vs-Green for injectors. Changing the build's convention to match MaxxECU would require updating every `.wv` harness file and is deferred unless a rebuild is warranted. **If you ever splice into or extend this harness with a MaxxECU pre-terminated pigtail, expect a color conflict — the MaxxECU wire colors will be different from the convention in this loom.**
+
+#### Rob Dahm — *"Building a race car harness from scratch"* ([YouTube](https://www.youtube.com/watch?v=EA-oVJCnjZM))
+
+Rob Dahm's convention on his four-rotor build (Haltech + Ecumaster PDM):
+
+| Signal type | Rob Dahm | **This build** | Notes |
+|-------------|----------|---------------|-------|
+| Sensor signals | White | **White** ✓ | Agree |
+| Power (+12V, 5V ref) | Red | **Red** ✓ | Agree |
+| Ignition coil drives | **Yellow** | **Grey** | Rob uses Yellow for coil drives; this build reserves Yellow for secondary analog signals and uses Grey for IGN outputs |
+| Injector drives | **Blue** | **Green** | Rob uses Blue for injectors; this build uses Green for INJ outputs and Blue for CAN L — two different functional priorities |
+| Actuator GPOs | Green | **Green** ✓ | Agree (broadly) |
+
+Neither convention is wrong — the critical requirement is **internal consistency**. Do not mix the two schemes within this build.
+
+#### SAE J1128 — general North American automotive convention
+
+SAE J1128 specifies wire insulation materials and temperature ratings; it does not mandate specific colors for specific functions. The general consumer-automotive convention (often cited alongside J1128) diverges significantly in a motorsport context:
+
+| Color | SAE/OEM automotive typical use | **This build** | Why different |
+|-------|-------------------------------|---------------|---------------|
+| Yellow | Constant battery power / keep-alive / airbag SRS | Secondary analog signals | Motorsport builds rarely route constant-battery keep-alive lines; Yellow freed for signal use |
+| Green | Exterior lighting circuits | Injector drives, actuator GPOs | OEM lighting convention irrelevant in a custom standalone ECU harness |
+| White | Speaker / audio signals (consumer electronics) | Analog sensor signals | Sensor-signal convention is universal in standalone ECU community (HPA, StreetCarJoe, Rywire) |
+| Blue | Antenna / amplifier remote turn-on | CAN L, digital inputs | CAN bus convention overrides OEM antenna use in ECU harness context |
+| Orange | Interior illumination / dimmer | DBW motor+ (H-bridge) | OEM dimmer convention irrelevant here |
+
+> **Practical note:** If you ever hand this harness to an OEM-trained technician unfamiliar with standalone ECU conventions, the Grey-for-ignition and Green-for-injector assignments will be the biggest source of confusion. Label sub-looms with PermaSleeve heat-shrink labels (`IGNITION`, `INJECTORS`) at the main trunk breakouts so function is readable without tracing wire color.
+
+#### HPA — motorsport harness courses
+
+High Performance Academy does not prescribe a mandatory color standard in their harness courses. One specific note from their course material: **Violet is used for filler wires** in concentric twist layer design (wires added to complete a layer with no electrical function). This build **diverges**: violet is used here for functional circuits (DBW motor−, EWP PWM, AC enable, PMU16 CAN2). If concentric twist is ever adopted for a trunk segment in this build, choose a different color for filler wires — suggest Pink (PK) or Turquoise (TQ), which are otherwise unused in this harness.
+
+### Sensor GND vs. power GND — same color (Black), different bus
+
+Both sensor GND and power GND are Black in this build. They are **electrically distinct buses** — do not confuse them:
+
+- **Power GND (BK):** High-current return path. Terminates at engine block M8 GND stud or chassis stud. Carries injector, coil, relay return currents.
+- **Sensor GND (BK):** Low-current, noise-sensitive return. Terminates at MaxxECU dedicated SGND pins only — never share with power GND on the ECU connector. See `maxxecu-m52.wv` / `maxxecu-07k.wv` for which pins are SGND.
+
+The `.wv` files distinguish these in the pin label (SGND vs GND). During build, mark both wire ends with PermaSleeve labels `PWR GND` and `SEN GND` before routing — both are black wire, both run near each other. A wrong-bus connection at the ECU is difficult to debug after loom is sealed.
+
+---
+
 ## Connector Families — Pinout Critical Warnings
 
 ### 3B0973703G — 3-pin VAG sensor (cam / crank / MAP)
@@ -272,6 +360,40 @@ Concentric stranding is worth considering for a long fixed-count trunk that term
 - After twisting, both wires run inside the TRIGGER sub-loom sleeve alongside the shield drain wire — do not separate them at any point in the routing
 
 The CAM Hall signal wire does not need twisting — it is a single-ended digital output with its own dedicated +5V and GND, not a differential pair.
+
+### Branch points — technique and strain relief
+
+Source: HPA — *"It's So Easy To Get This Wrong | Wiring Harness Branching"* ([YouTube](https://www.youtube.com/watch?v=XBnADm1SHoI))
+
+Branch points (breakouts from main trunk to sub-loom) are the most structurally complex sections of the harness. Nothing about the finished result is as tidy as a uniform trunk run — and that is expected and normal. The only thing that matters at a branch is **zero strain on every wire**.
+
+#### Zero tension is the only success criterion
+
+Every wire must arrive at its exit direction without being pulled. If a wire needs to travel from one side of the trunk to exit the opposite side, let it loop or cross — that crossing will be hidden inside the Kapton wrap and boot. A wire under tension at the branch point will work loose or crack at the insulation over vibration cycles regardless of how well the boot looks on the outside.
+
+#### Pre-design exit order before you touch the harness
+
+Before any wires are moved, decide which branch section exits in which direction and in what radial order around the trunk. The goal: no branch section should have to cross another after the boot is shrunk. This is a planning step from the `.wv` diagram and loom routing plan — if the routing hasn't been designed to avoid cross-overs at the branch, fix the routing plan first.
+
+#### Build sequence at each branch point
+
+1. Loosely gather the wires into their branch groups using temporary cable ties a few inches down each branch. Keep the cable ties well clear of where the Kapton will go — they will need to come off before taping.
+2. Arrange the branch groups in their designed exit order. Wires may twist across the trunk face to reach their direction — this is fine.
+3. Wrap the entire bare junction with **Kapton tape** in a confined area, covering all wires completely. Kapton serves two purposes:
+   - **Strain relief** — locks the exit angles in place; nothing moves once wrapped
+   - **Adhesive barrier** — the 3:1 adhesive-lined shrink boot that goes over this point contains hot-melt adhesive on the inside. If bare wire insulation contacts that adhesive when the boot is recovered, the wires bond permanently to the boot. Future repair requires cutting the boot off and possibly damaging the wires. Kapton prevents contact.
+4. **Keep the Kapton within the boot's working zone.** Each molded shrinkable boot has a maximum recovered length specified in its datasheet. The Kapton-wrapped area must fit inside that length — measure the boot before wrapping, not after.
+5. After Kapton, sleeve each branch section in Techflex to its end. Then recover the molded boot over the junction.
+
+#### Between branch points — uniform construction throughout
+
+The harness section between any two branch points must not change: same wire count, same parallel layout, same sleeve diameter all the way through. All changes happen at branch points, not mid-run. If a wire gauge or routing needs to change, place a new branch point there.
+
+#### Bench wire prep — cut to longest run, trim down
+
+Source: Rob Dahm — *"Building a race car harness from scratch"* ([YouTube](https://www.youtube.com/watch?v=EA-oVJCnjZM))
+
+When preparing wires for a harness section, cut all wires to the length of the **longest run in that section**, then trim individual wires to their final length after routing and checking position on the engine. Measuring and cutting each wire individually before routing wastes far more time than the small amount of wire lost by trimming. Do this before any crimping — once a terminal is on, the wire cannot be shortened without re-crimping.
 
 ### Harness finishing methods — Techflex vs. lacing vs. individual sheaths
 
