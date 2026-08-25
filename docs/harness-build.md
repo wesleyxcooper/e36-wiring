@@ -36,9 +36,11 @@ All sensor connectors in the engine harness (injector, COP coil, cam/crank/MAP 3
 
 **Why:** Every splice is a potential failure point. Pigtail assemblies add one extra joint per connector — ~17 connectors across the engine harness. Direct termination eliminates those joints entirely. Source: Drive, Revive, Tinker harness build series ([youtube.com/watch?v=Z3hmNz64Gw8](https://www.youtube.com/watch?v=Z3hmNz64Gw8)) — "minimize joints = minimize failure points."
 
-**What to buy:** Connector housings + individual terminals only, sourced from ProWire USA, Del City, Waytek, ECS Tuning, or FCP Euro. Do not buy pre-made pigtail assemblies from Amazon. See `walkthroughs/26-07k-harness.md` Parts section for connector families and OE part numbers.
+**What to buy:** Connector housings + individual terminals only. Preferred sources: ProWire USA, Del City, Waytek, ECS Tuning, or FCP Euro. For OEM part numbers (e.g. `3B0973703G`, `4B0973724`, EV14 USCAR kits), Amazon is acceptable when the listing is clearly an OEM or named-brand part with reviews confirming authenticity — not for generic unbranded terminals. Do not buy pre-made pigtail assemblies (housing + pre-wired stub) regardless of source. See `walkthroughs/26-07k-harness.md` Parts section for connector families and OE part numbers.
 
 **When a splice is unavoidable:** Sensors that ship with an integral moulded pigtail (wire bonded to sensor body, no removable connector housing) require one splice to join the sensor's pigtail wire to the build harness. Use a Raychem SRGB heat-activated solder sleeve — heat gun only, not iron. A soldering iron creates a rigid joint at the flex point that cracks under vibration.
+
+**Deutsch connectors and sensor pigtails:** This build already uses Deutsch Autosport AS series (AS79 firewall bulkhead) and Deutsch DT 2-pin (high-current bypass connectors for fan/EWP/AC relay). Those are correct applications. Deutsch DT or DTM connectors are **not** suitable as sensor pigtail connectors — they do not mate with OEM sensor bodies (VW 3B0973703G, 1J0973702, USCAR EV14, VAG 4-pin COP). Swapping to Deutsch at the sensor end would require an adapter that adds a connector interface back in. Use the OEM connector housings + terminals and direct-terminate into those.
 
 ---
 
@@ -297,6 +299,19 @@ Do not stack multiple systems on the same ground lug as the ECU.
 Each bank of coils needs a secondary ground to the cylinder head (one ground strap per bank).
 This is separate from the main coil power/GND supply wire. The coil will run without it,
 but with elevated secondary voltage noise. Do not share with any sensor ground path.
+
+### Ground Contact Surfaces — No Paint, No Coating, No Oxide
+
+Every ground lug attachment point must be **bare, clean metal** — not painted, powder-coated, anodised, or corroded. This applies to:
+
+| Location | Notes |
+|----------|-------|
+| Engine block → chassis bonding strap lug | Wire-brush or sand to bare metal before reinstalling lug; add a star washer |
+| Cylinder head → MaxxECU engine GND wire | Clean the bolt boss on the head; use a star washer |
+| Chassis GND stud (engine bay M8) | Strip the mounting point if inside a painted engine bay |
+| **07K knock sensor mounting boss** | **Critical.** The Bosch flat knock sensors (passive piezoelectric) ground through their M8 mounting bolt and the sensor face-to-block contact. Any paint, sealer, or coating at the mounting pad adds resistance in the signal return path and degrades knock detection sensitivity. Wire-brush or lightly sand the sensor mounting area on the block to bare aluminium before torquing the sensor. Re-apply corrosion protection (thin wipe of anti-seize) only to the threads, not the sensor face contact area. |
+
+> Source: Drive, Revive, Tinker harness build and lessons-learned videos ([youtube.com/watch?v=Z3hmNz64Gw8](https://www.youtube.com/watch?v=Z3hmNz64Gw8)); HP Academy EFI Wiring Fundamentals.
 
 ### One-to-Many 5V Reference Distribution
 When multiple sensors share the MaxxECU 5V SENS OUT: use a **non-insulated 1→4 crimp
