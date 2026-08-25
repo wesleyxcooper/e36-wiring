@@ -236,9 +236,32 @@ The 07K COP coil (4B0973724, 4-pin) has 3 active wires:
 ### Wire bundling inside sub-looms — parallel, not twisted or braided
 
 Individual wires within a sub-loom run **side-by-side in parallel**. Do not twist the bundle, do not braid individual wires together. Reasons:
-- Twisting the whole bundle makes it rigid and adds length, making it difficult to branch individual wires at different component positions along the sub-loom
+- Twisting the whole bundle as a unit makes it rigid and adds length, making it difficult to branch individual wires at different component positions along the sub-loom
 - The Techflex expandable braid holds the bundle together and provides abrasion resistance without any twisting underneath
 - For the breakout transition from main trunk to sub-loom, a few wraps of Tesa 51036 fabric tape (or similar) under the Techflex consolidates the bundle at the branch point — optional but keeps things clean
+
+#### Concentric twist — real technique, not applicable here
+
+**Concentric stranding** (also called concentric twist or helical layering) is a distinct technique from bulk-twisting the bundle as a unit. Wires are arranged in concentric layers, each layer wound helically in the opposite direction to the one inside it. The geometry forces specific wire counts per layer:
+
+| Layers | Total wire count |
+|--------|-----------------|
+| Core only | 1 |
+| Core + 1st layer | 7 (1 + 6) |
+| Core + 2 layers | 19 (1 + 6 + 12) |
+| Core + 3 layers | 37 (1 + 6 + 12 + 18) |
+
+**Real advantages** (from professional harness practice, confirmed by [Rennacs harness build video](https://www.youtube.com/watch?v=K12VFuqbeD4)):
+- Maintains flexibility along the harness run — opposite-direction layers allow the bundle to bend without individual wires buckling or kinking
+- Smaller bundle OD than loosely parallel wires — mathematically optimal round-wire packing reduces diameter under the Techflex
+- **Thicker wires belong in the center.** High-gauge power and ground wires at the core provide a rigid center spine; lighter sensor wires in the outer layers are also the ones most likely to exit early along the route — natural organization
+
+**Why it is not used here:**
+- The wire counts in this harness's sub-looms do not match the valid fill numbers (7, 19, 37). An incomplete outer layer creates an uneven bundle OD and loses the flexibility and compactness advantages — you get the labor cost with none of the benefit.
+- Sub-loom wires branch to individual components at multiple points along the run. In a concentrically stranded bundle, a wire buried in the center layer must cross through all outer layers to exit — this creates a messy, difficult-to-execute breakout at every branch point.
+- The Techflex F6 sleeve provides adequate shape retention and abrasion protection over a parallel bundle without any stranding complexity underneath.
+
+Concentric stranding is worth considering for a long fixed-count trunk that terminates at a single connector with no intermediate branches — but that geometry does not exist in this build.
 
 **The one exception is the crank VR pair.** The VR+ and VR− wires **must be twisted together** before going into the TRIGGER sub-loom:
 - Twist rate: ~1 twist per 25mm (1 twist per inch) — twist by hand from tip to tip before routing
