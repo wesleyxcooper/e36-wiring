@@ -57,11 +57,15 @@
 #      through a DT cavity
 #
 # Signals crossing (see per-pin detail in DT12_CABIN pinlabels below):
-#   - CAN H/L (twisted pair, shielded)   → Gauge.S cluster, DCT shifter
-#   - APS ch1 (SGND1, +5V1, signal1)     → MaxxECU C1 APS1 AIN
-#   - APS ch2 (SGND2, +5V2, signal2)     → MaxxECU C1 APS2 AIN
-#   - Shield drain (single, ECU-side terminated only)
-#   - 3× spare cavities for future expansion
+#   - CAN H/L (twisted pair, shielded)   → Gauge.S cluster CAN input only
+#     (DCT shifter is NOT on CAN — it uses discrete DIN inputs; see below)
+#   - APS ch1 (SGND1, +5V1, signal1)     → MaxxECU APS1 AIN
+#   - APS ch2 (SGND2, +5V2, signal2)     → MaxxECU APS2 AIN
+#   - DCT shifter UP/DOWN switches       → MaxxECU DIN 2 / DIN 1 (discrete)
+#   - DCT shifter GND reference          → MaxxECU sensor GND (C1 H1)
+#   - CAN shield drain (single, ECU-side terminated only)
+#   - 0 spare cavities (fully packed — add second small crossing if expansion
+#     is needed later)
 #
 # Signals NOT crossing (change from previous architecture):
 #   - IGN, INJ, sensor, GPO actuator: all stay engine-bay (ECU is engine-bay)
@@ -102,18 +106,18 @@ connectors:
     subtype: "Cabin side — permanent on cabin harness. Sockets, size-16 contacts."
     pincount: 12
     pinlabels:
-      - "CAN H (to Gauge.S + DCT shifter)"         # 1  22 AWG twisted pair with pin 2, shielded
-      - "CAN L (to Gauge.S + DCT shifter)"         # 2  22 AWG twisted pair with pin 1, shielded
-      - "CAN + APS shield drain"                    # 3  22 AWG — terminate at ECU end only
+      - "CAN H (to Gauge.S cluster CAN input)"      # 1  22 AWG twisted pair with pin 2, shielded
+      - "CAN L (to Gauge.S cluster CAN input)"      # 2  22 AWG twisted pair with pin 1, shielded
+      - "CAN shield drain"                          # 3  22 AWG — terminate at ECU end only
       - "APS SGND 1 (E46 APS pedal pin 1)"         # 4  22 AWG twisted with pin 5
       - "APS +5V 1 / VCC1 (E46 APS pedal pin 5)"   # 5  22 AWG twisted with pin 4
       - "APS1 signal (E46 APS pedal pin 4)"        # 6  22 AWG
       - "APS SGND 2 (E46 APS pedal pin 2)"         # 7  22 AWG twisted with pin 8
       - "APS +5V 2 / VCC2 (E46 APS pedal pin 3)"   # 8  22 AWG twisted with pin 7
       - "APS2 signal (E46 APS pedal pin 6)"        # 9  22 AWG
-      - "SPARE"                                     # 10 cavity-plug at build; future expansion
-      - "SPARE"                                     # 11 cavity-plug at build; future expansion
-      - "SPARE"                                     # 12 cavity-plug at build; future expansion
+      - "DCT shifter UP (DCT paddle Black wire)"    # 10 22 AWG discrete switch to GND
+      - "DCT shifter DOWN (DCT paddle Blue wire)"   # 11 22 AWG discrete switch to GND
+      - "DCT shifter GND (DCT paddle Brown wire)"   # 12 22 AWG sensor GND reference
     notes: >-
       DT-12 is the ONLY dedicated firewall crossing for MaxxECU RACE H2O signals in this
       build. The MaxxECU sits in the engine bay (OEM E-box cavity, intake side = passenger
@@ -158,9 +162,9 @@ connectors:
       - "APS SGND 2 → MaxxECU C1 SGND (H1)"        # 7
       - "APS +5V 2 → MaxxECU C1 G1 (+5V sensor)"   # 8
       - "APS2 signal → MaxxECU C2 APS2 AIN"        # 9  MaxxECU C2 APS2 pin
-      - "SPARE"                                     # 10
-      - "SPARE"                                     # 11
-      - "SPARE"                                     # 12
+      - "DCT UP → MaxxECU 16-pin aux DIN 2 (pin 15)"    # 10
+      - "DCT DOWN → MaxxECU 16-pin aux DIN 1 (pin 16)"  # 11
+      - "DCT GND → MaxxECU 16-pin aux SGND (pin 2)"     # 12
     notes: >-
       Mates DT12_CABIN at the firewall face on the engine-bay side of the firewall
       grommet. Pin-side of the connector pair, so the removable engine harness holds the
@@ -181,13 +185,14 @@ cables:
   W_DT12_CROSSING:
     # Cable bundle that traverses the firewall grommet and terminates in DT12_CABIN
     # at the engine-bay face of the firewall. The other end of each wire routes to its
-    # cabin destination (APS pedal module, CAN bus tap points, or the shield drain
-    # single-end-drain termination).
+    # cabin destination (APS pedal module, DCT shifter paddle, Gauge.S cluster CAN
+    # input, or the shield drain single-end-drain termination).
     #
     # Colors follow this build's convention (see docs/harness-build.md § Wire Color
-    # Convention). GN (green) is intentionally NOT used for signal wires here to keep
-    # GN reserved for GPO/actuator drives elsewhere in the build.
-    wirecount: 9
+    # Convention). DCT shifter wire colors (Black UP, Blue DOWN, Brown GND) match the
+    # OEM DCT Shifter harness per dctshifter.com/pages/installation, cited in
+    # harnesses/dct-shifter.wv.
+    wirecount: 12
     colors:
       - WH   # 1  CAN H
       - BU   # 2  CAN L
@@ -198,6 +203,9 @@ cables:
       - BN   # 7  APS SGND 2
       - RD   # 8  APS +5V 2
       - WH   # 9  APS2 signal
+      - BK   # 10 DCT UP        — matches OEM DCT paddle Black
+      - BU   # 11 DCT DOWN      — matches OEM DCT paddle Blue
+      - BN   # 12 DCT GND       — matches OEM DCT paddle Brown
     wirelabels:
       - "CAN H (22 AWG TP-shld)"
       - "CAN L (22 AWG TP-shld)"
@@ -208,25 +216,32 @@ cables:
       - "APS SGND 2 (22 AWG)"
       - "APS +5V 2 (22 AWG)"
       - "APS2 sig (22 AWG)"
+      - "DCT UP (22 AWG)"
+      - "DCT DOWN (22 AWG)"
+      - "DCT GND (22 AWG)"
     length: 0.5 m
     notes: >-
-      Length is a placeholder — measure from the cabin-side APS pedal + CAN devices
-      through the firewall grommet to the DT12_CABIN mating face on the engine-bay side.
+      Length is a placeholder — measure from the cabin-side APS pedal + DCT paddle +
+      Gauge.S cluster through the firewall grommet to the DT12_CABIN mating face on
+      the engine-bay side.
 
       SHIELD: CAN pair (wires 1/2) and APS pairs (4/5 and 7/8) should share a common
       overall foil shield for the entire cable run. Shield drain (wire 3) terminates
       only at the ECU end (in the engine bay). At the cabin end the shield floats.
+      DCT shifter wires (10/11/12) are inside the same overall bundle for physical
+      routing convenience but do NOT need to be inside the CAN/APS shield foil — the
+      DCT switches are low-frequency low-current and are not noise-critical.
 
-      TWISTING: within the shielded bundle, twist CAN H/L as one pair, APS SGND1+VCC1
-      as a second pair, APS SGND2+VCC2 as a third pair. This preserves the differential
-      /reference topology for each function.
+      TWISTING: within the shielded portion of the bundle, twist CAN H/L as one pair,
+      APS SGND1+VCC1 as a second pair, APS SGND2+VCC2 as a third pair. This preserves
+      the differential/reference topology for each function.
 
 
 connections:
 
-  # DT-12 crossing: the connector pair itself. Cable W_DT12_CROSSING wires 1-9
-  # connect DT12_CABIN pins 1-9 to DT12_ENGINE pins 1-9. Pins 10/11/12 on both
-  # sides are cavity-plugged spares.
-  - - DT12_CABIN:  [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    - W_DT12_CROSSING: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    - DT12_ENGINE: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  # DT-12 crossing: the connector pair itself. Cable W_DT12_CROSSING wires 1-12
+  # connect DT12_CABIN pins 1-12 to DT12_ENGINE pins 1-12. Connector is fully packed
+  # (0 spare cavities) — see header notes for expansion strategy if needed later.
+  - - DT12_CABIN:  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    - W_DT12_CROSSING: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    - DT12_ENGINE: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]

@@ -1,8 +1,18 @@
 # dct-shifter.wv
-# DCT Shifter Paddle → MaxxECU DIN 1 / DIN 2
+# DCT Shifter Paddle → MaxxECU DIN 1 / DIN 2 (via engine-bay ECU through firewall)
 # Source: dctshifter.com/pages/installation
 #
-# Cabin-to-cabin. No firewall bulkhead crossing.
+# Firewall crossing: with MaxxECU RACE H2O mounted in the engine bay under the
+# active architecture, the DCT paddle switches (cabin-mounted) cross the firewall
+# to reach the ECU DIN inputs. Three wires (UP, DOWN, GND) traverse the shared
+# DT-12 cabin ↔ engine-bay crossing on pins 10, 11, 12. See:
+#   - harnesses/firewall-crossing-dt12.wv (DT12_CABIN pins 10-12)
+#   - docs/vendor/maxxecu/MaxxECU_RACE_H2O.md (H2O + engine-bay rationale)
+#
+# NOTE: The DCT shifter is on MaxxECU discrete DIN inputs, NOT on CAN. Passive
+# momentary switches close UP/DOWN to GND. Do not confuse with Gauge.S cluster
+# which IS CAN-based (see harnesses/body-x20.wv GAUGES_CAN_FEED).
+#
 # Compatible Phase 1 → Phase 3 (shifter paddle unchanged through engine swap).
 
 connectors:
