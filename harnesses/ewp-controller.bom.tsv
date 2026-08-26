@@ -1,9 +1,0 @@
-Id	Description	Qty	Unit	Designators
-1	Cable, 1 x 10 AWG	3.5	m	CABLE_GND, CABLE_PWR_IN, CABLE_PWR_OUT
-2	Cable, 1 x 22 AWG	2	m	CABLE_PWM
-3	Cable, 2 x 18 AWG	1	m	CABLE_RELAY_COIL
-4	Connector, 40A automotive relay (Bosch 0 332 002 150 or equiv), Standard 4-pin or 5-pin relay, 4 pins	1		MAIN_RELAY
-5	Connector, Battery positive terminal, 12V AGM, 1 pins	1		BATT_POS
-6	Connector, Chassis ground stud (body metal), 1 pins	1		CHASSIS_GND
-7	Connector, MaxxECU RACE -- PWM General Purpose Output, GPO pin TBD -- confirm in MaxxECU pin assignment, 1 pins	1		MAXXECU_GPO
-8	Connector, Pierburg CWA400 (PWM version) -- Kostal 2+2 connector, 150 LPM @ 0.85 bar -- installed in lower radiator hose, 4 pins	1		CWA400_PUMP

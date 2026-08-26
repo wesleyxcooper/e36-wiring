@@ -1,9 +1,24 @@
 # maxxecu-07k.wv
-# MaxxECU Race <-> VW 07K (CBUA/BGP 2.5L inline-5) Engine Harness (Phase 3)
+# MaxxECU Race H2O <-> VW 07K (CBUA/BGP 2.5L inline-5) Engine Harness
+# Build: Phase 2 (offline, while M52 is still running).
+# Install: Phase 3 (engine swap — plug into engine-bay ECU + mate Maven engine-side plugs).
 #
-# Same MaxxECU RACE ECU as M52 phase — zero ECU cost at swap.
-# Firewall bulkhead: engine mating plug swaps (M52 out, 07K in). Cabin side mostly
-# permanent — NO bulkhead additions: APS pedal wires are cabin-to-cabin (see below).
+# ─────────────────────────────────────────────────────────────────────────────
+# ARCHITECTURE
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# MaxxECU RACE H2O is engine-bay-mounted (OEM DME E-box cavity, intake side =
+# passenger side of RHD car). All engine sensors, IGN, INJ, and GPO signals
+# terminate DIRECTLY at MaxxECU C1/C2 CMC pins — no firewall bulkhead crossing.
+# See docs/vendor/maxxecu/MaxxECU_RACE_H2O.md for full ECU + mount rationale.
+#
+# Firewall crossing: Maven HD30 dual 16+16 bulkhead (harnesses/firewall-crossing-maven.wv)
+# carries ONLY cabin-originated signals: CAN to Gauge.S cluster + DCT shifter
+# paddle inputs (Connector A, populated Phase 2) and APS e-pedal (Connector B,
+# populated Phase 3). All other 07K harness wires terminate at the engine-bay
+# ECU with no bulkhead involvement.
+#
+# Same MaxxECU RACE H2O ECU as M52 phase — zero ECU cost at swap.
 # Source: ME7.1.1 pinout — https://drive.google.com/file/d/15RPWyYPLHGEMMQZIlUgpoo77T-CxjyMP/
 #         MaxxECU pinout: maxxecu.com/webhelp/wirings-maxxecu_pinout.html
 #         MaxxECU e-throttle: maxxecu.com/webhelp/settings-ethrottle.html
@@ -11,7 +26,10 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # CRIMP TOOLS — which tool for which contact in this harness:
 #
-#   AS79 size-22 contacts           → Daniels AFM8 (M22520/2-01) + K42 positioner (pin) / K40 (socket)
+#   Maven HD30 size-16 contacts     → Deutsch HDT-48-00 (covers all Deutsch
+#                                     solid contacts across DT/DTM/DTP/DTHD/
+#                                     HD10/HD30/HDP20/DRC per deutschconnector.com
+#                                     HDT-48-00 selection guide)
 #   VAG JMT/JPT pigtail contacts    → Engineer PA-09
 #     (cam · crank · MAP · CLT · IAT · knock · EV14 injector · 07K COP)
 #   MaxxECU C1/C2 Molex contacts    → Molex 63811-9200 (small) / 63811-8900 (large)
@@ -21,39 +39,41 @@
 # Full tool-to-connector reference: e36-wiring/docs/harness-build.md § Tools
 # ─────────────────────────────────────────────────────────────────────────────
 #
-# CABIN UNCHANGED: virtual clutch position sensor (C2 AIN 5) carries from M52 phase
-#   with zero re-work. Pedal, sensor, and C2 wiring are cabin-side and engine-agnostic.
-#   See maxxecu-m52.wv CLUTCH_POS_SENSOR / ECU_C2 for sensor wiring detail.
+# 8HP virtual clutch (Phase 1 onward, unchanged at 07K swap): DCT Clutch Simulator
+#   Remote mount in engine bay outputs 0.5-4.5V CPS analog to MaxxECU C2 AIN 5
+#   (C2 pin G3). Fully engine-bay-to-engine-bay under the H2O arch — no bulkhead
+#   crossing. See docs/vendor/dctshifter/DCT_Clutch_Simulator.md.
 #
-# KEY DIFFERENCES FROM M52 (harness rebuild required — engine mating plug swap):
-#   + 5-cylinder: INJ 1-5, IGN 1-5. INJ 6 / IGN 6 cavity-plugged.
+# KEY DIFFERENCES FROM M52 (harness rebuild required):
+#   + 5-cylinder: INJ 1-5, IGN 1-5. INJ 6 / IGN 6 cavity-plugged (unused).
 #   + DBW throttle body (07K native, ~65mm) replaces cable TPS.
 #     Motor+/Motor- use MaxxECU C2 H4/H2 (MOTOR 1+/MOTOR 1-). NOT GPO3/4.
 #     GPO3 → VVT solenoid. GPO4 → freed/spare.
-#     Motor wires cross AS79 bulkhead via pins 22 (Motor+) and 23 (Motor-).
-#     TPS1 → AS79 pin 48 (CMC G2, was M52 TPS). TPS2 → AS79 pin 56 (CMC J2/AIN2).
-#   + VW cam Hall sensor (+5V type): different connector body; SAME AS79 pin 19 as M52 cam.
+#     Motor wires terminate directly at MaxxECU C2 in the engine bay — no bulkhead crossing.
+#     TPS1 → CMC G2 (pin 26, was M52 TPS wire — reused). TPS2 → CMC J2 (AIN 2, pin 34).
+#   + VW cam Hall sensor (+5V type): different connector body from M52 cam.
+#     Terminates directly at CMC H4 (HOME, pin 32) — no bulkhead crossing.
 #   + VW crank Hall 60-2: Hall effect sensor (NOT VR — OE# 07K906433B confirmed Hall
 #     by Valeo PN 366675 datasheet "Sensor Type: Hall Sensor"; Bremi PN 60319 listing
 #     "Contains Hall-Effect Sensor ICs from OE Manufacturer"; the07k.wiki/wiki/Standalone_Management).
 #     ⚠️ BGP wiring diagram labels pins "VR+/VR-/Shield" — this is INCORRECT per the07k.wiki
 #     ("same sensor diagram shown but different sensors are used").
-#     SAME AS79 pin 16 (signal, CMC H3); pins 17/18 CHANGE cabin-side destination:
-#       M52: pin17→CMC H2 (VR-), pin18→CMC E3 (shield GND)
-#       07K: pin17→CMC G1 (+5V sensor supply, pin25); pin18→CMC H1 (Sensor GND, pin29)
-#     Re-terminate cabin-side pigtails for pins 17 and 18 when building the 07K cabin harness.
+#     Signal → CMC H3 (pin 31, TRIGGER); +5V supply → CMC G1 (pin 25); Sensor GND
+#     → CMC H1 (pin 29). Direct-terminate at engine-bay ECU.
 #     MTune trigger type: Digital (Hall, opto) — NOT VR sensor, Zero-crossing.
 #   + Bosch EV14 injectors (ID1050x x5): M50 harness ships with EV1 pigtails —
 #     replace with EV14 pigtail ends at engine-side harness build.
-#   + 2x Bosch flat knock sensors: route through AS79 expansion pins 43/44/45.
+#   + 2x Bosch flat knock sensors: signal directly to CMC K3/K4 (pins 39/40). Shield
+#     drain terminates at CMC H1 (Sensor GND). No bulkhead crossing.
 #   + NO VANOS solenoid. NO ICV. GPO 3 → VVT solenoid. GPO 5 freed from ICV B → reassigned to reverse light relay (MTune change only — no rewiring). GPO 4 → spare.
 #   + PST-F1: same wiring, new mount (iABED M10x1.0 port) — no wiring change.
 #   + WBO2 LSU 4.9: same wiring, new bung in 07K top-mount exhaust manifold.
 #   + CABIN-SIDE ADDITION: BMW E46 DBW accelerator pedal installed.
-#     CABIN-TO-CABIN ONLY (no bulkhead crossing): pedal (footwell) → MaxxECU C2
-#     directly. APS1 → C2 E4 (AIN 6), APS2 → C2 F1 (AIN 7). +5V → CMC G1,
-#     GND → CMC H1. AS79 pins 72-77 are NOT used for APS.
-#     See harnesses/epedal-bmw-e46.wv.
+#     CROSSES FIREWALL via Maven Connector B (6 wires) under the H2O arch:
+#       APS ch1 SGND/+5V/sig, APS ch2 SGND/+5V/sig.
+#     Engine-side of Maven B → MaxxECU: APS1 → C2 (verify pin against RACE REV9+ diagram),
+#     APS2 → C2 (verify pin), +5V rails → C1 G1 shared, SGND rails → C1 H1.
+#     See harnesses/firewall-crossing-maven.wv and harnesses/epedal-bmw-e46.wv.
 #   + OEM ME7.1.1 engine connector reference:
 #     Crank VR: ME7 pin 82  |  Cam Hall: pin 86  |  CLT: pin 93  |  MAP: pin 101
 #     INJ 1-5: pins 96/97/112/88/89  |  IGN 1-5: pins 102/103/111/94/95
@@ -99,7 +119,7 @@
 #       NOT GPO3/GPO4. MaxxECU RACE C2 has dedicated H-bridge outputs for e-throttle.
 #       Source: MaxxECU RACE GEN1 C2 pinout (maxxecu.com/webhelp/wirings-maxxecu_pinout.html).
 #       GPO3 → VVT solenoid (CMC D4). GPO4 → freed/spare.
-#       Motor wires cross AS79 via cabin pins 22 (C2 H4) and 23 (C2 H2).
+#       Motor wires terminate directly at MaxxECU C2 H4/H2 in the engine bay.
 #       In MTune: Settings → E-Throttle → Motor output → Motor 1 (not GPO).
 #
 # DONE: Injector firing order — 07K order is 1-2-4-5-3 (confirmed).
@@ -178,8 +198,8 @@ connectors:
   #                    Source: 34-ecu-harness-final.md line 23, 8hp-body-integrations.wv lines 40-41.
   # ETh Motor+/Motor-: MaxxECU C2 H4 (MOTOR 1+) and C2 H2 (MOTOR 1-). NOT GPO3/GPO4.
   #   C2 has dedicated H-bridge outputs for e-throttle.
-  #   Motor+ (C2 H4) → AS79 cabin pin 22 → TB motor lead.
-  #   Motor- (C2 H2) → AS79 cabin pin 23 → TB motor lead.
+  #   Direct-terminate at engine-bay ECU: C2 H4 → TB motor Motor+ lead;
+  #   C2 H2 → TB motor Motor- lead. No firewall crossing (ECU is engine-bay).
   # GPO 2 (C4/pin 12): fan/pump NO LONGER physical relay wires — MaxxECU broadcasts
   # GPO 6 (B1/pin 5):  fan/pump states over CAN1 → PMU16 maps to O3/O4 outputs.
   #                    12-pin relay trigger pins 2/3/9 are also unconnected (N/C).
@@ -247,25 +267,31 @@ connectors:
       - "G3: AIN 5 — clutch position signal (0-5V)"
       - "+5V sensor supply (C2 shared rail)"
       - "Sensor GND (C2 shared rail)"
-      - "H4: MOTOR 1+ — ETh Motor+ → AS79 pin 22 → TB motor"
-      - "H2: MOTOR 1- — ETh Motor- → AS79 pin 23 → TB motor"
+      - "H4: MOTOR 1+ — ETh Motor+ → TB motor (direct-terminate engine-bay)"
+      - "H2: MOTOR 1- — ETh Motor- → TB motor (direct-terminate engine-bay)"
     notes: >-
       C2 H4 (MOTOR 1+) and C2 H2 (MOTOR 1-) are the dedicated H-bridge outputs for
-      the 07K DBW throttle body. NOT GPO3/4. These wires cross the AS79 bulkhead via
-      cabin pins 22 and 23 respectively.
+      the 07K DBW throttle body. NOT GPO3/4. These wires direct-terminate at the TB
+      motor leads engine-bay-side (ECU is engine-bay per H2O arch — no bulkhead crossing).
       AIN 6 (C2 E4) and AIN 7 (C2 F1) are used for APS1/APS2 from the E46 pedal --
-      those are cabin-to-cabin wires and do not appear in engine-side connections here.
+      those wires cross the firewall via Maven Connector B (see
+      harnesses/firewall-crossing-maven.wv).
       Source: MaxxECU RACE GEN1 C2 pinout (maxxecu.com/webhelp/wirings-maxxecu_pinout.html).
-      See maxxecu-m52.wv ECU_C2 for AIN 5 clutch wiring detail.
+      For CPS (clutch position) wiring detail see docs/vendor/dctshifter/DCT_Clutch_Simulator.md.
 
   # ── Virtual clutch pedal position sensor ─────────────────────────────────────
   # Identical to M52 harness — cabin-side, no re-work at engine swap.
   CLUTCH_POS_SENSOR:
-    type: "Rotary position sensor 0-5V — E36 clutch pedal pivot"
-    subtype: "Carries from Phase 1 M52 unchanged. Same pedal, same sensor, same C2 AIN 5."
+    type: "DCT Clutch Simulator Remote — CPS output"
+    subtype: "Engine-bay-mounted hydraulic clutch simulator. Same unit from Phase 1B (8HP swap) — no re-work at 07K swap."
     pincount: 3
-    pinlabels: ["+5V", Signal, GND]
-    notes: "No re-work required at 07K swap. See maxxecu-m52.wv CLUTCH_POS_SENSOR for full notes."
+    pinlabels: ["+5V", "Signal (0.5-4.5V CPS)", GND]
+    notes: >-
+      Source: dctshifter.com/products/dct-clutch-simulator-remote and
+      docs/vendor/dctshifter/DCT_Clutch_Simulator.md. Simulator lives in the engine bay,
+      fed by the OEM E36 hydraulic clutch line from the cabin master cylinder. CPS output:
+      +5V (CMC G1) / Signal (C2 AIN 5 = C2 pin G3) / SGND (CMC H1). All engine-bay-to-
+      engine-bay — no firewall crossing. Unchanged at 07K swap.
 
   # ── Cabin-side connectors — unchanged from M52, included to resolve diagram ──────
 
@@ -280,7 +306,9 @@ connectors:
       DOWN (Blue) :: MaxxECU DIN 1 (Transmission DOWN shift).
       GND (Brown) :: Sensor GND or chassis GND.
       MTune: Advanced :: 8HP :: Shifter type :: 8HP SEQ shifter.
-      Cabin-to-cabin; does NOT cross firewall bulkhead. Unchanged from M52 phase.
+      Under H2O engine-bay arch: 3 wires cross firewall via Maven Connector A
+      (see harnesses/firewall-crossing-maven.wv pins 4/5/6). Unchanged from M52 phase
+      logically — only the physical routing (cabin-to-engine-bay via Maven, not cabin-to-cabin).
 
   CAN_BUS_JUNCTION:
     type: "Splice / junction"
@@ -309,49 +337,49 @@ connectors:
       Enable in MTune: CAN :: Default CAN output :: MaxxECU Default 1.3.
       Unchanged from M52 phase.
 
-  # ── Engine-side mating plug (07K Phase 3 — first installation, not a swap) ──────
-
-  # ── Firewall bulkhead engine-side plug (07K Phase 3) — PIN REFERENCE ───────────
-  # Connector type: Deutsch AS79 / Souriau 8STA 79-way jam nut plug (engine side)
-  # Operation: First installation of the AS79 engine-side plug at 07K swap. Phase 1 (M52)
-  #   used the pre-terminated harness through the OEM firewall grommet — no AS79 mating plug
-  #   was ever built or installed for Phase 1. Cabin side is pre-built during Phase 2.
-  # Full cabin-side connector modeled in harnesses/firewall-bulkhead.wv (BULKHEAD_CABIN).
-  # Excluded from WireViz connectors here — bulkhead treated as transparent in this diagram.
+  # ── 07K signal → MaxxECU pin destinations (direct-terminate at engine-bay H2O) ──
   #
-  # ── Confirmed AS79 pin assignments (cross-reference firewall-bulkhead.wv BULKHEAD_CABIN) ──
-  #   Power rails (Option B — via bulkhead; Option A routes separately through DT grommet):
-  #     1, 2, 29, 30: +12V Coils/Inj rails (four contacts in parallel, 4×5A = 20A)
-  #     3, 31, 52:    Engine GND (three contacts in parallel, 3×5A = 15A)
-  #   Ignition outputs (22 AWG max per size-22D contact):
-  #     4: IGN 1 (CMC A2)   5: IGN 2 (CMC A3)   6: IGN 3 (CMC B2)   7: IGN 4 (CMC B3)
-  #     32: IGN 5 (CMC C2)  33: IGN 6 [M52 only, cavity-plug 07K]    34: SPARE — cavity-plug both phases (IGN 5 = pin 32)
-  #   Injector outputs (22 AWG end-to-end, direct termination — no pigtail splice):
-  #     8: INJ 1 (CMC K1)   9: INJ 2 (CMC K2)   10: INJ 3 (CMC M1)
-  #     11: INJ 4 (CMC M2)  12: INJ 5 (CMC M3)  13: INJ 6 [M52 only, cavity-plug 07K]
+  # All 07K engine-bay signals terminate directly at the MaxxECU CMC (C1) or C2
+  # connectors on the engine-bay ECU. See docs/vendor/maxxecu/MaxxECU_RACE_H2O.md
+  # and harnesses/firewall-crossing-maven.wv.
+  #   Ignition outputs (07K 5-cyl uses IGN 1-5; IGN 6/7 not populated):
+  #     IGN 1 → CMC A2   IGN 2 → CMC A3   IGN 3 → CMC B2   IGN 4 → CMC B3
+  #     IGN 5 → CMC C2   [IGN 6/7 unused on 07K]
+  #   Injector outputs (07K 5-cyl uses INJ 1-5; INJ 6/7 not populated):
+  #     INJ 1 → CMC K1   INJ 2 → CMC K2   INJ 3 → CMC M1
+  #     INJ 4 → CMC M2   INJ 5 → CMC M3   [INJ 6/7 unused on 07K]
   #   Crank / Cam triggers:
-  #     16: Crank signal (CMC H3=TRIGGER/pin31) [M52 VR+; 07K Hall signal — same ECU pin]
-  #     17: M52: Crank VR- (CMC H2/pin30); 07K: Crank +5V (CMC G1/pin25) — re-terminate cabin side
-  #     18: M52: Crank shield drain (CMC E3/pin19); 07K: Crank Sensor GND (CMC H1/pin29) — re-terminate cabin side
-  #     19: Cam Hall signal (CMC H4)   [M52 + 07K — same ECU pin, swap connector body only]
-  #   DBW throttle body (07K only; cavity-plug on M52):
-  #     22: ETh Motor+ → MaxxECU C2 H4 (MOTOR 1+)   23: ETh Motor- → MaxxECU C2 H2 (MOTOR 1-)
-  #     48: TPS1 (CMC G2)   56: TPS2 / AIN 2 (CMC J2)   [+5V from 47, GND from 79]
-  #   Sensor signals:
-  #     25: CLT (CMC F1)   26: IAT (CMC F2)   27: Flex fuel +12V
-  #     47: +5V sensor supply (CMC G1 — TPS/MAP/PST-F1/Cam/07K DBW TPS)
-  #     48: TPS1 signal (CMC G2)   49: MAP signal (AIN 4)   79: Sensor GND (CMC H1, center pin)
+  #     Crank Hall signal → CMC H3 (TRIGGER, pin 31)
+  #     Crank +5V supply → CMC G1 (pin 25, shared sensor rail)
+  #     Crank Sensor GND → CMC H1 (pin 29, shared sensor GND)
+  #     Cam Hall signal → CMC H4 (HOME, pin 32)
+  #     Cam Hall +5V → CMC G1 (pin 25, shared)
+  #     Cam Hall GND → CMC H1 (pin 29, shared)
+  #   DBW throttle body (07K native, cable throttle on M52):
+  #     Motor+ → MaxxECU C2 H4 (MOTOR 1+)   Motor- → MaxxECU C2 H2 (MOTOR 1-)
+  #     TPS1 → CMC G2 (pin 26, was M52 TPS wire — reused)
+  #     TPS2 → CMC J2 (AIN 2, pin 34)
+  #     +5V → CMC G1 (pin 25, shared)   GND → CMC H1 (pin 29, shared)
+  #   Engine sensors:
+  #     CLT → CMC F1 (pin 21)   IAT → CMC F2 (pin 22)
+  #     MAP → AIN 4 (CMC J4, pin 38)
+  #     PST-F1 pressure → AIN 3 (CMC J3, pin 37)
+  #     PST-F1 temp → AIN 1 (CMC J1, pin 33)
+  #     Flex fuel signal → CMC C1 (DIN 3, pin 9)   Flex fuel +12V → PDM/relay
   #   GPO actuators:
-  #     35: GPO 3 → VANOS (M52) / VVT solenoid (07K)   36: GPO 4 → ICV-A (M52) / SPARE (07K)
-  #     37: GPO 5 → ICV-B (M52) / Rev light relay (07K — MTune reassignment, no rewiring)   38: Starter trigger   39: Alt D+
-  #   Knock sensors (07K only; cavity-plug on M52):
-  #     43: Knock 1 signal (CMC K3)   44: Knock 2 signal (CMC K4)   45: Knock GND / shield drain
-  #   Misc:
-  #     64: Flex fuel signal (CMC C1 / DIN3)
-  #   Pins 20, 24, 41: SPARE / cavity-plug
-#   Pins 50, 51: PST-F1 pressure (AIN 3, CMC J3), PST-F1 temp (AIN 1, CMC J1) — NOT spare. Source: firewall-bulkhead.wv pins 50-51.
-#   Pins 52–63, 65–78: SPARE / cavity-plug
-  #   Pins 72–79 (except 79): SPARE — APS is cabin-to-cabin, no bulkhead crossing needed
+  #     GPO 3 → VVT solenoid (07K; was VANOS on M52 — same MTune output)
+  #     GPO 4 → SPARE (07K; was ICV-A on M52)
+  #     GPO 5 → Reverse light relay (07K; was ICV-B on M52 — MTune reassignment)
+  #     Starter trigger, Alt D+ excitation → direct to relay board
+  #   Knock sensors (07K only):
+  #     Knock 1 signal → CMC K3 (DIN/VR1, pin 39)
+  #     Knock 2 signal → CMC K4 (DIN/VR2, pin 40)
+  #     Knock shield drain → CMC H1 (Sensor GND) at ECU end (single-end drain)
+  #     Knock GND → sensor body via M8 mounting bolt to block (no wire)
+  #   Cabin↔engine crossings (via Maven HD30 Connector B, Phase 3 install):
+  #     APS ch1 SGND / +5V / signal → C1 H1 / C1 G1 / C2 APS1
+  #     APS ch2 SGND / +5V / signal → C1 H1 / C1 G1 / C2 APS2
+  #     (See harnesses/firewall-crossing-maven.wv for Maven pin assignments)
 
   # ── 07K engine sensors / actuators ─────────────────────────────────────────
 
@@ -368,10 +396,8 @@ connectors:
       Swapped pigtails → no-start with no obvious failure indicator.
       MTune: Trigger Input = "Digital (Hall, opto, etc)" — NOT VR sensor.
       Trigger system: N-1 / 60-2 missing tooth. ME7.1.1 harness ref: Conn B pin 82.
-      AS79 routing: pin1(+5V)→AS79pin17→CMC G1(pin25); pin2(signal)→AS79pin16→CMC H3(pin31);
-      pin3(SensorGND)→AS79pin18→CMC H1(pin29). Note: AS79 pin17 cabin-side must be
-      re-terminated from CMC H2 → CMC G1, and pin18 cabin-side from CMC E3 → CMC H1,
-      when building the 07K cabin harness (different from M52 VR routing).
+      Direct-terminate at engine-bay ECU: pin1(+5V)→CMC G1(pin 25); pin2(signal)→
+      CMC H3(pin 31, TRIGGER); pin3(SensorGND)→CMC H1(pin 29).
       Location: cylinder 5 side — sensor G28 at timing chain compartment cover.
       Source: charm.li CBTA/BGP component locations, item 12.
 
@@ -382,8 +408,8 @@ connectors:
     pinlabels: ["+5V", "Sensor GND", Signal]
     notes: >
       TODO: Confirm exact VW connector body type at install.
-      ME7.1.1 harness ref: pin 86. +5V supply shared with MAP/TPS/PST-F1 (bulkhead pin 47).
-      Signal → HOME input (CMC H4 = pin 32). Same bulkhead pin 19 as M52 cam.
+      ME7.1.1 harness ref: pin 86. +5V supply shared with MAP/TPS/PST-F1 on CMC G1 rail.
+      Signal → CMC H4 (HOME, pin 32) — direct-terminate at engine-bay ECU.
 
   CLT:
     type: "VW 07K coolant temp sensor 2-pin"
@@ -426,16 +452,15 @@ connectors:
     notes: >
       TODO: Confirm VW TB connector body and motor wire polarity at install.
       ME7.1.1 ref: Motor+=pin84, Motor-=pin92, TPS1=pin117, TPS2=pin118.
-      MaxxECU ETh1 motor: C2 H4 (MOTOR 1+) → AS79 pin 22 → TB Motor+.
-                           C2 H2 (MOTOR 1-) → AS79 pin 23 → TB Motor-.
-      NOT GPO3/GPO4. C2 MOTOR 1+/1- are the correct H-bridge outputs.
+      MaxxECU ETh1 motor: C2 H4 (MOTOR 1+) → TB Motor+; C2 H2 (MOTOR 1-) → TB Motor-.
+      NOT GPO3/GPO4. C2 MOTOR 1+/1- are the correct H-bridge outputs. Direct-terminate at
+      engine-bay ECU — no firewall crossing.
       Source: MaxxECU RACE GEN1 C2 pinout (maxxecu.com/webhelp/wirings-maxxecu_pinout.html).
       MTune: Settings → E-Throttle → Motor output → Motor 1.
       IMPORTANT: verify motor polarity with volt meter before wiring — swap Motor+/-
       at TB connector if throttle runs in wrong direction during e-throttle wizard.
-      TPS1 → CMC G2 (pin 26) / AS79 pin 48 (was M52 TPS — same wire).
-      TPS2 → CMC J2 (AIN 2, pin 34) / AS79 pin 56 (was ATF temp spare — repurposed).
-      +5V → AS79 pin 47 (shared +5V rail, CMC G1). GND → AS79 pin 79 (SGND, CMC H1).
+      TPS1 → CMC G2 (pin 26). TPS2 → CMC J2 (AIN 2, pin 34).
+      +5V → CMC G1 (pin 25, shared +5V rail). GND → CMC H1 (pin 29, SGND).
       Calibrate in MTune :: Throttle :: E-Throttle wizard.
 
   KNOCK_1:
@@ -445,8 +470,8 @@ connectors:
     pinlabels: ["KS1 signal"]
     notes: >
       GND via M8 mounting bolt to block — no separate GND wire.
-      ME7.1.1 ref: pin 106. MaxxECU: CMC K3 (DIN/VR1, pin 39).
-      AS79 bulkhead: signal via pin 43 (EXP: Knock sensor 1). Shield drain via pin 45.
+      ME7.1.1 ref: pin 106. MaxxECU: CMC K3 (DIN/VR1, pin 39) — direct-terminate at
+      engine-bay ECU. Shield drain terminates at CMC H1 (Sensor GND) at the ECU end.
       Location: "back side of engine block" = exhaust side (both KS1 and KS2).
       Source: charm.li CBTA/BGP component locations — "Knock Sensors" section.
 
@@ -457,7 +482,8 @@ connectors:
     pinlabels: ["KS2 signal"]
     notes: >
       GND via M8 mounting bolt. ME7.1.1 ref: pin 107.
-      MaxxECU: CMC K4 (DIN/VR2, pin 40). AS79 bulkhead: signal via pin 44. Shield drain via pin 45.
+      MaxxECU: CMC K4 (DIN/VR2, pin 40) — direct-terminate at engine-bay ECU.
+      Shield drain terminates at CMC H1 (Sensor GND) at the ECU end (shared with KS1).
 
   # ── Ignition (5-cyl — same VAG 4-way COP as M52; S54 COPs retained) ─────────
 
@@ -576,7 +602,7 @@ connectors:
         MTune: Settings → Outputs → GPO 3 → Output type: Negative (low-side) → Function: PWM Solenoid
                → assign to Cam VVT control. Duty cycle 0% = cam retarded; higher DC = more advance.
                Max advance: ~42° crank degrees. PWM frequency: 100–200 Hz.
-      AS79 bulkhead: GPO 3 signal crosses via CABIN pin 35 (engine-side 07K plug pin 35).
+      GPO 3 signal terminates directly at CMC D4 (pin 16) at the engine-bay ECU — no bulkhead crossing.
       Flyback diode: 1N4007 at solenoid connector, cathode (banded end) to +12V pin (1), anode to GPO pin (2).
       Source: VW BGP/BGQ workshop manual (solenoid resistance, pin function);
               automotivetechinfo.com 2010 Golf valve timing repair (connector PN confirmation);
@@ -613,10 +639,11 @@ cables:
     length: 1.0 m
     notes: >-
       Hall effect sensor — 3-wire active (not shielded twisted pair like M52 VR).
-      RD=+5V supply (→ AS79 pin17 → CMC G1/pin25 after cabin re-terminate).
-      WH=Hall signal (→ AS79 pin16 → CMC H3/pin31, same as M52 VR+).
-      BN=Sensor GND (→ AS79 pin18 → CMC H1/pin29 after cabin re-terminate).
-      Shielded cable still recommended for noise immunity; if shielded, drain at ECU-end BN.
+      RD=+5V supply → CMC G1 (pin 25).
+      WH=Hall signal → CMC H3 (pin 31, TRIGGER).
+      BN=Sensor GND → CMC H1 (pin 29).
+      Direct-terminate at engine-bay ECU. Shielded cable still recommended for noise
+      immunity; if shielded, drain at ECU-end BN.
 
   W_CAM:
     wirecount: 3
@@ -625,9 +652,9 @@ cables:
     length: 0.8 m
     shield: true
     notes: >-
-      +5V from shared sensor rail (CMC G1/pin 25 → AS79 pin 47).
-      Shielded recommended — cam Hall signal runs in Sector 1 near crank trigger and coil primaries.
-      Shield drain terminates at CMC E3 (GND Shield, pin 19). Float at sensor side.
+      +5V from shared sensor rail (CMC G1, pin 25).
+      Shielded recommended — cam Hall signal is sensitive to coil primary noise.
+      Shield drain terminates at CMC E3 (GND Shield, pin 19) at the ECU end. Float at sensor side.
 
   # ── Temperature / pressure sensors ────────────────────────────────────────────
   W_CLT:
@@ -668,9 +695,9 @@ cables:
     wirelabels: ["Motor+ (C2 H4 MOTOR 1+)", "Motor- (C2 H2 MOTOR 1-)"]
     length: 0.5 m
     notes: >-
-      22 AWG (size-22D contact accepts 22–26 AWG only; 3A peak, 0.5 m — 22 AWG adequate). Verify polarity at TB before final crimp.
+      22 AWG (3A peak, 0.5 m). Verify polarity at TB before final crimp.
       Engine-side wires terminate at throttle body motor leads (OE ref: pin 84 Mot+, pin 92 Mot-).
-      Cabin side of this wire goes to MaxxECU C2 H4/H2 via AS79 pins 22/23.
+      ECU-side wires terminate directly at MaxxECU C2 H4/H2 (engine-bay ECU — no bulkhead crossing).
 
   # ── Knock sensors ─────────────────────────────────────────────────────────────
   W_KNOCK_1:
@@ -681,8 +708,8 @@ cables:
     shield: true
     notes: >-
       GND via M8 mounting bolt — no GND wire.
-      Shield drain (wire 2) terminates at CMC H1 (Sensor GND, pin 29) via AS79 pin 45.
-      Float at sensor side. Per firewall-bulkhead.wv knock note.
+      Shield drain (wire 2) terminates at CMC H1 (Sensor GND, pin 29) at the ECU end.
+      Float at sensor side (single-end drain to prevent ground loops).
       ROUTING: Both KS1/KS2 sensors are on the exhaust side of the block.
       Route pigtails down the block face, away from the exhaust manifold, then
       bundle into KNOCK sub-loom across the bottom of the engine.
@@ -699,7 +726,7 @@ cables:
     length: 0.4 m
     shield: true
     notes: >-
-      Shield drain terminates at CMC H1 (Sensor GND, pin 29) via AS79 pin 45 (shared with KS1).
+      Shield drain terminates at CMC H1 (Sensor GND, pin 29) at the ECU end (shared with KS1 drain).
       See W_KNOCK_1 for routing and heat management spec.
 
   # ── Ignition coils (5-cyl) ────────────────────────────────────────────────────
@@ -854,7 +881,7 @@ connections:
 
   # ── Crank trigger (Hall effect — NOT VR) ──────────────────────────────────────
   # +5V = G1/CMC pin25; Hall signal = H3/CMC pin31 (TRIGGER); Sensor GND = H1/CMC pin29
-  # AS79 cabin-side re-terminate: pin17 H2→G1(pin25); pin18 E3→H1(pin29).
+  # Direct-terminate at engine-bay ECU.
   # MTune: Trigger Input = "Digital (Hall, opto, etc)" — NOT VR sensor.
   - - CRANK_HALL: [1, 2, 3]
     - W_CRANK: [1, 2, 3]
@@ -892,13 +919,13 @@ connections:
     - ECU_CMC: [25, 29, 26, 34]
 
   # ── DBW throttle body — motor (C2 H4/H2 internal H-bridge) ─────────────────────
-  # Motor+ = C2 H4 (MOTOR 1+) → AS79 pin 22; Motor- = C2 H2 (MOTOR 1-) → AS79 pin 23
+  # Motor+ = C2 H4 (MOTOR 1+); Motor- = C2 H2 (MOTOR 1-). Direct-terminate engine-bay.
   - - DBW_TB: [5, 6]
     - W_DBW_MOTOR: [1, 2]
     - ECU_C2: [4, 5]
 
-  # ── Knock sensors (via AS79 pins 43/44/45 → CMC K3/K4; GND via M8 bolt to block) ──
-  # Shield drain for both sensors shares AS79 pin 45 → CMC H1 (Sensor GND, pin 29)
+  # ── Knock sensors (KS1 → CMC K3, KS2 → CMC K4; GND via M8 bolt to block) ─────
+  # Shield drains for both sensors terminate at CMC H1 (Sensor GND, pin 29) at ECU end.
   - - KNOCK_1: [1]
     - W_KNOCK_1: [1]
     - ECU_CMC: [39]
