@@ -480,7 +480,7 @@ A service loop is a small coil of extra wire (1–2 turns, ~30–50mm diameter) 
 
 | Connector | Method | Rationale |
 |-----------|--------|-----------|
-| AS79 engine-side mating plug | No individual loops — leave 200–300mm of harness slack near the connector exit, route with a gentle curve before the first P-clip | ~38 active wires (M52) / ~45 active wires (07K) through a 79-pin shell; individual loops inside the backshell are not practical at that density. Bundle-level slack provides the same function |
+| AS79 engine-side mating plug | No individual loops — leave 200–300mm of harness slack near the connector exit, route with a gentle curve before the first P-clip | ~45 active wires (07K Phase 3 — only mating plug built; Phase 1 uses OEM grommet, no AS79 mating plug) through a 79-pin shell; individual loops inside the backshell are not practical at that density. Bundle-level slack provides the same function |
 | Maven HD30 35-pin accessories | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before boot | 35 wires. Loop each wire, wrap the coiled bundle in 3:1 adhesive heat-shrink before sliding the boot on — holds loops organized and gives the boot a clean round profile to seat against |
 | Crank VR+/VR− connector end | ✓ Individual loop, 1–2 turns | Most vibration-sensitive signal; crank sensor at front of block sees belt-drive vibration |
 | CAM sensor connector end | ✓ Individual loop, 1–2 turns | Same rationale |

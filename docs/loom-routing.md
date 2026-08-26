@@ -30,7 +30,7 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 ---
 
 ### 2. Firewall Bulkhead
-**Connector:** Deutsch AS79 (79-way) — cabin flange receptacle permanent; engine-side mating plug swaps M52↔07K  
+**Connector:** Deutsch AS79 (79-way) — cabin flange receptacle permanent; engine-side mating plug installed at 07K swap (Phase 3 — first install, no M52 mating plug; Phase 1 uses OEM grommet)  
 **Location:** TODO — firewall pass-through location TBD at fitment (left of center stack preferred for short cabin→ECU run)  
 **Harness file:** `harnesses/firewall-bulkhead.wv`
 

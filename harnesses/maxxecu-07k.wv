@@ -309,12 +309,14 @@ connectors:
       Enable in MTune: CAN :: Default CAN output :: MaxxECU Default 1.3.
       Unchanged from M52 phase.
 
-  # ── Engine-side mating plug (07K — replaces M52 mating plug at bulkhead) ────
+  # ── Engine-side mating plug (07K Phase 3 — first installation, not a swap) ──────
 
   # ── Firewall bulkhead engine-side plug (07K Phase 3) — PIN REFERENCE ───────────
   # Connector type: Deutsch AS79 / Souriau 8STA 79-way jam nut plug (engine side)
-  # Operation: Unplug M52 engine mating plug, insert 07K mating plug. Cabin side unchanged.
-  # Full connector modeled in harnesses/firewall-bulkhead.wv (BULKHEAD_ENGINE_M52 / 07K notes).
+  # Operation: First installation of the AS79 engine-side plug at 07K swap. Phase 1 (M52)
+  #   used the pre-terminated harness through the OEM firewall grommet — no AS79 mating plug
+  #   was ever built or installed for Phase 1. Cabin side is pre-built during Phase 2.
+  # Full cabin-side connector modeled in harnesses/firewall-bulkhead.wv (BULKHEAD_CABIN).
   # Excluded from WireViz connectors here — bulkhead treated as transparent in this diagram.
   #
   # ── Confirmed AS79 pin assignments (cross-reference firewall-bulkhead.wv BULKHEAD_CABIN) ──

@@ -328,7 +328,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 *Source: `maxxecu-07k.wv`*
 
-> Phase 3 engine harness — replaces M52 engine-side mating plug. MaxxECU ECU, 12-pin, and 16-pin connectors carry over unchanged.
+> Phase 3 engine harness — first installation of the AS79 engine-side mating plug (no M52 mating plug existed; Phase 1 used OEM firewall grommet). MaxxECU ECU, 12-pin, and 16-pin connectors carry over unchanged.
 
 ### Connectors
 

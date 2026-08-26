@@ -312,10 +312,11 @@ connectors:
       # ── ONE spare cavity ─────────────────────────────────────────────
       - "SPARE"                                   # B47
     notes: >-
-      Connector B cabin side is permanent (never disconnected). Engine-side mating plug
-      swaps at M52→07K: M52 plug populates B1–B36 (B8/B14/B31–B33 on M52 mating plug;
-      B37–B46 cavity-plugged). 07K plug populates B1–B7, B9–B13, B15–B19 cavity-plugged
-      (07K uses B39–B40 for its own cam/crank CMC inputs), B20–B30, B34–B36, B37–B46.
+      Connector B cabin side is permanent (never disconnected). Phase 1 (M52) does NOT
+      use this connector — pre-terminated harness through OEM grommet. Engine-side mating
+      plug is installed for the first time at the 07K swap (Phase 3). 07K plug populates:
+      B1–B7, B9–B13, B20–B30, B34–B36, B37–B46; B8/B14/B15–B19/B31–B33 cavity-plugged
+      (07K uses B39–B40 for its own cam/crank CMC inputs).
       WBO2 Heater+ (LSU 4.9 pin 4) splices locally to +12V coil/inj rail (B1) on the
       engine side — no dedicated bulkhead pin needed.
       Crank VR+/−/shield (B15–B17) must be shielded twisted pair; shield terminates at
@@ -327,90 +328,34 @@ connectors:
       must either share an existing GND/5V rail (check load budgets) or overflow to
       Connector A spares A24–A29.
 
-  BULKHEAD_B_ENGINE_M52:
-    type: "Maven / Deutsch HD30 shell-size-24 47-way jam nut plug"
-    subtype: "Connector B engine side — M52 Phase 1. Unplugs at 07K swap."
-    pincount: 47
-    pinlabels:
-      - "+12V Coils/Inj → engine harness common rail"   # B1
-      - "Engine GND → cylinder head stud"               # B2
-      - "IGN 1 → coil 1"                                # B3
-      - "IGN 2 → coil 2"                                # B4
-      - "IGN 3 → coil 3"                                # B5
-      - "IGN 4 → coil 4"                                # B6
-      - "IGN 5 → coil 5"                                # B7
-      - "IGN 6 → coil 6"                                # B8  M52 only
-      - "INJ 1 → injector 1"                            # B9
-      - "INJ 2 → injector 2"                            # B10
-      - "INJ 3 → injector 3"                            # B11
-      - "INJ 4 → injector 4"                            # B12
-      - "INJ 5 → injector 5"                            # B13
-      - "INJ 6 → injector 6"                            # B14  M52 only
-      - "Crank VR+ → M52 crank sensor pin 1"            # B15
-      - "Crank VR- → M52 crank sensor pin 2"            # B16
-      - "Crank shield → sensor shell"                    # B17
-      - "Cam Hall signal → BMW 12141726590 pin 2"        # B18
-      - "SPARE — cavity plug"                            # B19
-      - "Sensor GND → CLT/IAT/TPS/MAP/PST-F1 GND"      # B20
-      - "CLT → Bosch JPT 2-way pin 1"                   # B21
-      - "IAT → OEM M52 pin 1"                           # B22
-      - "+5V → TPS pin 1 / MAP / PST-F1"               # B23
-      - "TPS signal → OEM TPS pin 2"                    # B24
-      - "MAP signal → MAP sensor"                       # B25
-      - "PST-F1 pressure → sensor pin 3"                # B26
-      - "PST-F1 temp → sensor pin 4"                    # B27
-      - "Flex fuel → Continental sensor signal"          # B28
-      - "Flex fuel +12V → Continental sensor +12V"      # B29
-      - "SPARE — cavity plug (boost solenoid on Connector A)" # B30
-      - "GPO 3 → VANOS solenoid pin 2"                  # B31  M52 only
-      - "GPO 4 → ICV coil A (JPT 3-way pin 2)"          # B32  M52 only
-      - "GPO 5 → ICV coil B (JPT 3-way pin 3)"          # B33  M52 only
-      - "Starter trigger → starter solenoid"             # B34
-      - "Alt D+ → alternator excitation terminal"       # B35
-      - "AIN 2 — STUB (sealed)"                         # B36
-      - "STUB — cavity plug"   # B37  (07K INJ 7)
-      - "STUB — cavity plug"   # B38  (07K IGN 7)
-      - "STUB — cavity plug"   # B39  (07K cam)
-      - "STUB — cavity plug"   # B40  (07K crank)
-      - "STUB — cavity plug"   # B41  (07K DBW signal)
-      - "STUB — cavity plug"   # B42  (07K DBW +5V)
-      - "STUB — cavity plug"   # B43  (07K DBW GND)
-      - "STUB — cavity plug"   # B44  (knock 1)
-      - "STUB — cavity plug"   # B45  (knock 2)
-      - "STUB — cavity plug"   # B46  (knock GND)
-      - "SPARE — cavity plug"  # B47
-    notes: >-
-      M52 Phase 1 engine-side plug. 36 active wires (B1–B36, minus B19 spare).
-      B37–B47 cavity-plugged. At 07K swap: unplug this, build and install 07K Phase 3 plug.
-      Connector A engine side stays connected throughout — do not unplug.
-      07K PHASE 3 PLUG PINOUT (not modelled as WireViz connector — describe at build time):
-        B1–B7: same (IGN 1-5 active; IGN 6 cavity-plug).
-        B8: cavity-plug (07K 5-cyl, no IGN 6).
-        B9–B13: same (INJ 1-5 active; INJ 6 cavity-plug).
-        B14: cavity-plug (07K 5-cyl, no INJ 6).
-        B15–B18: cavity-plug (M52 crank/cam; 07K uses B39–B40).
-        B19: spare cavity-plug.
-        B20–B23: same (sensor GND, CLT, IAT, +5V — verify 07K cam Hall shares G1 5V ref).
-        B24: cavity-plug (M52 TPS; 07K TB TPS → B41 DBW set).
-        B25–B29: same (MAP, PST pres, PST temp, flex sig, flex +12V).
-        B30: SPARE on both M52 and 07K plugs (boost solenoid moved to Connector A pin A24).
-        B31–B33: cavity-plug (VANOS, ICV A/B — 07K has none).
-        B34–B36: same (starter, alt D+, AIN2 stub).
-        B37: INJ 7 → 07K injector 5 (CMC L2).
-        B38: IGN 7 → 07K coil 5 (CMC D2).
-        B39: 07K cam signal (confirm CMC pin — different type from M52 Hall).
-        B40: 07K crank VR signal.
-        B41: DBW TB signal → TB TPS output.
-        B42: DBW TB +5V → TB sensor supply.
-        B43: DBW TB GND → TB sensor GND.
-        B44: Knock sensor 1.
-        B45: Knock sensor 2.
-        B46: Knock GND.
-        B47: SPARE.
-      Cam sensor note: if 07K cam Hall is +5V type and cannot share B23 (CMC G1),
-      migrate to Connector A A25 (+5V-2) / A26 (SGND-2).
-      DBW TB motor +/− stay on engine side (H-bridge engine-bay mounted) — do not cross bulkhead.
-      WBO2 Heater+ (LSU 4.9 pin 4): splice to +12V coil/inj rail at B1 on engine side.
+  # ── Connector B engine-side mating plug ─────────────────────────────────
+  # Phase 1 (M52): no engine-side plug exists here. Pre-terminated harness routes
+  # through OEM E36 firewall grommet. This connector (Connector B) is installed
+  # for the first time at the 07K swap (Phase 3).
+  #
+  # 07K PHASE 3 PLUG PINOUT (not modelled as WireViz connector — describe at build time):
+  #   B1–B7:   active (IGN 1-5; +12V; engine GND)
+  #   B8:      cavity-plug (07K has no IGN 6)
+  #   B9–B13:  active (INJ 1-5)
+  #   B14:     cavity-plug (07K has no INJ 6)
+  #   B15–B18: cavity-plug (M52 crank/cam pins unused — 07K uses B39–B40)
+  #   B19:     spare cavity-plug
+  #   B20–B23: active (sensor GND, CLT, IAT, +5V — verify 07K cam Hall shares CMC G1)
+  #   B24:     cavity-plug (M52 TPS unused — 07K DBW TB TPS routes via B41 DBW set)
+  #   B25–B29: active (MAP, PST pres, PST temp, flex sig, flex +12V)
+  #   B30:     SPARE (boost solenoid on Connector A pin A24)
+  #   B31–B33: cavity-plug (VANOS/ICV — 07K has none)
+  #   B34–B36: active (starter, alt D+, AIN2 stub)
+  #   B37:     INJ 7 → 07K injector 5 (CMC L2)
+  #   B38:     IGN 7 → 07K coil 5 (CMC D2)
+  #   B39:     07K cam signal (confirm CMC pin at build)
+  #   B40:     07K crank signal
+  #   B41–B43: DBW TB signal / +5V / GND
+  #   B44–B46: knock 1 / knock 2 / knock GND
+  #   B47:     SPARE
+  #
+  #   Connector A engine side stays connected throughout — do not unplug at swap.
+  #   WBO2 Heater+ (LSU 4.9 pin 4): splice to +12V coil/inj rail at B1 on engine side.
 
 
 cables:
@@ -554,6 +499,6 @@ connections:
 
   # Connector B: pins 1–36 minus B30 (spare). W_BULKHEAD_B wires 1–35 map sequentially,
   # skipping the B30 spare cavity: B1–B29 → wires 1–29, B31–B36 → wires 30–35.
+  # Engine-side plug (07K Phase 3 only) not modelled — built at swap time.
   - - BULKHEAD_B_CABIN: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36]
     - W_BULKHEAD_B: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
-    - BULKHEAD_B_ENGINE_M52: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36]
