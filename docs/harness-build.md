@@ -21,7 +21,7 @@ Reference for connector pinning, depinning, and harness assembly across all e36-
 | M52 coil connectors ×6 | Pre-wired in MaxxECU M50 terminated harness — **not applicable to custom 07K harness build** | 2 each | n/a (pre-made) |
 | 07K COP connectors ×5 | 4B0973724 (4-pin COP) | 4 each | Engineer PA-09 |
 | EWP controller | Kostal 2+2 (4-pin) | 4 | Engineer PA-09 |
-| PST-F1 sensor | BSP M10×1.0 pigtail | 2 | Engineer PA-09 |
+| PST-F1 sensor | Bosch Trapezoid 5-pin (`F02U.B00.751-01`) | 4 active (pin 1 unused) | Engineer PA-09 |
 | ATF temp sensor | 2-pin spliced to C1 | 2 | Engineer PA-09 |
 | 8HP CAN harness | GT150 12-pin pre-term. | n/a (pre-made) | n/a |
 | DCT shifter | 4-wire — bare ends | 4 | Open-barrel (IWISS IWS-2820M) |
@@ -64,7 +64,7 @@ All sensor connectors in the engine harness (injector, COP coil, cam/crank/MAP 3
 | **Depin — Molex small terminals** | 638132400 | C1/C2 small-pin extraction |
 | **Depin — Molex big terminals** | 638132300 | C1/C2 large-pin extraction |
 | **Depin — VW/Bosch PTS connectors** | Lisle 57750 | All VAG push-to-seat pigtails (sensor, COP, injector) |
-| **Depin — Deutsch AS size 20** | Deutsch **0411-240-2005** (~$15 — [deutschconnector.com](https://www.deutschconnector.com/products/deutsch_connector_tools/deutsch_connector_removal_tools/0411-240-2005/)) | Firewall bulkhead contacts — note: AS79 connector ships with one insertion/extraction tool included |
+| **Depin — Deutsch AS size 22** | Tool included with AS79 connector body (or M81969/14-01 equiv) — ⚠️ `0411-240-2005` is DT/DTM size-16/20 only, does not fit AS79 size-22 solid barrel contacts | Firewall bulkhead contacts only |
 
 > ⚠️ **Depin tool matters:** Lisle 57750 works on push-to-seat (PTS) bodies only.
 > Do NOT use it on pull-to-seat (PTLS) or Molex contacts — different locking geometry.
@@ -370,7 +370,7 @@ Every component has multiple wires. The EV14 injector connector has 2 pins and r
 | Pin 1 | +12V switched | Shared coils/inj power rail (tapped via Raychem splice from the bus wire running along the injector rail) |
 | Pin 2 | INJ-N signal | Individual wire from AS79 pin 8–13 — unique to each injector |
 
-The shared +12V bus runs as one continuous wire the full length of the injector rail. At each injector, a Raychem sleeve taps it: one wire in from the upstream bus, one stub out to the pigtail pin 1, one wire out continuing the bus downstream. The INJ signal wire (unique per injector) is a separate Raychem splice at the same pigtail, going to pin 2.
+The shared +12V bus runs as one continuous wire the full length of the injector rail. At each injector, a Raychem sleeve taps it: one wire in from the upstream bus, one stub out to EV14 pin 1, one wire out continuing the bus downstream. The INJ signal wire (unique per injector) runs **directly** from the AS79 contact (pin 8–12) to EV14 pin 2 — no splice, no pigtail.
 
 The 07K COP coil (4B0973724, 4-pin) has 3 active wires:
 
@@ -573,14 +573,12 @@ Print this list before touching any wire. Source: `firewall-bulkhead.wv` — BUL
 | 12 | `12 INJ5` | INJECTORS | ✓ | ✓ |
 | 13 | `13 INJ6` | INJECTORS | ✓ (M52) | — (cavity-plug) |
 | 14 | `14 INJ7` | INJECTORS | — (stub) | ✓ (07K 5th cyl) |
-| 16 | `16 CRANK-VR+` | TRIGGER | ✓ | — (07K uses pin 41) |
-| 17 | `17 CRANK-VR-` | TRIGGER | ✓ | — |
+| 16 | `16 CRANK-VR+` | TRIGGER | ✓ | ✓ (same pin both phases; connector body changes) |
+| 17 | `17 CRANK-VR-` | TRIGGER | ✓ | ✓ (same pin both phases) |
 | 18 | `18 CRANK-SHLD` | TRIGGER | ✓ | ✓ |
-| 19 | `19 CAM-HALL` | TRIGGER | ✓ (M52) | — (07K uses pin 20) |
-| 20 | `20 CAM-07K` | TRIGGER | — (stub) | ✓ (07K cam) |
-| 22 | `22 DBW-SIG` | SENSORS | — (stub) | ✓ (07K DBW TB signal) |
-| 23 | `23 DBW-5V` | SENSORS | — (stub) | ✓ (07K DBW TB +5V) |
-| 24 | `24 DBW-GND` | SENSORS | — (stub) | ✓ (07K DBW TB GND) |
+| 19 | `19 CAM-HALL` | TRIGGER | ✓ | ✓ (same pin both phases; connector body changes) |
+| 22 | `22 MOTOR+` | SENSORS | — (07K only) | ✓ |
+| 23 | `23 MOTOR-` | SENSORS | — (07K only) | ✓ |
 | 25 | `25 CLT` | SENSORS | ✓ | ✓ |
 | 26 | `26 IAT` | SENSORS | ✓ | ✓ |
 | 27 | `27 FLEX-12V` | SENSORS | ✓ | ✓ |
@@ -589,13 +587,12 @@ Print this list before touching any wire. Source: `firewall-bulkhead.wv` — BUL
 | 31 | `31 ENG-GND` | COILS | ✓ | ✓ |
 | 32 | `32 IGN5` | COILS | ✓ | ✓ |
 | 33 | `33 IGN6` | COILS | ✓ (M52) | — (cavity-plug) |
-| 34 | `34 IGN7` | COILS | — (stub) | ✓ (07K 5th cyl) |
-| 35 | `35 VANOS` | ACTUATORS | ✓ (M52) | — |
+| 34 | — cavity-plug — | COILS | — (cavity-plug) | — (cavity-plug; IGN 5 = pin 32) |
+| 35 | `35 VANOS` / `35 VVT-SOL` | ACTUATORS | ✓ (M52: VANOS) | ✓ (07K: VVT solenoid — same pin, relabel) |
 | 36 | `36 ICV-A` | ACTUATORS | ✓ (M52) | — |
-| 37 | `37 ICV-B` | ACTUATORS | ✓ (M52) | — |
+| 37 | `37 ICV-B` / `37 REV-LT` | ACTUATORS | ✓ (M52: GPO5 ICV-B) | ✓ (07K: GPO5 → rev light relay, MTune reassign, same wire) |
 | 38 | `38 STARTER` | ACTUATORS | ✓ | ✓ |
 | 39 | `39 ALT-D+` | ACTUATORS | ✓ | ✓ |
-| 41 | `41 CRANK-07K` | TRIGGER | — (stub) | ✓ (07K crank VR+) |
 | 43 | `43 KNOCK1` | KNOCK | — (stub) | ✓ |
 | 44 | `44 KNOCK2` | KNOCK | — (stub) | ✓ |
 | 45 | `45 KNOCK-GND` | KNOCK | — (stub) | ✓ |
@@ -609,7 +606,7 @@ Print this list before touching any wire. Source: `firewall-bulkhead.wv` — BUL
 | 64 | `64 FLEX-SIG` | SENSORS | ✓ | ✓ |
 | 79 | `79 SENS-GND` | SENSORS | ✓ | ✓ |
 
-**Type A totals:** M52 Phase 1 plug — 37 wires × 2 = **74 labels**. 07K Phase 3 plug adds 13 wires (pins 14, 20, 22–24, 34, 41, 43–45 + 3 DBW) × 2 = **26 more labels → 100 total**.
+**Type A totals:** M52 Phase 1 plug — 37 wires × 2 = **74 labels**. 07K Phase 3 plug adds 6 new-position wires (pins 14, 22, 23, 43, 44, 45) × 2 = **12 more labels → 86 total**. Pins 16/17/18/19/35/37 reuse M52 positions (relabel on 07K plug only — same physical positions). Pins 20, 24, 34, 41 = cavity-plug both phases (no label needed).
 
 ---
 

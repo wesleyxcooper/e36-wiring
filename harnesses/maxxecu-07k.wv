@@ -314,8 +314,8 @@ connectors:
   #     3, 31, 52:    Engine GND (three contacts in parallel, 3×5A = 15A)
   #   Ignition outputs (22 AWG max per size-22D contact):
   #     4: IGN 1 (CMC A2)   5: IGN 2 (CMC A3)   6: IGN 3 (CMC B2)   7: IGN 4 (CMC B3)
-  #     32: IGN 5 (CMC C2)  33: IGN 6 [M52 only, cavity-plug 07K]    34: EXP IGN 7
-  #   Injector outputs (22 AWG main harness through size-22D contact; pigtail stub engine-side can be 20 AWG after splice):
+  #     32: IGN 5 (CMC C2)  33: IGN 6 [M52 only, cavity-plug 07K]    34: SPARE — cavity-plug both phases (IGN 5 = pin 32)
+  #   Injector outputs (22 AWG end-to-end, direct termination — no pigtail splice):
   #     8: INJ 1 (CMC K1)   9: INJ 2 (CMC K2)   10: INJ 3 (CMC M1)
   #     11: INJ 4 (CMC M2)  12: INJ 5 (CMC M3)  13: INJ 6 [M52 only, cavity-plug 07K]
   #   Crank / Cam triggers:

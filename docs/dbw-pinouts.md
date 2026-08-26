@@ -166,9 +166,9 @@ Source: `harnesses/maxxecu-07k.wv` lines confirming Motor+/− via AS79 pins 22/
 
 | Signal | AS79 pin | MaxxECU terminal | Wire |
 |---|---|---|---|
-| ETh Motor+ | 22 | C2 H4 (MOTOR 1+) | 20 AWG |
-| ETh Motor− | 23 | C2 H2 (MOTOR 1−) | 20 AWG |
-| TPS1 | 48 | CMC G2 (AIN 5 / was M52 TPS) | 22 AWG shielded |
+| ETh Motor+ | 22 | C2 H4 (MOTOR 1+) | **22 AWG** (AS79 size-22D; 20 AWG will not seat) |
+| ETh Motor− | 23 | C2 H2 (MOTOR 1−) | **22 AWG** (same) |
+| TPS1 | 48 | CMC G2 (C1 TPS input / was M52 TPS) | 22 AWG shielded |
 | TPS2 | 56 | CMC J2 (AIN 2) | 22 AWG shielded |
 | +5V sensor supply | 47 | CMC G1 (+5V SENS OUT) | 22 AWG |
 | Sensor GND | 79 | CMC H1 (SGND) | 22 AWG |

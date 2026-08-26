@@ -14,15 +14,58 @@ Usage:
 Install hook:
     bash scripts/install-hooks.sh
 
-Adding rules:
+═══════════════════════════════════════════════════════════════════════════════
+METHODOLOGY — HOW TO MAINTAIN THIS AUDIT
+═══════════════════════════════════════════════════════════════════════════════
+
+This audit is intentionally self-reinforcing: every inconsistency found in a
+manual review becomes a DenyRule or a structural check so it can never silently
+re-appear.
+
+Workflow after finding an issue:
+  1. Fix the affected file(s).
+  2. Identify the "wrong value" pattern and add a DenyRule below — or, if the
+     check requires comparing two values across a file, add a structural check
+     in the structural_audit_file() section at the bottom.
+  3. Optionally add the correct value to KNOWN_CMC_PINS / KNOWN_AS79_PINS if
+     it is a signal→pin mapping that should be enforced everywhere.
+  4. Run the audit to confirm it now catches the old value and passes on the
+     corrected file.
+
+There are three layers of protection:
+
+  Layer 1 — DENYLIST (regex, per-line)
+    Catches explicit wrong values: wrong part numbers, wrong AWG specs,
+    deprecated architecture references, wrong connector family names, etc.
+    Rule of thumb: add one rule per issue class found, not per file.
+
+  Layer 2 — KNOWN_CMC_PINS / check_signal_pin_references (structural, cross-file)
+    A ground-truth dict maps signal keywords to their correct CMC pin numbers.
+    The checker scans every "CMC pin NN" reference near a signal keyword and
+    flags mismatches.  Add an entry whenever a signal→pin mapping is confirmed
+    by an authoritative source (MaxxECU wiring diagram or maxxecu-07k.wv).
+
+  Layer 3 — check_wire_color_convention / check_duplicate_pins (structural)
+    Validates .wv cable definitions: color↔function convention and no duplicate
+    pin indices in the same connections entry.
+
+Adding a DenyRule:
     Each DenyRule has:
       pattern   — regex that must NOT match any line in any audited file
       message   — human-readable explanation of why it's wrong
-      source    — authoritative URL that confirms the correct value
+      source    — authoritative file or URL confirming the correct value
       exclude   — optional regex; if it also matches the same line, the
                   violation is suppressed.  Use this when a line legitimately
                   mentions a wrong value *in order to warn against it*
-                  (e.g. "NOT K43", "does not exist").
+                  (e.g. "NOT K43", "does not exist", "20 AWG will not seat").
+
+Tips:
+  • Use the exclude= field liberally — it is better to have a rule that
+    suppresses one legitimate warning-context line than to have no rule at all.
+  • Prefer narrow patterns over broad ones: "CLT.*CMC pin 13" is better than
+    "CMC pin 13" (which could legitimately appear in WBO2 heater context).
+  • After each manual audit round, grep for the old-wrong patterns in the
+    repo to confirm there are no survivors.
 """
 
 import re
@@ -264,6 +307,142 @@ DENYLIST: list[DenyRule] = [
         exclude=r"(?i)(NOT|wrong|does\s+not\s+stay|incorrect)",
     ),
 
+    # ── DBW motor wire gauge ─────────────────────────────────────────────────
+    # Audit round 3 (2025-07): wiring-bom.md lines 34–35, dbw-pinouts.md lines
+    # 169–170, and firewall-bulkhead.wv line 253 all said "20 AWG minimum" for
+    # motor leads.  AS79 size-22D contacts accept 22–26 AWG only.
+    DenyRule(
+        pattern=r"(?i)(Motor\+|Motor-|ETh.{0,10}Motor|DBW.{0,10}Motor).{0,40}20\s*AWG",
+        message="DBW throttle body motor wires (AS79 pins 22/23) must be 22 AWG. "
+                "AS79 size-22D contacts accept 22–26 AWG only — 20 AWG will not seat. "
+                "Source: maxxecu-07k.wv W_DBW_MOTOR notes; 26-07k-harness.md.",
+        source="harnesses/maxxecu-07k.wv",
+        exclude=r"(?i)(NOT|cannot|will not seat|does not|22.AWG.{0,20}not.{0,20}20|20.AWG.{0,20}will not)",
+    ),
+    DenyRule(
+        pattern=r"(?i)20\s*AWG.{0,40}(Motor\+|Motor-|ETh.{0,10}Motor|DBW.{0,10}Motor)",
+        message="DBW throttle body motor wires (AS79 pins 22/23) must be 22 AWG. "
+                "AS79 size-22D contacts accept 22–26 AWG only — 20 AWG will not seat. "
+                "Source: maxxecu-07k.wv W_DBW_MOTOR notes.",
+        source="harnesses/maxxecu-07k.wv",
+        exclude=r"(?i)(NOT|cannot|will not seat|does not|22.AWG.{0,20}not.{0,20}20)",
+    ),
+    # Deprecated pigtail-stub tail with 20 AWG (old method, never valid in this build)
+    DenyRule(
+        pattern=r"(?i)pigtail.{0,20}stub.{0,40}20\s*AWG|20\s*AWG.{0,40}pigtail.{0,20}stub",
+        message="The pigtail-stub / 20 AWG engine-side tail approach is deprecated. "
+                "All harness wires are 22 AWG TXL end-to-end, direct termination. "
+                "Source: wiring-bom.md § Pigtail tail wire removed; harness-build.md § Direct Termination.",
+        source="docs/harness-build.md",
+        exclude=r"(?i)(removed|replaced|no longer|deprecated|previous|NOT|old method|was.*20)",
+    ),
+
+    # ── EWP supply wire gauge ─────────────────────────────────────────────────
+    # Audit round 3: wiring-bom.md line 43 (bulk wire table) said 10 AWG.
+    # 10 AWG is marginal at 35.5A / 1.5m; 8 AWG is spec.
+    DenyRule(
+        pattern=r"(?i)(EWP|CWA400|electric\s+water\s+pump).{0,50}10\s*AWG",
+        message="EWP supply wire must be 8 AWG. 10 AWG is marginal at 35.5A / 1.5m "
+                "(voltage drop exceeds CWA400 spec). "
+                "Source: wiring-bom.md CABLE_PWR_OUT definition.",
+        source="docs/wiring-bom.md",
+        # GND return cable (CABLE_GND) at 10 AWG is fine — lower impedance path, shorter.
+        # Dual-leg architecture (10 AWG per leg × 2 in parallel) is fine — parallel = lower resistance.
+        # "Insufficient" / "marginal" lines are warning context, not an error.
+        exclude=r"(?i)(marginal|NOT|8.AWG.{0,20}not.{0,20}10|10.*marginal|insufficient|undersized"
+                r"|CABLE_GND|chassis\s+GND|GND.*10\s*AWG|10\s*AWG.*GND"
+                r"|per\s+leg|per.leg|parallel\s+leg|O5.*O14|dual.*AWG)",
+    ),
+
+    # ── CLT CMC pin number ────────────────────────────────────────────────────
+    # Audit round 3: 26-07k-harness.md line 127 said "CMC pin 13" for CLT.
+    # CMC pin 13 = D1 = WBO2 Heater−.  CLT = CMC F1 = pin 21.
+    DenyRule(
+        pattern=r"(?i)(CLT|coolant.{0,10}temp).{0,40}CMC.{0,10}pin\s*13"
+                r"|CMC.{0,10}pin\s*13.{0,40}(CLT|coolant.{0,10}temp)",
+        message="CLT is at CMC F1 = pin 21. CMC pin 13 = D1 = WBO2 Heater−. "
+                "Wiring CLT to pin 13 connects coolant temp to the WBO2 heater output. "
+                "Source: harnesses/maxxecu-07k.wv ECU_CMC pinlabels.",
+        source="harnesses/maxxecu-07k.wv",
+        exclude=r"(?i)(NOT|wrong|was.*13|13.*was|correct.*21|21.*correct)",
+    ),
+
+    # ── Knock sensor 1J0973712 contact family ────────────────────────────────
+    # Audit round 3: 26-07k-harness.md line 120 said "JMT 1.5mm" for 1J0973712.
+    # 1J0973712 uses flat-blade (push-on spade) contacts, not round-pin JMT.
+    DenyRule(
+        pattern=r"(?i)1J0973712.{0,40}JMT|JMT.{0,40}1J0973712",
+        message="1J0973712 (knock sensor connector) uses flat-blade (push-on spade) contacts — "
+                "NOT JMT 1.5mm round-pin. JMT contacts will not seat in 1J0973712 cavities. "
+                "Source: E36_CSVs/E36_Phase3_FinalSwap.csv; 26-07k-harness.md parts table.",
+        source="docs/wiring-bom.md",
+        exclude=r"(?i)(NOT|will not seat|JMT.{0,10}not|not.{0,10}JMT|flat.blade.*not|not.*flat.blade)",
+    ),
+
+    # ── AS79 pin 34 as active IGN 7 ──────────────────────────────────────────
+    # Audit round 3: maxxecu-07k.wv comment and firewall-bulkhead.wv notes
+    # both said "34: EXP IGN 7" / "34 (IGN 7)" as an active 07K pin.
+    # Pin 34 is cavity-plug on both M52 and 07K; 07K 5th cyl = IGN 5 at pin 32.
+    DenyRule(
+        pattern=r"(?i)pin\s*34.{0,30}IGN.{0,5}7|IGN.{0,5}7.{0,30}pin\s*34",
+        message="AS79 pin 34 is cavity-plug on both M52 and 07K phases. "
+                "07K 5th cylinder uses IGN 5 at AS79 pin 32 (CMC C2). "
+                "IGN 7 at CMC D2 is unused on both engine variants. "
+                "Source: firewall-bulkhead.wv cabin-side label; 26-07k-harness.md.",
+        source="harnesses/firewall-bulkhead.wv",
+        exclude=r"(?i)(cavity.plug|spare|NOT|not.{0,10}active|correct.*32|32.*correct|plug.*both)",
+    ),
+
+    # ── TPS1 mislabeled as AIN 5 ─────────────────────────────────────────────
+    # Audit round 3: dbw-pinouts.md line 171 parenthetical "(AIN 5 / was M52 TPS)".
+    # TPS1 is at CMC G2 (C1 TPS input). AIN 5 = CMC C2 G3 = clutch position sensor.
+    DenyRule(
+        pattern=r"(?i)TPS\s*1?.{0,30}AIN\s*5|AIN\s*5.{0,30}TPS\s*1?",
+        message="TPS1 is at CMC G2 (C1 TPS input). AIN 5 = CMC C2 G3 (clutch position sensor). "
+                "These are different pins on different ECU connectors. "
+                "Source: harnesses/maxxecu-07k.wv ECU_CMC and ECU_C2 pinlabels.",
+        source="harnesses/maxxecu-07k.wv",
+        exclude=r"(?i)(NOT|wrong|AIN\s*5.{0,20}is.{0,20}clutch|clutch.{0,20}AIN\s*5|≠)",
+    ),
+
+    # ── INJ signal wire splice ────────────────────────────────────────────────
+    # Audit round 3: harness-build.md line 373 said INJ signal wire uses a
+    # "separate Raychem splice at the same pigtail, going to pin 2".
+    # INJ signal wires run end-to-end; only the +12V bus (pin 1) gets a Raychem tap.
+    DenyRule(
+        pattern=r"(?i)(INJ.{0,20}signal|signal.{0,20}INJ).{0,60}(Raychem\s*splice|pigtail\s*splice|splice.{0,20}pin\s*2)",
+        message="INJ signal wires (EV14 pin 2) run end-to-end from AS79 to EV14 terminal — no splice. "
+                "Only the shared +12V bus (EV14 pin 1) uses a Raychem tap splice. "
+                "Source: harness-build.md § Direct Termination; wiring-bom.md line 45.",
+        source="docs/harness-build.md",
+        exclude=r"(?i)(NOT|no\s+splice|no\s+intermediate|end.to.end|directly from)",
+    ),
+
+    # ── Deutsch 0411-240-2005 as AS79 extraction tool ────────────────────────
+    # Audit round 3: harness-build.md line 67 labeled 0411-240-2005 as the
+    # "Firewall bulkhead contacts" depin tool.  It is DT/DTM size-16/20 only.
+    DenyRule(
+        pattern=r"(?i)0411-240-2005.{0,60}(AS\s*79|bulkhead|size.22\b)",
+        message="Deutsch 0411-240-2005 is a DT/DTM series size-16/20 extraction tool. "
+                "It does NOT fit AS79 size-22 solid barrel contacts. "
+                "Use the tool shipped with the AS79 connector body (M81969/14-01 equiv). "
+                "Source: harness-build.md § Tools table.",
+        source="docs/harness-build.md",
+        exclude=r"(?i)(NOT|does not fit|do not use|cannot|DT.{0,5}DTM|not for AS|wrong)",
+    ),
+
+    # ── DBW TPS cable sensor GND color ───────────────────────────────────────
+    # Audit round 3: wiring-bom.md line 348 listed BK (chassis GND) and GN (GPO)
+    # for the DBW TPS 4-wire cable.  Correct: BN (sensor GND), WH (TPS2 signal).
+    DenyRule(
+        pattern=r"(?i)(DBW.{0,10}TPS|TPS.{0,10}4.wire).{0,60}\bBK\b.{0,30}(sensor\s*GND|SGND|GND\s*signal)",
+        message="DBW TB TPS 4-wire sensor GND wire must be BN (Brown), not BK (Black). "
+                "BK = chassis GND only. BN = sensor GND / VR Signal−. "
+                "Source: harnesses/maxxecu-07k.wv W_DBW_TPS cable colors.",
+        source="harnesses/maxxecu-07k.wv",
+        exclude=r"(?i)(NOT|wrong|BN.{0,20}not.{0,20}BK|use.{0,10}BN)",
+    ),
+
     # ── EWP SSR / relay — replaced by PMU16 ──────────────────────────────────
     DenyRule(
         pattern=r"(?i)(CWA400|EWP|electric\s+water\s+pump).{0,80}(Crydom|D1D40|40A\s+relay|power\s+hold\s+relay)",
@@ -285,6 +464,36 @@ DENYLIST: list[DenyRule] = [
         source="harnesses/power-distribution.wv",
         exclude=r"(?i)(removed|replaced|replaces|no\s+longer|NOT|obsolete|superseded)",
     ),
+]
+
+# ---------------------------------------------------------------------------
+# Ground-truth signal → CMC pin mapping  (Layer 2)
+# ---------------------------------------------------------------------------
+# Source of truth: harnesses/maxxecu-07k.wv ECU_CMC / ECU_C2 pinlabels block.
+# Each entry: signal_keyword → (row_col_label, cmc_pin_number)
+# The checker below scans every "CMC pin NN" reference near the keyword and
+# flags if NN does not match cmc_pin_number.
+#
+# How to add entries:
+#   1. Confirm the pin number from maxxecu-07k.wv ECU_CMC pinlabels comments.
+#   2. Add ("SIGNAL_KEYWORD", "row_col", pin_number) — keyword is case-insensitive.
+#   3. Run the audit to confirm no false positives (adjust keyword if needed).
+KNOWN_CMC_PINS: list[tuple[str, str, int]] = [
+    # (signal_keyword, cmc_row_col, correct_cmc_pin_number)
+    ("CLT",             "F1",  21),   # Coolant Temp → C1 F1
+    ("IAT",             "F2",  22),   # Intake Air Temp → C1 F2
+    ("WBO2 Heater",     "D1",  13),   # WBO2 Heater- → C1 D1
+    ("GND Shield",      "E3",  19),   # Shield drain GND → C1 E3
+    ("Sensor GND",      "H1",  29),   # Sensor GND rail → C1 H1
+    ("MAP",             "J3",  37),   # MAP sensor AIN → C1 J3
+    ("TPS1",            "G2",  26),   # TPS1 / DBW TB TPS1 → C1 G2
+    ("TPS2",            "J2",  34),   # TPS2 / DBW TB TPS2 → C1 J2
+    ("IGN 5",           "C2",  10),   # Ignition output 5 → C1 C2
+    ("INJ 1",           "K1",  45),   # Injector output 1 → C1 K1
+    ("INJ 2",           "K2",  46),   # Injector output 2 → C1 K2
+    ("INJ 3",           "M1",  49),   # Injector output 3 → C1 M1
+    ("INJ 4",           "M2",  50),   # Injector output 4 → C1 M2
+    ("INJ 5",           "M3",  51),   # Injector output 5 → C1 M3
 ]
 
 # ---------------------------------------------------------------------------
@@ -513,10 +722,58 @@ def check_wire_color_convention(path: Path) -> list[str]:
     return errors
 
 
+def check_signal_pin_references(path: Path) -> list[str]:
+    """
+    Layer 2 structural check: scan every line for patterns like
+    "SIGNAL ... CMC pin NN" and verify NN matches KNOWN_CMC_PINS.
+
+    This catches the class of error where a doc correctly names the signal
+    but then quotes the wrong CMC pin number — the kind of error that is easy
+    to introduce when copying rows from one table to another.
+
+    Only triggers when BOTH the signal keyword AND a CMC-pin reference appear
+    within 120 characters on the same line.  Pure signal mentions (no pin
+    number) are ignored.  Lines that also contain NOT / wrong / correct /
+    was / fix are suppressed (warning-context lines).
+    """
+    if path.suffix not in {".md", ".csv"}:
+        return []
+    errors = []
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except Exception:
+        return []
+
+    rel = str(path.relative_to(ROOT))
+    _SUPPRESS = re.compile(r"(?i)\b(NOT|wrong|was|correct|fix|error|should be|incorrect)\b")
+    _CMC_PIN  = re.compile(r"\bCMC\s+pin\s+(\d+)\b", re.IGNORECASE)
+
+    for keyword, row_col, correct_pin in KNOWN_CMC_PINS:
+        kw_re = re.compile(re.escape(keyword), re.IGNORECASE)
+        for lineno, line in enumerate(lines, 1):
+            if not kw_re.search(line):
+                continue
+            if _SUPPRESS.search(line):
+                continue
+            for m in _CMC_PIN.finditer(line):
+                found_pin = int(m.group(1))
+                if found_pin != correct_pin:
+                    errors.append(f"\n  {rel}:{lineno}")
+                    errors.append(
+                        f"  ERROR: Signal '{keyword}' referenced with CMC pin {found_pin}, "
+                        f"but KNOWN_CMC_PINS says it should be CMC {row_col} = pin {correct_pin}. "
+                        f"Source: harnesses/maxxecu-07k.wv ECU_CMC pinlabels."
+                    )
+                    errors.append(f"  SOURCE: harnesses/maxxecu-07k.wv")
+                    errors.append(f"  LINE:   {line.strip()[:140]}")
+    return errors
+
+
 def structural_audit_file(path: Path) -> list[str]:
     errors = []
     errors.extend(check_duplicate_pins_in_connections(path))
     errors.extend(check_wire_color_convention(path))
+    errors.extend(check_signal_pin_references(path))
     return errors
 
 

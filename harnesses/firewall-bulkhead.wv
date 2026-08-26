@@ -102,7 +102,7 @@ connectors:
       - "IGN 4 (CMC B3)"                        # 7   R1  Size 22D  22 AWG
       # ══ SECTOR 2 (3→6 o'clock) — INJ outputs + GPO actuators ═══════════
       # R1 outer, pins 8–14
-      - "INJ 1 (CMC K1)"                        # 8   R1  Size 22D  22 AWG  (pigtail stub engine-side can be 20 AWG after splice)
+      - "INJ 1 (CMC K1)"                        # 8   R1  Size 22D  22 AWG  (direct termination — 22 AWG end-to-end; no pigtail splice)
       - "INJ 2 (CMC K2)"                        # 9   R1  Size 22D  22 AWG
       - "INJ 3 (CMC M1)"                        # 10  R1  Size 22D  22 AWG
       - "INJ 4 (CMC M2)"                        # 11  R1  Size 22D  22 AWG
@@ -250,7 +250,7 @@ connectors:
         Motor+ → cabin side of pin 22 → MaxxECU C2 H4 (MOTOR 1+).
         Motor- → cabin side of pin 23 → MaxxECU C2 H2 (MOTOR 1-).
         Engine side of pins 22/23 → TB motor terminals (verify polarity at bench before final crimp).
-        20 AWG minimum (H-bridge output, ~3A peak). Source: MaxxECU RACE C2 pinout.
+        22 AWG (H-bridge output, ~3A peak — AS79 size-22D contacts accept 22–26 AWG only; 20 AWG will not seat). Source: `maxxecu-07k.wv` W_DBW_MOTOR notes.
         GPO 3 and GPO 4 are NOT used for motor drive. GPO 3 → VVT solenoid (pin 35).
 
       DBW TPS (pins 48/56): TPS1 (pin 48) and TPS2 (pin 56) serve both M52 TPS and 07K DBW.
@@ -355,7 +355,8 @@ connectors:
       Pins 53–75, 77–78 are cavity-plugged spares.
       At 07K swap: unplug this, build and install 07K Phase 3 plug.
       07K plug populates NEW pins vs M52: 14 (INJ 7), 22 (ETh Motor+ from C2 H4), 23 (ETh Motor-
-        from C2 H2), 34 (IGN 7), 43–45 (knock 1/2/GND), 56 (DBW TPS2 / AIN 2 if fitted).
+        from C2 H2), 43–45 (knock 1/2/GND), 56 (DBW TPS2 / AIN 2 if fitted).
+        Pin 34 = cavity-plug on BOTH M52 and 07K — 07K 5th cyl uses IGN 5 at pin 32.
       07K pins UNCHANGED from M52: 16/17/18 (crank VR+/VR-/shield — different sensor body, same pins),
         19 (cam Hall — different sensor body, same pin), 35 (GPO3: VANOS→VVT solenoid),
         and all power/GND/injector/ignition pins.

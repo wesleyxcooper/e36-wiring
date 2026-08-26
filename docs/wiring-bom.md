@@ -31,8 +31,8 @@ Mil-spec M22759 is what race teams use. It's fine but costs 5–10× more and is
 | Grey | Injector drive outputs (INJ 1–5) | 25m | INJ signal wires only — not IGN. Previously mislabeled as IGN. |
 | Green | GPO actuator outputs only (VVT solenoid, boost solenoid) | 15m | GPO outputs only — not injectors. |
 | **Yellow** | **Shield GND drain wire only** | **10m** | **Convention: YE = shield drain (single-end, ECU end). Crank, cam, knock shields. Never use Yellow for Starter trigger or Alt D+.** |
-| Orange | DBW ETh Motor+ | 5m | 20 AWG minimum. |
-| Violet | DBW ETh Motor−, PWM signal wires | 5m | 20 AWG for motor leads; 22 AWG for PWM signals. |
+| Orange | DBW ETh Motor+ | 5m | **22 AWG** (AS79 size-22D accepts 22–26 AWG only; 20 AWG will not seat). |
+| Violet | DBW ETh Motor−, PWM signal wires | 5m | **22 AWG** for motor leads; 22 AWG for PWM signals. |
 | White + Blue (WH/BU twisted pair) | CAN H / CAN L | 10m | Buy as pre-twisted pair (WiringPros sells by the foot). WH = CAN H, BU = CAN L — matches all .wv harness files. |
 
 Heavier gauge for specific runs (buy short lengths, not full spools):
@@ -40,7 +40,7 @@ Heavier gauge for specific runs (buy short lengths, not full spools):
 | Gauge | Use | Length |
 |-------|-----|--------|
 | 12 AWG GXL red/black | Fan relay output runs (after DT bypass connector, to fan motor) | 5m |
-| 10 AWG GXL red | EWP output run (after DT bypass connector, to CWA400) | 2m |
+| 8 AWG GXL red | EWP output run (after DT bypass connector, to CWA400) | 2m |
 
 > **Pigtail tail wire removed.** Previous BOM listed 18 AWG coil tails and 20 AWG injector tails for pigtail-to-harness splices. The build now uses direct termination — TXL 22 AWG runs end-to-end from the AS79 to the sensor connector terminal; no intermediate splice and no heavier-gauge stub. See `walkthroughs/26-07k-harness.md` connector sourcing section.
 
@@ -345,7 +345,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | Run | Color(s) | Gauge | Length | Shielded | Notes |
 |-----|----------|-------|--------|----------|-------|
 | DBW TB Motor +/− | OG, VT | 22 AWG | 0.5 m ea | No | H-bridge output — **22 AWG max** (AS79 size-22D contacts accept 22–26 AWG only; 20 AWG will not seat). 3A peak at 0.5 m — 22 AWG adequate. Verify polarity before crimping. |
-| DBW TB TPS 4-wire | RD, BK, WH, GN | 22 AWG | 0.5 m | Preferred | +5V, GND, TPS1, TPS2 signals |
+| DBW TB TPS 4-wire | RD, BN, WH, WH | 22 AWG | 0.5 m | Preferred | +5V (RD), Sensor GND (BN — not BK; BK=chassis GND), TPS1 signal (WH), TPS2 signal (WH). Source: `maxxecu-07k.wv` W_DBW_TPS cable. |
 | Knock sensor 1 signal | WH | 22 AWG | 0.4 m | Preferred | KS1 signal wire; shield drain at ECU end |
 | Knock sensor 2 signal | WH | 22 AWG | 0.6 m | Preferred | KS2 signal wire |
 | Knock shield drain | YE | 22 AWG | 0.5 m | No | Shared knock sensor shield drain (via bulkhead **pin 45** → CMC H1 Sensor GND). Source: `maxxecu-07k.wv` comment; `firewall-bulkhead.wv` pin 45. Color YE = shield drain — never BK (power GND). |
@@ -367,7 +367,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 |-----|------|-------|
 | 1 | Deutsch Autosport AS79 / Souriau 8STA 79-way flange receptacle | Cabin side — permanent. Deutsch p/n AS616-79PN or Souriau 8STA79PN |
 | 1 | Deutsch AS79 / Souriau 8STA 79-way jam nut plug — M52 engine side | Phase 1 mating plug. Sector-optimized layout per `firewall-bulkhead.wv`. ~38 active pins, remainder cavity-plugged |
-| 1 | Deutsch AS79 / Souriau 8STA 79-way jam nut plug — 07K engine side | Phase 3 mating plug. Same pin numbers as M52 plug + adds 07K-only stubs (IGN 7, INJ 7, cam, crank, DBW, knock) |
+| 1 | Deutsch AS79 / Souriau 8STA 79-way jam nut plug — 07K engine side | Phase 3 mating plug. Same pin numbers as M52 plug. Adds 07K-only pins: INJ 7 (14), ETh Motor+/− (22/23), knock 1/2/shield (43–45). Cam (19) and crank (16/17/18) **reuse M52 pin positions** — only the engine-side connector body changes. Pin 34 cavity-plug both phases. |
 | — | AS79 / 8STA **size-22** solid barrel sockets (38943-22) | Cabin side contacts — order with housing kit or separately. 5A max, 22–26 AWG. Source: m-cal.com AS020-35SN product data ("Primary Contacts Size: 22 AWG"); ecuplus.de AS620-35PN ("79x 22 AWG"). |
 | — | AS79 / 8STA **size-22** solid barrel pins (38941-22) | Engine-side mating plug contacts. 5A max, 22–26 AWG. |
 | — | AS79 / 8STA cavity plugs (size 22) | Seal all unused cavities on both sides — required for IP67. ~41 unused on M52 side, ~34 on 07K side |
@@ -390,9 +390,9 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 | Qty | Item | Notes |
 |-----|------|-------|
-| 4 | Deutsch DT 2-pin connector pair (DT06-2S receptacle + DT04-2P plug + W2S wedge) | One per relay output: +12V Fan · +12V Cond Fan · +12V EWP · +12V AC. Rated 25A/contact. DT connector max per contact = 25A; for EWP use 10 AWG and derate — 36.3A peak is within short-term rating |
-| — | DT size-16 contacts (12 AWG) | Fan relay outputs — 12 AWG fits size-16 DT contact |
-| — | DT size-12 contacts (10 AWG) | EWP output only — 10 AWG, 36.3A max |
+| 4 | Deutsch DT 2-pin connector pair (DT06-2S receptacle + DT04-2P plug + W2S wedge) | One per relay output: +12V Fan · +12V Cond Fan · +12V EWP · +12V AC. Fan contacts rated 25A/contact. EWP contacts rated 35A/contact. |
+| — | DT size-16 contacts (12 AWG) | Fan relay outputs — 12 AWG, 25A max |
+| — | DT size-8 contacts (8 AWG) | **EWP output only** — 8 AWG, 35A continuous (Phase 3: PMU16 O5+O14 direct drive). ⚠️ Size-12 contacts (10 AWG / 22A max) are **insufficient** for 35.5A nominal EWP load. |
 | 1 | Weatherproof firewall grommet, ~25mm | For the 4× DT wire bundles through firewall alongside main connector plate |
 
 ---
