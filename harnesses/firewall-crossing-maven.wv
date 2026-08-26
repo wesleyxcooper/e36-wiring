@@ -1,9 +1,8 @@
 # firewall-crossing-maven.wv
 # E36 Firewall Crossing — Maven HD30 Dual 16+16 (cabin ↔ engine-bay ECU)
 #
-# ACTIVE ARCHITECTURE for cabin↔engine-bay ECU signal routing.
-# Supersedes the abandoned single AS79 (firewall-bulkhead.wv) and dual Maven-HD30-plus-AS79
-# (firewall-bulkhead-dual.wv) designs — both retained as historical reference only.
+# ACTIVE ARCHITECTURE for cabin↔engine-bay ECU signal routing under the H2O
+# engine-bay-mount design (see docs/vendor/maxxecu/MaxxECU_RACE_H2O.md).
 #
 # ─────────────────────────────────────────────────────────────────────────────
 # CONTEXT: MaxxECU RACE H2O in engine bay
@@ -69,9 +68,18 @@
 #   Mated IP67 (TE Connectivity Deutsch DT technical brochure)
 #   1/4-turn coupling ring (audible/tactile mate confirmation)
 #
-# CAN topology:
-#   ISO 11898-2:2016 (High-speed CAN transceiver — twisted pair, 120Ω differential)
-#   Texas Instruments SLLA279 "Introduction to the CAN Physical Layer"
+# CAN topology (twisted pair + 120Ω termination):
+#   MaxxECU official docs:
+#     https://maxxecu.com/webhelp/can-information.html
+#       "A correctly terminated CAN bus uses two 120 Ω termination resistors,
+#        one at each end of the bus... MaxxECU GEN1 (MINI, STREET, RACE, RACE H2O,
+#        PRO): Built-in termination on CAN1."
+#     https://maxxecu.se/webhelp/can-default_maxxecu_protocol.html
+#       "Wiring loom: Twisted pink / gray. Pink = CAN L, grey = CAN H."
+#       "External termination (120 ohm) is recommended for bus lengths over 1m."
+#   Underlying standard:
+#     ISO 11898-2:2016 (High-speed CAN transceiver — twisted pair, 120Ω differential)
+#     Texas Instruments SLLA279 "Introduction to the CAN Physical Layer"
 #
 # APS (E46 accelerator pedal module — Phase 3):
 #   Repo-internal: docs/dbw-pinouts.md

@@ -2,11 +2,12 @@ metadata:
   project: E36 Restomod -- BMW E46 Accelerator Pedal (DBW) Wiring
   description: >-
     BMW E46 accelerator pedal module (35426786282 manual / 35426786281 auto)
-    wired to MaxxECU RACE. Phase 3 (07K engine). MaxxECU is cabin-mounted on the
-    interior firewall face. APS wiring is CABIN-TO-CABIN ONLY -- no firewall
-    bulkhead crossing required. Six wires run from pedal (footwell) to MaxxECU
-    C2 connector and the main CMC sensor supply rail. AS79 bulkhead pins 72-77
-    are NOT used for APS; they remain spare.
+    wired to MaxxECU RACE H2O. Phase 3 install (07K engine + APS pedal). MaxxECU
+    is ENGINE-BAY mounted (OEM DME E-box cavity, intake side of RHD car). APS
+    signals cross the firewall via the Maven HD30 dual bulkhead Connector B
+    (see harnesses/firewall-crossing-maven.wv). Six wires run from the pedal
+    (cabin footwell) to Maven B_CABIN pins 1-6, then engine-bay side to MaxxECU
+    C2 (APS1/APS2) and CMC (+5V/SGND rails).
     Confirmed C2 pin assignments: APS1 → C2 E4 (AIN 6), APS2 → C2 F1 (AIN 7).
     Source: MaxxECU RACE GEN1 C2 pinout (maxxecu.com/webhelp/wirings-maxxecu_pinout.html).
     Cross-reference docs/dbw-pinouts.md for full specs and TB pinouts.
@@ -15,7 +16,8 @@ metadata:
 # ─────────────────────────────────────────────────────────────────────────────
 # CRIMP TOOLS — which tool for which contact in this harness:
 #
-#   Maven HD30 size-20 contacts (A14–A19, cabin face) → Deutsch HDT-48-00 (or JRready NEW-DT2)
+#   Maven HD30 size-16 contacts (B1–B6 APS positions) → Deutsch HDT-48-00
+#     (covers all Deutsch solid contacts DT/DTM/DTP/DTHD/HD30/etc.)
 #   MaxxECU C2 Molex contacts (APS1 · APS2 · +5V · GND) → Molex 63811-9200 (small)
 #   BMW E46 pedal connector contacts                   → Engineer PA-09
 #
@@ -32,7 +34,7 @@ metadata:
 #   [x] Confirm MaxxECU AIN pin numbers for APS1 and APS2
 #       CONFIRMED: APS1 → C2 E4 (AIN 6), APS2 → C2 F1 (AIN 7)
 #       Source: MaxxECU RACE GEN1 C2 pinout — maxxecu.com/webhelp/wirings-maxxecu_pinout.html
-#   [x] APS routing confirmed cabin-to-cabin; AS79 bulkhead NOT used for APS
+#   [x] APS routing: crosses firewall via Maven Connector B (Phase 3 install)
 #   [ ] Source and crimp BMW E46 pedal OEM connector + terminals
 #       (54-way Molex MX150L series or pigtail from donor harness)
 #   [ ] Verify bench: APS1 idle ~0.70V, WOT ~4.50V; APS2 idle ~0.36V, WOT ~2.20V

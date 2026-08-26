@@ -23,7 +23,7 @@ metadata:
 #   [x] Confirm MaxxECU AIN pin numbers for APS1 and APS2
 #       CONFIRMED: APS1 → C2 E4 (AIN 6), APS2 → C2 F1 (AIN 7)
 #       Source: MaxxECU RACE GEN1 C2 pinout — maxxecu.com/webhelp/wirings-maxxecu_pinout.html
-#   [x] APS routing confirmed cabin-to-cabin; AS79 bulkhead NOT used for APS
+#   [x] APS routing: crosses firewall via Maven Connector B (Phase 3 install)
 #   [ ] Verify bench: APS1 and APS2 idle/WOT voltages before installing in car
 #   [ ] Load MaxxECU native Hella profile in MTune before calibration wizard
 #   [ ] Run e-throttle calibration wizard after wiring
@@ -105,7 +105,7 @@ cables:
       Wire 5 RD: +5V1 (pedal pin 5) → MAXXECU_SUPPLY +5V rail (CMC G1).
       Wire 6 WH: TPS1/APS1 signal (pedal pin 6) → MAXXECU_C2 E4 (AIN 6).
       Note: wire-color order differs from E46 variant -- label both ends clearly.
-      AS79 bulkhead NOT used for APS -- cabin-to-cabin direct run.
+      APS crosses firewall via Maven Connector B (see harnesses/firewall-crossing-maven.wv).
 
 # ── Connections ────────────────────────────────────────────────────────────────
 

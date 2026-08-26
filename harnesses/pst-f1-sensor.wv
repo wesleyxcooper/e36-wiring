@@ -1,8 +1,25 @@
 # pst-f1-sensor.wv
 # Bosch PST-F1 dual oil temp+pressure sensor → MaxxECU AIN
-# Signals cross firewall via AS79 bulkhead: SensorGND=pin 79, +5V=pin 47,
-# Pressure/AIN3=pin 50, Temp/AIN1=pin 51.
-# Source: harnesses/firewall-bulkhead.wv pins 47/50/51/79.
+#
+# Scope: This file documents the PST-F1 sensor pigtail (the 4-wire cable between the
+# sensor body and its terminus at MaxxECU). The pigtail IS built by the user (Bosch
+# F02U.B00.751-01 mating kit + 4 wires). The ECU-side terminus differs by phase:
+#
+#   Phase 1 (M52 + M50 pre-terminated harness):
+#     Pigtail terminates at the M50 harness 16-pin AUX BREAKOUT pins 1/2/12/14
+#     (+5V/SGND/AIN3/AIN1). The breakout comes pre-terminated with the purchased
+#     harness — no build work on that end, just plug in.
+#     Ref: docs/vendor/maxxecu/MaxxECU_M50_Terminated_Harness.md § 16-pin extra connector.
+#     ECU_16PIN block below documents the breakout for reference (it's a purchase, not a build).
+#
+#   Phase 3 (07K custom harness):
+#     Pigtail integrates into the custom 07K engine-side harness and terminates
+#     directly at MaxxECU CMC pins G1 (+5V, pin 25) / H1 (SGND, pin 29) / J3 (AIN 3
+#     pressure, pin 37) / J1 (AIN 1 temp, pin 33). See harnesses/maxxecu-07k.wv.
+#
+# Under the H2O engine-bay-mount architecture the sensor and the MaxxECU are BOTH
+# in the engine bay in either phase — no firewall crossing for these 4 wires.
+# See docs/vendor/maxxecu/MaxxECU_RACE_H2O.md.
 #
 # Mount: M52 VANOS banjo bolt path (M14x1.5 → M10x1.0 adapter → PST-F1).
 # Phase 3: moves to iABED 07K oil housing M10x1.0 port — no wiring changes needed.
@@ -29,28 +46,6 @@ connectors:
       Temp output: NTC — calibrate in MTune against resistance table.
       Mount adapter: M14x1.5 female → M10x1.0 male.
       Phase 3: moves to 07K iABED oil housing (M10x1.0 port) unchanged.
-
-  # Bulkhead passthrough — engine side to cabin side
-  # Full 79-pin diagram: harnesses/firewall-bulkhead.wv
-  BULKHEAD_ENGINE:
-    type: "Deutsch AS79 bulkhead — engine side (PST-F1 pins)"
-    subtype: "Pins 79/47/50/51 of 79-way engine mating plug"
-    pincount: 4
-    pinlabels:
-      - "Sensor GND (pin 79)"        # 1 — center pin, ~8 o'clock
-      - "+5V sensor (pin 47)"        # 2 — shared TPS/MAP/PST-F1 supply
-      - "PST-F1 pressure (pin 50)"   # 3 — AIN 3 (CMC J3)
-      - "PST-F1 temp (pin 51)"       # 4 — AIN 1 (CMC J1)
-
-  BULKHEAD_CABIN:
-    type: "Deutsch AS79 bulkhead — cabin side (PST-F1 pins)"
-    subtype: "Pins 79/47/50/51 of 79-way cabin flange receptacle"
-    pincount: 4
-    pinlabels:
-      - "Sensor GND (pin 79)"        # 1 — center pin, ~8 o'clock
-      - "+5V sensor (pin 47)"        # 2 — shared TPS/MAP/PST-F1 supply
-      - "PST-F1 pressure (pin 50)"   # 3 — AIN 3 (CMC J3)
-      - "PST-F1 temp (pin 51)"       # 4 — AIN 1 (CMC J1)
 
   ECU_16PIN:
     type: "MaxxECU M50 terminated harness — 16-pin aux breakout"
@@ -80,26 +75,16 @@ cables:
     wirecount: 4
     colors: [BN, RD, WH, WH]
     wirelabels: ["Sensor GND", "+5V", "Pressure (AIN 3)", "Temp (AIN 1)"]
-    length: 0.6 m
-    notes: "Engine-side sensor to bulkhead engine plug. Keep away from ignition/coil wires."
-
-  W_PST_F1_CABIN:
-    wirecount: 4
-    colors: [BN, RD, WH, WH]
-    wirelabels: ["Sensor GND", "+5V", "Pressure (AIN 3)", "Temp (AIN 1)"]
-    length: 0.4 m
-    notes: "Bulkhead cabin plug to MaxxECU 16-pin aux breakout."
+    length: 1.0 m
+    notes: >-
+      Engine-bay run from PST-F1 sensor to M50 harness 16-pin aux breakout (both engine-bay
+      side under the H2O arch — no firewall crossing). Keep away from ignition/coil wires.
 
 connections:
 
-  # Engine side: sensor to bulkhead engine plug
+  # PST-F1 sensor → M50 harness 16-pin aux breakout (both engine-bay, direct run)
   # PST_F1 pin 1 = NC (skip). Active: pin3=+5V, pin4=GND, pin2=Pressure, pin5=Temp.
+  # ECU_16PIN: pin 1=+5V, pin 2=SensorGND, pin 12=AIN3 (Pressure), pin 14=AIN1 (Temp).
   - - PST_F1: [3, 4, 2, 5]
     - W_PST_F1: [2, 1, 3, 4]
-    - BULKHEAD_ENGINE: [2, 1, 3, 4]
-
-  # Cabin side: bulkhead cabin plug to MaxxECU 16-pin
-  # ECU_16PIN: pin 1=+5V, pin 2=SensorGND, pin 12=AIN3, pin 14=AIN1
-  - - BULKHEAD_CABIN: [2, 1, 3, 4]
-    - W_PST_F1_CABIN: [2, 1, 3, 4]
     - ECU_16PIN: [1, 2, 12, 14]
