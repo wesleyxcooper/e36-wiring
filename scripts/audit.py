@@ -6,6 +6,46 @@ Checks all .md / .wv / .csv files for known-wrong values and
 cross-file inconsistencies.  Designed to run as a pre-commit hook
 or manually as a full-repo scan.
 
+═══════════════════════════════════════════════════════════════════════════════
+ARCHITECTURE CONTEXT (H2O engine-bay-mount + phase model)
+═══════════════════════════════════════════════════════════════════════════════
+
+As of the race-h20-investigation branch, the wiring architecture is:
+
+  - MaxxECU RACE H2O is engine-bay-mounted (OEM DME E-box cavity, intake side
+    of RHD car — driver-opposite side). All engine sensor / IGN / INJ / GPO
+    signals direct-terminate at the ECU's C1/C2 Molex CMC connectors. There
+    is NO firewall bulkhead in the engine-sensor path.
+
+  - Cabin↔engine signals cross via the Maven HD30 Dual 16+16 Bulkhead kit:
+      * Connector A (16-pin): CAN + DCT shifter — populated Phase 2/3.
+      * Connector B (16-pin): APS throttle input — SAFETY-CRITICAL by design,
+        populated Phase 3.
+    Product page: mavenspeed.com/collections/b2t-engineering/products/
+                  dual-connector-bulkhead
+
+  - PMU16 is a Phase 3 install. NOT present in Phase 1 or Phase 2. Phase 1
+    fuel pump uses a discrete high-current relay (JDT Racing rewire kit) driven
+    by MaxxECU GPO 2 via M50 pre-terminated harness 12-pin extra pin 3.
+
+  - The Deutsch AS79 79-way firewall bulkhead is DEPRECATED. Files
+    harnesses/firewall-bulkhead.wv and harnesses/firewall-bulkhead-dual.wv
+    have been deleted. Use harnesses/firewall-crossing-maven.wv.
+
+Phase-split .wv files (created when a component's wiring changes across
+phases due to the PMU16 or ECU-harness transition):
+  - harnesses/8hp-body-integrations-phase{1,3}.wv (reverse light circuit)
+  - harnesses/fuel-pump-hanger-phase{1,3}.wv (Walbro F90000267 drive)
+  - harnesses/flex-fuel-sensor-phase{1,3}.wv (GM 13577379 sensor)
+
+Vendor citations in this audit:
+  - MaxxECU H2O: maxxecu.com/products/race/, maxxecu.com/webhelp/wirings-maxxecu_pinout.html
+  - Ecumaster PMU16: docs/vendor/ecumaster/PMU16_Manual_v101.pdf
+  - Walbro F90000267: walbrofuelpumps.com/450lph-walbro-e85-racing-fuel-pump-f90000267.html
+  - JDT Racing rewire kit: jdtracing.com/products/walbro-ti-f90000267-450lph-fuel-pump-w-install-kit-rewire-kit-e85-compatible
+  - Deutsch HDT-48-00: deutschconnector.com selection guide
+
+
 Usage:
     python3 scripts/audit.py               # full repo scan
     python3 scripts/audit.py --staged      # staged files only (pre-commit)
@@ -154,65 +194,37 @@ DENYLIST: list[DenyRule] = [
         source="https://www.designengineering.com/reflect-a-gold-heat-reflective-tape-1-5-x-15/",
     ),
 
-    # ── AS79 contact size ────────────────────────────────────────────────────
+    # ── H2O engine-bay-mount architecture — deprecated AS79 references ──────
+    # As of the race-h20-investigation branch, the MaxxECU RACE H2O is engine-bay-
+    # mounted and the Deutsch AS79 79-way firewall bulkhead is REMOVED entirely.
+    # Signals cross via the Maven HD30 dual 16+16 bulkhead (Connector A = CAN + DCT
+    # cabin signals, Connector B = safety-critical APS throttle input) — see
+    # harnesses/firewall-crossing-maven.wv and docs/vendor/maxxecu/MaxxECU_RACE_H2O.md.
+    # Any active AS79 statement (not a deprecation-context reference) is now stale.
     DenyRule(
-        pattern=r"(?i)AS[-\s]?79.{0,30}size[-\s]?20|size[-\s]?20.{0,30}AS[-\s]?79",
-        message="AS79 uses size-22 contacts, not size-20. "
-                "Source: m-cal.com AS020-35SN (\"Primary Contacts Size: 22 AWG\").",
-        source="https://m-cal.com/en-gb/883605120-mc03-as020-35sn-deutsch-autosport-as-connector-79-way-shell-size-20-pin-layout-20-35-style-0-flange-receptacle-red-n-keyway-sockets-standard",
-        # Allow lines that are clarifying the *shell* size-20 vs contact size-22 distinction,
-        # or that are explicitly warning against size-20 for AS79.
-        exclude=r"(?i)(NOT|\bNo\b|not for|does not|cannot|shell\s+size.?20|layout.?20.?35)",
+        pattern=r"(?i)\bAS[-\s]?79\b",
+        message="AS79 firewall bulkhead has been deprecated. Under the H2O engine-bay-mount "
+                "architecture the MaxxECU is engine-bay-mounted and there is no AS79 in the "
+                "build. Cabin↔engine signals cross via the Maven HD30 dual 16+16 bulkhead. "
+                "See harnesses/firewall-crossing-maven.wv and docs/vendor/maxxecu/MaxxECU_RACE_H2O.md. "
+                "If this line is a deprecation reference (comparing to old arch), add 'deprecated' "
+                "or 'no longer used' or 'was AS79' or 'switch to Maven' to the same line.",
+        source="harnesses/firewall-crossing-maven.wv",
+        exclude=r"(?i)(deprecated|no longer|no.?longer|was\s+AS79|previously|removed|abandoned"
+                r"|superseded|obsolete|instead of|replaces|replaced|migration|migrated"
+                r"|switch to|switching to|H2O|switch from|not\s+AS79|AS.?series\s+(bulkhead\s+)?from\s+a\s+previous"
+                r"|old\s+arch|old\s+architecture|previous\s+architecture|Phase\s+1\s+used"
+                r"|dropping|dropped|scrap|scrapped|no\s+separate\s+AS|no\s+separate\s+AS-series"
+                r"|not\s+used|not\s+active|N/A|does\s+not\s+exist)",
     ),
     DenyRule(
-        pattern=r"(?i)(firewall\s+bulkhead|AS\s*series).{0,60}size[-\s]?20\b",
-        message="The AS-series firewall bulkhead uses size-22 contacts (5A, 22-26 AWG). "
-                "Size-20 is for Maven HD30 / DT-series contacts.",
-        source="https://www.ecuplus.de/en/deutsch-autosport-as620-35pn-79x-22-awg.html",
-        # Allow lines explaining that size-20 is NOT for the AS bulkhead,
-        # or referencing the HD30's size-20 contacts in contrast.
-        exclude=r"(?i)(NOT|\bNo\b|only|HD30|Maven|DT.?series|not for|cannot|does not)",
-    ),
-
-    # ── AS79 positioners ─────────────────────────────────────────────────────
-    DenyRule(
-        pattern=r"\bK43\b.{0,80}AS[-\s]?79|AS[-\s]?79.{0,80}\bK43\b",
-        message="K43 (M22520/2-10) is the size-20 positioner. "
-                "AS79 size-22 contacts need K42 (pin, M22520/2-09) and K40 (socket, M22520/2-07).",
-        source="https://www.ecuplus.de/en/deutsch-autosport-as620-35pn-79x-22-awg.html",
-        # Suppress when the same line explicitly disqualifies K43 (warning context).
-        exclude=r"(?i)(NOT\s+K43|K43\s+is\s+(the\s+)?size|do not use.*K43|K43.*do not|wrong.*K43|K43.*wrong)",
-    ),
-    DenyRule(
-        pattern=r"\bK43\b.{0,80}(firewall\s+bulkhead|AS\s+series)"
-                r"|(firewall\s+bulkhead|AS\s+series).{0,80}\bK43\b",
-        message="K43 (M22520/2-10) is the size-20 positioner. "
-                "AS-series firewall bulkhead needs K42 (pin) + K40 (socket) for size-22 contacts.",
-        source="https://dmctools.com/k40",
-        exclude=r"(?i)(NOT\s+K43|K43\s+is\s+(the\s+)?size|do not use.*K43|K43.*do not|wrong.*K43)",
-    ),
-    DenyRule(
-        pattern=r"M22520/2-10.{0,60}AS[-\s]?79|AS[-\s]?79.{0,60}M22520/2-10",
-        message="M22520/2-10 is the K43 (size-20) positioner. "
-                "AS79 needs K42 = M22520/2-09 (pin) and K40 = M22520/2-07 (socket).",
-        source="https://deltaintl.com/products/k42",
-        exclude=r"(?i)(NOT|wrong|do not|cannot|size.?20\s+positioner)",
-    ),
-
-    # ── HDT-48-00 scope ──────────────────────────────────────────────────────
-    DenyRule(
-        pattern=r"HDT-48-00.{0,80}AS[-\s]?79|AS[-\s]?79.{0,80}HDT-48-00",
-        message="HDT-48-00 covers size 12/16/20 contacts only. "
-                "It CANNOT crimp AS79 size-22 contacts. Use AFM8 + K42/K40.",
-        source="https://www.deutschconnector.com/downloads/HDT-48-00%20Instructions.pdf",
-        exclude=r"(?i)(NOT|cannot|does not|CANNOT|not for|not support|not.*size.?22)",
-    ),
-    DenyRule(
-        pattern=r"(?i)HDT-48-00.{0,80}(firewall\s+bulkhead|AS\s+bulkhead)",
-        message="HDT-48-00 is for Maven HD30 and DT-series (size 12/16/20) only. "
-                "The AS-series firewall bulkhead requires AFM8 + K42 + K40.",
-        source="https://www.deutschconnector.com/downloads/HDT-48-00%20Instructions.pdf",
-        exclude=r"(?i)(NOT|cannot|does not|CANNOT|not for|not support)",
+        pattern=r"harnesses/firewall-bulkhead(-dual)?\.wv",
+        message="harnesses/firewall-bulkhead.wv and harnesses/firewall-bulkhead-dual.wv have "
+                "been DELETED. Use harnesses/firewall-crossing-maven.wv instead. "
+                "(git history preserves the old files for archival access.)",
+        source="harnesses/firewall-crossing-maven.wv",
+        exclude=r"(?i)(deleted|removed|deprecated|superseded|replaced|no longer|obsolete"
+                r"|was\s+in|old\s+plan|old\s+file|previous\s+arch|history|archival)",
     ),
 
     # ── Non-existent part / tool numbers ────────────────────────────────────
@@ -231,33 +243,13 @@ DENYLIST: list[DenyRule] = [
         # Suppress when the line is citing it as an example of what NOT to use.
         exclude=r"(?i)(does not exist|not exist|previously listed|not in the|⚠️|WARNING|WARN)",
     ),
-    DenyRule(
-        pattern=r"(?i)HDT-48-00.{0,30}size[-\s]?22|size[-\s]?22.{0,30}HDT-48-00",
-        message="HDT-48-00 cannot crimp size-22 contacts. Use AFM8 + K42 (pin) or K40 (socket).",
-        source="https://dmctools.com/afm8",
-        exclude=r"(?i)(NOT|cannot|does not|CANNOT|not support)",
-    ),
+    # (HDT-48-00 vs size-22 rule removed — no more size-22 contacts in this build.)
 
-    # ── Wire gauge / contact compatibility ───────────────────────────────────
-    DenyRule(
-        pattern=r"Size\s+22D\s+20\s+AWG",
-        message="Size-22D solid barrel contacts accept 22–26 AWG only. "
-                "20 AWG will not seat correctly in the barrel and will produce a cold crimp. "
-                "Use 22 AWG for the main harness wire through the contact; pigtail stubs "
-                "on the engine side (after the splice) may be heavier gauge.",
-        source="https://www.ecuplus.de/en/deutsch-autosport-as620-35pn-79x-22-awg.html",
-        exclude=r"(?i)(NOT|cannot|does not|incompatible|too large|will not fit)",
-    ),
+    # (Size-22D 20 AWG rule removed — no AS79 size-22 contacts in this build.
+    #  Maven HD30 size-16 contacts accept 14-20 AWG. See docs/wiring-bom.md System 8.)
 
-    # ── Cross-file pin number consistency ────────────────────────────────────
-    DenyRule(
-        pattern=r"(?i)(AIN\s*2|pin\s*J2).{0,40}pin\s+51\b|pin\s+51\b.{0,40}(AIN\s*2|pin\s*J2)",
-        message="AIN 2 (CMC J2) crosses the AS79 firewall bulkhead at pin 56, not pin 51. "
-                "Pin 51 = PST-F1 temp (AIN 1 / CMC J1). "
-                "Source: firewall-bulkhead.wv — pin 51 = PST-F1 temp (AIN 1); pin 56 = AIN 2.",
-        source="harnesses/firewall-bulkhead.wv",
-        exclude=r"(?i)(NOT|wrong|error|was.*51|previously|51.*was|correct.*56|56.*correct)",
-    ),
+    # (AIN 2 / pin 51 cross-file consistency rule removed — bulkhead pin numbers
+    #  no longer applicable under direct-terminate architecture.)
 
     # ── EPS controller capability ─────────────────────────────────────────────
     DenyRule(
@@ -270,15 +262,10 @@ DENYLIST: list[DenyRule] = [
         exclude=r"(?i)(no\s+VSS|not\s+supported|has\s+no|does\s+not\s+have|no\s+external|no\s+port|cannot|removed|struck)",
     ),
 
-    # ── PST-F1 bulkhead pin numbers ───────────────────────────────────────────
-    DenyRule(
-        pattern=r"(?i)PST.{0,20}(pin\s+27|pin\s+30|pin\s+33|pin\s+34)",
-        message="PST-F1 crosses the AS79 bulkhead at pins 79 (SensorGND), 47 (+5V), 50 (pressure/AIN3), "
-                "51 (temp/AIN1). Pins 27/30/33/34 are flex fuel +12V, coil/inj +12V, IGN6, and IGN7 — "
-                "completely wrong. Source: harnesses/firewall-bulkhead.wv pins 47/50/51/79.",
-        source="harnesses/firewall-bulkhead.wv",
-        exclude=r"(?i)(NOT|wrong|error|correct|was\s+pin)",
-    ),
+    # (PST-F1 bulkhead pin numbers rule removed — PST-F1 no longer crosses a bulkhead.
+    #  Under H2O arch, sensor and ECU are both engine-bay-side. Phase 1: PST-F1 pigtail
+    #  → M50 harness 16-pin aux breakout pins 1/2/12/14. Phase 3: PST-F1 → CMC C1
+    #  pins 25/29/37/33 direct-terminate. See harnesses/pst-f1-sensor.wv.)
 
     # ── TB motor output — GPO3/4 is wrong ────────────────────────────────────
     DenyRule(
@@ -290,47 +277,46 @@ DENYLIST: list[DenyRule] = [
         exclude=r"(?i)(NOT\s+GPO|do\s+not\s+use\s+GPO|GPO.*wrong|not\s+Motor)",
     ),
 
-    # ── APS through AS79 pins 72-77 ───────────────────────────────────────────
-    # Only flag when a line specifically routes APS *through the bulkhead* on pins 72-77.
-    # ME7.1.1 OEM connector reference tables (e.g. "APS 1 GND | pin 72 | A14") are fine.
+    # ── APS routing under H2O arch — Maven Connector B, NOT Connector A ──────
+    # Under the new arch, Connector B is designated safety-critical and reserved
+    # for APS (throttle command input). Connector A carries CAN + DCT shifter.
+    # See docs/dbw-pinouts.md § Firewall Crossing Allocation.
     DenyRule(
-        pattern=r"(?i)(APS.{0,40}(bulkhead|AS79).{0,40}pin\s+7[2-7]|bulkhead.{0,40}APS.{0,40}pin\s+7[2-7]|APS.{0,20}pins?\s+72.{0,10}77.{0,40}(bulkhead|reserved|crossing|firewall))",
-        message="APS (e-pedal) does not use AS79 pins 72–77. APS is cabin-to-cabin via Maven HD30 "
-                "Connector A cabin face pins A14–A19. AS79 pins 72–77 remain spare. "
-                "Source: harnesses/firewall-bulkhead-dual.wv, harnesses/epedal-bmw-e46.wv.",
-        source="harnesses/firewall-bulkhead-dual.wv",
-        exclude=r"(?i)(NOT|spare|not\s+used|remain\s+spare|AS79.*not|no.*bulkhead|cabin-to-cabin)",
+        pattern=r"(?i)APS.{0,60}Maven.{0,10}(HD30\s+)?[Cc]onnector\s+A"
+                r"|Maven.{0,10}(HD30\s+)?[Cc]onnector\s+A.{0,60}APS",
+        message="APS crosses via Maven HD30 Connector B (safety-critical, populated Phase 3), "
+                "NOT Connector A. Connector A carries CAN + DCT shifter cabin signals. "
+                "Source: harnesses/firewall-crossing-maven.wv; docs/dbw-pinouts.md § Firewall Crossing Allocation.",
+        source="harnesses/firewall-crossing-maven.wv",
+        exclude=r"(?i)(NOT\s+Connector\s+A|Connector\s+A.{0,20}not|CAN.{0,10}DCT|Connector\s+B\s+for\s+APS"
+                r"|B\s*=\s*APS|not\s+A|instead\s+of\s+A|was\s+A|old\s+plan)",
+    ),
+    DenyRule(
+        pattern=r"(?i)(APS|e.?pedal).{0,60}cabin.to.cabin|cabin.to.cabin.{0,60}(APS|e.?pedal)",
+        message="APS is NOT cabin-to-cabin under the H2O engine-bay-mount arch — MaxxECU is "
+                "engine-bay-mounted, so APS crosses the firewall via Maven Connector B (6 wires). "
+                "Source: harnesses/epedal-bmw-e46.wv; docs/dbw-pinouts.md.",
+        source="harnesses/epedal-bmw-e46.wv",
+        exclude=r"(?i)(NOT\s+cabin.to.cabin|was\s+cabin|previously|old\s+plan|deprecated"
+                r"|cabin.to.cabin.{0,10}was|now\s+cross|does\s+cross)",
     ),
 
-    # ── TB wiring stays engine side — wrong claim ─────────────────────────────
+    # ── Maven bulkhead — dual 16+16, NOT single 35-pin ───────────────────────
+    # Earlier plan was a single 35-pin HD30 24-35 connector. Superseded by
+    # dual 16+16 kit which gives cleaner pin allocation and dedicated safety-
+    # critical Connector B for APS.
+    # NOTE: The shell-size-24 designation is Deutsch's shell nomenclature — it
+    # applies to BOTH the old single 35-pin insert AND the new individual 16-way
+    # inserts in the dual kit. Only flag when the DEPRECATED "24-35" arrangement
+    # or the "35-pin" wording appears.
     DenyRule(
-        pattern=r"(?i)(Motor\+.*Motor.{0,30}|TB\s+wiring.{0,50})(stay|stays|remain|engine\s+side).{0,60}(bulkhead|firewall|not\s+cross)",
-        message="TB wiring (Motor+/−, TPS1, TPS2, +5V, GND) crosses the AS79 firewall bulkhead — "
-                "MaxxECU is cabin-mounted. Motor+/− via pins 22/23; TPS1/TPS2 via pins 48/56; "
-                "+5V/GND via pins 47/79. Source: harnesses/maxxecu-07k.wv.",
-        source="harnesses/maxxecu-07k.wv",
-        exclude=r"(?i)(NOT|wrong|does\s+not\s+stay|incorrect)",
-    ),
-
-    # ── DBW motor wire gauge ─────────────────────────────────────────────────
-    # Audit round 3 (2025-07): wiring-bom.md lines 34–35, dbw-pinouts.md lines
-    # 169–170, and firewall-bulkhead.wv line 253 all said "20 AWG minimum" for
-    # motor leads.  AS79 size-22D contacts accept 22–26 AWG only.
-    DenyRule(
-        pattern=r"(?i)(Motor\+|Motor-|ETh.{0,10}Motor|DBW.{0,10}Motor).{0,40}20\s*AWG",
-        message="DBW throttle body motor wires (AS79 pins 22/23) must be 22 AWG. "
-                "AS79 size-22D contacts accept 22–26 AWG only — 20 AWG will not seat. "
-                "Source: maxxecu-07k.wv W_DBW_MOTOR notes; 26-07k-harness.md.",
-        source="harnesses/maxxecu-07k.wv",
-        exclude=r"(?i)(NOT|cannot|will not seat|does not|22.AWG.{0,20}not.{0,20}20|20.AWG.{0,20}will not)",
-    ),
-    DenyRule(
-        pattern=r"(?i)20\s*AWG.{0,40}(Motor\+|Motor-|ETh.{0,10}Motor|DBW.{0,10}Motor)",
-        message="DBW throttle body motor wires (AS79 pins 22/23) must be 22 AWG. "
-                "AS79 size-22D contacts accept 22–26 AWG only — 20 AWG will not seat. "
-                "Source: maxxecu-07k.wv W_DBW_MOTOR notes.",
-        source="harnesses/maxxecu-07k.wv",
-        exclude=r"(?i)(NOT|cannot|will not seat|does not|22.AWG.{0,20}not.{0,20}20)",
+        pattern=r"(?i)Maven.{0,20}(35.pin|HD30\s+24.?35|shell.?size.?24[-\s]?35|24.?35\s+arrangement)",
+        message="The Maven single 35-pin HD30 (shell-size-24, 24-35 arrangement) was superseded "
+                "by the Maven Dual Connector Bulkhead 16+16 kit. See docs/wiring-bom.md System 8. "
+                "Product page: mavenspeed.com/collections/b2t-engineering/products/dual-connector-bulkhead",
+        source="https://mavenspeed.com/collections/b2t-engineering/products/dual-connector-bulkhead",
+        exclude=r"(?i)(superseded|deprecated|was|previously|abandoned|old\s+plan|instead\s+of"
+                r"|not\s+35|dual\s+16|16.{0,3}16|16.way|16.pin)",
     ),
     # Deprecated pigtail-stub tail with 20 AWG (old method, never valid in this build)
     DenyRule(
@@ -384,19 +370,8 @@ DENYLIST: list[DenyRule] = [
         exclude=r"(?i)(NOT|will not seat|JMT.{0,10}not|not.{0,10}JMT|flat.blade.*not|not.*flat.blade)",
     ),
 
-    # ── AS79 pin 34 as active IGN 7 ──────────────────────────────────────────
-    # Audit round 3: maxxecu-07k.wv comment and firewall-bulkhead.wv notes
-    # both said "34: EXP IGN 7" / "34 (IGN 7)" as an active 07K pin.
-    # Pin 34 is cavity-plug on both M52 and 07K; 07K 5th cyl = IGN 5 at pin 32.
-    DenyRule(
-        pattern=r"(?i)pin\s*34.{0,30}IGN.{0,5}7|IGN.{0,5}7.{0,30}pin\s*34",
-        message="AS79 pin 34 is cavity-plug on both M52 and 07K phases. "
-                "07K 5th cylinder uses IGN 5 at AS79 pin 32 (CMC C2). "
-                "IGN 7 at CMC D2 is unused on both engine variants. "
-                "Source: firewall-bulkhead.wv cabin-side label; 26-07k-harness.md.",
-        source="harnesses/firewall-bulkhead.wv",
-        exclude=r"(?i)(cavity.plug|spare|NOT|not.{0,10}active|correct.*32|32.*correct|plug.*both)",
-    ),
+    # (AS79 pin 34 / IGN 7 rule removed — AS79 no longer applicable. The underlying
+    #  IGN 7 unused claim is preserved via the KNOWN_CMC_PINS map for CMC D2.)
 
     # ── TPS1 mislabeled as AIN 5 ─────────────────────────────────────────────
     # Audit round 3: dbw-pinouts.md line 171 parenthetical "(AIN 5 / was M52 TPS)".
@@ -423,18 +398,8 @@ DENYLIST: list[DenyRule] = [
         exclude=r"(?i)(NOT|no\s+splice|no\s+intermediate|end.to.end|directly from)",
     ),
 
-    # ── Deutsch 0411-240-2005 as AS79 extraction tool ────────────────────────
-    # Audit round 3: harness-build.md line 67 labeled 0411-240-2005 as the
-    # "Firewall bulkhead contacts" depin tool.  It is DT/DTM size-16/20 only.
-    DenyRule(
-        pattern=r"(?i)0411-240-2005.{0,60}(AS\s*79|bulkhead|size.22\b)",
-        message="Deutsch 0411-240-2005 is a DT/DTM series size-16/20 extraction tool. "
-                "It does NOT fit AS79 size-22 solid barrel contacts. "
-                "Use the tool shipped with the AS79 connector body (M81969/14-01 equiv). "
-                "Source: harness-build.md § Tools table.",
-        source="docs/harness-build.md",
-        exclude=r"(?i)(NOT|does not fit|do not use|cannot|DT.{0,5}DTM|not for AS|wrong)",
-    ),
+    # (0411-240-2005 vs AS79 extraction rule removed — AS79 no longer used.
+    #  Maven HD30 size-16 extraction uses standard Deutsch round-shoulder tool.)
 
     # ── DBW TPS cable sensor GND color ───────────────────────────────────────
     # Audit round 3: wiring-bom.md line 348 listed BK (chassis GND) and GN (GPO)
@@ -459,15 +424,75 @@ DENYLIST: list[DenyRule] = [
         exclude=r"(?i)(removed|replaced|no\s+longer|NOT|obsolete|superseded)",
     ),
 
-    # ── Fuel pump SSR — replaced by PMU16 O4 ─────────────────────────────────
+    # ── Fuel pump SSR — replaced (Phase 1: discrete relay; Phase 3: PMU16 O4) ─
     DenyRule(
         pattern=r"(?i)(fuel\s+pump|F90000267).{0,80}(Crydom|D1D40|SSR\s+Load|SSR\s+Ctrl)",
         message="The Crydom D1D40 SSR has been removed from the fuel pump circuit. "
-                "Phase 3: PMU16 O4 (25A, PWM-capable) drives the pump directly via CAN command from MaxxECU. "
-                "Phase 1 (M52): standard relay, MaxxECU GPO 2 → relay coil — no SSR. "
-                "Source: harnesses/power-distribution.wv, harnesses/fuel-pump-hanger.wv.",
-        source="harnesses/power-distribution.wv",
+                "Phase 1 (M52): discrete high-current relay (JDT Racing rewire kit or Bosch 0332-002-156), "
+                "MaxxECU GPO 2 → relay coil. Phase 3 (07K swap): PMU16 O4 (25A, PWM-capable) direct-drive "
+                "replaces the discrete relay. NEITHER phase uses an SSR. "
+                "Source: harnesses/fuel-pump-hanger-phase1.wv, harnesses/fuel-pump-hanger-phase3.wv.",
+        source="harnesses/fuel-pump-hanger-phase3.wv",
         exclude=r"(?i)(removed|replaced|replaces|no\s+longer|NOT|obsolete|superseded)",
+    ),
+
+    # ── PMU16 is Phase 3 install ONLY ─────────────────────────────────────────
+    # PMU16 is not in the car during Phase 1 or Phase 2. Any active statement
+    # claiming a PMU16 output drives a load in Phase 1 is stale.
+    DenyRule(
+        pattern=r"(?i)Phase\s*1.{0,60}PMU16|PMU16.{0,60}Phase\s*1\s*(install|arrives|drives|present|is\s+installed|installation)",
+        message="PMU16 is NOT installed in Phase 1 or Phase 2 — it arrives at Phase 3 (07K swap moment) "
+                "along with the Maven bulkhead, custom 07K harness, EWP, APS pedal, and electric AC. "
+                "Under Phase 1, loads that PMU16 will eventually drive use OEM relays or aftermarket "
+                "discrete relays driven by MaxxECU GPO outputs. See harnesses/power-distribution.wv "
+                "'PHASE 3 INSTALL FILE' header + OEM E36 RELAY REPLACEMENT MAP.",
+        source="harnesses/power-distribution.wv",
+        exclude=r"(?i)(NOT\s+installed|not\s+in|no\s+PMU\s+in\s+Phase\s+1|arrives\s+at\s+Phase\s+3"
+                r"|Phase\s+3\s+install|no\s+longer|previously|deprecated|old\s+plan|was\s+Phase\s+1"
+                r"|corrected|Phase\s+3\s+arrival|Phase\s+3\s+file)",
+    ),
+
+    # ── MaxxECU is engine-bay-mounted (H2O), NOT cabin-mounted ────────────────
+    # Under the H2O architecture the MaxxECU RACE H2O sits in the engine bay
+    # (OEM DME E-box cavity, intake side of RHD car). Any active statement
+    # saying "MaxxECU is cabin-mounted" is stale.
+    DenyRule(
+        pattern=r"(?i)MaxxECU\s+is\s+cabin.?mounted|cabin.?mounted\s+MaxxECU",
+        message="Under the H2O engine-bay-mount architecture, the MaxxECU RACE H2O is engine-bay-"
+                "mounted (OEM DME E-box cavity, intake side of RHD car). NOT cabin-mounted. "
+                "Source: docs/vendor/maxxecu/MaxxECU_RACE_H2O.md; harnesses/firewall-crossing-maven.wv.",
+        source="docs/vendor/maxxecu/MaxxECU_RACE_H2O.md",
+        exclude=r"(?i)(NOT\s+cabin|no\s+longer\s+cabin|was\s+cabin|previously\s+cabin|old\s+arch"
+                r"|deprecated|now\s+engine.?bay|engine.?bay\s+mount|H2O|corrected)",
+    ),
+
+    # ── Deleted / renamed .wv file references ─────────────────────────────────
+    DenyRule(
+        pattern=r"harnesses/8hp-body-integrations\.wv",
+        message="harnesses/8hp-body-integrations.wv has been SPLIT into "
+                "harnesses/8hp-body-integrations-phase1.wv (M50 harness + discrete relay) and "
+                "harnesses/8hp-body-integrations-phase3.wv (PMU16 direct-drive). "
+                "Update the reference to the phase-appropriate file.",
+        source="harnesses/8hp-body-integrations-phase1.wv",
+        exclude=r"(?i)(split|deleted|renamed|superseded|-phase1|-phase3|old\s+file|was\s+split)",
+    ),
+    DenyRule(
+        pattern=r"harnesses/fuel-pump-hanger\.wv",
+        message="harnesses/fuel-pump-hanger.wv has been SPLIT into "
+                "harnesses/fuel-pump-hanger-phase1.wv (discrete relay + JDT rewire kit) and "
+                "harnesses/fuel-pump-hanger-phase3.wv (PMU16 O4 direct-drive). "
+                "Update the reference to the phase-appropriate file.",
+        source="harnesses/fuel-pump-hanger-phase1.wv",
+        exclude=r"(?i)(split|deleted|renamed|superseded|-phase1|-phase3|old\s+file|was\s+split)",
+    ),
+    DenyRule(
+        pattern=r"harnesses/flex-fuel-sensor\.wv",
+        message="harnesses/flex-fuel-sensor.wv (if referenced) does not exist as a single file — "
+                "flex fuel is split into harnesses/flex-fuel-sensor-phase1.wv (M50 harness 16-pin "
+                "aux breakout DIN 3) and harnesses/flex-fuel-sensor-phase3.wv (CMC C1 direct DIN 3). "
+                "Update the reference to the phase-appropriate file.",
+        source="harnesses/flex-fuel-sensor-phase1.wv",
+        exclude=r"(?i)(does not exist|deleted|-phase1|-phase3|split)",
     ),
 
     # ── 07K crank sensor type — Hall, NOT VR ─────────────────────────────────
@@ -571,15 +596,33 @@ KNOWN_CMC_PINS: list[tuple[str, str, int]] = [
     ("WBO2 Heater",     "D1",  13),   # WBO2 Heater- → C1 D1
     ("GND Shield",      "E3",  19),   # Shield drain GND → C1 E3
     ("Sensor GND",      "H1",  29),   # Sensor GND rail → C1 H1
-    ("MAP",             "J3",  37),   # MAP sensor AIN → C1 J3
-    ("TPS1",            "G2",  26),   # TPS1 / DBW TB TPS1 → C1 G2
-    ("TPS2",            "J2",  34),   # TPS2 / DBW TB TPS2 → C1 J2
+    ("+5V sensor",      "G1",  25),   # Shared +5V sensor supply → C1 G1
+    ("MAP",             "J3",  37),   # MAP sensor AIN → C1 J3 (AIN 4)
+    ("PST-F1 pressure", "J3",  37),   # PST-F1 pressure output → AIN 3 (same J3)
+    ("PST-F1 temp",     "J1",  33),   # PST-F1 temp output → AIN 1 (C1 J1)
+    ("AIN 1",           "J1",  33),   # AIN 1 → C1 J1
+    ("AIN 2",           "J2",  34),   # AIN 2 → C1 J2
+    ("AIN 3",           "J3",  37),   # AIN 3 → C1 J3
+    ("AIN 4",           "J4",  38),   # AIN 4 → C1 J4
+    ("TPS1",            "G2",  26),   # TPS1 / DBW TB TPS1 → C1 G2 (was M52 TPS wire)
+    ("TPS2",            "J2",  34),   # TPS2 / DBW TB TPS2 → C1 J2 (AIN 2)
+    ("HOME",            "H4",  32),   # Cam Hall HOME input → C1 H4
+    ("Cam Hall",        "H4",  32),   # Cam Hall signal → C1 H4 (HOME)
+    ("Knock 1",         "K3",  39),   # Knock sensor 1 → C1 K3 (DIN/VR1)
+    ("Knock 2",         "K4",  40),   # Knock sensor 2 → C1 K4 (DIN/VR2)
+    ("Flex fuel",       "C1",   9),   # Flex fuel signal → C1 row-C column-1 (DIN 3, pin 9)
+    ("DIN 3",           "C1",   9),   # DIN 3 → C1 (pin 9) — flex fuel input
+    ("IGN 1",           "A2",   2),   # Ignition output 1 → C1 A2
+    ("IGN 2",           "A3",   3),   # Ignition output 2 → C1 A3
+    ("IGN 3",           "B2",   6),   # Ignition output 3 → C1 B2
+    ("IGN 4",           "B3",   7),   # Ignition output 4 → C1 B3
     ("IGN 5",           "C2",  10),   # Ignition output 5 → C1 C2
     ("INJ 1",           "K1",  45),   # Injector output 1 → C1 K1
     ("INJ 2",           "K2",  46),   # Injector output 2 → C1 K2
     ("INJ 3",           "M1",  49),   # Injector output 3 → C1 M1
     ("INJ 4",           "M2",  50),   # Injector output 4 → C1 M2
     ("INJ 5",           "M3",  51),   # Injector output 5 → C1 M3
+    ("VVT solenoid",    "D4",  16),   # GPO 3 / VVT solenoid (07K) → C1 D4
     # Crank Hall signal → TRIGGER (H3, pin 31). Confirmed Audit round 4.
     # Note: M52 VR+ uses the same pin (H3/31) — same ECU destination, different sensor type.
     ("TRIGGER",         "H3",  31),   # Crank trigger signal → C1 H3 (both M52 VR+ and 07K Hall)
