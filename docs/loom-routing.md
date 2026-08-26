@@ -10,8 +10,8 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 ## Loom Runs
 
 ### 1. Engine Bay Trunk Loom
-**Path:** ECU bulkhead → PMU16 → firewall bulkhead (engine side)  
-**Route:** Left inner fender rail (away from exhaust), secured to existing body grommets  
+**Path:** MaxxECU RACE H2O (OEM E-box cavity, intake side of RHD car) → PMU16 (co-mounted alongside H2O) → engine-bay actuators / sensors  
+**Route:** Intake side inner fender rail (RHD passenger side, away from exhaust which is on driver side), secured to existing body grommets  
 **Sleeve:** Expandable braid, DR-25 over sensor sub-looms  
 **Sub-looms that branch off this trunk:**
 
@@ -30,23 +30,28 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 ---
 
 ### 2. Firewall Bulkhead
-**Connector:** Deutsch AS79 (79-way) — cabin flange receptacle permanent; engine-side mating plug installed at 07K swap (Phase 3 — first install, no M52 mating plug; Phase 1 uses OEM grommet)  
-**Location:** TODO — firewall pass-through location TBD at fitment (left of center stack preferred for short cabin→ECU run)  
-**Harness file:** `harnesses/firewall-bulkhead.wv`
+**Connector:** Maven HD30 Dual 16+16 kit ($274) — Phase 2 install.
+- Connector A (16-pin, populated Phase 2): CAN + DCT shifter (6 wires used, 8 spare)
+- Connector B (16-pin, populated Phase 3): APS e-pedal (6 wires used, 10 spare)
+- Plate: 2.6" × 5.25" CNC billet aluminum, black anodized, template included
+- Phase 1: no bulkhead — 6 wires (CAN + DCT) route through OEM E36 firewall grommet as individual wires alongside the pre-terminated M50 harness  
+**Location:** TODO — firewall pass-through location TBD at fitment. Recommended: driver-opposite side of firewall (intake side = passenger side of RHD car) for shortest run to the engine-bay MaxxECU  
+**Harness file:** `harnesses/firewall-crossing-maven.wv`
+**Vendor:** [mavenspeed.com/collections/b2t-engineering/products/dual-connector-bulkhead](https://mavenspeed.com/collections/b2t-engineering/products/dual-connector-bulkhead)
 
 ---
 
 ### 3. Cabin Loom
-**Path:** ECU (under dash / tunnel-side) → pedal box, gauge cluster, shifter, DCT module  
+**Path:** Maven Connector A + B (cabin face, at firewall) → pedal box (APS + clutch pedal reservoir), gauge cluster (Gauge.S), shifter (DCT paddle)  
 **Route:** Behind lower dash panel, secured with P-clips to existing body studs  
 **Sub-looms:**
 
-| Sub-loom | Harness file |
-|----------|-------------|
-| E-pedal (E46 pedal → bulkhead) | `harnesses/epedal-bmw-e46.wv` |
-| Gauge.S CAN (ECU → cluster) | `harnesses/gauge-s-can.wv` |
-| DCT Shifter paddle (cabin-to-cabin) | `harnesses/dct-shifter.wv` |
-| Body X20 signals | `harnesses/body-x20.wv` |
+| Sub-loom | Harness file | Firewall crossing |
+|----------|-------------|-------------------|
+| E-pedal (E46 pedal → Maven Connector B) | `harnesses/epedal-bmw-e46.wv` | Maven Connector B (6 wires, Phase 3) |
+| Gauge.S CAN (ECU → cluster) | `harnesses/gauge-s-can.wv` | Maven Connector A pins 1/2/3 (Phase 2+; Phase 1 uses OEM grommet) |
+| DCT Shifter paddle | `harnesses/dct-shifter.wv` | Maven Connector A pins 4/5/6 (Phase 2+; Phase 1 uses OEM grommet) |
+| Body X20 signals | `harnesses/body-x20.wv` | OEM X20 (unchanged from OEM E36 — no ECU signals traverse X20) |
 
 ---
 
@@ -58,8 +63,8 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 | Sub-loom | Harness file | Notes |
 |----------|-------------|-------|
 | Fuel pump (full run, ~3.5–4m estimated) | `harnesses/fuel-pump-hanger.wv` | 12 AWG min; run separately from CAN to avoid PWM noise on bus |
-| ATF temp sensor (inline -8AN adapter) | `harnesses/atf-temp-sensor.wv` | Short stub from tunnel to bulkhead pin 56 |
-| 8HP CAN + power (engine bay → ZF 8HP) | `harnesses/8hp-can.wv` | Twisted pair — must maintain twist all the way to TCU plug |
+| ATF temp sensor (inline -8AN adapter) | `harnesses/atf-temp-sensor.wv` | Runs along tunnel forward to engine-bay ECU (no bulkhead crossing under H2O arch — sensor and ECU both engine-bay-side of firewall) |
+| 8HP CAN + power (engine bay → ZF 8HP TCU) | `harnesses/8hp-can.wv` (reference only — pre-made MaxxECU 8HP GEN1 kit, plug-and-play) | Twisted pair — engine-bay-to-engine-bay under H2O arch |
 
 ---
 
@@ -72,7 +77,7 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 | Sensor sub-looms (in sleeve) | DR-25 or Raychem SCL | Separate sleeve within engine bay trunk |
 | Injector/coil sub-looms | DR-25 | Separate from sensor sleeve — isolation critical |
 | Cabin / tunnel | Expandable braid | Lower heat exposure |
-| Firewall transition boots | Adhesive-lined heat shrink + boot | Seal breakout from sleeve at bulkhead entry |
+| Firewall transition boots | Adhesive-lined heat shrink + boot | Seal breakout from sleeve at Maven bulkhead entry (Phase 2+); OEM firewall grommet (Phase 1) |
 
 ---
 
@@ -88,17 +93,23 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 ## PMU16 — Mounting and Layout
 
 The Ecumaster PMU16 replaces the relay board, blade fuse block, and Crydom SSR.
-Mounting location: **engine bay, near ANL fuse / battery positive** — keeps the
-high-current BATT+ run to the PMU16 M6 stud as short as possible (≤ 18 in from
-battery preferred). The 39-pin Sicma connector faces toward the cabin for harness routing.
+Mounting location: **engine bay, intake side (RHD passenger side), alongside the
+MaxxECU RACE H2O in / adjacent to the OEM DME E-box cavity area**. This keeps:
+- MaxxECU H2O and PMU16 physically adjacent for the shortest ECU +12V feed run
+- Both units on the intake side, away from exhaust heat (driver side in RHD)
+- BATT+ run from ANL fuse to PMU16 M6 stud as short as practical
+See docs/vendor/maxxecu/MaxxECU_RACE_H2O.md and `harnesses/power-distribution.wv`.
+
+The 39-pin Sicma connector faces down/inboard for harness routing to engine-bay loads.
 
 ### Layout Workflow
-1. **Mock-up placement with the PMU16 body in-hand.** Verify clearance for the 39-pin
-   Sicma connector harness exit, the M6 BATT+ stud cable, and the CAN2 twisted pair run
-   toward the firewall bulkhead.
+1. **Mock-up placement with the PMU16 and RACE H2O bodies in-hand.** Verify clearance
+   for the 39-pin Sicma connector harness exit on the PMU16, the M6 BATT+ stud cable,
+   the CAN2 twisted pair run to MaxxECU C1 pins E1/E2, and the RACE H2O 155×195×40mm
+   footprint alongside.
 2. **Rivnuts (riveted nut inserts)** are the correct technique for attaching the PMU16
-   bracket to thin sheetmetal where backside nut access is impossible. M6 rivnuts for
-   the bracket. Tool: Astro Pneumatic 1442 or equivalent manual rivnut setter.
+   and H2O brackets to thin firewall sheetmetal where backside nut access is impossible.
+   M6 rivnuts for each bracket. Tool: Astro Pneumatic 1442 or equivalent manual rivnut setter.
    Source: StreetCarJoe Race Car Wiring Pt.3.
 3. If mounting to cage tubing or a roll bar, weld tabs and touch up paint.
 
@@ -107,9 +118,14 @@ battery preferred). The 39-pin Sicma connector faces toward the cabin for harnes
   ANL fuse within 18 in of battery terminal. See `harnesses/power-distribution.wv`.
 - **GND:** PMU16 GND lug → engine bay chassis star stud (M8). 6 AWG minimum.
 - **IGN sense:** IGN switched +12V (X20 pin 21, green wire) → PMU16 39-pin pin 7.
-  Switches PMU on/off with key. 22 AWG, protect with 5A inline fuse near X20.
-- **CAN2:** PMU16 CAN2 H/L → MaxxECU CAN1 H/L via 22 AWG twisted pair through
-  firewall bulkhead. 120Ω termination at both ends.
+  Switches PMU on/off with key. X20 pin 21 already runs to the engine bay in the OEM
+  E36 body harness — tap it engine-side. 22 AWG, protect with 5A inline fuse.
+- **CAN2:** PMU16 CAN2 H/L → MaxxECU CAN1 H/L (C1 pins E1/E2). Engine-bay-to-engine-bay
+  under H2O arch — no bulkhead crossing. 22 AWG twisted pair. 120Ω termination at
+  MaxxECU (built-in on CAN 1 per maxxecu.com/webhelp/can-information.html); enable
+  120Ω software termination on PMU16 CAN2 end.
+- **ECU +12V:** PMU16 O1 (or similar high-side output configured for constant +12V) →
+  MaxxECU CMC pin (see maxxecu-m52.wv / maxxecu-07k.wv). Engine-bay-to-engine-bay.
 
 ### Harness Organization at PMU16
 - **Adhesive-backed zip tie anchor mounts (cable saddle clips)** on the chassis near
@@ -122,9 +138,9 @@ battery preferred). The 39-pin Sicma connector faces toward the cabin for harnes
 
 ## TODO — Fill In During Build
 
-- [ ] Confirm firewall bulkhead pass-through hole location (L/R side, height from floor)
-- [ ] Confirm PMU16 mounting location in engine bay — verify M6 stud run ≤ 18 in to ANL fuse
-- [ ] Measure engine bay trunk run: PMU16 → each sensor breakout → bulkhead
+- [ ] Confirm Maven bulkhead pass-through hole location (intake side preferred; height from floor)
+- [ ] Confirm PMU16 + RACE H2O co-mount location on intake-side firewall — verify OEM DME E-box cavity accepts the H2O 155×195mm footprint (may need fabricated mounting plate — measure during Phase 1 mockup)
+- [ ] Measure engine bay trunk run: PMU16 → each sensor breakout → MaxxECU CMC
 - [ ] Confirm fuel pump loom total length (PMU16 O4 → Radium hanger, est. 3.5–4m tunnel run)
 - [ ] Confirm 8HP CAN run length (ECU → ZF 8HP TCU connector)
 - [ ] Confirm EWP loom length (PMU16 O5+O14 → CWA400 mounting location)

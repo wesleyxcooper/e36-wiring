@@ -110,8 +110,11 @@ cables:
     colors: [BN, BN, RD, WH, RD, WH]
     shield: true
     notes: >-
-      Cabin-only run: E46 pedal connector (footwell) → MaxxECU connector area (firewall).
-      No firewall crossing. Route along the tunnel/sill, away from audio wiring.
+      Cabin footwell → Maven HD30 Connector B (cabin face, at firewall) — 6 wires
+      crossing to engine-bay MaxxECU via Connector B pins 1-6 under the H2O arch.
+      Cabin-side run only in this cable file — the engine-side hop (Maven engine
+      face → MaxxECU C2/CMC) is documented in harnesses/firewall-crossing-maven.wv.
+      Route the cabin portion along the tunnel/sill, away from audio wiring.
       24 AWG sufficient -- total circuit draw ~20 mA.
       Shielded 6-conductor; drain shield at MaxxECU end only (single-end drain prevents
       ground loops). Tie drain wire to CMC H1 (Sensor GND).

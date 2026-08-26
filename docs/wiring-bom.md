@@ -230,24 +230,51 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 
 ## System 4 — Fuel System
 
-*Source: `fuel-pump-hanger.wv`*
+*Sources: `fuel-pump-hanger-phase1.wv` (discrete relay era) · `fuel-pump-hanger-phase3.wv` (PMU16 direct-drive)*
 
-> Replaces the M52 in-tank Walbro 255 + relay from Phase 1 with the Radium 20-1170 hanger + F90000267 driven by PMU16 O4 direct (PWM). No DC SSR — PMU16 O4 (25A, PWM-capable) sources current from its BATT+ stud and runs 12 AWG through the tunnel to the hanger. MaxxECU commands speed via CAN to PMU16. No re-work at Phase 3 07K swap.
+> Radium Engineering 20-1170 hanger + Walbro F90000267 (465 LPH E85) installed at Phase 1. Wiring approach changes between phases because PMU16 is not installed until Phase 3.
+>
+> - **Phase 1**: Discrete high-current relay + 30A fuse in engine bay. Relay coil driven by MaxxECU GPO 2 (12-pin extra connector pin 3). Relay contact feeds 12 AWG through cabin/tunnel to hanger pump(+) stud.
+> - **Phase 3**: Discrete relay REMOVED at 07K swap. PMU16 O4 direct-drives the same 12 AWG cabin/tunnel wire (relay end lands on PMU16 O4 output pin). Minimal Phase 3 rework — cabin/tunnel/hanger wiring unchanged.
 
-### Connectors
+### Phase 1 — Discrete Relay Purchase
+
+Two purchase paths (both cover the relay + fuse + heavy-gauge wire + terminals):
+
+| Option | Item | Cost | Source |
+|--------|------|------|--------|
+| A (bundled — simplest) | **JDT Racing F90000267 + Walbro 400-1168 install kit + JDT rewire kit** | **$193.19** | [jdtracing.com F90000267 bundle](https://jdtracing.com/products/walbro-ti-f90000267-450lph-fuel-pump-w-install-kit-rewire-kit-e85-compatible). Includes: F90000267 pump, Walbro 400-1168 install kit, 16' 10 AWG blue power cable, 30A inline fuse, 3' 10 AWG black ground, relay, relay pigtail, pass-through grommet, ring terminals, wire loom, cable ties. **One SKU, one shipping charge.** |
+| B (already have pump) | **JDT Racing Universal Fuel Pump Rewire Kit** (rewire only, no pump) | **$37.99** | [jdtracing.com universal rewire kit](https://jdtracing.com/products/jdt-racing-universal-fuel-pump-rewire-kit-w-10-gauge-power-ground-fuse-relay). Same components as bundle rewire portion — for users who already own the F90000267 separately. |
+| C (à la carte) | Walbro F90000267 + Bosch/Hella 40/70A relay + 30A fuse + 10 AWG wire + terminals | ~$220+ | Pump ~$181 (Real Street Performance) + relay ~$8-12 + fuse holder ~$5 + wire/terminals ~$20+ from Waytek/ProWire USA. Cheapest per part but multiple shipments and no single-vendor support. |
+
+**Recommendation: Option A** — the JDT bundle is functionally equivalent to Option C at a lower total cost when shipping and time are factored in, and Option B is only useful if the pump is already owned.
+
+### Connectors (Phase 1 discrete relay era)
 
 | Qty | Item | Notes |
 |-----|------|-------|
-| 1 | PMU16 O4 output stub (engine bay) | 🔁 Shared with power-distribution.wv — RADIUM_HANGER_STUB. PMU16 O4 (PHYS pin 13, 25A PWM). |
+| 1 | Discrete high-current relay (Bosch 0 332 002 156 or JDT-supplied) | 40A/70A dual-rating ISO mini. 12V coil, ~150 mA. Included in JDT bundle Option A or Option B. |
+| 1 | 30A blade fuse holder + fuse | Inline, weatherproof, engine-bay mount. Included in JDT bundle Option A or Option B. |
 | 1 | Radium Engineering 20-1170 hanger terminals | Top-plate external studs (pump+ and pump−) — anti-rotation, hermetically sealed. Comes with hanger kit, not sourced separately. |
+| 1 | Pass-through grommet (firewall or trunk floor) | Included in JDT bundle Option A or Option B. |
 | 1 | Chassis ground stud | 🔁 Shared with power distribution |
 
-### Cables
+### Connectors (Phase 3 PMU16 direct-drive)
+
+| Qty | Item | Notes |
+|-----|------|-------|
+| 1 | PMU16 O4 output stub (engine bay) | 🔁 Shared with power-distribution.wv — RADIUM_HANGER_STUB. PMU16 O4 (PHYS pin 13, 25A PWM). Replaces the Phase 1 discrete relay at 07K swap. |
+| 1 | Radium 20-1170 hanger terminals | Same as Phase 1 (no change at swap). |
+| 1 | Chassis ground stud | 🔁 Shared. |
+
+**Phase 3 removes**: the Phase 1 discrete relay, 30A fuse, coil-side wires. Everything else stays.
+
+### Cables (both phases — same physical wire)
 
 | Run | Color | Gauge | Length | Shielded | Notes |
 |-----|-------|-------|--------|----------|-------|
-| CABLE_PWR (PMU16 O4 → hanger pump+) | RD | 12 AWG | 4.0 m | No | Full run engine bay → fuel tank (est. 3.5–4m; measure on car). Route through transmission tunnel. No separate fuse — PMU16 O4 overcurrent protection handles this. |
-| CABLE_GND (hanger pump− → chassis GND) | BK | 12 AWG | 0.5 m | No | Dedicated ground — do not share with ECU sensor GND. Ring terminals both ends. |
+| CABLE_PWR (relay pin 87 / PMU16 O4 → hanger pump+) | RD | 12 AWG (or 10 AWG if JDT bundle used) | ~4.0 m | No | Full run engine bay → fuel tank (est. 3.5–4m; measure on car). Route through transmission tunnel. Phase 1: relay contact + 30A fuse protection. Phase 3: no separate fuse — PMU16 O4 overcurrent protection handles this. |
+| CABLE_GND (hanger pump− → chassis GND) | BK | 12 AWG | 0.5 m | No | Dedicated ground — do not share with ECU sensor GND. Ring terminals both ends. Unchanged between phases. |
 
 ---
 

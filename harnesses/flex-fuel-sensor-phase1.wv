@@ -1,0 +1,130 @@
+metadata:
+  project: E36 Restomod -- GM/Continental Flex Fuel Sensor Wiring (PHASE 1)
+  phase: "Phase 1 (M52 + M50 pre-terminated harness era — ECU-side wiring via 16-pin aux breakout)"
+  description: >-
+    PHASE 1 flex fuel sensor wiring: GM/Continental 3-wire ethanol content
+    sensor (GM 13577379 / Continental 21P1023) reads ethanol % + fuel
+    temperature and outputs a variable-frequency signal to MaxxECU DIN 3.
+
+    Under Phase 1 the MaxxECU M50 pre-terminated harness exposes DIN 3 at the
+    16-pin aux breakout (pin 5 — labeled "GPO 7 / DIN 3"). The flex fuel signal
+    wire terminates at this breakout pin. MTune Analog Inputs configured to
+    interpret the pulse train as ethanol %.
+
+    Under Phase 3 (07K custom engine harness), the M50 harness is retired.
+    The flex fuel signal moves to MaxxECU CMC C1 pin 9 (DIN 3) — same ECU
+    input but different physical harness termination. See
+    harnesses/flex-fuel-sensor-phase3.wv for that variant.
+
+    The SENSOR itself, its mount location (inline in fuel supply line between
+    tank and engine), and the sensor pigtail wiring are IDENTICAL between
+    phases — only the ECU-side termination changes.
+
+    Sensor part references:
+      GM 13577379 — Continental/VDO 21P1023 3-wire flex fuel sensor
+      Sold aftermarket by CJM Industries and similar shops for E85 conversions.
+      3-wire: +12V IGN (pin A), signal output (pin B), ground (pin C).
+      Signal: variable frequency 50-150 Hz proportional to ethanol %.
+
+    MaxxECU flex fuel documentation:
+      maxxecu.com/webhelp/settings-inputs.html (DIN inputs, frequency mode)
+      maxxecu.com/webhelp/settings-flexfuel.html (ethanol calibration table)
+
+    Fuel-pump-hanger relationship: this file covers ONLY the sensor signal
+    wiring. Fuel pump power wiring is covered separately in
+    harnesses/fuel-pump-hanger-phase1.wv (discrete relay era).
+
+# ── TODO list ──────────────────────────────────────────────────────────────────
+#
+#   [ ] Source GM 13577379 or Continental 21P1023 sensor + mating connector
+#       (Delphi-family 3-pin GT150 or equivalent — verify at purchase)
+#   [ ] Confirm sensor mount location (inline fuel supply, post-hanger, pre-rail)
+#       Radium/AN adapter with 3/8" quick-connect port for the sensor is typical
+#   [ ] Verify M50 harness 16-pin aux breakout DIN 3 physical location
+#       Source: docs/vendor/maxxecu/MaxxECU_M50_Terminated_Harness.md § 16-pin aux
+#       Expected: pin 5 of 16-pin aux breakout (label: "GPO 7 / DIN 3")
+#   [ ] MTune Analog/Digital Inputs → DIN 3 → Type: Frequency → Function: Flex fuel
+#       Calibrate 50 Hz = 0% ethanol, 150 Hz = 100% ethanol per MaxxECU flex fuel doc
+#   [ ] Shielded 3-conductor from sensor to breakout — drain shield at ECU end only
+
+# ── Connectors ─────────────────────────────────────────────────────────────────
+
+connectors:
+
+  FLEX_FUEL_SENSOR:
+    type: "GM 13577379 / Continental 21P1023 flex fuel sensor"
+    subtype: "3-wire ethanol content + fuel temperature sensor"
+    pincount: 3
+    pinlabels:
+      - "A: +12V IGN supply"
+      - "B: Signal (variable frequency 50-150 Hz)"
+      - "C: Ground (sensor GND)"
+    notes: >
+      Inline sensor — mount in fuel supply line between Radium hanger output and
+      fuel rail inlet. 3/8" quick-connect ports on both sides (verify at purchase).
+      +12V supply must be IGN-switched (sensor draws current only when engine on).
+      Signal is a square-wave pulse train — MaxxECU interprets frequency as ethanol %.
+      Cold fuel temperature output modulates duty cycle on the same signal wire.
+
+  M50_AUX_16PIN:
+    type: "MaxxECU M50 pre-terminated harness — 16-pin aux breakout"
+    subtype: "REV2 — DIN 3 = pin 5 (labeled 'GPO 7 / DIN 3')"
+    pincount: 3
+    pinlabels:
+      - "Pin 1: +5V sensor supply (NOT USED here — sensor uses +12V IGN, not +5V)"
+      - "Pin 2: Sensor GND (shared sensor return bus)"
+      - "Pin 5: DIN 3 (flex fuel signal input, GPO 7 remapped to DIN in MTune)"
+    notes: >
+      Only 2 of these pins are used for flex fuel: pin 2 (SGND) and pin 5 (DIN 3).
+      +12V for the sensor comes from a separate IGN-switched supply (not from the
+      16-pin aux breakout — no +12V IGN pin there).
+      Source: docs/vendor/maxxecu/MaxxECU_M50_Terminated_Harness.md 16-pin aux table.
+
+  IGN_12V_BODY:
+    type: "OEM ignition relay — body harness switched +12V"
+    subtype: "Sensor +12V supply"
+    pincount: 1
+    pinlabels: ["+12V IGN"]
+    notes: >
+      Same OEM IGN relay rail used by fan relay and fuel pump relay coils.
+      Sensor draws ~50-100 mA when active — negligible load.
+      Inline fuse: 3A blade fuse recommended in a weatherproof holder near the sensor.
+
+# ── Cables ─────────────────────────────────────────────────────────────────────
+
+cables:
+
+  W_FF_POWER:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V IGN → sensor pin A"]
+    length: 3.0 m
+    notes: >
+      From engine-bay IGN +12V (via 3A inline fuse) to flex fuel sensor pin A.
+      18 AWG. Route with fuel line (protected from heat/abrasion).
+
+  W_FF_SIGNAL:
+    wirecount: 2
+    colors: [WH, BN]
+    wirelabels: ["Sensor pin B (signal)", "Sensor pin C (SGND)"]
+    length: 3.0 m
+    shield: true
+    notes: >
+      Shielded twisted pair from sensor to M50 harness 16-pin aux breakout.
+      22 AWG. Drain shield at ECU end only (single-end drain — connect to SGND at
+      the 16-pin aux breakout pin 2). Route with fuel line where possible; keep
+      away from ignition primaries.
+
+# ── Connections ────────────────────────────────────────────────────────────────
+
+connections:
+
+  # ── Sensor +12V IGN supply ───────────────────────────────────────────────────
+  - - IGN_12V_BODY: [1]
+    - W_FF_POWER: [1]
+    - FLEX_FUEL_SENSOR: [1]     # pin A
+
+  # ── Sensor signal + GND to M50 harness 16-pin aux breakout ───────────────────
+  - - FLEX_FUEL_SENSOR: [2, 3]  # pins B, C
+    - W_FF_SIGNAL: [1, 2]
+    - M50_AUX_16PIN: [3, 2]     # DIN 3 (pin 5 of breakout), SGND (pin 2)

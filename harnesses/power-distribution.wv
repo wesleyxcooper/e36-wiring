@@ -1,6 +1,19 @@
 metadata:
-  project: E36 Restomod -- Power Distribution
+  project: E36 Restomod -- Power Distribution (PMU16 install)
+  phase: "Phase 3 (07K swap moment — PMU16 physically installed for the first time)"
   description: >-
+    ⚠️ PHASE 3 INSTALL FILE. PMU16 is NOT installed in the car during Phase 1 or Phase 2.
+    Under Phase 1 (M52 + M50 pre-terminated harness), aftermarket loads that PMU16
+    will eventually drive are handled by:
+      - Discrete aftermarket high-current relays (e.g., fuel pump — see
+        harnesses/fuel-pump-hanger-phase1.wv)
+      - MaxxECU GPO outputs driving small relay coils (e.g., reverse light —
+        see harnesses/8hp-body-integrations-phase1.wv)
+      - OEM E36 relays that remain in place until replaced (K6300 DME main,
+        K21/K22 fan relays, K19 A/C compressor)
+    Phase 2 is offline harness/engine build — no in-car install work happens.
+    At Phase 3 swap moment PMU16 arrives and replaces all of the above at once.
+
     Ecumaster PMU16 power management unit replaces relay board, fuse block,
     and DC SSR from earlier design. PMU16 provides 16 programmable MOSFET
     high-side outputs with per-channel digital fusing, current monitoring,
@@ -18,9 +31,69 @@ metadata:
     (PMU16 O1) and 8HP TCU power (KL30/KL15) are engine-bay-to-engine-bay
     runs. No firewall crossing for ECU or 8HP power lines.
 
-    Phase 1 (M52 engine). All wire lengths are stubs -- confirm before building.
-    Cross-reference harnesses/maxxecu-m52.wv for ECU CAN pin assignments and
-    harnesses/8hp-can.wv for 8HP TCU KL30/KL15 destinations.
+    Phase 3 install file. All wire lengths are stubs -- confirm before building.
+    Cross-reference harnesses/maxxecu-07k.wv for ECU CAN pin assignments (Phase 3
+    ECU harness) and harnesses/8hp-can.wv for 8HP TCU KL30/KL15 destinations.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# OEM E36 RELAY REPLACEMENT MAP — what PMU16 replaces vs what stays OEM
+#
+# The E36 has an OEM Front Power Distribution Box (engine bay, plastic-covered
+# black box on the driver-opposite inner fender near the strut tower). It
+# contains the OEM relays listed below. Source: E36 ETM section 0670.0
+# ("POWER DISTRIBUTION CHART FRONT POWER DISTRIBUTION BOX"):
+# https://www.carmanualsonline.info/bmw-318is-1999-e36-electrical-troubleshooting-manual/
+#
+# REPLACED BY PMU16 (OEM relay REMOVED from the Front Power Distribution Box;
+# its wires re-routed to a PMU16 output):
+#   K6300  Engine Control Module Relay (DME main)   →  PMU16 O1  (ECU +12V)
+#   K6301  Fuel Pump Relay (K6301w cyl 1-6)         →  PMU16 O4  (Walbro pump)
+#   K19    A/C Compressor Control Relay             →  PMU16 O7  (drives 100A
+#          [see ac-compressor.wv note: PMU16 O7 drives the coil of a discrete
+#           100A relay; PMU16 does NOT directly carry compressor current.]
+#   K21    Normal Speed Relay (A/C fan low)         →  PMU16 O3  (fan control)
+#   K22    High Speed Relay (A/C fan high)          →  PMU16 O3  (same PWM channel,
+#          duty controlled by MaxxECU → CAN → PMU16)
+#   K6304  Secondary Air Pump Relay                 →  DELETED (Phase 3 no SAI on 07K)
+#
+# STAYS OEM (relay remains in the Front Power Distribution Box; wires unchanged):
+#   K2     Horn Relay                               (cabin horn switch → relay → horn)
+#   K4     Blower Relay                             (HVAC blower motor)
+#   K10    ABS Relay                                (if ABS is retained)
+#   K13    Rear Defogger Relay
+#   K16    Hazard Flasher Relay
+#   K47    Front Fog Light Relay                    (if fog lights retained)
+#   K125   ABS Pump Motor Relay, Timed              (if ABS retained)
+#
+# STARTER RELAY — architecture-dependent:
+#   The E36 starter relay lives in the Front Power Distribution Box in some
+#   configurations and behind the glovebox in others. Under the new arch:
+#     Option A (simpler): starter relay stays OEM, wired to X20 pin 18 as
+#       stock. MaxxECU has NO involvement in the starter crank circuit.
+#       Starter inhibit (8HP gear != P/N) is NOT enforced by MaxxECU. Not
+#       recommended — you can crank in-gear.
+#     Option B (preferred): starter relay COIL is wired through a MaxxECU-
+#       controlled path (either a PMU16 output or a small in-line relay
+#       triggered by a MaxxECU GPO). MTune Advanced → Starter control →
+#       inhibit crank when gear != P/N. Enforced starter inhibit.
+#   This file assumes Option B and reserves one spare PMU16 output for it.
+#   See harnesses/8hp-body-integrations-phase{1,3}.wv "Starter inhibit" note.
+#
+# X20 PIN REUSE (existing OEM X20 wires repurposed under the new arch):
+#   X20 pin 4  (SW/BL, A/C Compressor Relay signal)  → engine-side rewired to
+#              MaxxECU DIN input for AC-request idle-up. See ac-compressor.wv.
+#   X20 pin 10 (BL/GE, Reverse Light Switch no-EGS)  → engine-side rewired to
+#              MaxxECU/PMU16 reverse-light output. See 8hp-body-integrations-*.wv.
+#   X20 pin 13 (GN/VI, Fuel Pump Relay output)       → engine-side CAVITY-PLUG
+#              (no longer used — PMU16 O4 drives the Radium hanger directly
+#              via a dedicated wire path; see fuel-pump-hanger.wv).
+#   X20 pin 21 (SW/GN, Ignition Switch +12V)         → engine-side tapped for
+#              PMU16 IGN sense input.
+#   All other X20 pins: unchanged from OEM.
+#
+# See docs/wiring-bom.md System 8 for firewall-crossing scope (Maven bulkhead)
+# and harnesses/body-x20.wv for the full X20 OEM pin inventory.
+# ─────────────────────────────────────────────────────────────────────────────
 
 # ── TODO list ──────────────────────────────────────────────────────────────────
 #

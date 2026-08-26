@@ -1,0 +1,251 @@
+metadata:
+  project: E36 Restomod -- Radium 20-1170 Fuel Pump Hanger Wiring (PHASE 1)
+  phase: "Phase 1 (M52 + M50 pre-terminated harness era — no PMU16 in car yet)"
+  description: >-
+    PHASE 1 fuel pump wiring: Radium 20-1170 hanger + Walbro F90000267 (E85-safe,
+    465 LPH) driven by a DISCRETE aftermarket high-current relay in the engine bay.
+    Relay coil is triggered by the MaxxECU M50 pre-terminated harness's fuel pump
+    signal wire. This is the industry-standard approach for high-current aftermarket
+    fuel pumps — see vendor citation below.
+
+    Why a discrete relay in Phase 1: PMU16 is NOT installed until Phase 3
+    (07K swap moment). Under Phase 1, MaxxECU RACE H2O is engine-bay-mounted but
+    it drives its GPO outputs at low current (~150 mA typical) — it cannot directly
+    carry the pump's ~14-17 A running current. And the OEM K6301 Fuel Pump Relay
+    that this circuit REPLACES is designed for the ~5-10 A OEM in-tank pump, at
+    the upper edge of its rating with a Walbro F90000267. Motorsport convention
+    is a dedicated aftermarket relay + fuse + heavier gauge wire (per JDT Racing
+    Rewire Kit vendor guidance below).
+
+    Pump current draw citation:
+      walbrofuelpumps.com/450lph-walbro-e85-racing-fuel-pump-f90000267.html
+      "465 lph @ 40 psi and 13.5V (14.1 amps) in gasoline"
+      (E85 slightly higher due to fuel density — plan for ~15-17 A running current)
+
+    Convention citation (aftermarket rewire kit):
+      jdtracing.com/products/walbro-ti-f90000267-450lph-fuel-pump-w-install-kit-rewire-kit-e85-compatible
+      "One of the most common mistakes people make when trying to run a high volume
+       fuel pump is trying to use the factory wiring which on most vehicles is
+       extremely inadequate. When installing a much larger than factory fuel pump
+       you need to upgrade the wiring, fuse and relay setup."
+      The JDT Racing Rewire Kit includes: new relay, 30A inline fuse, 10 AWG wire,
+      pass-through grommet, ring terminals. Same architecture used here.
+
+    Phase 3 transition: at 07K swap moment, this discrete relay is REMOVED and
+    replaced by PMU16 O4 direct-drive. See harnesses/fuel-pump-hanger-phase3.wv.
+    The 12 AWG cabin/tunnel wire from firewall grommet → tunnel → hanger pump(+)
+    stud stays in place — only the engine-bay end changes (relay contact →
+    PMU16 O4). Minimal Phase 3 rewiring.
+
+    OEM E36 fuel pump routing (that this wire mirrors): K6301 Fuel Pump Relay pin 87
+    (engine-bay Front Power Distribution Box) → X20 pin 13 → cabin body harness →
+    trunk/tank → in-tank pump. Source: E36 ETM section 0670.2 via
+    carmanualsonline.info/bmw-318is-1999-e36-electrical-troubleshooting-manual.
+    Under our Phase 1 arch, the discrete added relay REPLACES the K6301 relay
+    function; X20 pin 13 (previously the OEM fuel pump feed) is cavity-plugged.
+
+    Cross-reference fuel-pump-hanger-reference.md for pump/hanger specs
+    and MTune config (fuel pump signal function assignment).
+    Install PDF: radiumauto.com/pages/instructions (20-1170).
+
+# ── TODO list ──────────────────────────────────────────────────────────────────
+#
+#   [ ] Verify F90000267 fits chosen Radium hanger slot -- 39mm/50mm DCSS body confirmed
+#   [ ] Source discrete high-current relay -- Bosch/Hella 0332-002-156 or equiv (40/70A rating)
+#   [ ] Source 30A inline blade fuse holder + fuse
+#   [ ] Confirm MaxxECU M50 harness fuel pump signal wire identification
+#       Reference: docs/vendor/maxxecu/MaxxECU_M50_Terminated_Harness.md
+#       Typical: GPO on the 16-pin aux breakout or a dedicated harness stub
+#   [ ] Assign MaxxECU MTune fuel pump output function to the GPO driving the coil
+#       MTune: Outputs -> Output config -> Function: Fuel Pump (or PWM fuel pump if desired)
+#   [ ] Confirm 12 AWG run length (engine bay relay → tunnel → tank hanger, est. 3.5-4m)
+#       Add 20% slack per BOM conventions; pre-terminate before routing through tunnel
+#   [ ] Thread 20-1000-1010 swivel fitting (10AN ORB) into pump-out port HAND-TIGHT
+#       then attach -10AN braided line before final torque -- allows rotation to route
+#   [ ] Return port: use included 8.5mm barb adapter (OEM return line)
+#       OR add 20-1000-0606 (6AN ORB swivel) if converting to full AN return
+#   [ ] Dedicate chassis GND stud for pump(-) -- do not share with ECU sensor grounds
+
+# ── Connectors ─────────────────────────────────────────────────────────────────
+
+connectors:
+
+  MAXXECU_GPO_FP:
+    type: "MaxxECU M50 pre-terminated harness — 12-pin extra connector pin 3 (GPO 2)"
+    subtype: "Low-side GPO 2 output (~150 mA), drives relay coil pin 85"
+    pincount: 1
+    pinlabels: ["GPO 2 signal (low-side switch to GND)"]
+    notes: >
+      MaxxECU GPO 2 low-side output — sinks to GND when fuel pump is commanded on.
+      Does NOT supply +12V. MTune Function: "Fuel pump relay" (binary on/off in Phase 1).
+      Exposed on the M50 pre-terminated harness's 12-pin EXTRA connector at pin 3
+      (ECU_12PIN pin 3). This is the canonical Phase 1 fuel pump path per the
+      walkthrough at e36-docs/walkthroughs/08-fuel-system.md step 9 and
+      e36-docs/walkthroughs/11-ecu-chassis-wiring.md relay block spec.
+      Source: docs/vendor/maxxecu/MaxxECU_M50_Terminated_Harness.md §12-pin extra.
+      Phase 3: this GPO 2 assignment moves to a MaxxECU CAN broadcast that PMU16
+      subscribes to; PMU16 O4 direct-drives the pump. See fuel-pump-hanger-phase3.wv.
+
+  FP_RELAY:
+    type: "Discrete high-current relay (40A / 70A dual-rating ISO mini)"
+    subtype: "Bosch 0 332 002 156 or Hella equivalent — 12V coil, dual contact"
+    pincount: 5
+    pinlabels:
+      - "85 Coil - (MaxxECU GPO low-side)"
+      - "86 Coil + (+12V OEM IGN)"
+      - "87 Contact NO out → cabin/tunnel wire → hanger"
+      - "87a Contact NC (unused, cap or clip off)"
+      - "30 Battery+ (fused via 30A inline)"
+    notes: >
+      40A/70A dual-rating relay gives ~2x headroom over the Walbro F90000267 running
+      current (~14-17A). Coil draws ~150 mA — well within MaxxECU GPO output spec.
+      Mount in engine bay alongside the existing OEM Front Power Distribution Box
+      or on a fabricated bracket near the MaxxECU RACE H2O.
+
+      Flyback diode: 1N4007 across relay coil.
+        Cathode (banded end) → pin 86 / +12V.
+        Anode → pin 85 / GPO.
+      Prevents GPO output damage from coil back-EMF at relay de-energization.
+
+      Phase 3 transition: this relay is REMOVED at 07K swap. PMU16 O4 replaces it —
+      the O4 output wire lands on the same cabin/tunnel wire that this relay's
+      contact pin 87 currently feeds. See fuel-pump-hanger-phase3.wv.
+
+  FP_FUSE:
+    type: "30A blade fuse holder (inline, engine-bay-mounted)"
+    subtype: "MTA/Littelfuse 30A ATO/ATC blade with weatherproof inline holder"
+    pincount: 1
+    pinlabels: ["+12V fused to relay pin 30"]
+    notes: >
+      30A rating matches JDT Racing Rewire Kit vendor spec for this exact pump.
+      Mount within 12" of battery positive to protect the entire relay+wire path.
+      Weatherproof inline holder recommended for engine-bay location.
+
+  RADIUM_HANGER:
+    type: "Radium Engineering 20-1170 — stainless stud electrical terminals"
+    subtype: "Top-plate external studs — anti-rotation, hermetically sealed"
+    pincount: 2
+    pinlabels:
+      - "Pump(+) — switched +12V from relay contact 87"
+      - "Pump(-) — chassis GND"
+    notes: >
+      Radium 20-1170 uses custom stainless steel studs through the top plate (not a
+      multi-pin connector). External connection via ring terminals + anodized acorn nuts.
+      Anti-rotation feature prevents stud from spinning during install.
+      Hermetically sealed and impervious to E85, gasoline, methanol.
+      Ring terminals: 12 AWG crimp ring, M4 or M5 stud diameter (confirm at install).
+      In-tank wiring insulated with ETFE — chemically resistant to all fuel types.
+      Single pump install (F90000267): run 12 AWG from relay pin 87 to pump(+) stud
+      (Phase 1) or from PMU16 O4 to pump(+) stud (Phase 3 — same wire, upstream end
+      changes).
+      Hanger: https://www.radiumauto.com/products/bmw-e36-fuel-pump-hanger
+      Pump: https://www.walbrofuelpumps.com/product/f90000267/
+
+  BATT_POS:
+    type: "Battery positive stud (engine bay side of cutoff switch)"
+    subtype: "Post-cutoff +12V constant supply"
+    pincount: 1
+    pinlabels: ["+12V BATT (post-cutoff, fused via FP_FUSE 30A)"]
+
+  IGN_12V_BODY:
+    type: "OEM ignition relay — body harness switched +12V"
+    subtype: "Relay coil supply (pin 86)"
+    pincount: 1
+    pinlabels: ["+12V IGN (body harness)"]
+    notes: >
+      Same OEM IGN relay rail used by fan relay and OEM fuel pump relay coils.
+      Coil draws ~150 mA at 12V — negligible load.
+
+  CHASSIS_GND:
+    type: "Chassis ground stud (body metal, near fuel tank)"
+    pincount: 1
+    pinlabels: ["GND"]
+    notes: >-
+      Dedicated ground for pump(-) terminal on Radium hanger.
+      Do not share with ECU sensor grounds or other high-current grounds.
+      12 AWG minimum. Ring terminal, solid bolt to body metal.
+
+# ── Cables ─────────────────────────────────────────────────────────────────────
+
+cables:
+
+  W_GPO_COIL:
+    wirecount: 1
+    colors: [GN]
+    wirelabels: ["MaxxECU GPO → relay pin 85 (coil low-side)"]
+    length: 0.5 m
+    notes: >
+      Engine-bay-only run from MaxxECU M50 harness fuel pump signal exit to relay
+      pin 85. 18 AWG sufficient — carries ~150 mA coil current only.
+
+  W_COIL_PWR:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V IGN → relay pin 86 (coil +)"]
+    length: 0.3 m
+    notes: "OEM IGN relay +12V to relay pin 86. 18 AWG."
+
+  W_FUSE_TO_RELAY:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V battery via 30A fuse → relay pin 30"]
+    length: 0.5 m
+    notes: >
+      From battery+ stud through 30A inline fuse to relay pin 30 (contact input).
+      10 AWG (matches JDT Racing Rewire Kit spec — provides low voltage drop at
+      peak current).
+
+  W_PUMP_PWR:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["Relay pin 87 → cabin grommet → tunnel → tank hanger pump(+)"]
+    length: 4.0 m
+    notes: >
+      Relay contact output (pin 87) → dedicated firewall grommet → cabin body
+      harness route (mirrors OEM E36 fuel pump path) → back to trunk/tank →
+      Radium hanger pump(+) stud.
+      12 AWG minimum. Route through transmission tunnel. Keep clear of exhaust
+      where tunnel-side routing is close to heat. Loom in expandable braid for
+      this full run. Estimated run: 3.5-4m -- measure on car, add 20% slack
+      before cutting.
+      Phase 3: this SAME WIRE stays in place. Only the relay-end lands on
+      PMU16 O4 instead of relay pin 87. Minimal Phase 3 rework.
+
+  W_PUMP_GND:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: ["Radium hanger pump(-) → chassis GND"]
+    length: 0.5 m
+    notes: >
+      Radium hanger pump(-) stud to chassis ground stud. 12 AWG.
+      Dedicated ground — do not share with ECU sensor ground bus.
+      Ring terminal at both ends.
+
+# ── Connections ────────────────────────────────────────────────────────────────
+
+connections:
+
+  # ── Relay coil circuit ───────────────────────────────────────────────────────
+  # MaxxECU GPO sinks pin 85 to GND when fuel pump active. Pin 86 is +12V IGN.
+  - - MAXXECU_GPO_FP: [1]
+    - W_GPO_COIL: [1]
+    - FP_RELAY: [1]           # pin 85 — low-side
+
+  - - IGN_12V_BODY: [1]
+    - W_COIL_PWR: [1]
+    - FP_RELAY: [2]           # pin 86 — coil +
+
+  # ── Relay contact circuit ────────────────────────────────────────────────────
+  # Battery+ → 30A fuse → relay pin 30 → relay pin 87 → cabin/tunnel wire → pump.
+  - - BATT_POS: [1]
+    - W_FUSE_TO_RELAY: [1]
+    - FP_RELAY: [5]           # pin 30 — contact in (via fuse)
+
+  - - FP_RELAY: [3]           # pin 87 — contact out
+    - W_PUMP_PWR: [1]
+    - RADIUM_HANGER: [1]      # pump(+) stud
+
+  # ── Pump GND circuit ─────────────────────────────────────────────────────────
+  - - RADIUM_HANGER: [2]      # pump(-) stud
+    - W_PUMP_GND: [1]
+    - CHASSIS_GND: [1]

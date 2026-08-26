@@ -1,12 +1,25 @@
 metadata:
-  project: E36 Restomod -- CWA400 Electric Water Pump Wiring
+  project: E36 Restomod -- CWA400 Electric Water Pump Wiring (PHASE 3)
+  phase: "Phase 3 (07K swap moment — electric water pump replaces belt-driven OEM pump; PMU16 arrives concurrently)"
   description: >-
+    ⚠️ PHASE 3 INSTALL FILE. The CWA400 electric water pump is installed at the
+    07K engine swap — the belt-driven OEM water pump is removed with the M52.
+    Under Phase 1 (M52 in car) the OEM belt-driven pump is still spinning and
+    NO electric pump wiring exists. PMU16 also arrives at Phase 3 (see
+    harnesses/power-distribution.wv), so all EWP wiring is Phase 3 install.
+
     Pierburg CWA400 (PWM version) powered by Ecumaster PMU16 O5+O14 parallel
-    outputs (50A combined) and controlled by MaxxECU RACE via PWM GPO.
-    Phase 3 (07K engine). OEM pump 07K121011B impeller removed, housing stays
-    as coolant manifold. No separate pump controller -- MaxxECU is the sole
-    PWM driver. PMU16 replaces MAIN_RELAY: O5+O14 wire direct to CWA400 Pin 3.
-    Post-shutdown cooling managed by PMU16 (no separate power-hold relay needed).
+    outputs (50A combined) and controlled by MaxxECU RACE H2O via PWM GPO.
+    OEM pump 07K121011B impeller removed, housing stays as coolant manifold.
+    No separate pump controller -- MaxxECU is the sole PWM driver.
+    PMU16 O5+O14 wire direct to CWA400 Pin 3. Post-shutdown cooling managed
+    by PMU16 (no separate power-hold relay needed).
+
+    Under the H2O engine-bay-mount architecture: MaxxECU RACE H2O, PMU16, and CWA400
+    are ALL engine-bay-mounted (see docs/vendor/maxxecu/MaxxECU_RACE_H2O.md §8 and
+    harnesses/power-distribution.wv). CWA400 wiring is entirely engine-bay-to-
+    engine-bay — no firewall crossing.
+
     Cross-reference ewp-wiring-reference.md for full specs, part numbers,
     duty cycle map, and post-shutdown config.
     Confirmed: @wingman703 (07K/8HP build, identical drivetrain).

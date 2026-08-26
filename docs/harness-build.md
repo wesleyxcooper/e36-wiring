@@ -10,7 +10,7 @@ Reference for connector pinning, depinning, and harness assembly across all e36-
 |-----------|--------|---------------|------|
 | MaxxECU RACE C1 | Molex 48-pin | ~40 (varies by harness) | 63811-9200 (small) · 63811-8900/9000 (big) |
 | MaxxECU RACE C2 | Molex 32-pin | 0 (Phase 1/3) — defer | Same as C1 |
-| Deutsch AS firewall bulkhead | AS series, **size 22** | Up to 79 | Daniels M22520/2-01 (AFM8) + **K42** positioner (pin) / **K40** positioner (socket). Source: m-cal.com AS020-35SN; ecuplus.de AS620-35PN. |
+| Maven HD30 dual firewall bulkhead | HD30 shell-24, **size 16** | Up to 32 (16 + 16) | Deutsch HDT-48-00 — covers all Deutsch solid contacts (per deutschconnector.com selection guide). See `docs/wiring-bom.md` System 8 for kit spec. |
 | 07K cam sensor connector | 3B0973703G (3-pin VAG JMT) | 3 | Engineer PA-09 |
 | 07K crank sensor connector | 3B0973703G (3-pin VAG JMT) | 3 | Engineer PA-09 |
 | 07K MAP sensor connector | 3B0973703G (3-pin VAG JMT) | 3 | Engineer PA-09 |
@@ -32,7 +32,7 @@ hard-to-trace shorts and intermittent sensor faults.
 
 ### Direct termination — no pigtail splices
 
-All sensor connectors in the engine harness (injector, COP coil, cam/crank/MAP 3-pin, CLT/IAT 2-pin, knock 2-pin) use **direct termination**: the build TXL wire runs end-to-end from the AS79 contact to the sensor connector terminal. There is no intermediate pigtail wire and no splice joint.
+All sensor connectors in the engine harness (injector, COP coil, cam/crank/MAP 3-pin, CLT/IAT 2-pin, knock 2-pin) use **direct termination**: the build TXL wire runs end-to-end from the MaxxECU CMC contact to the sensor connector terminal. There is no intermediate pigtail wire and no splice joint. (Under the H2O engine-bay-mount architecture, the ECU is engine-bay so there is no bulkhead in the middle of any engine sensor run.)
 
 **Why:** Every splice is a potential failure point. Pigtail assemblies add one extra joint per connector — ~17 connectors across the engine harness. Direct termination eliminates those joints entirely. Source: Drive, Revive, Tinker harness build series ([youtube.com/watch?v=Z3hmNz64Gw8](https://www.youtube.com/watch?v=Z3hmNz64Gw8)) — "minimize joints = minimize failure points."
 
@@ -40,7 +40,7 @@ All sensor connectors in the engine harness (injector, COP coil, cam/crank/MAP 3
 
 **When a splice is unavoidable:** Sensors that ship with an integral moulded pigtail (wire bonded to sensor body, no removable connector housing) require one splice to join the sensor's pigtail wire to the build harness. Use a Raychem SRGB heat-activated solder sleeve — heat gun only, not iron. A soldering iron creates a rigid joint at the flex point that cracks under vibration.
 
-**Deutsch connectors and sensor pigtails:** This build already uses Deutsch Autosport AS series (AS79 firewall bulkhead) and Deutsch DT 2-pin (high-current bypass connectors for fan/EWP/AC relay). Those are correct applications. Deutsch DT or DTM connectors are **not** suitable as sensor pigtail connectors — they do not mate with OEM sensor bodies (VW 3B0973703G, 1J0973702, USCAR EV14, VAG 4-pin COP). Swapping to Deutsch at the sensor end would require an adapter that adds a connector interface back in. Use the OEM connector housings + terminals and direct-terminate into those.
+**Deutsch connectors and sensor pigtails:** This build uses Deutsch HD30 series (Maven dual bulkhead — cabin↔engine crossing) and Deutsch DT 2-pin (short bypass connectors where needed). Those are correct applications. Deutsch DT or DTM connectors are **not** suitable as sensor pigtail connectors — they do not mate with OEM sensor bodies (VW 3B0973703G, 1J0973702, USCAR EV14, VAG 4-pin COP). Swapping to Deutsch at the sensor end would require an adapter that adds a connector interface back in. Use the OEM connector housings + terminals and direct-terminate into those.
 
 ---
 
@@ -52,10 +52,7 @@ All sensor connectors in the engine harness (injector, COP coil, cam/crank/MAP 3
 | Molex ratcheting crimper (big 0.5–1.0 mm²) | 63811-8900 | MaxxECU C1/C2 large-gauge pins |
 | Molex ratcheting crimper (big 1–2 mm²) | 63811-9000 | MaxxECU C1/C2 large-gauge pins |
 | **Micro-pin crimper — VAG JMT/JPT pigtails** | **Engineer PA-09** (~$30–40, Amazon) — community standard for Bosch JMT 1.5mm and JPT 2.8mm contacts. Covers VAG cam/crank/MAP/CLT/IAT/knock/COP pigtail terminals in one tool. Budget: IWISS SN-2549 (~$17). ⚠️ `Knipex 97 52 68` (previously listed here) does not exist — that PN is not in the Knipex catalog. The Knipex 97 52 67 DT (~$427) is for Deutsch DT contacts only, not for Bosch JMT/JPT. | All VAG sensor pigtails, COP, EV14 injector connectors |
-| **Deutsch HD30 / DT contacts crimper** | **Deutsch HDT-48-00** (~$350–465) or **JRready NEW-DT2** (~$169 budget) | Maven HD30 35-pin connector (size-16 and size-20) + DT 2-pin bypass connectors |
-| **AS solid barrel crimper** | Daniels M22520/2-01 (**AFM8**) handle — $601.65 ([dmctools.com](https://dmctools.com/afm8)) | **Firewall bulkhead Deutsch AS size-22 solid barrel contacts.** Mil-spec tool for AS contacts — NOT the HDT-48-00 or clones (DT/DTM/DTP only, different contact geometry). No cheap substitute — wrong die geometry produces cold crimps that pass pull-test but fail under vibration. Source: m-cal.com AS020-35SN "Primary Contacts Size: 22 AWG"; ecuplus.de AS620-35PN "79x 22 AWG". |
-| AS crimper positioner — pin | Daniels **K42** (M22520/2-09) — $112.64 ([deltaintl.com](https://deltaintl.com/products/k42)) | Size-22 **pin** contacts (38941-22), 22–26 AWG. Use with AFM8 frame for all AS79 pin crimps (engine-side plug). NOT K43 — that is for size-20 contacts. |
-| AS crimper positioner — socket | Daniels **K40** (M22520/2-07) — $93.86 ([dmctools.com](https://dmctools.com/k40)) | Size-22 **socket** contacts (38943-22), 22–26 AWG. Use with AFM8 frame for all AS79 socket crimps (cabin-side receptacle). |
+| **Deutsch solid barrel crimper** | **Deutsch HDT-48-00** — ~$197 ([mavenspeed.com](https://mavenspeed.com/collections/b2t-engineering/products/deutsch-crimp-tool-solid-contacts)) | Covers ALL Deutsch solid pins/sockets across DT/DTM/DTP/DTHD/HD10/**HD30**/HDP20/DRC series (per [deutschconnector.com selection guide](https://www.deutschconnector.com/technical/deutsch_connector_crimp_guide/)). One tool for the Maven HD30 dual bulkhead + any DT 2-pin bypasses + PST-F1 pigtail — no separate positioner set needed. |
 | Open-barrel crimper | IWISS IWS-2820M | Ring terminals, relay contacts, general non-insulated open-barrel splices. Use non-insulated + adhesive-lined heat shrink — never pre-insulated crimps. |
 | Ferrule crimper | **iCrimp AWG23-10** (HSC8 6-4A, ~$25 — [amazon.com/dp/B00XVB6B1C](https://www.amazon.com/dp/B00XVB6B1C)) — self-adjusting ratchet, 0.25–6mm² (AWG 23–10) | Screw-clamp terminals (ECU power/GND strands) |
 | Wire stripper | **Ideal Stripmaster 45-097** (~$60–90, [Amazon](https://www.amazon.com/dp/B000RFSWF8)) with included **L4994 blades** (16–26 AWG) — community standard for motorsport harness work (HPA, StreetCarJoe, Rywire). Fixed-notch blades sized so the 22 AWG hole (0.039") stops physically before reaching the conductor — works correctly on TXL and GXL. | Primary gauge is 22 AWG TXL. Do NOT use auto-adjusting or general-purpose electrician strippers on 22 AWG TXL — thin insulation wall means wrong-geometry blades nick strands even with careful technique. |
@@ -64,7 +61,7 @@ All sensor connectors in the engine harness (injector, COP coil, cam/crank/MAP 3
 | **Depin — Molex small terminals** | 638132400 | C1/C2 small-pin extraction |
 | **Depin — Molex big terminals** | 638132300 | C1/C2 large-pin extraction |
 | **Depin — VW/Bosch PTS connectors** | Lisle 57750 | All VAG push-to-seat pigtails (sensor, COP, injector) |
-| **Depin — Deutsch AS size 22** | Tool included with AS79 connector body (or M81969/14-01 equiv) — ⚠️ `0411-240-2005` is DT/DTM size-16/20 only, does not fit AS79 size-22 solid barrel contacts | Firewall bulkhead contacts only |
+| **Depin — Deutsch HD30 / DT size-16** | Standard Deutsch round-shoulder removal tool — ~$15–35 (Maven sells at $34.97: [mavenspeed.com/…/deutsch-terminal-tool](https://mavenspeed.com/collections/b2t-engineering/products/deutsch-terminal-tool)) | Maven HD30 dual bulkhead + DT 2-pin contacts. Push in from front, releases collet, contact exits rear. |
 
 > ⚠️ **Depin tool matters:** Lisle 57750 works on push-to-seat (PTS) bodies only.
 > Do NOT use it on pull-to-seat (PTLS) or Molex contacts — different locking geometry.
@@ -186,7 +183,7 @@ Mixing crank/cam shield drains into the H1 sensor GND bus injects switching nois
 **Physical implementation note for the H1 group:** The MaxxECU CMC has one physical H1 pin (29). All the individual BN sensor GND wires need to join somewhere before that pin. The correct approach:
 
 - Run individual BN wires separately through the trunk bundle (they are separate conductors, just co-routed)
-- Join them at a short Raychem or solder-and-shrink splice **within 150 mm of the ECU connector** (AS79 bulkhead cavity or ECU connector area)
+- Join them at a short Raychem or solder-and-shrink splice **within 150 mm of the MaxxECU CMC connector** at the engine-bay ECU mount
 - A single short stub then runs to CMC pin 29
 
 The shared segment is at most 150 mm — negligible impedance. The long trunk runs remain independent. This is the same approach used in MaxxECU's own pre-terminated RACE harnesses (source: `docs/vendor/maxxecu/MaxxECU_RACE_REV9plus_Wiring.pdf`, sensor GND routing).
@@ -245,12 +242,12 @@ Follow this order on every connector. Do not deviate for speed.
 2. Depress the locking lance while pulling the wire from the rear
 3. The terminal slides out the back of the connector — do not pull from the front
 
-**Deutsch AS size 22 — use the insertion/extraction tool included with the AS79 connector** (or M81969/14-01 equivalent):
+**Deutsch HD30 / DT size-16 — use the standard round-shoulder Deutsch extraction tool** (Maven $34.97 or generic equivalent):
 1. Insert extraction tool into the front face of the bulkhead
 2. Tool depresses the collet; pull wire from rear while holding tool engaged
 3. Contact exits from the rear
 
-> ⚠️ The Deutsch `0411-240-2005` is a DT/DTM series tool for size-16/20 contacts — it does **not** fit AS79 size-22 solid barrel contacts. Use only the tool that ships with the AS79 connector body.
+> ⚠️ Note: the AS79 79-way bulkhead from a previous architecture required a different extraction tool (M81969/14-01 for size-22). That connector is no longer used in this build — Maven HD30 dual bulkhead replaces it. See `docs/wiring-bom.md` System 8.
 
 **Molex C1/C2 (PN 638132400 / 638132300):**
 1. Use the designated removal tool from the front face
@@ -338,7 +335,7 @@ A properly built engine harness has three tiers. Each tier has a distinct role.
 
 ### Tier 1 — Main trunk
 
-Runs from the AS79 firewall connector along the length of the engine. Contains all wires for the duration of their shared routing path. Sleeved in 1/2" (13mm) Techflex F6 expandable braid. Secured to engine brackets or valve cover rail with P-clips at ~250mm intervals.
+Runs from the engine-bay MaxxECU RACE H2O along the length of the engine. Contains all wires for the duration of their shared routing path. Sleeved in 1/2" (13mm) Techflex F6 expandable braid. Secured to engine brackets or valve cover rail with P-clips at ~250mm intervals.
 
 ### Tier 2 — Sub-looms
 
@@ -357,7 +354,7 @@ At defined breakout points, groups of wires exit the main trunk and run as a sho
 
 ### Tier 3 — Sensor connectors (direct termination)
 
-At the end of each sub-loom, individual wires branch to the component connector. This build uses **direct termination**: the harness wire runs end-to-end from the AS79 contact to the sensor connector terminal. There is no intermediate pigtail wire and no splice joint at the sensor end.
+At the end of each sub-loom, individual wires branch to the component connector. This build uses **direct termination**: the harness wire runs end-to-end from the MaxxECU CMC contact to the sensor connector terminal. There is no intermediate pigtail wire and no splice joint at the sensor end.
 
 **What to buy and how:** Purchase connector housings + individual terminals for each sensor connector family (EV14 injector, 4B0973724 COP coil, 3B0973703G 3-pin sensor, 1J0973702 2-pin NTC, 1J0973712 knock). Crimp a terminal directly onto the harness wire using the Engineer PA-09, then insert the terminal into the connector housing until the locking lance clicks. See the connector table at the top of this document for part numbers and the `26-07k-harness.md` Parts section for OE part numbers and sources.
 
@@ -368,9 +365,9 @@ Every component has multiple wires. The EV14 injector connector has 2 pins and r
 | EV14 pin | Wire | Source |
 |----------|------|--------|
 | Pin 1 | +12V switched | Shared coils/inj power rail (tapped via Raychem splice from the bus wire running along the injector rail) |
-| Pin 2 | INJ-N signal | Individual wire from AS79 pin 8–13 — unique to each injector |
+| Pin 2 | INJ-N signal | Individual wire from MaxxECU CMC pin (K1/K2/M1/M2/M3 — see maxxecu-07k.wv) — unique to each injector |
 
-The shared +12V bus runs as one continuous wire the full length of the injector rail. At each injector, a Raychem sleeve taps it: one wire in from the upstream bus, one stub out to EV14 pin 1, one wire out continuing the bus downstream. The INJ signal wire (unique per injector) runs **directly** from the AS79 contact (pin 8–12) to EV14 pin 2 — no splice, no pigtail.
+The shared +12V bus runs as one continuous wire the full length of the injector rail. At each injector, a Raychem sleeve taps it: one wire in from the upstream bus, one stub out to EV14 pin 1, one wire out continuing the bus downstream. The INJ signal wire (unique per injector) runs **directly** from the MaxxECU CMC contact (K1/K2/M1/M2/M3) to EV14 pin 2 — no splice, no pigtail.
 
 The 07K COP coil (4B0973724, 4-pin) has 3 active wires:
 
@@ -378,7 +375,7 @@ The 07K COP coil (4B0973724, 4-pin) has 3 active wires:
 |--------------|------|--------|
 | Pin 1 | +12V switched | Shared coils/inj power rail (same bus as injectors) |
 | Pin 2 | GND | Shared engine-head GND strap; do NOT connect to sensor GND |
-| Pin 3 | IGN-N signal | Individual wire from AS79 pin 4–7 or 32–34 — unique to each coil |
+| Pin 3 | IGN-N signal | Individual wire from MaxxECU CMC pin (A2/A3/B2/B3/C2 — see maxxecu-07k.wv) — unique to each coil |
 | Pin 4 | Not connected (or diagnostic — leave unconnected unless specified by ECU) | — |
 
 > **The +12V shared bus is a single wire, not 5 separate wires.** It runs the length of the injector (or coil) rail and gets tapped at each component with a Raychem splice. Think of it as a power chain — one wire in, stub out, same wire continues to the next injector.
@@ -480,7 +477,8 @@ A service loop is a small coil of extra wire (1–2 turns, ~30–50mm diameter) 
 
 | Connector | Method | Rationale |
 |-----------|--------|-----------|
-| AS79 engine-side mating plug | No individual loops — leave 200–300mm of harness slack near the connector exit, route with a gentle curve before the first P-clip | ~45 active wires (07K Phase 3 — only mating plug built; Phase 1 uses OEM grommet, no AS79 mating plug) through a 79-pin shell; individual loops inside the backshell are not practical at that density. Bundle-level slack provides the same function |
+| MaxxECU CMC (C1 48-pin Molex) at engine-bay ECU | ✓ Individual loop per wire before entering the CMC boot | ~40 wires. Loop each wire in the harness exit area, then bundle into the CMC entry. This is the highest-density connector in the build; take the extra time. |
+| Maven HD30 dual bulkhead (Connector A + B, engine-side plugs) | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before boot | ~12 wires total across both plugs at Phase 3. Loop each wire, wrap the coiled bundle in 3:1 adhesive heat-shrink before sliding boots on. |
 | Maven HD30 35-pin accessories | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before boot | 35 wires. Loop each wire, wrap the coiled bundle in 3:1 adhesive heat-shrink before sliding the boot on — holds loops organized and gives the boot a clean round profile to seat against |
 | Crank VR+/VR− connector end | ✓ Individual loop, 1–2 turns | Most vibration-sensitive signal; crank sensor at front of block sees belt-drive vibration |
 | CAM sensor connector end | ✓ Individual loop, 1–2 turns | Same rationale |
@@ -524,11 +522,11 @@ Labels are the only way to identify wires and looms once the harness is sleeved.
 
 | Location | Label content | Tool |
 |----------|--------------|------|
-| Every main harness wire — both ends | AS79 pin number + signal name (e.g., `8 INJ1`) | Brady M210 + PermaSleeve M21-125-C-342 (22–16 AWG) |
+| Every main harness wire — both ends | CMC pin location + signal name (e.g., `K1 INJ1`) | Brady M210 + PermaSleeve M21-125-C-342 (22–16 AWG) |
 | Wire — sensor connector end (before body snaps on) | Signal + cylinder number (e.g., `INJ1`, `COL3`, `CAM`, `CRANK`) | Same |
-| Wire — AS79 terminal end (within 50mm of connector body) | AS79 pin number + signal name (e.g., `8 INJ1`) | Same |
+| Wire — CMC terminal end (within 50mm of connector body) | CMC pin location + signal name (e.g., `K1 INJ1`) | Same |
 | Sub-loom at breakout from main trunk | Sub-loom name (e.g., `INJECTORS`, `COILS`, `SENSORS`) | Brady M210 + PermaSleeve M21-375-C-342 (3/8" cartridge, slides over 1/4" sub-loom before Techflex goes on) |
-| Main trunk at AS79 exit | Harness name (e.g., `ENGINE 07K PH3`) | Brady M210 + PermaSleeve M21-500-C-342 (1/2" cartridge) |
+| Main trunk at MaxxECU CMC entry | Harness name (e.g., `ENGINE 07K PH3`) | Brady M210 + PermaSleeve M21-500-C-342 (1/2" cartridge) |
 
 ### Breakout labeling — PermaSleeve, not zip-tie flags
 
@@ -548,14 +546,14 @@ Zip-tie flag labels (a printed tab folded through a zip-tie cinched to the loom)
 8. Run full bench continuity test (see next section)
 9. Only after passing continuity: close connector shells, install sealing boots
 
-### Complete label inventory — AS79 engine harness
+### Complete label inventory — 07K engine harness (CMC pin destinations)
 
-Print this list before touching any wire. Source: `firewall-bulkhead.wv` — BULKHEAD_ENGINE_M52 pinlabels. 07K additions (Phase 3 plug) noted separately.
+Print this list before touching any wire. Source: `harnesses/maxxecu-07k.wv` — 07K signal → MaxxECU CMC pin destinations block.
 
 **Type A — Main harness wire labels** (Brady M21-125-C-342, ×2 per wire)
 
-- **End 1 — AS79 end:** slide onto wire before crimping the AS79 contact; position within ~50mm of the connector body after insertion. This is what you read when tracing wires at the bulkhead.
-- **End 2 — sensor connector end:** slide onto wire before cutting to length; position within ~50mm of the terminal/connector end. This label sits right at the sensor connector during build so you can confirm the signal identity without tracing back to the AS79. It is at the connector end of the wire, not at the sub-loom breakout (the sub-loom breakout has its own separate Type C label).
+- **End 1 — CMC end:** slide onto wire before crimping the Molex CMC contact; position within ~50mm of the connector body after insertion. This is what you read when tracing wires at the ECU.
+- **End 2 — sensor connector end:** slide onto wire before cutting to length; position within ~50mm of the terminal/connector end. This label sits right at the sensor connector during build so you can confirm the signal identity without tracing back to the ECU. It is at the connector end of the wire, not at the sub-loom breakout (the sub-loom breakout has its own separate Type C label).
 
 | Pin | Label text | Sub-loom | M52 | 07K |
 |-----|-----------|---------|-----|-----|
@@ -653,7 +651,7 @@ Print this list before touching any wire. Source: `firewall-bulkhead.wv` — BUL
 
 ---
 
-**Type D — Main trunk label** (Brady M21-500-C-342 1/2" cartridge, ×1, at AS79 exit from main trunk)
+**Type D — Main trunk label** (Brady M21-500-C-342 1/2" cartridge, ×1, at MaxxECU CMC entry to main trunk)
 
 | Label text | When |
 |-----------|------|
@@ -680,9 +678,9 @@ Print all Type A and B labels before touching any wire. Print Type C and D label
 
 1. **Plan** — With the 07K engine on a stand in its intended orientation, dry-route a tape mock-up of the main trunk. Confirm routing path, bracket attachment points, and connector reach. Measure wire lengths per signal with 10% slack added. Record lengths against the `.wv` file before cutting anything.
 
-2. **Bench build the main trunk** — Cut and label all wires (label sleeves on before cutting to length). Crimp AS79 engine-side contact onto each wire. Insert into the AS79 mating plug body one pin at a time, verifying pin identity against the `.wv` file at each insertion. Bundle wires loosely — **do not sleeve yet.**
+2. **Bench build the main trunk** — Cut and label all wires (label sleeves on before cutting to length). Crimp Molex CMC contact onto the ECU end of each wire. Insert into the MaxxECU C1 (48-pin) housing one pin at a time, verifying pin identity against `harnesses/maxxecu-07k.wv` at each insertion. Bundle wires loosely — **do not sleeve yet.**
 
-3. **Route the engine-side loom** — Lay the harness along the engine with the AS79 mating plug at the firewall position and the wire ends at their intended destinations. Confirm lengths reach components with sufficient slack. Trim or add at this stage — not after sleeving.
+3. **Route the engine-side loom** — Lay the harness along the engine with the CMC connector at the ECU mount position (intake-side firewall face) and the wire ends at their intended destinations. Confirm lengths reach components with sufficient slack. Trim or add at this stage — not after sleeving.
 
 4. **Terminate sensor connectors** — At each branch point: cut the main harness wire to length, apply a PermaSleeve label to the wire end (signal name + cylinder), crimp a terminal directly onto the wire end using the Engineer PA-09, and insert the terminal into the sensor connector housing until the locking lance clicks. Connector body plugs onto the component. Exception: sensors with an integral moulded pigtail (e.g., donor WBO2) require one Raychem SRGB splice to join the sensor pigtail to the harness wire — see Splice types section.
 
@@ -707,8 +705,8 @@ If your multimeter does not have a dedicated continuity mode, use **resistance (
 ### Test procedure — four checks in order
 
 **Check 1 — Continuity (every signal wire)**
-1. Open the `.wv` file (`firewall-bulkhead.wv` for the engine harness)
-2. For each populated pin: touch one probe to the AS79 cabin-side wire end (or the ECU C1/C2 connector pin), touch the other probe to the expected sensor connector pin at the far end
+1. Open the `.wv` file (`harnesses/maxxecu-07k.wv` for the engine harness — the "07K signal → MaxxECU pin destinations" block lists CMC pin for each signal)
+2. For each populated pin: touch one probe to the wire's CMC contact (crimped but not yet inserted, or inserted with continuity access via the front face), touch the other probe to the expected sensor connector pin at the far end
 3. Beep (or <0.5Ω) = wire seated correctly and circuit complete
 4. No beep = break — bad crimp, pin not fully seated, or wrong pin. Do NOT sleeve until resolved. Depin, inspect, re-crimp.
 5. Work through every signal pin in the label inventory table above, in pin order — check them off on a printed copy of the label inventory
