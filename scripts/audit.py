@@ -439,8 +439,13 @@ DENYLIST: list[DenyRule] = [
     # ── PMU16 is Phase 3 install ONLY ─────────────────────────────────────────
     # PMU16 is not in the car during Phase 1 or Phase 2. Any active statement
     # claiming a PMU16 output drives a load in Phase 1 is stale.
+    # This rule is narrow: only flag lines that assert PMU16 is present in
+    # Phase 1 as a completed fact. Lines describing the Phase 1 → Phase 3
+    # transition (e.g., "Phase 1 discrete relay ... Phase 3 PMU16") are OK.
     DenyRule(
-        pattern=r"(?i)Phase\s*1.{0,60}PMU16|PMU16.{0,60}Phase\s*1\s*(install|arrives|drives|present|is\s+installed|installation)",
+        pattern=r"(?i)(PMU16\s+in\s+Phase\s*1|Phase\s*1.{0,30}PMU16\s+drives|PMU16\s+drives.{0,30}Phase\s*1"
+                r"|Phase\s*1.{0,30}install.{0,30}PMU16|PMU16.{0,30}Phase\s*1.{0,30}install"
+                r"|Phase\s*1.{0,30}PMU16\s+output|PMU16\s+output.{0,30}Phase\s*1)",
         message="PMU16 is NOT installed in Phase 1 or Phase 2 — it arrives at Phase 3 (07K swap moment) "
                 "along with the Maven bulkhead, custom 07K harness, EWP, APS pedal, and electric AC. "
                 "Under Phase 1, loads that PMU16 will eventually drive use OEM relays or aftermarket "
@@ -449,7 +454,9 @@ DENYLIST: list[DenyRule] = [
         source="harnesses/power-distribution.wv",
         exclude=r"(?i)(NOT\s+installed|not\s+in|no\s+PMU\s+in\s+Phase\s+1|arrives\s+at\s+Phase\s+3"
                 r"|Phase\s+3\s+install|no\s+longer|previously|deprecated|old\s+plan|was\s+Phase\s+1"
-                r"|corrected|Phase\s+3\s+arrival|Phase\s+3\s+file)",
+                r"|corrected|Phase\s+3\s+arrival|Phase\s+3\s+file|Phase\s+1.*Phase\s+3|Phase\s+3.*replace"
+                r"|Phase\s+1\s+(discrete|GPO|relay|OEM)|Phase\s+1\s+wiring\s+(now\s+)?removed"
+                r"|Phase\s+3\s+(direct.drive|replacement|arrival)|Phase\s+3\s+(swap|moment))",
     ),
 
     # ── MaxxECU is engine-bay-mounted (H2O), NOT cabin-mounted ────────────────
