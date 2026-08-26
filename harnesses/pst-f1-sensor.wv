@@ -14,16 +14,21 @@
 connectors:
 
   PST_F1:
-    type: "Bosch PST-F1 4-pin"
+    type: "Bosch PST-F1 5-pin Bosch Trapezoid"
     subtype: "Dual oil temp + pressure sensor"
-    pincount: 4
-    pinlabels: ["+5V", GND, "Pressure (0-5V)", "Temp (NTC)"]
+    pincount: 5
+    pinlabels: ["—", "Pressure Signal", "+5V", GND, "Temp Signal (NTC)"]
     notes: >
-      Bosch PST-F1 4-pin. Mount adapter: M14x1.5 female → M10x1.0 male.
-      Pressure output: 0.5V = 0 bar, 4.5V = 10 bar (linear 0-5V).
-      Temp output: NTC thermistor — calibrate in MTune against resistance table.
+      Bosch PST-F1 (order# 0261.544.01F / OEM equiv 0281006414). 5-pin Bosch Trapezoid connector.
+      Pin 1 = NC (empty in housing). Active pins: 2=Pressure, 3=+5V, 4=GND, 5=Temp.
+      Mating connector kit: Bosch F02U.B00.751-01 (housing 1928405159, 5-pin Trapez).
+      ⚠️ NOT a 4-pin connector — ordering a 4-pin body will mismatch the sensor physically.
+      Source: Bosch Motorsport datasheet bosch-motorsport.com PST-F 1 (Pin 2=Pressure Signal,
+      Pin 3=Power Supply, Pin 4=Ground, Pin 5=Temperature Signal). Confirmed xtramotorsport.com.
+      Pressure output: 0.5V = 0 bar, 4.5V = 10 bar (ratiometric, 5V supply).
+      Temp output: NTC — calibrate in MTune against resistance table.
+      Mount adapter: M14x1.5 female → M10x1.0 male.
       Phase 3: moves to 07K iABED oil housing (M10x1.0 port) unchanged.
-      Product: https://www.bosch-motorsport.com/products/sensors/pressure-and-temperature/pressure-sensor-combined-pst-f-1/
 
   # Bulkhead passthrough — engine side to cabin side
   # Full 79-pin diagram: harnesses/firewall-bulkhead.wv
@@ -73,22 +78,23 @@ cables:
 
   W_PST_F1:
     wirecount: 4
-    colors: [BK, RD, GN, YE]
-    wirelabels: [GND, "+5V", "Pressure (AIN 3)", "Temp (AIN 1)"]
+    colors: [BN, RD, WH, WH]
+    wirelabels: ["Sensor GND", "+5V", "Pressure (AIN 3)", "Temp (AIN 1)"]
     length: 0.6 m
     notes: "Engine-side sensor to bulkhead engine plug. Keep away from ignition/coil wires."
 
   W_PST_F1_CABIN:
     wirecount: 4
-    colors: [BK, RD, GN, YE]
-    wirelabels: [GND, "+5V", "Pressure (AIN 3)", "Temp (AIN 1)"]
+    colors: [BN, RD, WH, WH]
+    wirelabels: ["Sensor GND", "+5V", "Pressure (AIN 3)", "Temp (AIN 1)"]
     length: 0.4 m
     notes: "Bulkhead cabin plug to MaxxECU 16-pin aux breakout."
 
 connections:
 
   # Engine side: sensor to bulkhead engine plug
-  - - PST_F1: [1, 2, 3, 4]
+  # PST_F1 pin 1 = NC (skip). Active: pin3=+5V, pin4=GND, pin2=Pressure, pin5=Temp.
+  - - PST_F1: [3, 4, 2, 5]
     - W_PST_F1: [2, 1, 3, 4]
     - BULKHEAD_ENGINE: [2, 1, 3, 4]
 

@@ -105,7 +105,7 @@ cables:
     gauge: "24 AWG"
     length: "1.5 m"
     wirecount: 6
-    colors: [BK, BK, RD, GN, RD, YE]
+    colors: [BN, BN, RD, WH, RD, WH]
     shield: true
     notes: >-
       Cabin-only run: E46 pedal connector (footwell) → MaxxECU connector area (firewall).
@@ -113,12 +113,12 @@ cables:
       24 AWG sufficient -- total circuit draw ~20 mA.
       Shielded 6-conductor; drain shield at MaxxECU end only (single-end drain prevents
       ground loops). Tie drain wire to CMC H1 (Sensor GND).
-      Wire 1 BK: APS1 GND (pedal pin 1) → MAXXECU_SUPPLY GND bus (CMC H1).
-      Wire 2 BK: APS2 GND (pedal pin 2) → MAXXECU_SUPPLY GND bus (CMC H1).
+      Wire 1 BN: APS1 GND (pedal pin 1) → MAXXECU_SUPPLY GND bus (CMC H1).
+      Wire 2 BN: APS2 GND (pedal pin 2) → MAXXECU_SUPPLY GND bus (CMC H1).
       Wire 3 RD: VCC2 (pedal pin 3) → MAXXECU_SUPPLY +5V rail (CMC G1).
-      Wire 4 GN: APS1 signal (pedal pin 4) → MAXXECU_C2 E4 (AIN 6).
+      Wire 4 WH: APS1 signal (pedal pin 4) → MAXXECU_C2 E4 (AIN 6).
       Wire 5 RD: VCC1 (pedal pin 5) → MAXXECU_SUPPLY +5V rail (CMC G1).
-      Wire 6 YE: APS2 signal (pedal pin 6) → MAXXECU_C2 F1 (AIN 7).
+      Wire 6 WH: APS2 signal (pedal pin 6) → MAXXECU_C2 F1 (AIN 7).
 
 # ── Connections ────────────────────────────────────────────────────────────────
 

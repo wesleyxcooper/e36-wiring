@@ -1,13 +1,28 @@
 # maxxecu-m52.wv
-# MaxxECU Race ↔ BMW M52 Engine Harness (Phase 1)
+# MaxxECU Race ↔ BMW M52 Engine Harness (Phase 1) — SIGNAL REFERENCE ONLY
+#
+# !! THIS IS NOT A BUILD DOCUMENT !!
+# Phase 1 uses the MaxxECU M50 pre-terminated engine harness.
+# Do NOT build a custom M52 harness. Do NOT order connectors/terminals from this file.
+# Source harness: https://maxxecu.us/product/terminated-engine-harness-bmw-m50/ (US)
+#                 https://www.maxxecu.com/products/terminated_engine_harness/bmw_m50 (EU)
+# See: docs/vendor/maxxecu/MaxxECU_M50_Terminated_Harness.md for full coverage, gaps, and
+#      Phase 1 install notes (VANOS cam, WBO2 LSU 4.2, extra connectors, firewall routing).
+#
+# This file documents the ECU pin assignments from the purchased harness (REV 2).
+# Use it as a reference when configuring MTune or troubleshooting signals.
+# The connector/cable blocks below reflect harness signal routing — not parts to order.
 #
 # Source: https://www.maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html
+# (Content verified live 2026-08-26 — matches archived doc in docs/vendor/maxxecu/)
 # Harness revision: REV 2
 # Note: Harness is built for non-VANOS M50 head.
 #       M52 VANOS cam sensor requires sensor swap to BMW 12141726590.
+#       Phase 1 firewall routing: harness passes through existing E36 firewall grommet/bushing.
+#       No AS79 bulkhead connector is used in Phase 1. AS79 is Phase 3 (07K) only.
 #
 # ─────────────────────────────────────────────────────────────────────────────
-# CRIMP TOOLS — which tool for which contact in this harness:
+# CRIMP TOOLS — for reference only (Phase 3 / 07K harness build, not Phase 1):
 #
 #   AS79 size-22 contacts           → Daniels AFM8 (M22520/2-01) + K42 positioner (pin) / K40 (socket)
 #   VAG/Bosch JMT/JPT pigtail contacts → Engineer PA-09
@@ -63,10 +78,10 @@
 #       in Phase 1). Phase 3 (07K): GPO 1 drives the boost solenoid.
 #       +12V for solenoid/relay comes from coil/inj rail (ECU_12PIN[1]).
 #
-# DONE: Firewall bulkhead connector — 79-way decided (Deutsch AS79 / Souriau 8STA).
-#       ~59 pins used/reserved; ~20 true spares for expansion.
-#       Cabin side permanent: MaxxECU, relay board, fuse block, 8HP powerhold relay.
-#       M52 engine harness terminates at engine-side mating plug (plug-and-play swap to 07K).
+# NOTE: Firewall bulkhead (AS79) — Phase 3 only, NOT used in Phase 1.
+#       Phase 1: pre-terminated harness passes through existing E36 firewall grommet/bushing.
+#       Phase 3: Deutsch AS79 / Souriau 8STA 79-way bulkhead installed; 07K engine-side plug
+#       terminates the custom harness (plug-and-play swap). ~59 pins used/reserved; ~20 spares.
 #       Full pin assignment: harnesses/firewall-bulkhead.wv
 #       Source: RaceSpec Online (racespeconline.com) — AS79 ~$120-180.
 #
@@ -79,7 +94,8 @@
 # TODO: PST-F1 mounting confirmation
 #       M52 VANOS banjo bolt path (M14x1.5 :: M10x1.0 adapter :: PST-F1) is the plan.
 #       Confirm the adapter thread spec matches the PST-F1 body at install.
-#       PST-F1 4-pin connector pinout should be confirmed against Gauge.S docs.
+#       PST-F1 is a 5-pin Bosch Trapezoid connector (pin 1=NC, 2=Pressure, 3=+5V, 4=GND, 5=Temp).
+#       Mating kit: Bosch F02U.B00.751-01. Source: Bosch Motorsport PST-F1 datasheet.
 #
 # TODO: MAP sensor connector and vacuum port
 #       MaxxECU M50 harness includes MAP sensor with vacuum hose.
@@ -385,10 +401,12 @@ connectors:
       +12V must come from switched 12V relay rail — not ECU 5V supply rail.
 
   PST_F1:
-    type: "Bosch PST-F1 4-pin"
+    type: "Bosch PST-F1 5-pin Bosch Trapezoid"
     subtype: "Dual oil temp+pressure sensor"
-    pincount: 4
-    pinlabels: ["+5V", "GND", "Pressure (0-5V)", "Temp (NTC)"]
+    pincount: 5
+    pinlabels: ["—", "Pressure Signal", "+5V", GND, "Temp Signal (NTC)"]
+    # Pin 1 = NC. Active: pin2=Pressure, pin3=+5V, pin4=GND, pin5=Temp.
+    # Mating kit: Bosch F02U.B00.751-01 (housing 1928405159). Source: Bosch Motorsport datasheet.
     notes: >
       Mount: M52 VANOS banjo bolt (M14x1.5 :: M10x1.0 adapter :: PST-F1).
       Pressure :: AIN 3 (0-5V, 0-10 bar / 0-145 psi).
@@ -564,43 +582,43 @@ cables:
     wirecount: 1
     colors: [BK]
     wirelabels: ["Engine GND"]
-    notes: "Brown wire :: cylinder head ground stud. Do not omit."
+    notes: "Black wire (power GND) to cylinder head ground stud. Do not omit."
 
   # Sensors
   W_CRANK:
     wirecount: 3
-    colors: [WH, BK, GY]
+    colors: [WH, BN, YE]
     wirelabels: [Signal+, Signal-, Shield]
     length: 1.2 m
 
   W_CAM:
     wirecount: 3
-    colors: [WH, BK, GY]
+    colors: [WH, BN, YE]
     wirelabels: [Signal, "Sensor GND", Shield]
     length: 0.8 m
     notes: "BMW 12141726590 (non-VANOS type) — 3-wire: signal, GND, shield. No +12V supply."
 
   W_CLT:
     wirecount: 2
-    colors: [WH, BK]
-    wirelabels: [Signal, GND]
+    colors: [WH, BN]
+    wirelabels: [Signal, "Sensor GND"]
     length: 0.5 m
 
   W_IAT:
     wirecount: 2
-    colors: [WH, BK]
-    wirelabels: [Signal, GND]
+    colors: [WH, BN]
+    wirelabels: [Signal, "Sensor GND"]
     length: 0.6 m
 
   W_TPS:
     wirecount: 3
-    colors: [RD, WH, BK]
-    wirelabels: ["+5V", Signal, GND]
+    colors: [RD, WH, BN]
+    wirelabels: ["+5V", Signal, "Sensor GND"]
     length: 0.5 m
 
   W_VANOS:
     wirecount: 2
-    colors: [RD, BK]
+    colors: [RD, GN]
     wirelabels: ["+12V", "GPO 3"]
     length: 0.6 m
 
@@ -629,8 +647,8 @@ cables:
   # PST-F1
   W_PST_F1:
     wirecount: 4
-    colors: [RD, BK, GN, YE]
-    wirelabels: ["+5V", GND, "Pressure (AIN 3)", "Temp (AIN 1)"]
+    colors: [RD, BN, WH, WH]
+    wirelabels: ["+5V", "Sensor GND", "Pressure (AIN 3)", "Temp (AIN 1)"]
     length: 0.6 m
 
   # M52 Idle air control valve (ICV / stepper)
@@ -638,7 +656,7 @@ cables:
   # GPO 4 (E4/CMC 20) = Coil A, GPO 5 (A1/CMC 1) = Coil B.
   W_ICV:
     wirecount: 3
-    colors: [BK, WH, GN]
+    colors: [BK, GN, GN]
     wirelabels: [GND, "Coil A (GPO 4)", "Coil B (GPO 5)"]
     length: 0.4 m
     notes: "Flyback diode 1N4007 across each coil at ICV connector, cathode toward +12V rail."
@@ -646,32 +664,32 @@ cables:
   # Injectors (6×2-wire; +12V rail + ECU driver). Inside M50 terminated harness.
   W_INJ_1:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 1"]
     length: 0.4 m
   W_INJ_2:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 2"]
     length: 0.4 m
   W_INJ_3:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 3"]
     length: 0.4 m
   W_INJ_4:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 4"]
     length: 0.4 m
   W_INJ_5:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 5"]
     length: 0.4 m
   W_INJ_6:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 6"]
     length: 0.4 m
 
@@ -679,32 +697,32 @@ cables:
   # +12V from coil/inj relay (ECU_12PIN[1]), GND = L4/CMC44, Signal per cyl, Shield = E3/CMC19.
   W_IGN_1:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, "IGN 1", Shield]
     length: 0.5 m
   W_IGN_2:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, "IGN 2", Shield]
     length: 0.5 m
   W_IGN_3:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, "IGN 3", Shield]
     length: 0.5 m
   W_IGN_4:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, "IGN 4", Shield]
     length: 0.5 m
   W_IGN_5:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, "IGN 5", Shield]
     length: 0.5 m
   W_IGN_6:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, "IGN 6", Shield]
     length: 0.5 m
 
@@ -726,7 +744,7 @@ cables:
   # Boost solenoid
   W_BOOST:
     wirecount: 2
-    colors: [RD, BK]
+    colors: [RD, GN]
     wirelabels: ["+12V", "GPO 1"]
     length: 0.8 m
 
@@ -747,8 +765,8 @@ cables:
   # Virtual clutch position sensor — cabin-side, no bulkhead crossing
   W_CLUTCH_POS:
     wirecount: 3
-    colors: [RD, WH, BK]
-    wirelabels: ["+5V", "AIN 5 signal", GND]
+    colors: [RD, WH, BN]
+    wirelabels: ["+5V", "AIN 5 signal", "Sensor GND"]
     length: 0.8 m
     notes: >
       All cabin-side. 22 AWG, no shield required (short run, low-frequency signal).

@@ -33,9 +33,16 @@
 #     Motor wires cross AS79 bulkhead via pins 22 (Motor+) and 23 (Motor-).
 #     TPS1 → AS79 pin 48 (CMC G2, was M52 TPS). TPS2 → AS79 pin 56 (CMC J2/AIN2).
 #   + VW cam Hall sensor (+5V type): different connector body; SAME AS79 pin 19 as M52 cam.
-#   + VW crank VR 60-2: same trigger type as M52, different connector body.
-#     SAME AS79 pins 16/17/18 as M52 crank. MaxxECU trigger type N-1 unchanged.
-#     Only crank angle offset needs recalibrate.
+#   + VW crank Hall 60-2: Hall effect sensor (NOT VR — OE# 07K906433B confirmed Hall
+#     by Valeo PN 366675 datasheet "Sensor Type: Hall Sensor"; Bremi PN 60319 listing
+#     "Contains Hall-Effect Sensor ICs from OE Manufacturer"; the07k.wiki/wiki/Standalone_Management).
+#     ⚠️ BGP wiring diagram labels pins "VR+/VR-/Shield" — this is INCORRECT per the07k.wiki
+#     ("same sensor diagram shown but different sensors are used").
+#     SAME AS79 pin 16 (signal, CMC H3); pins 17/18 CHANGE cabin-side destination:
+#       M52: pin17→CMC H2 (VR-), pin18→CMC E3 (shield GND)
+#       07K: pin17→CMC G1 (+5V sensor supply, pin25); pin18→CMC H1 (Sensor GND, pin29)
+#     Re-terminate cabin-side pigtails for pins 17 and 18 when building the 07K cabin harness.
+#     MTune trigger type: Digital (Hall, opto) — NOT VR sensor, Zero-crossing.
 #   + Bosch EV14 injectors (ID1050x x5): M50 harness ships with EV1 pigtails —
 #     replace with EV14 pigtail ends at engine-side harness build.
 #   + 2x Bosch flat knock sensors: route through AS79 expansion pins 43/44/45.
@@ -55,16 +62,18 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # TODOs (verify at engine-side harness build):
 #
-# DONE: VW 07K crank sensor connector body (Conn B; 60-2 VR sensor).
-#       2 active signal wires + shield (3-pin housing) confirmed per BGP wiring diagram.
-#       BGP source: the07k.wiki/upload/f/fd/BGP_Wiring_diagram.pdf
-#       NCA in diagram = "No Connector Adapter" — sensor pigtail wires into ECM
-#       harness directly; sensor body still has a 3-pin housing.
+# DONE: VW 07K crank sensor type confirmed HALL EFFECT (not VR).
+#       OE# 07K906433B — 3-pin Hall effect sensor (3 active wires: +5V, signal, GND).
+#       Valeo PN 366675 datasheet: "Sensor Type: Hall Sensor". Bremi PN 60319: "Hall-Effect ICs".
+#       the07k.wiki/wiki/Standalone_Management: "The 07K engine uses a Hall Effect crank
+#       position sensor." BGP wiring diagram labels are WRONG ("VR+/VR-/Shield") per
+#       the07k.wiki — "same sensor diagram shown but different sensors are used."
+#       Connector body: 3-pin oval VW housing (same body as cam sensor; DIFFERENT pinout).
+#       Crank: +5V/Signal/SensorGND. Cam: +5V/SensorGND/Signal.
+#       ⚠️ Label pigtails CRANK and CAM at crimp time — identical housing, different pinout!
 #       Location: cylinder 5 side — G28 "secured to the control housing cover"
-#       (timing chain compartment cover). Source: charm.li CBTA/BGP component
-#       locations, item 12. Intake vs exhaust face: unverified this session.
-#       Connector family: VW 3-pin oval sensor housing (same body as cam, diff pinout)
-#       — verify OE# 3B0973703G at engine before ordering pigtail.
+#       (timing chain compartment cover). Source: charm.li CBTA/BGP locations, item 12.
+#       Connector family: verify OE# 3B0973703G at engine before ordering pigtail.
 #
 # DONE: VW 07K cam Hall sensor supply confirmed +5V.
 #       3-pin confirmed. Supply confirmed +5V from ECM sensor reference rail
@@ -209,8 +218,8 @@ connectors:
       - "G3: WBO2 IP"                    # 27
       - "G4: WBO2 RCAL"                  # 28
       - "H1: Sensor GND"                # 29
-      - "H2: Trigger GND (VR-)"        # 30
-      - "H3: TRIGGER (crank VR+)"      # 31
+      - "H2: Trigger GND (VR-) [M52 only — UNUSED for 07K Hall crank]"  # 30
+      - "H3: TRIGGER (crank Hall signal)"  # 31
       - "H4: HOME (cam Hall)"           # 32
       - "J1: AIN 1 (PST-F1 temp)"      # 33
       - "J2: AIN 2 (DBW TPS2)"         # 34  — was spare; 07K DBW TPS2
@@ -300,12 +309,14 @@ connectors:
       Enable in MTune: CAN :: Default CAN output :: MaxxECU Default 1.3.
       Unchanged from M52 phase.
 
-  # ── Engine-side mating plug (07K — replaces M52 mating plug at bulkhead) ────
+  # ── Engine-side mating plug (07K Phase 3 — first installation, not a swap) ──────
 
   # ── Firewall bulkhead engine-side plug (07K Phase 3) — PIN REFERENCE ───────────
   # Connector type: Deutsch AS79 / Souriau 8STA 79-way jam nut plug (engine side)
-  # Operation: Unplug M52 engine mating plug, insert 07K mating plug. Cabin side unchanged.
-  # Full connector modeled in harnesses/firewall-bulkhead.wv (BULKHEAD_ENGINE_M52 / 07K notes).
+  # Operation: First installation of the AS79 engine-side plug at 07K swap. Phase 1 (M52)
+  #   used the pre-terminated harness through the OEM firewall grommet — no AS79 mating plug
+  #   was ever built or installed for Phase 1. Cabin side is pre-built during Phase 2.
+  # Full cabin-side connector modeled in harnesses/firewall-bulkhead.wv (BULKHEAD_CABIN).
   # Excluded from WireViz connectors here — bulkhead treated as transparent in this diagram.
   #
   # ── Confirmed AS79 pin assignments (cross-reference firewall-bulkhead.wv BULKHEAD_CABIN) ──
@@ -314,13 +325,15 @@ connectors:
   #     3, 31, 52:    Engine GND (three contacts in parallel, 3×5A = 15A)
   #   Ignition outputs (22 AWG max per size-22D contact):
   #     4: IGN 1 (CMC A2)   5: IGN 2 (CMC A3)   6: IGN 3 (CMC B2)   7: IGN 4 (CMC B3)
-  #     32: IGN 5 (CMC C2)  33: IGN 6 [M52 only, cavity-plug 07K]    34: EXP IGN 7
-  #   Injector outputs (22 AWG main harness through size-22D contact; pigtail stub engine-side can be 20 AWG after splice):
+  #     32: IGN 5 (CMC C2)  33: IGN 6 [M52 only, cavity-plug 07K]    34: SPARE — cavity-plug both phases (IGN 5 = pin 32)
+  #   Injector outputs (22 AWG end-to-end, direct termination — no pigtail splice):
   #     8: INJ 1 (CMC K1)   9: INJ 2 (CMC K2)   10: INJ 3 (CMC M1)
   #     11: INJ 4 (CMC M2)  12: INJ 5 (CMC M3)  13: INJ 6 [M52 only, cavity-plug 07K]
   #   Crank / Cam triggers:
-  #     16: Crank VR+ (CMC H3)  17: Crank VR- (CMC H2)  18: Crank shield drain
-  #     19: Cam Hall signal (CMC H4)   [M52 + 07K — same pins, swap connector body only]
+  #     16: Crank signal (CMC H3=TRIGGER/pin31) [M52 VR+; 07K Hall signal — same ECU pin]
+  #     17: M52: Crank VR- (CMC H2/pin30); 07K: Crank +5V (CMC G1/pin25) — re-terminate cabin side
+  #     18: M52: Crank shield drain (CMC E3/pin19); 07K: Crank Sensor GND (CMC H1/pin29) — re-terminate cabin side
+  #     19: Cam Hall signal (CMC H4)   [M52 + 07K — same ECU pin, swap connector body only]
   #   DBW throttle body (07K only; cavity-plug on M52):
   #     22: ETh Motor+ → MaxxECU C2 H4 (MOTOR 1+)   23: ETh Motor- → MaxxECU C2 H2 (MOTOR 1-)
   #     48: TPS1 (CMC G2)   56: TPS2 / AIN 2 (CMC J2)   [+5V from 47, GND from 79]
@@ -335,25 +348,31 @@ connectors:
   #     43: Knock 1 signal (CMC K3)   44: Knock 2 signal (CMC K4)   45: Knock GND / shield drain
   #   Misc:
   #     64: Flex fuel signal (CMC C1 / DIN3)
-  #   Pins 20, 24, 41, 50–63, 65–78: SPARE / cavity-plug
+  #   Pins 20, 24, 41: SPARE / cavity-plug
+#   Pins 50, 51: PST-F1 pressure (AIN 3, CMC J3), PST-F1 temp (AIN 1, CMC J1) — NOT spare. Source: firewall-bulkhead.wv pins 50-51.
+#   Pins 52–63, 65–78: SPARE / cavity-plug
   #   Pins 72–79 (except 79): SPARE — APS is cabin-to-cabin, no bulkhead crossing needed
 
   # ── 07K engine sensors / actuators ─────────────────────────────────────────
 
-  CRANK_VR:
-    type: "VW 07K crank VR sensor connector"
-    subtype: "60-2 missing tooth passive VR — MaxxECU VR input (N-1 trigger type)"
+  CRANK_HALL:
+    type: "VW 07K crank Hall sensor connector"
+    subtype: "60-2 missing tooth Hall effect — MaxxECU TRIGGER input (Digital/Hall, N-1 trigger type)"
     pincount: 3
-    pinlabels: [Signal+, Signal-, Shield]
+    pinlabels: ["+5V", Signal, "Sensor GND"]
     notes: >
-      OE# 3B0973703G — same connector body as CAM_HALL but DIFFERENT pinout.
-      Crank: Signal+/Signal-/Shield (passive VR). Cam: +5V/GND/Signal (active Hall).
-      LABEL PIGTAILS AT CRIMP TIME — swapped pigtails produce no-start with no
-      obvious failure indicator. MTune: VR input, trigger N-1 / 60-2 pattern, same
-      type as M52 crank. Only crank angle offset may differ — confirm in MTune
-      Trigger Setup before first crank. ME7.1.1 harness ref: Conn B pin 82.
-      Location: cylinder 5 side — sensor G28 "secured to the control housing cover"
-      (timing chain compartment cover at cylinder 5 end).
+      OE# 07K906433B (Hall sensor — confirmed Valeo 366675 / Bremi 60319 datasheets).
+      Connector body OE# 3B0973703G — same body as CAM_HALL but DIFFERENT pinout.
+      Crank: +5V / Signal / Sensor GND (Hall). Cam: +5V / Sensor GND / Signal (Hall).
+      ⚠️ LABEL PIGTAILS AT CRIMP TIME — identical housing, opposite signal/GND pinout!
+      Swapped pigtails → no-start with no obvious failure indicator.
+      MTune: Trigger Input = "Digital (Hall, opto, etc)" — NOT VR sensor.
+      Trigger system: N-1 / 60-2 missing tooth. ME7.1.1 harness ref: Conn B pin 82.
+      AS79 routing: pin1(+5V)→AS79pin17→CMC G1(pin25); pin2(signal)→AS79pin16→CMC H3(pin31);
+      pin3(SensorGND)→AS79pin18→CMC H1(pin29). Note: AS79 pin17 cabin-side must be
+      re-terminated from CMC H2 → CMC G1, and pin18 cabin-side from CMC E3 → CMC H1,
+      when building the 07K cabin harness (different from M52 VR routing).
+      Location: cylinder 5 side — sensor G28 at timing chain compartment cover.
       Source: charm.li CBTA/BGP component locations, item 12.
 
   CAM_HALL:
@@ -364,7 +383,7 @@ connectors:
     notes: >
       TODO: Confirm exact VW connector body type at install.
       ME7.1.1 harness ref: pin 86. +5V supply shared with MAP/TPS/PST-F1 (bulkhead pin 47).
-      Signal → HOME input (CMC H4 = pin 32). Same bulkhead pin 25 as M52 cam.
+      Signal → HOME input (CMC H4 = pin 32). Same bulkhead pin 19 as M52 cam.
 
   CLT:
     type: "VW 07K coolant temp sensor 2-pin"
@@ -510,10 +529,13 @@ connectors:
   # ── Shared / unchanged sensors ────────────────────────────────────────────────
 
   PST_F1:
-    type: "Bosch PST-F1 4-pin"
+    type: "Bosch PST-F1 5-pin Bosch Trapezoid"
     subtype: "Dual oil temp+pressure — iABED M10x1.0 port on 07K oil housing"
-    pincount: 4
-    pinlabels: ["+5V", GND, "Pressure (0-5V)", "Temp (NTC)"]
+    pincount: 5
+    pinlabels: ["—", "Pressure Signal", "+5V", GND, "Temp Signal (NTC)"]
+    # Pin 1 is physically present in the connector body but NC (not connected).
+    # Mating connector kit: Bosch F02U.B00.751-01 (5-pin Trapez; housing 1928405159).
+    # Source: Bosch Motorsport PST-F1 datasheet (bosch-motorsport.com), xtramotorsport.com listing.
     notes: >
       Same wiring as M52 phase — zero connector or cable changes.
       Mount: iABED 07K longitudinal oil housing M10x1.0 built-in port.
@@ -586,14 +608,19 @@ cables:
   # ── Crank / Cam ───────────────────────────────────────────────────────────────
   W_CRANK:
     wirecount: 3
-    colors: [WH, BK, GY]
-    wirelabels: [Signal+, Signal-, Shield]
+    colors: [RD, WH, BN]
+    wirelabels: ["+5V", Signal, "Sensor GND"]
     length: 1.0 m
-    notes: "Shielded twisted pair. Shield terminates at CMC E3 (GND Shield, pin 19) — dedicated shield ground, not sensor GND bus."
+    notes: >-
+      Hall effect sensor — 3-wire active (not shielded twisted pair like M52 VR).
+      RD=+5V supply (→ AS79 pin17 → CMC G1/pin25 after cabin re-terminate).
+      WH=Hall signal (→ AS79 pin16 → CMC H3/pin31, same as M52 VR+).
+      BN=Sensor GND (→ AS79 pin18 → CMC H1/pin29 after cabin re-terminate).
+      Shielded cable still recommended for noise immunity; if shielded, drain at ECU-end BN.
 
   W_CAM:
     wirecount: 3
-    colors: [RD, BK, WH]
+    colors: [RD, BN, WH]
     wirelabels: ["+5V", "Sensor GND", Signal]
     length: 0.8 m
     shield: true
@@ -605,34 +632,34 @@ cables:
   # ── Temperature / pressure sensors ────────────────────────────────────────────
   W_CLT:
     wirecount: 2
-    colors: [WH, BK]
-    wirelabels: [Signal, GND]
+    colors: [WH, BN]
+    wirelabels: [Signal, "Sensor GND"]
     length: 0.5 m
 
   W_IAT:
     wirecount: 2
-    colors: [WH, BK]
-    wirelabels: [Signal, GND]
+    colors: [WH, BN]
+    wirelabels: [Signal, "Sensor GND"]
     length: 0.5 m
 
   W_MAP:
     wirecount: 3
-    colors: [RD, WH, BK]
-    wirelabels: ["+5V", Signal, GND]
+    colors: [RD, WH, BN]
+    wirelabels: ["+5V", Signal, "Sensor GND"]
     length: 0.5 m
 
   W_PST_F1:
     wirecount: 4
-    colors: [RD, BK, GN, YE]
-    wirelabels: ["+5V", GND, "Pressure (AIN 3)", "Temp (AIN 1)"]
+    colors: [RD, BN, WH, WH]
+    wirelabels: ["+5V", "Sensor GND", "Pressure (AIN 3)", "Temp (AIN 1)"]
     length: 0.6 m
     notes: "Same cable as M52 build — no change."
 
   # ── DBW throttle body ────────────────────────────────────────────────────────
   W_DBW_TPS:
     wirecount: 4
-    colors: [RD, BK, WH, GN]
-    wirelabels: ["+5V", GND, "TPS1 signal", "TPS2 signal"]
+    colors: [RD, BN, WH, WH]
+    wirelabels: ["+5V", "Sensor GND", "TPS1 signal", "TPS2 signal"]
     length: 0.5 m
 
   W_DBW_MOTOR:
@@ -648,7 +675,7 @@ cables:
   # ── Knock sensors ─────────────────────────────────────────────────────────────
   W_KNOCK_1:
     wirecount: 2
-    colors: [WH, GY]
+    colors: [WH, YE]
     wirelabels: ["KS1 signal", "Shield drain"]
     length: 0.4 m
     shield: true
@@ -667,7 +694,7 @@ cables:
 
   W_KNOCK_2:
     wirecount: 2
-    colors: [WH, GY]
+    colors: [WH, YE]
     wirelabels: ["KS2 signal", "Shield drain"]
     length: 0.4 m
     shield: true
@@ -678,70 +705,70 @@ cables:
   # ── Ignition coils (5-cyl) ────────────────────────────────────────────────────
   W_IGN_1:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, Signal, Shield]
     length: 0.5 m
 
   W_IGN_2:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, Signal, Shield]
     length: 0.5 m
 
   W_IGN_3:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, Signal, Shield]
     length: 0.5 m
 
   W_IGN_4:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, Signal, Shield]
     length: 0.5 m
 
   W_IGN_5:
     wirecount: 4
-    colors: [RD, BK, WH, GY]
+    colors: [RD, BK, BU, YE]
     wirelabels: ["+12V", GND, Signal, Shield]
     length: 0.5 m
 
   # ── Injectors (EV14; 5-cyl) ───────────────────────────────────────────────────
   W_INJ_1:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 1"]
     length: 0.4 m
 
   W_INJ_2:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 2"]
     length: 0.4 m
 
   W_INJ_3:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 3"]
     length: 0.4 m
 
   W_INJ_4:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 4"]
     length: 0.4 m
 
   W_INJ_5:
     wirecount: 2
-    colors: [RD, GN]
+    colors: [RD, GY]
     wirelabels: ["+12V", "INJ 5"]
     length: 0.4 m
 
   # Virtual clutch position sensor — cabin-side, carries unchanged from M52
   W_CLUTCH_POS:
     wirecount: 3
-    colors: [RD, WH, BK]
-    wirelabels: ["+5V", "AIN 5 signal", GND]
+    colors: [RD, WH, BN]
+    wirelabels: ["+5V", "AIN 5 signal", "Sensor GND"]
     length: 0.8 m
     notes: "Unchanged from M52 phase. See maxxecu-m52.wv W_CLUTCH_POS for full notes."
 
@@ -825,17 +852,23 @@ cables:
 
 connections:
 
-  # ── Crank trigger ─────────────────────────────────────────────────────────────
-  # TRIGGER+ = H3/CMC pin 31, TRIGGER- = H2/CMC pin 30, Shield = E3/CMC pin 19
-  - - CRANK_VR: [1, 2, 3]
+  # ── Crank trigger (Hall effect — NOT VR) ──────────────────────────────────────
+  # +5V = G1/CMC pin25; Hall signal = H3/CMC pin31 (TRIGGER); Sensor GND = H1/CMC pin29
+  # AS79 cabin-side re-terminate: pin17 H2→G1(pin25); pin18 E3→H1(pin29).
+  # MTune: Trigger Input = "Digital (Hall, opto, etc)" — NOT VR sensor.
+  - - CRANK_HALL: [1, 2, 3]
     - W_CRANK: [1, 2, 3]
-    - ECU_CMC: [31, 30, 19]
+    - ECU_CMC: [25, 31, 29]
 
   # ── Cam / HOME trigger ─────────────────────────────────────────────────────────
   # Signal = H4/CMC pin 32, GND = H1/CMC pin 29, +5V = G1/CMC pin 25
   - - CAM_HALL: [3, 2, 1]
     - W_CAM: [3, 2, 1]
     - ECU_CMC: [32, 29, 25]
+
+  # W_CAM shield drain → CMC E3 (GND Shield, pin 19); float at sensor side
+  - - W_CAM: [s]
+    - ECU_CMC: [19]
 
   # ── CLT ───────────────────────────────────────────────────────────────────────
   - - CLT: [1, 2]
@@ -979,6 +1012,10 @@ connections:
   - - WIDEBAND: [6, 2, 1, 5, 3]
     - W_WBO2: [1, 2, 3, 4, 5]
     - ECU_CMC: [24, 23, 27, 28, 13]
+
+  # W_WBO2 shield drain → CMC E3 (GND Shield, pin 19); single-end at ECU only
+  - - W_WBO2: [s]
+    - ECU_CMC: [19]
 
   # WBO2 heater positive: WIDEBAND pin 4 (H+) → splice to +12V coil/inj rail
   - - WIDEBAND: [4]

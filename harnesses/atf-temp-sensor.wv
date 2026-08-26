@@ -73,7 +73,7 @@ cables:
 
   W_ATF_TEMP_ENGINE:
     wirecount: 2
-    colors: [BK, WH]
+    colors: [BN, WH]
     wirelabels: ["Sensor GND", "AIN 2 signal"]
     length: 2.5 m
     shield: true
@@ -85,7 +85,7 @@ cables:
 
   W_ATF_TEMP_CABIN:
     wirecount: 2
-    colors: [BK, WH]
+    colors: [BN, WH]
     wirelabels: ["Sensor GND", "AIN 2 signal"]
     length: 0.4 m
     notes: "Bulkhead cabin plug to MaxxECU CMC. Short cabin-side run."

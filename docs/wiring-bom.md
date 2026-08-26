@@ -3,6 +3,16 @@
 Aggregated from all WireViz harness source files.
 Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv` · `power-distribution.wv` · `epedal-bmw-e46.wv` · `epedal-hella-6pv.wv` · `fuel-pump-hanger.wv` · `ewp-controller.wv` · `body-x20.wv` · `8hp-can.wv` · `gauge-s-can.wv` · `dct-shifter.wv` · `pst-f1-sensor.wv` · `atf-temp-sensor.wv` *(optional)*
 
+> **Source-of-truth hierarchy:** `.wv` files → this BOM → CSVs (downstream purchase tracking)
+>
+> The `.wv` harness files define build architecture: what is custom-built vs. purchased,
+> connector families, signal assignments, and cable specs. This BOM aggregates from them.
+> The CSVs are downstream — they track purchase cost/status and reflect decisions already
+> made in the `.wv` files.
+>
+> If a `.wv` file says "build it" but the actual approach is "buy it pre-made," the `.wv`
+> file is wrong and must be corrected first. The BOM and CSVs follow from that correction.
+
 > **⚠️ TODO** = placeholder in source `.wv` — gauge, model, or pin not yet confirmed. Buy only after resolving.
 > **🔁 shared** = appears in multiple harnesses, buy once.
 > All wire lengths include ~10% slack. Add more for complex routing runs.
@@ -23,22 +33,26 @@ Mil-spec M22759 is what race teams use. It's fine but costs 5–10× more and is
 
 | Color | Use in harness | Suggested qty | Notes |
 |-------|---------------|---------------|-------|
-| Red | +12V power, sensor +5V | 50m | Most frequently used power color |
-| Black | All grounds | 50m | — |
-| White | Sensor signal inputs (analog) | 100m | Highest volume — sensors, triggers, cam, crank |
-| Grey | Ignition outputs (coil drives) | 25m | — |
-| Green | Injector outputs, GPO actuators | 25m | — |
-| Yellow | Starter trigger, alt D+ | 10m | Short runs only |
+| Red | +12V power, +5V sensor supply | 50m | Most frequently used power color |
+| Black | Power/chassis GND (never sensor GND) | 50m | Convention: BK = high-current return only. Never use Black for sensor GND wires. |
+| White | Sensor signal inputs (analog), WBO2 signals | 100m | Highest volume — sensors, triggers, cam, crank |
+| **Brown** | **Sensor GND / VR Signal−** | **25m** | **Required — every sensor GND wire and crank VR− return. Without Brown the sensor sub-loom cannot be built. Source: `harness-build.md` § Wire Color Convention.** |
+| **Blue** | **Ignition coil drive outputs (IGN 1–5)** | **25m** | **Required. Previously listed as Grey; correct color per MaxxECU convention and all .wv files is Blue (BU).** |
+| Grey | Injector drive outputs (INJ 1–5) | 25m | INJ signal wires only — not IGN. Previously mislabeled as IGN. |
+| Green | GPO actuator outputs only (VVT solenoid, boost solenoid) | 15m | GPO outputs only — not injectors. |
+| **Yellow** | **Shield GND drain wire only** | **10m** | **Convention: YE = shield drain (single-end, ECU end). Crank, cam, knock shields. Never use Yellow for Starter trigger or Alt D+.** |
+| Orange | DBW ETh Motor+ | 5m | **22 AWG** (AS79 size-22D accepts 22–26 AWG only; 20 AWG will not seat). |
+| Violet | DBW ETh Motor−, PWM signal wires | 5m | **22 AWG** for motor leads; 22 AWG for PWM signals. |
 | White + Blue (WH/BU twisted pair) | CAN H / CAN L | 10m | Buy as pre-twisted pair (WiringPros sells by the foot). WH = CAN H, BU = CAN L — matches all .wv harness files. |
 
 Heavier gauge for specific runs (buy short lengths, not full spools):
 
 | Gauge | Use | Length |
 |-------|-----|--------|
-| 18 AWG GXL/TXL grey | Coil pigtail tails (engine side of splice, if you want heavier gauge at coil) | 3m |
-| 20 AWG GXL/TXL green | Injector pigtail tails (engine side of splice) | 3m |
 | 12 AWG GXL red/black | Fan relay output runs (after DT bypass connector, to fan motor) | 5m |
-| 10 AWG GXL red | EWP output run (after DT bypass connector, to CWA400) | 2m |
+| 8 AWG GXL red | EWP output run (after DT bypass connector, to CWA400) | 2m |
+
+> **Pigtail tail wire removed.** Previous BOM listed 18 AWG coil tails and 20 AWG injector tails for pigtail-to-harness splices. The build now uses direct termination — TXL 22 AWG runs end-to-end from the AS79 to the sensor connector terminal; no intermediate splice and no heavier-gauge stub. See `walkthroughs/26-07k-harness.md` connector sourcing section.
 
 **Supplier:** [WiringPros.com](https://www.wiringpros.com) — TXL by the foot in any color; also sells CAN twisted pair pre-twisted. [Del City](https://www.delcity.net) — bulk spools. Do not buy from generic electronics suppliers (not automotive-spec insulation).
 
@@ -75,11 +89,12 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 
 | Item | Use | Notes |
 |------|-----|-------|
-| Raychem SRGB solder sleeves — 22–26 AWG (small, blue band) | All pigtail-to-harness splices on 22 AWG signal wires | Search "Raychem SRGB 22 AWG" or "TE Connectivity solder sleeve" on Amazon/Mouser/DigiKey. Qty needed: ~20 per engine harness (6 inj + 5 coil + 10 sensors/triggers). Buy a box of 25. |
-| Raychem SRGB solder sleeves — 18–20 AWG (medium, red band) | Any heavier-gauge splice at coil or injector exit if using 18/20 AWG pigtail stubs | Buy a small pack of 10 |
-| Non-insulated butt splice + 3:1 adhesive-lined heat-shrink (alternative) | Same joints as Raychem — purely mechanical crimp splice | Use IWISS IWS-2820M open-barrel crimper. Cover with ≥25mm of adhesive-lined heat-shrink. |
+| Raychem SRGB solder sleeves — 22–26 AWG (small, blue band) | Sensors with integral moulded pigtails only (e.g. E46 APS pedal donor connector if sourced from a car rather than as a housing+terminal kit) | Buy Mouser/DigiKey — not Amazon. Qty: ~5 (not 25 — direct-terminated connectors need no splice). |
+| Non-insulated butt splice + 3:1 adhesive-lined heat-shrink | Same application as SRGB — alternative for integral-pigtail sensors | IWISS IWS-2820M + ≥25mm adhesive-lined heat-shrink. |
 
-> **Raychem SRGB use:** Overlap bare wire ends 5–10mm inside the sleeve, heat gun at 50–75mm standoff, move slowly — solder ring melts and wicks, sleeve shrinks. No iron. Fully encapsulated result. Do NOT use a soldering iron on wires in the loom — rigid joint at flex point fails under vibration.
+> **Direct termination eliminates most pigtail splices.** Previous BOM specified ~20 SRGB solder sleeves for pigtail-to-harness splices at every injector, coil, and sensor connector. With direct termination (TXL runs end-to-end from AS79 to sensor connector terminal), those joints are eliminated. Only sensors that ship with an integral moulded wire pigtail require a splice. See `walkthroughs/26-07k-harness.md` connector sourcing section.
+
+> **Raychem SRGB technique (for any remaining integral-pigtail splices):** Overlap bare wire ends 5–10mm inside the sleeve. Heat gun at 50–75mm standoff, move slowly — solder ring melts and wicks, sleeve shrinks. No iron. Do NOT use a soldering iron on wires in the loom — rigid joint at the flex point fails under vibration.
 
 ### Breakout boots and end caps
 
@@ -136,7 +151,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 | BATT_NEG → chassis stud | BK | 4 AWG welding cable | TBD | Battery − → chassis ground stud M8 — body electrical returns |
 | **(optional) BATT_NEG → engine block (direct)** | BK | 4 AWG welding cable | TBD | Optional dedicated battery negative → engine block cable. Not required while factory M52 bonding strap is clean. |
 | IGN +12V → PMU16 pin 7 (+12V SW) | RD | 18 AWG | TBD | IGN-switched +12V → PMU16 on/off sense. Fuse at source: 5A. |
-| PMU16 CAN2 H/L → MaxxECU CAN1 H/L | GY/PU | 22 AWG shielded twisted pair | TBD | PMU16 pins 24/34 → MaxxECU CAN1H/CAN1L. Drain at MaxxECU end only. Route away from coil/injector wires. |
+| PMU16 CAN2 H/L → MaxxECU CAN1 H/L | GY/**VT** | 22 AWG shielded twisted pair | TBD | PMU16 pins 24/34 → MaxxECU CAN1H/CAN1L. Drain at MaxxECU end only. Route away from coil/injector wires. |
 | PMU16 O1 → ECU logic +12V | RD | 16 AWG | TBD | O1 (pin 38, 25A) → MaxxECU 12-pin pin 7 |
 | PMU16 O2 → coil+inj +12V | RD | 12 AWG | TBD | O2 (pin 39, 25A) → MaxxECU 12-pin pin 1 |
 | PMU16 O3 → SPAL fan | RD | 12 AWG | TBD | O3 (pin 26, 25A PWM) → fan motor + terminal |
@@ -150,43 +165,42 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 
 ## System 2 — Engine Management (M52 Phase 1)
 
-*Source: `maxxecu-m52.wv`*
+*Signal reference: `maxxecu-m52.wv` (reference only — not a build document)*
 
-### Connectors
+> **Phase 1 uses the MaxxECU M50 pre-terminated engine harness.** All engine sensor connectors
+> (injectors, coils, CLT, IAT, TPS, crank, cam, VANOS solenoid, boost stub, WBO2 LSU 4.2, MAP)
+> are pre-crimped and included. The C1 (48-pin Molex) ECU connector is also included.
+> Source: https://www.maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html (verified 2026-08-26)
+>
+> Harness routes through the existing E36 firewall grommet/bushing. No AS79 bulkhead for Phase 1.
+
+### Connectors — additional items NOT included in the pre-terminated harness
 
 | Qty | Item | Notes |
 |-----|------|-------|
-| 1 | **Molex 48-pin C1** — MaxxECU RACE/STREET/SPORT/PRO connector 1 | [MaxxECU store ID 925](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-street-or-sport-or-race-or-pro-connector-1-48-pin-molex), $33.41 — **REQUIRED** (all current harnesses). Special Molex crimp tool required (63811-9200 primary). Pin assignments in `maxxecu-m52.wv` / `maxxecu-07k.wv`. |
-| 1 | **Molex 32-pin C2** — MaxxECU RACE connector 2 | [MaxxECU store ID 1982](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-mini-or-race-c2-or-pro-c4-32-pin-molex), $32.25 — **REQUIRED**: AIN 5 (C2 pin G3) is used for 8HP virtual clutch pedal position. C1 AIN 1–4 are fully allocated; C2 is the only path for clutch position. Also carries EGT 1–8, AIN 6–8, DIN 4–5, GPO 15/16, DBW motor H-bridge 1–2 (deferred for now). Same crimp tools as C1. Source: MaxxECU RACE REV9+ wiring diagram, pin G3 = "Extra analog sensor / pedal main position 0-5V". |
-| 1 | Bosch JPT 3-way | M52 60-2 VR crank trigger |
-| 1 | BMW `12141726590` 3-pin | M52 VANOS cam Hall sensor |
-| 1 | Bosch JPT 2-way | M52 coolant temp NTC |
-| 1 | OEM M52 2-pin | Intake air temp NTC |
-| 1 | OEM M52 3-pin | Throttle position sensor (0–5V) |
-| 1 | Bosch JPT 2-way | M52 VANOS intake solenoid |
-| 1 | Superseal 2-way | Turbosmart boost solenoid (2-port PWM) |
-| 1 | Bosch PST-F1 4-pin | Dual oil temp + pressure sensor |
-| 1 | 3-pin inline | Ethanol content / flex fuel sensor (digital) |
+| 1 | **BMW sensor PN `12141726590`** — VANOS cam sensor (sensor, not connector) | Required swap before Phase 1 can fire. The harness CAM connector is wired for non-VANOS M50 head; VANOS M52 cam sensor is a different type. Swap the sensor and the harness connector works as-is. Alternative: cut harness CAM connector and rewire with VANOS body + switched +12V (see `MaxxECU_M50_Terminated_Harness.md`). |
+| 1 | **Molex 32-pin C2** — MaxxECU RACE connector 2 | [MaxxECU store ID 1982](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-mini-or-race-c2-or-pro-c4-32-pin-molex), $32.25 — needed for 8HP virtual clutch pedal position (C2 pin G3 = AIN 5). C1 AIN 1–4 are consumed by PST-F1 and MAP via the harness 16-pin breakout; C2 is the only remaining path. Crimp tool: Molex 63811-9200. Source: MaxxECU RACE REV9+ wiring diagram, pin G3 = "Extra analog sensor / pedal main position 0-5V". |
+| 1 | Bosch PST-F1 5-pin Bosch Trapezoid mating kit — F02U.B00.751-01 | Dual oil temp + pressure sensor connector. Wires to 16-pin breakout AIN 1 (temp) + AIN 3 (pressure). |
+| 1 | 3-pin inline | Ethanol content / flex fuel sensor (Continental digital) — wires to 16-pin breakout DIN 3 |
 | 1 | SPDT relay socket | SPAL fan relay (cross-ref `power-distribution.wv`) |
 | 1 | SPDT relay socket | Fuel pump relay (cross-ref `power-distribution.wv`) |
-| 1 | Splice / junction, 4-pin | CAN H/L shared bus junction |
-| 1 | DCT shifter paddle harness connector | 4-wire E36 fitment |
-| 1 | MaxxECU 8HP GEN1 CAN harness connector | ZF 8HP70 transmission CAN |
+| 1 | Splice / junction, 4-pin | CAN H/L shared bus junction (8HP + Gauge.S share 16-pin breakout CAN H/L) |
+| 1 | DCT shifter paddle harness connector | 4-wire E36 fitment — wires to 16-pin breakout DIN 1 + DIN 2 |
+| 1 | MaxxECU 8HP GEN1 CAN harness | ZF 8HP70 transmission CAN — pre-made harness #2287 from MaxxECU/LPS |
 | 1 | Gauge.S E36 CAN input, 2-pin | Cross-ref `body-x20.wv` |
-| 3 | Ring terminal | Batt +12V (fused), chassis GND, IGN switched +12V |
+| 3 | Ring terminal | Batt +12V (fused), chassis GND, IGN switched +12V to 12-pin breakout |
 
 ### Cables
 
-> Gauge and per-run lengths are stubs in `maxxecu-m52.wv` — buy after measuring physical routing. Colors are defined in the source file and visible in the SVG diagram.
+> No engine-side cable purchases needed — all engine sensor wiring is in the pre-terminated harness.
+> What remains is wiring the 12-pin and 16-pin breakout connectors to cabin destinations (PDM/PMU16,
+> relay board, CAN bus, additional sensors). Measure routing lengths on the car before cutting.
 
-| Run | Color(s) | Type | WV Total | Notes |
-|-----|----------|------|----------|-------|
-| W_CAN, W_CAN_8HP, W_CAN_GAUGES | WH/BU (CAN H/L — WH=H, BU=L) | 2-wire twisted | 6.9 m total across all 2-wire runs | Use shielded twisted pair for CAN runs |
-| W_CLT, W_IAT, W_VANOS, W_FAN, W_FUELPUMP, W_BOOST | RD/BK or signal-specific | 2-wire | included in above total | |
-| W_CRANK, W_CAM, W_TPS | varies | 3-wire | 3.3 m total | |
-| W_FLEXFUEL | — | 3-wire | included above | |
-| W_PST_F1, W_SHIFTER | — | 4-wire | 2.1 m total | |
-| W_COIL_PWR, W_ECU_PWR, W_ENGINE_GND | RD, RD, BK | single-wire | ⚠️ stub (0 m) | Lengths TBD — size based on fused current |
+| Run | Notes |
+|-----|-------|
+| 12-pin extra connector → cabin | Power rails (+12V coil/ECU/starter/alternator), engine GND, GPO 2 (fuel pump), GPO 6 (fan). All 14–18 AWG. |
+| 16-pin extra connector → cabin | CAN bus, AIN 1–4 sensor signals, DIN 1–3, GPO 3/7/8. All 18–22 AWG. |
+| C2 pigtail (single wire) | AIN 5 (G3) for 8HP virtual clutch position sensor. 22 AWG. |
 
 ---
 
@@ -200,8 +214,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 |-----|------|-------|
 | 1 | **BMW E46 Accelerator Pedal Module** | PN `35426786282` (manual) / `35426786281` (auto) — used, ~$80–120. See `docs/dbw-pinouts.md` for sourcing table. |
 | — | *OR* **Hella 6PV010946-141** | RHD fallback — standalone floor-mount, no OEM pedal box, ~$80–120 new |
-| 1 | Deutsch Autosport AS-series bulkhead — **cabin side** | Size 20 contacts, **pins 72-77** reserved for e-pedal (GND1/GND2/VCC2/APS1/VCC1/APS2) |
-| 1 | Deutsch Autosport AS-series bulkhead — **engine side** | Size 20 contacts, **pins 72-77** — engine side of same pass-through, wires to MaxxECU APS AIN |
+| 1 | Maven HD30 35-pin accessories bulkhead — Connector A | APS routes through **Connector A cabin face pins A14–A19** (cabin-to-cabin; no AS79 crossing needed). AS79 pins 72–77 remain SPARE. Source: `firewall-bulkhead-dual.wv`; `epedal-bmw-e46.wv`. |
 | 1 | MaxxECU RACE CMC — APS analog inputs | 6-pin CMC section — AIN, 5V SENS OUT, SGND — pins TBD |
 
 ### Cables
@@ -247,7 +260,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 | Qty | Item | Notes |
 |-----|------|-------|
 | 1 | **Pierburg CWA400 (PWM version)** | Kostal 2+2 connector, 150 LPM @ 0.85 bar — installed in lower radiator hose |
-| 1 | 40A automotive relay | Bosch `0 332 002 150` or equiv — standard 4- or 5-pin |
+| 1 | 40A automotive relay | **Phase 3 CWA400 control only — not used in Phase 1** (there is no EWP in Phase 1). Phase 3 supersedes this relay with PMU16 O5+O14 MOSFET direct drive. Relay listed here for reference only. Source: `34-ecu-harness-final.md` lines 144–147. |
 | 1 | Battery positive terminal | 🔁 Shared |
 | 1 | Chassis ground stud | 🔁 Shared |
 | 1 | MaxxECU RACE GPO | 🔁 Shared — GPO pin TBD |
@@ -256,12 +269,12 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 
 | Run | Color | Gauge | Length | Shielded | Notes |
 |-----|-------|-------|--------|----------|-------|
-| CABLE_PWR_IN (BATT+ → relay pin 30) | RD | 10 AWG | 0.5 m | No | Fused 40A within 30 cm of battery. Ring terminal at battery. |
-| CABLE_PWR_OUT (relay pin 87 → CWA400 Pin 3) | RD | 10 AWG | 1.5 m | No | Switched +12V pump supply. 35.5A nominal draw — 10 AWG minimum. |
-| CABLE_GND (CWA400 Pin 4 → chassis GND) | BK | 10 AWG | 1.5 m | No | Dedicated ground. 10 AWG minimum. |
-| CABLE_PWM (MaxxECU GPO → CWA400 Pin 1) | VT | 22 AWG | 2.0 m | Preferred | PWM signal (680 Hz). Drain at ECU end only. Keep from coil wires. |
-| CABLE_RELAY_COIL wire 1 (relay pin 86 → IGN +12V) | GN | 18 AWG | 0.5 m | No | Relay coil supply. |
-| CABLE_RELAY_COIL wire 2 (relay pin 85 → chassis GND) | BK | 18 AWG | 0.5 m | No | Relay coil return. |
+| CABLE_PWR_IN (BATT+ → PMU16 input) | RD | 10 AWG | 0.5 m | No | Fused 40A within 30 cm of battery. **Phase 3:** PMU16 O5+O14 (50A combined MOSFET) drives CWA400 directly — no relay. Ring terminal at battery. |
+| CABLE_PWR_OUT (PMU16 O5+O14 → CWA400 Pin 3) | RD | 8 AWG | 1.5 m | No | Switched +12V pump supply. 35.5A nominal — **8 AWG** (10 AWG marginal at 35.5A / 1.5m in engine bay; System 1 and consolidated buy table both specify 8 AWG). PMU16 manages post-shutdown cooling hold. |
+| CABLE_GND (CWA400 Pin 4 → chassis GND) | BK | 10 AWG | 1.5 m | No | Dedicated ground. 10 AWG minimum. Both phases. |
+| CABLE_PWM (MaxxECU GPO → CWA400 Pin 1) | VT | 22 AWG | 2.0 m | Preferred | PWM signal (680 Hz). **Phase 3:** MaxxECU broadcasts EWP state over CAN1 to PMU16 — no direct GPO wire to CWA400. 22 AWG if retained for direct drive fallback. |
+| *Phase 1 only* relay coil wire 1 (relay pin 86 → IGN +12V) | GN | 18 AWG | 0.5 m | No | **Not used in Phase 3 (PMU16 direct drive).** |
+| *Phase 1 only* relay coil wire 2 (relay pin 85 → chassis GND) | BK | 18 AWG | 0.5 m | No | **Not used in Phase 3 (PMU16 direct drive).** |
 
 ---
 
@@ -315,23 +328,23 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 *Source: `maxxecu-07k.wv`*
 
-> Phase 3 engine harness — replaces M52 engine-side mating plug. MaxxECU ECU, 12-pin, and 16-pin connectors carry over unchanged.
+> Phase 3 engine harness — first installation of the AS79 engine-side mating plug (no M52 mating plug existed; Phase 1 used OEM firewall grommet). MaxxECU ECU, 12-pin, and 16-pin connectors carry over unchanged.
 
 ### Connectors
 
 | Qty | Item | Notes |
 |-----|------|-------|
 | 1 | Deutsch AS79 jam nut plug — engine side (07K) | Replaces M52 mating plug at bulkhead; same pin-numbering |
-| 5 | Bosch EV14 / USCAR injector pigtail, 2-pin | Replace M50 harness EV1 ends with EV14 (ID1050x). PN `0 280 156 127` pigtail or equivalent |
+| 5 | EV14 / USCAR injector connector housing + terminals | Direct termination — housing: Bosch `1 928 402 258` (or equiv USCAR 2-pin); terminal: Bosch `1 928 499 000` or Delphi `12129476`. ⚠️ `0 280 156 127` is a **Bosch injector** PN, not a connector PN — do not order it for wiring. |
 | 5 | VAG 4-way COP connector | IGN 1-5 ignition coils (07K firing order 1-2-4-5-3) |
-| 1 | VW 07K crank VR sensor, 3-pin | ⚠️ TODO: confirm exact body (Bosch Kombi-F or similar) at install |
+| 1 | VW 07K crank Hall sensor OE# 07K906433B, 3-pin | Hall effect (confirmed — Valeo 366675 datasheet "Sensor Type: Hall Sensor"). Connector body: 3B0973703G (same as cam — label CRANK at crimp time). Pinout: +5V/Signal/SensorGND. ⚠️ Verify exact body at install. |
 | 1 | VW 07K cam Hall sensor, 3-pin | ⚠️ TODO: confirm exact body at install (+5V type — different from M52 +12V) |
 | 1 | VW 07K CLT sensor connector | ⚠️ TODO: confirm connector body at install |
 | 1 | VW 07K IAT sensor connector | ⚠️ TODO: confirm connector body at install |
 | 1 | VW 07K DBW throttle body connector | ⚠️ TODO: confirm 6-pin body (Motor+/Motor−/TPS1+TPS2 +5V/GND) at install |
 | 2 | Bosch flat knock sensor connector, 1-pin | KS1 + KS2 (Bosch flat-type, M8 mount) — signal only; GND via mounting bolt |
-| 1 | Bosch LSU 4.9 6-way connector | WBO2 — same as M52 harness (new bung in 07K manifold) |
-| 1 | Bosch PST-F1 4-pin | 🔁 Same as M52 — new mount on 07K oil housing iABED M10×1.0 port |
+| 1 | Bosch LSU 4.9 6-way connector | WBO2 — new purchase for Phase 3. Phase 1 harness uses LSU 4.2 (different pinout — do NOT reuse). New bung required in 07K manifold. |
+| 1 | Bosch PST-F1 5-pin Bosch Trapezoid | 🔁 Same connector as M52 — new mount on 07K oil housing iABED M10×1.0 port. Kit F02U.B00.751-01. |
 | 1 | Superseal 2-way | 🔁 Same boost solenoid as M52 |
 | 1 | VW/Tyco Micro Timer 1.5mm Sealed, 2-pin — `1J0 973 702` female pigtail | N205 VVT solenoid (cam adjustment valve). Solenoid male body: `1J0 973 802`. Pre-made pigtail: automotive-connectors.com `42121600-PT` (~30 cm leads) or Amazon B0D8FH4S8T (~170 mm leads). Terminals 0.35–0.5 mm² (22 AWG) — crimp with IWISS IWS-2820M. Source: VW BGP/BGQ workshop manual + automotivetechinfo.com 2010 Golf valve timing repair. |
 | 1 | 3-pin inline | 🔁 Same Continental flex fuel sensor as M52 |
@@ -340,11 +353,11 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 | Run | Color(s) | Gauge | Length | Shielded | Notes |
 |-----|----------|-------|--------|----------|-------|
-| DBW TB Motor +/− | OG, VT | 20 AWG | 0.5 m ea | No | H-bridge output — 20 AWG min (3A). Verify polarity before crimping. |
-| DBW TB TPS 4-wire | RD, BK, WH, GN | 22 AWG | 0.5 m | Preferred | +5V, GND, TPS1, TPS2 signals |
+| DBW TB Motor +/− | OG, VT | 22 AWG | 0.5 m ea | No | H-bridge output — **22 AWG max** (AS79 size-22D contacts accept 22–26 AWG only; 20 AWG will not seat). 3A peak at 0.5 m — 22 AWG adequate. Verify polarity before crimping. |
+| DBW TB TPS 4-wire | RD, BN, WH, WH | 22 AWG | 0.5 m | Preferred | +5V (RD), Sensor GND (BN — not BK; BK=chassis GND), TPS1 signal (WH), TPS2 signal (WH). Source: `maxxecu-07k.wv` W_DBW_TPS cable. |
 | Knock sensor 1 signal | WH | 22 AWG | 0.4 m | Preferred | KS1 signal wire; shield drain at ECU end |
 | Knock sensor 2 signal | WH | 22 AWG | 0.6 m | Preferred | KS2 signal wire |
-| Knock GND | BK | 22 AWG | 0.5 m | No | Shared knock GND (via bulkhead pin 71) |
+| Knock shield drain | YE | 22 AWG | 0.5 m | No | Shared knock sensor shield drain (via bulkhead **pin 45** → CMC H1 Sensor GND). Source: `maxxecu-07k.wv` comment; `firewall-bulkhead.wv` pin 45. Color YE = shield drain — never BK (power GND). |
 
 ---
 
@@ -362,11 +375,10 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | Qty | Item | Notes |
 |-----|------|-------|
 | 1 | Deutsch Autosport AS79 / Souriau 8STA 79-way flange receptacle | Cabin side — permanent. Deutsch p/n AS616-79PN or Souriau 8STA79PN |
-| 1 | Deutsch AS79 / Souriau 8STA 79-way jam nut plug — M52 engine side | Phase 1 mating plug. Sector-optimized layout per `firewall-bulkhead.wv`. ~38 active pins, remainder cavity-plugged |
-| 1 | Deutsch AS79 / Souriau 8STA 79-way jam nut plug — 07K engine side | Phase 3 mating plug. Same pin numbers as M52 plug + adds 07K-only stubs (IGN 7, INJ 7, cam, crank, DBW, knock) |
+| 1 | Deutsch AS79 / Souriau 8STA 79-way jam nut plug — 07K engine side | **Phase 3 only.** Phase 1 pre-terminated harness uses the existing E36 firewall grommet — no AS79 engine plug for Phase 1. Phase 3 mating plug per `firewall-bulkhead.wv`: INJ 1–6 + INJ 7 (14), ETh Motor+/− (22/23), knock 1/2/shield (43–45), cam (19), crank (16/17/18), etc. Pin 34 cavity-plugged. |
 | — | AS79 / 8STA **size-22** solid barrel sockets (38943-22) | Cabin side contacts — order with housing kit or separately. 5A max, 22–26 AWG. Source: m-cal.com AS020-35SN product data ("Primary Contacts Size: 22 AWG"); ecuplus.de AS620-35PN ("79x 22 AWG"). |
-| — | AS79 / 8STA **size-22** solid barrel pins (38941-22) | Engine-side mating plug contacts. 5A max, 22–26 AWG. |
-| — | AS79 / 8STA cavity plugs (size 22) | Seal all unused cavities on both sides — required for IP67. ~41 unused on M52 side, ~34 on 07K side |
+| — | AS79 / 8STA **size-22** solid barrel pins (38941-22) | Engine-side mating plug contacts (Phase 3 / 07K side). 5A max, 22–26 AWG. |
+| — | AS79 / 8STA cavity plugs (size 22) | Seal all unused cavities — required for IP67. ~34 unused on 07K engine side (cabin side fill as-built). |
 
 > ⚠️ **Crimping tool:** AS79 size-22 contacts require **Daniels AFM8 (M22520/2-01)** handle ($601.65 — [dmctools.com](https://dmctools.com/afm8)) + **K42 positioner (M22520/2-09)** for pin contacts ($112.64 — [deltaintl.com](https://deltaintl.com/products/k42)) + **K40 positioner (M22520/2-07)** for socket contacts ($93.86 — [dmctools.com](https://dmctools.com/k40)). NOT the HDT-48-00 (DT/DTM only). NOT K43 (that is for size-20 contacts). Fischer Motorsports kit labeled "DMC Deutsch Size 20 AS Tool Kit" is for a different contact size — do not use for this AS79 build.
 
@@ -386,9 +398,9 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 | Qty | Item | Notes |
 |-----|------|-------|
-| 4 | Deutsch DT 2-pin connector pair (DT06-2S receptacle + DT04-2P plug + W2S wedge) | One per relay output: +12V Fan · +12V Cond Fan · +12V EWP · +12V AC. Rated 25A/contact. DT connector max per contact = 25A; for EWP use 10 AWG and derate — 36.3A peak is within short-term rating |
-| — | DT size-16 contacts (12 AWG) | Fan relay outputs — 12 AWG fits size-16 DT contact |
-| — | DT size-12 contacts (10 AWG) | EWP output only — 10 AWG, 36.3A max |
+| 4 | Deutsch DT 2-pin connector pair (DT06-2S receptacle + DT04-2P plug + W2S wedge) | One per relay output: +12V Fan · +12V Cond Fan · +12V EWP · +12V AC. Fan contacts rated 25A/contact. EWP contacts rated 35A/contact. |
+| — | DT size-16 contacts (12 AWG) | Fan relay outputs — 12 AWG, 25A max |
+| — | DT size-8 contacts (8 AWG) | **EWP output only** — 8 AWG, 35A continuous (Phase 3: PMU16 O5+O14 direct drive). ⚠️ Size-12 contacts (10 AWG / 22A max) are **insufficient** for 35.5A nominal EWP load. |
 | 1 | Weatherproof firewall grommet, ~25mm | For the 4× DT wire bundles through firewall alongside main connector plate |
 
 ---
@@ -512,7 +524,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 > **Required (signal-critical, always shield):**
 > | Run | System | Notes |
 > |-----|--------|-------|
-> | Crank VR sensor (Signal+/Signal−/Shield) | M52 (Sys 2) + 07K (Sys 7) | Passive VR signal — most noise-sensitive wire in the harness. `.wv` source models shield explicitly (`CRANK_VR:3:Shield`), drains at ECU CMC pin 19 (E3). |
+> | Crank trigger signal + supply/GND | M52 (Sys 2) + 07K (Sys 7) | M52: passive VR shielded pair (Signal+/Signal−/Shield→E3). 07K: Hall effect 3-wire (Signal/+5V/SensorGND); no dedicated shield drain — sensor GND to CMC H1 (pin 29). `.wv` source: `CRANK_HALL` in `maxxecu-07k.wv`. |
 > | Cam Hall sensor (+5V/GND/Signal + shield) | M52 (Sys 2) + 07K (Sys 7) | Shares E3 drain point with crank shield. |
 > | E-pedal cable, both legs (cabin + engine side) | E-pedal (Sys 3) | 6-conductor shielded, 24 AWG. Single-end drain at MaxxECU end only. |
 > | Wideband O2 (WBO2) — VS/VREF/IP/RCAL | 07K (Sys 7) | ⚠️ **Fixed in this pass** — `maxxecu-07k.wv` W_WBO2 previously had no shield attribute despite being low-level analog signal near the turbo/exhaust bung; now `shield: true`. **M52 (Sys 2) WBO2 harness is a larger gap — entirely unmodeled in `maxxecu-m52.wv`** (no connector, cable, or connections block, only reserved ECU_CMC pin labels). See TODO block at top of `maxxecu-m52.wv` — must be authored (with shield) before Phase 1 harness build. |
@@ -551,13 +563,9 @@ Only items not already included with their respective purchased components (e.g.
 | 1 | BMW E36 X20 25-pin connector (cabin) | OEM or aftermarket — source from E36 donor or Molex catalog | Body |
 | 1 | BMW E36 X20 25-pin connector (engine side) | OEM | Body |
 | 1 | Gauge.S E36 PNP cluster connector, 6-pin | Ships with Gauge.S unit | Body |
-| 1 | Deutsch Autosport AS-series bulkhead shell + contacts | Cabin side + engine side mating pair — Size 20 contacts for all signal pins | E-pedal / all engine crossing |
-| 1 | MaxxECU RACE C1, 48-pin Molex harness connector | [MaxxECU store ID 925](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-street-or-sport-or-race-or-pro-connector-1-48-pin-molex), $33.41 — **does NOT ship with ECU**; special Molex crimp tool required | M52 harness |
-| 1 | MaxxECU RACE C2, 32-pin Molex harness connector | [MaxxECU store ID 1982](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-mini-or-race-c2-or-pro-c4-32-pin-molex), $32.25 — same Molex crimp tool as C1 | M52 harness |
-| 1 | Bosch JPT 2-way (×2) | M52 CLT + VANOS solenoid | M52 harness |
-| 1 | Bosch JPT 3-way | M52 crank VR trigger | M52 harness |
-| 1 | BMW `12141726590` 3-pin | M52 VANOS cam Hall sensor | M52 harness |
-| 1 | Superseal 2-way | Turbosmart boost solenoid | M52 harness |
+| 1 | Deutsch Autosport AS-series bulkhead shell + contacts | Cabin side + engine side mating pair — **Size 22 contacts** (22–26 AWG) for all signal pins. No size-20 contacts exist in the AS79 insert. Source: `firewall-bulkhead.wv`. | All engine crossing |
+| 1 | **BMW sensor PN `12141726590`** — VANOS cam sensor | Required before Phase 1 can fire — VANOS head cam sensor swap. Not a connector; this is the replacement sensor that matches the pre-terminated harness CAM connector. | M52 Phase 1 |
+| 1 | MaxxECU RACE C2, 32-pin Molex harness connector | [MaxxECU store ID 1982](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-mini-or-race-c2-or-pro-c4-32-pin-molex), $32.25 — C1 comes with the pre-terminated harness; C2 is separate. Phase 1: AIN 5 (G3) for 8HP virtual clutch. Phase 3: DBW, knock, e-pedal. Molex 63811-9200 crimp tool. | Phase 1 + 07K |
 | 1 | VW `1J0 973 702` 2-pin Micro Timer pigtail | N205 VVT solenoid — automotive-connectors.com `42121600-PT` or Amazon B0D8FH4S8T | 07K harness |
 
 ---
@@ -575,7 +583,7 @@ One-time tooling purchase — covers all connector families in this build. See [
 | Open-barrel engine bay (general) | _(use IWS-2820M or IWS-2412M above per AWG)_ | — | **In the engine bay and anywhere exposed to moisture/vibration: use non-insulated barrel + adhesive-lined heat shrink** over every crimp. Adhesive liner seals against capillary wicking that pre-insulated connectors allow. Interior/cabin: pre-insulated nylon-sleeve crimps acceptable with the correct ratcheting tool. Source: StreetCarJoe Race Car Wiring Pt.1. |
 | **AS solid barrel crimper** | **Daniels M22520/2-01 (AFM8)** handle + **K42 positioner (M22520/2-09)** (pin contacts) + **K40 positioner (M22520/2-07)** (socket contacts) | AFM8: **$601.65** ([dmctools.com](https://dmctools.com/afm8)) · K42: **$112.64** ([deltaintl.com](https://deltaintl.com/products/k42)) · K40: **$93.86** ([dmctools.com](https://dmctools.com/k40)) — total ~$808 | **Required for Deutsch Autosport AS79 size-22 solid barrel contacts** (firewall bulkhead). Source: m-cal.com AS020-35SN "Primary Contacts Size: 22 AWG"; ecuplus.de AS620-35PN "79x 22 AWG, Required Positioner for DMC AFM8: K40". NOT the HDT-48-00 or clones (DT/DTM/DTP only, different contact geometry). NOT K43 (size-20 positioner — wrong for this build). No cheap substitute: wrong die geometry produces cold crimps that pass initial pull-test but fail under vibration. |
 | Ferrule crimper | **iCrimp AWG23-10** (HSC8 6-4A, [amazon.com/dp/B00XVB6B1C](https://www.amazon.com/dp/B00XVB6B1C)) | ~$25 | Stranded wire ends into screw-clamp terminals (ECU power/ground, DIN rail fuse block). Self-adjusting ratchet, 0.25–6mm² (AWG 23–10). ⚠️ PN IWS-10 does not exist in IWISS/iCrimp's catalog — corrected to AWG23-10. |
-| Deutsch contact extraction | **Deutsch 0411-240-2005** ([deutschconnector.com](https://www.deutschconnector.com/products/deutsch_connector_tools/deutsch_connector_removal_tools/0411-240-2005/)) | ~$15 | AS bulkhead size 20 contact removal — push in, releases retention lock cleanly. Do not use a screwdriver. Note: AS79 connector ships with one insertion/extraction tool included. ⚠️ PN 1680-73-01 does not exist in Deutsch/TE catalog — corrected to 0411-240-2005. |
+| AS79 size-22 contact extraction | **Use the tool included with the AS79 connector body** (or M81969/14-01 equiv) | included | AS bulkhead **size-22** solid barrel contact removal — push in from front, releases collet, contact exits rear. Note: `0411-240-2005` is a DT/DTM size-16/20 tool — it does **not** fit AS79 size-22 contacts. Do not use a screwdriver. |
 | VW/Bosch connector de-pinning picks | **Lisle 57750** | ~$20 | Sensor pigtails (3B0973703G, 1J0973702, 1J0973712), COP connectors — push-to-release housings. |
 | Rivnut tool + rivnut assortment | **Astro Pneumatic 1442** ([Amazon](https://www.amazon.com/Astro-Pneumatic-Tool-1442-Setter/dp/B003TODXQW) ~$71) + M4/M6 zinc rivnut kit | ~$75–90 | Installs threaded inserts into thin sheetmetal or carbon panels without backside access. Required for PMU16 bracket and ECU bracket mounting. Source: StreetCarJoe Race Car Wiring Pt.3. |
 | **Molex CMC crimp — small** | **63811-9200** | ~$200–250 | MaxxECU C1/C2 small terminals (643221029, 0.75mm²/~20 AWG) — 40 of 48 C1 pins and 24 of 32 C2 pins are this size. **Primary tool for ECU connector wiring.** Source: Digikey, Mouser. |

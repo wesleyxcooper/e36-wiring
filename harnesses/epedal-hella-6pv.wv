@@ -90,7 +90,7 @@ cables:
     gauge: "24 AWG"
     length: "1.5 m"
     wirecount: 6
-    colors: [BK, RD, YE, BK, RD, GN]
+    colors: [BN, RD, WH, BN, RD, WH]
     shield: true
     notes: >-
       Cabin-only run: Hella pedal connector (footwell) → MaxxECU connector area (firewall).
@@ -98,12 +98,12 @@ cables:
       24 AWG sufficient -- low-current sensor signals only.
       Shielded 6-conductor; drain shield at MaxxECU end only (single-end drain).
       Tie drain wire to CMC H1 (Sensor GND).
-      Wire 1 BK: GND1 (pedal pin 1) → MAXXECU_SUPPLY GND bus (CMC H1).
+      Wire 1 BN: GND1 (pedal pin 1) → MAXXECU_SUPPLY GND bus (CMC H1).
       Wire 2 RD: +5V2 (pedal pin 2) → MAXXECU_SUPPLY +5V rail (CMC G1).
-      Wire 3 YE: TPS2/APS2 signal (pedal pin 3) → MAXXECU_C2 F1 (AIN 7).
-      Wire 4 BK: GND2 (pedal pin 4) → MAXXECU_SUPPLY GND bus (CMC H1).
+      Wire 3 WH: TPS2/APS2 signal (pedal pin 3) → MAXXECU_C2 F1 (AIN 7).
+      Wire 4 BN: GND2 (pedal pin 4) → MAXXECU_SUPPLY GND bus (CMC H1).
       Wire 5 RD: +5V1 (pedal pin 5) → MAXXECU_SUPPLY +5V rail (CMC G1).
-      Wire 6 GN: TPS1/APS1 signal (pedal pin 6) → MAXXECU_C2 E4 (AIN 6).
+      Wire 6 WH: TPS1/APS1 signal (pedal pin 6) → MAXXECU_C2 E4 (AIN 6).
       Note: wire-color order differs from E46 variant -- label both ends clearly.
       AS79 bulkhead NOT used for APS -- cabin-to-cabin direct run.
 
