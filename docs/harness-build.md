@@ -573,9 +573,9 @@ Print this list before touching any wire. Source: `firewall-bulkhead.wv` — BUL
 | 12 | `12 INJ5` | INJECTORS | ✓ | ✓ |
 | 13 | `13 INJ6` | INJECTORS | ✓ (M52) | — (cavity-plug) |
 | 14 | `14 INJ7` | INJECTORS | — (stub) | ✓ (07K 5th cyl) |
-| 16 | `16 CRANK-VR+` | TRIGGER | ✓ | ✓ (same pin both phases; connector body changes) |
-| 17 | `17 CRANK-VR-` | TRIGGER | ✓ | ✓ (same pin both phases) |
-| 18 | `18 CRANK-SHLD` | TRIGGER | ✓ | ✓ |
+| 16 | `16 CRANK-SIG` | TRIGGER | ✓ (VR+) | ✓ (Hall signal — same ECU pin CMC H3) |
+| 17 | `17 CRANK-P2` | TRIGGER | ✓ (VR−→CMC H2) | ✓ (+5V→CMC G1; **cabin re-terminate at swap**) |
+| 18 | `18 CRANK-P3` | TRIGGER | ✓ (shield→CMC E3) | ✓ (SensorGND→CMC H1; **cabin re-terminate at swap**) |
 | 19 | `19 CAM-HALL` | TRIGGER | ✓ | ✓ (same pin both phases; connector body changes) |
 | 22 | `22 MOTOR+` | SENSORS | — (07K only) | ✓ |
 | 23 | `23 MOTOR-` | SENSORS | — (07K only) | ✓ |

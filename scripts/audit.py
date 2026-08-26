@@ -76,6 +76,11 @@ from pathlib import Path
 from typing import Optional
 
 ROOT = Path(__file__).parent.parent
+# Also scan the sibling e36-docs repo if present. All DenyRules apply there too — the
+# walkthrough .md and .csv files in e36-docs are just as likely to carry stale values.
+EXTRA_ROOTS: list[Path] = [
+    p for p in [ROOT.parent / "e36-docs"] if p.is_dir()
+]
 AUDIT_EXTENSIONS = {".md", ".wv", ".csv"}
 
 # ---------------------------------------------------------------------------
@@ -464,6 +469,57 @@ DENYLIST: list[DenyRule] = [
         source="harnesses/power-distribution.wv",
         exclude=r"(?i)(removed|replaced|replaces|no\s+longer|NOT|obsolete|superseded)",
     ),
+
+    # ── 07K crank sensor type — Hall, NOT VR ─────────────────────────────────
+    # Audit round 4 (2025-07): OE# 07K906433B confirmed Hall (Valeo 366675 datasheet
+    # "Sensor Type: Hall Sensor"; the07k.wiki "The 07K engine uses a Hall Effect crank
+    # position sensor").  BGP wiring diagram labels it "VR" — that diagram is wrong.
+    DenyRule(
+        pattern=r"(?i)(07K|07k).{0,40}(passive\s*VR|VR\s*sensor|VR\+|VR-|Trigger\s*GND\s*/\s*VR)",
+        message="The VW 07K crank sensor is Hall effect (OE# 07K906433B), NOT passive VR. "
+                "BGP wiring diagram labels 'VR+/VR-/Shield' but the07k.wiki confirms this is wrong. "
+                "Confirmed: Valeo PN 366675 datasheet 'Sensor Type: Hall Sensor'. "
+                "Correct connector: CRANK_HALL, pinout +5V/Signal/SensorGND. "
+                "MTune trigger = Digital (Hall, opto), NOT VR sensor Zero-crossing.",
+        source="https://www.amcarparts.co.uk/valeo/657870-crankshaft-sensor-valeo-366675-for-audi-vw-oe-07k906433b-3276423666759",
+        exclude=r"(?i)(NOT\s+VR|Hall.{0,10}not.{0,10}VR|confirmed.{0,10}Hall|BGP.{0,30}wrong"
+                r"|was.*VR|VR.*was|M52.*VR|VR.*M52|re-terminate|→G1|VR.*→|VR-→)",
+    ),
+    # CRANK_VR is valid in maxxecu-m52.wv (M52 IS a VR sensor). Only flag in 07K context.
+    DenyRule(
+        pattern=r"07K.{0,60}CRANK_VR|CRANK_VR.{0,60}07K",
+        message="CRANK_VR connector was renamed CRANK_HALL in the 07K harness — the 07K crank sensor "
+                "is Hall effect, not VR. Update any 07K-context reference to CRANK_HALL. "
+                "Source: harnesses/maxxecu-07k.wv.",
+        source="harnesses/maxxecu-07k.wv",
+        exclude=r"(?i)(renamed|was\s+CRANK_VR|OLD|replaced|M52)",
+    ),
+    # Crank VR- (CMC H2, pin 30) must NOT be wired as a new 07K connection.
+    # Allow lines that are documenting the M52 routing in order to contrast with 07K.
+    DenyRule(
+        pattern=r"(?i)(07K|[Cc]rank).{0,30}CMC\s*H2|CMC\s*H2.{0,30}(07K|[Cc]rank)\b",
+        message="CMC H2 (Trigger GND / VR−, pin 30) is unused for the 07K Hall crank sensor. "
+                "H2 was for M52 VR−. 07K crank wires: "
+                "pin16→H3(TRIGGER), pin17→G1(+5V), pin18→H1(SensorGND). "
+                "Source: harnesses/maxxecu-07k.wv connections block.",
+        source="harnesses/maxxecu-07k.wv",
+        exclude=r"(?i)(M52\s+only|UNUSED|not\s+used|M52.*VR|VR.*M52|was.*H2|H2.*was|NOT|only.*M52"
+                r"|re-terminate|G1.*\+5V|\+5V.*G1|→G1|M52:)",
+    ),
+
+    # ── PST-F1 connector pincount — 5-pin, NOT 4-pin ────────────────────────
+    # Audit round 4 (2025-07): Bosch Motorsport PST-F1 datasheet confirmed 5-pin
+    # Bosch Trapezoid connector (F02U.B00.751-01). Pin 1 = NC. Active pins 2-5.
+    # All previous docs said 4-pin — wrong; ordering a 4-pin body mismatches sensor.
+    DenyRule(
+        pattern=r"(?i)PST.{0,5}F.?1.{0,20}4.pin|4.pin.{0,20}PST.{0,5}F.?1",
+        message="Bosch PST-F1 uses a 5-pin Bosch Trapezoid connector (F02U.B00.751-01). "
+                "Pin 1 = NC; active pins: 2=Pressure, 3=+5V, 4=GND, 5=Temp. "
+                "Ordering a 4-pin body will not match the sensor physically. "
+                "Source: Bosch Motorsport PST-F1 datasheet (bosch-motorsport.com); xtramotorsport.com.",
+        source="https://xtramotorsport.com/product/bosch-motorsport-combined-10-bar-pressure-temp-sensor-for-oil-and-fuel/",
+        exclude=r"(?i)(NOT\s+4|5.pin|5\s+pin|was.*4.pin|4.pin.*was|NOT\s+a\s+4)",
+    ),
 ]
 
 # ---------------------------------------------------------------------------
@@ -494,6 +550,9 @@ KNOWN_CMC_PINS: list[tuple[str, str, int]] = [
     ("INJ 3",           "M1",  49),   # Injector output 3 → C1 M1
     ("INJ 4",           "M2",  50),   # Injector output 4 → C1 M2
     ("INJ 5",           "M3",  51),   # Injector output 5 → C1 M3
+    # Crank Hall signal → TRIGGER (H3, pin 31). Confirmed Audit round 4.
+    # Note: M52 VR+ uses the same pin (H3/31) — same ECU destination, different sensor type.
+    ("TRIGGER",         "H3",  31),   # Crank trigger signal → C1 H3 (both M52 VR+ and 07K Hall)
 ]
 
 # ---------------------------------------------------------------------------
@@ -514,9 +573,20 @@ def get_staged_files() -> list[Path]:
 
 def get_all_files() -> list[Path]:
     files = []
-    for ext in AUDIT_EXTENSIONS:
-        files.extend(ROOT.rglob(f"*{ext}"))
+    for root in [ROOT] + EXTRA_ROOTS:
+        for ext in AUDIT_EXTENSIONS:
+            files.extend(root.rglob(f"*{ext}"))
     return [f for f in files if ".git" not in str(f)]
+
+
+def _rel(path: Path) -> str:
+    """Return path relative to the nearest known root, prefixed with repo name."""
+    for root in [ROOT] + EXTRA_ROOTS:
+        try:
+            return f"{root.name}/{path.relative_to(root)}"
+        except ValueError:
+            pass
+    return str(path)
 
 
 def audit_file(path: Path, verbose: bool) -> list[str]:
@@ -524,9 +594,9 @@ def audit_file(path: Path, verbose: bool) -> list[str]:
     try:
         lines = path.read_text(encoding="utf-8").splitlines()
     except Exception as e:
-        return [f"  [read error] {path.relative_to(ROOT)}: {e}"]
+        return [f"  [read error] {_rel(path)}: {e}"]
 
-    rel = path.relative_to(ROOT)
+    rel = _rel(path)
     if verbose:
         print(f"  checking {rel}", file=sys.stderr)
 
@@ -565,7 +635,7 @@ def check_duplicate_pins_in_connections(path: Path) -> list[str]:
     except Exception:
         return []
 
-    rel = str(path.relative_to(ROOT))
+    rel = _rel(path)
     # Match lines like:   - - CONNECTOR: [1, 2, 3, 4, 5]
     #                     - - CONNECTOR: [2, 1, 6, 5, 6]   ← pin 6 twice
     # Connector name is the word before the colon.
@@ -629,7 +699,7 @@ def check_wire_color_convention(path: Path) -> list[str]:
     except Exception:
         return []
 
-    rel = str(path.relative_to(ROOT))
+    rel = _rel(path)
 
     # Patterns for wirelabels that identify specific signal types
     _IGN_LABEL   = re.compile(r"IGN\s*\d", re.IGNORECASE)
@@ -744,7 +814,7 @@ def check_signal_pin_references(path: Path) -> list[str]:
     except Exception:
         return []
 
-    rel = str(path.relative_to(ROOT))
+    rel = _rel(path)
     _SUPPRESS = re.compile(r"(?i)\b(NOT|wrong|was|correct|fix|error|should be|incorrect)\b")
     _CMC_PIN  = re.compile(r"\bCMC\s+pin\s+(\d+)\b", re.IGNORECASE)
 

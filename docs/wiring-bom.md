@@ -170,7 +170,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 | 1 | OEM M52 3-pin | Throttle position sensor (0–5V) |
 | 1 | Bosch JPT 2-way | M52 VANOS intake solenoid |
 | 1 | Superseal 2-way | Turbosmart boost solenoid (2-port PWM) |
-| 1 | Bosch PST-F1 4-pin | Dual oil temp + pressure sensor |
+| 1 | Bosch PST-F1 5-pin Bosch Trapezoid | Dual oil temp + pressure sensor. Mating kit: F02U.B00.751-01. Pin 1=NC, 2=Pressure, 3=+5V, 4=GND, 5=Temp. |
 | 1 | 3-pin inline | Ethanol content / flex fuel sensor (digital) |
 | 1 | SPDT relay socket | SPAL fan relay (cross-ref `power-distribution.wv`) |
 | 1 | SPDT relay socket | Fuel pump relay (cross-ref `power-distribution.wv`) |
@@ -328,14 +328,14 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | 1 | Deutsch AS79 jam nut plug — engine side (07K) | Replaces M52 mating plug at bulkhead; same pin-numbering |
 | 5 | EV14 / USCAR injector connector housing + terminals | Direct termination — housing: Bosch `1 928 402 258` (or equiv USCAR 2-pin); terminal: Bosch `1 928 499 000` or Delphi `12129476`. ⚠️ `0 280 156 127` is a **Bosch injector** PN, not a connector PN — do not order it for wiring. |
 | 5 | VAG 4-way COP connector | IGN 1-5 ignition coils (07K firing order 1-2-4-5-3) |
-| 1 | VW 07K crank VR sensor, 3-pin | ⚠️ TODO: confirm exact body (Bosch Kombi-F or similar) at install |
+| 1 | VW 07K crank Hall sensor OE# 07K906433B, 3-pin | Hall effect (confirmed — Valeo 366675 datasheet "Sensor Type: Hall Sensor"). Connector body: 3B0973703G (same as cam — label CRANK at crimp time). Pinout: +5V/Signal/SensorGND. ⚠️ Verify exact body at install. |
 | 1 | VW 07K cam Hall sensor, 3-pin | ⚠️ TODO: confirm exact body at install (+5V type — different from M52 +12V) |
 | 1 | VW 07K CLT sensor connector | ⚠️ TODO: confirm connector body at install |
 | 1 | VW 07K IAT sensor connector | ⚠️ TODO: confirm connector body at install |
 | 1 | VW 07K DBW throttle body connector | ⚠️ TODO: confirm 6-pin body (Motor+/Motor−/TPS1+TPS2 +5V/GND) at install |
 | 2 | Bosch flat knock sensor connector, 1-pin | KS1 + KS2 (Bosch flat-type, M8 mount) — signal only; GND via mounting bolt |
 | 1 | Bosch LSU 4.9 6-way connector | WBO2 — same as M52 harness (new bung in 07K manifold) |
-| 1 | Bosch PST-F1 4-pin | 🔁 Same as M52 — new mount on 07K oil housing iABED M10×1.0 port |
+| 1 | Bosch PST-F1 5-pin Bosch Trapezoid | 🔁 Same connector as M52 — new mount on 07K oil housing iABED M10×1.0 port. Kit F02U.B00.751-01. |
 | 1 | Superseal 2-way | 🔁 Same boost solenoid as M52 |
 | 1 | VW/Tyco Micro Timer 1.5mm Sealed, 2-pin — `1J0 973 702` female pigtail | N205 VVT solenoid (cam adjustment valve). Solenoid male body: `1J0 973 802`. Pre-made pigtail: automotive-connectors.com `42121600-PT` (~30 cm leads) or Amazon B0D8FH4S8T (~170 mm leads). Terminals 0.35–0.5 mm² (22 AWG) — crimp with IWISS IWS-2820M. Source: VW BGP/BGQ workshop manual + automotivetechinfo.com 2010 Golf valve timing repair. |
 | 1 | 3-pin inline | 🔁 Same Continental flex fuel sensor as M52 |
@@ -516,7 +516,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 > **Required (signal-critical, always shield):**
 > | Run | System | Notes |
 > |-----|--------|-------|
-> | Crank VR sensor (Signal+/Signal−/Shield) | M52 (Sys 2) + 07K (Sys 7) | Passive VR signal — most noise-sensitive wire in the harness. `.wv` source models shield explicitly (`CRANK_VR:3:Shield`), drains at ECU CMC pin 19 (E3). |
+> | Crank trigger signal + supply/GND | M52 (Sys 2) + 07K (Sys 7) | M52: passive VR shielded pair (Signal+/Signal−/Shield→E3). 07K: Hall effect 3-wire (Signal/+5V/SensorGND); no dedicated shield drain — sensor GND to CMC H1 (pin 29). `.wv` source: `CRANK_HALL` in `maxxecu-07k.wv`. |
 > | Cam Hall sensor (+5V/GND/Signal + shield) | M52 (Sys 2) + 07K (Sys 7) | Shares E3 drain point with crank shield. |
 > | E-pedal cable, both legs (cabin + engine side) | E-pedal (Sys 3) | 6-conductor shielded, 24 AWG. Single-end drain at MaxxECU end only. |
 > | Wideband O2 (WBO2) — VS/VREF/IP/RCAL | 07K (Sys 7) | ⚠️ **Fixed in this pass** — `maxxecu-07k.wv` W_WBO2 previously had no shield attribute despite being low-level analog signal near the turbo/exhaust bung; now `shield: true`. **M52 (Sys 2) WBO2 harness is a larger gap — entirely unmodeled in `maxxecu-m52.wv`** (no connector, cable, or connections block, only reserved ECU_CMC pin labels). See TODO block at top of `maxxecu-m52.wv` — must be authored (with shield) before Phase 1 harness build. |

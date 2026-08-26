@@ -79,7 +79,8 @@
 # TODO: PST-F1 mounting confirmation
 #       M52 VANOS banjo bolt path (M14x1.5 :: M10x1.0 adapter :: PST-F1) is the plan.
 #       Confirm the adapter thread spec matches the PST-F1 body at install.
-#       PST-F1 4-pin connector pinout should be confirmed against Gauge.S docs.
+#       PST-F1 is a 5-pin Bosch Trapezoid connector (pin 1=NC, 2=Pressure, 3=+5V, 4=GND, 5=Temp).
+#       Mating kit: Bosch F02U.B00.751-01. Source: Bosch Motorsport PST-F1 datasheet.
 #
 # TODO: MAP sensor connector and vacuum port
 #       MaxxECU M50 harness includes MAP sensor with vacuum hose.
@@ -385,10 +386,12 @@ connectors:
       +12V must come from switched 12V relay rail — not ECU 5V supply rail.
 
   PST_F1:
-    type: "Bosch PST-F1 4-pin"
+    type: "Bosch PST-F1 5-pin Bosch Trapezoid"
     subtype: "Dual oil temp+pressure sensor"
-    pincount: 4
-    pinlabels: ["+5V", "GND", "Pressure (0-5V)", "Temp (NTC)"]
+    pincount: 5
+    pinlabels: ["—", "Pressure Signal", "+5V", GND, "Temp Signal (NTC)"]
+    # Pin 1 = NC. Active: pin2=Pressure, pin3=+5V, pin4=GND, pin5=Temp.
+    # Mating kit: Bosch F02U.B00.751-01 (housing 1928405159). Source: Bosch Motorsport datasheet.
     notes: >
       Mount: M52 VANOS banjo bolt (M14x1.5 :: M10x1.0 adapter :: PST-F1).
       Pressure :: AIN 3 (0-5V, 0-10 bar / 0-145 psi).

@@ -112,9 +112,9 @@ connectors:
       # ══ SECTOR 3 (6→9 o'clock) — Triggers + knock (max distance from IGN) ═
       # R1 outer, pins 15–21
       - "SPARE — S2→S3 boundary buffer"         # 15  R1  do not populate without review
-      - "Crank VR+ (CMC H3 = pin 31) [M52 + 07K — same pin, swap connector body only]"  # 16  R1  Size 22D  22 AWG shielded pair with 17
-      - "Crank VR- (CMC H2 = pin 30) [M52 + 07K — same pin, swap connector body only]"  # 17  R1  Size 22D  22 AWG shielded pair with 16
-      - "Crank shield drain [M52 + 07K]"        # 18  R1  Size 22D  22 AWG  float engine side; tie cabin side pin 18 → ECU CMC E3 (GND Shield, pin 19). NOT CMC H1 (Sensor GND). Source: maxxecu-07k.wv W_CRANK; wiring-bom.md line 516.
+      - "Crank trigger signal (M52: VR+→CMC H3/pin31; 07K: Hall signal→CMC H3/pin31) [same ECU pin]"  # 16  R1  Size 22D  22 AWG
+      - "M52: Crank VR-→CMC H2/pin30 | 07K: Crank +5V supply→CMC G1/pin25 [cabin re-terminate at swap]"  # 17  R1  Size 22D  22 AWG
+      - "M52: Crank shield drain→CMC E3/pin19 | 07K: Crank Sensor GND→CMC H1/pin29 [cabin re-terminate at swap]"  # 18  R1  Size 22D  22 AWG
       - "Cam Hall signal (CMC H4 = pin 32) [M52 + 07K — same pin, swap connector body only]"  # 19  R1  Size 22D  22 AWG
       - "SPARE — 07K cam reuses pin 19 (same bulkhead pin; only engine-side connector body changes)"  # 20  R1  do not populate
       - "SPARE — S3→S4 boundary buffer"         # 21  R1  do not populate without review
@@ -233,13 +233,16 @@ connectors:
         Source: Aero-Electric MIL-C-38999 Series I assembly instructions
           (aero-electric.com/product/MIL-C-38999_SERIES_I/assembly_instructions.html)
 
-      CRANK SHIELDED PAIR: Pins 16/17 must be shielded twisted pair. Shield drain (pin 18)
-        terminates at cabin side pin 18 → ECU CMC E3 (GND Shield, pin 19). Float at engine side.
-        Not CMC H1 (Sensor GND) — shield drain uses the dedicated shield ground pin.
-        Both M52 and 07K crank sensors use these same three pins — only the engine-side
-        connector body changes. Confirmed: 07K VW 60-2 VR sensor, same type as M52.
-        CMC: H3 (VR+, pin 31), H2 (VR-, pin 30), E3 (shield drain, pin 19).
-        Source: maxxecu-07k.wv trigger notes.
+      CRANK SENSOR PINS 16/17/18 — M52 vs 07K routing DIFFERS:
+        M52 (passive VR sensor): pin16=VR+→CMC H3(pin31), pin17=VR-→CMC H2(pin30),
+          pin18=shield drain→CMC E3(pin19, GND Shield). Shielded twisted pair.
+        07K (Hall effect sensor, OE# 07K906433B — confirmed Hall, Valeo PN 366675 datasheet):
+          pin16=Hall signal→CMC H3(pin31) [same ECU pin], pin17=+5V supply→CMC G1(pin25),
+          pin18=Sensor GND→CMC H1(pin29).
+        ⚠️ CABIN-SIDE RE-TERMINATE REQUIRED for 07K swap: move pin17 pigtail from CMC H2 → G1,
+          and pin18 pigtail from CMC E3 → H1. Pin16 cabin pigtail stays at CMC H3.
+        MTune trigger type MUST change: M52=VR sensor Zero-crossing; 07K=Digital (Hall, opto).
+        Source: maxxecu-07k.wv CRANK_HALL notes; Valeo 366675/Bremi 60319 datasheets.
 
       07K CAM SIGNAL (pin 19): Both M52 and 07K cam Hall sensors use pin 19 — only the
         engine-side connector body changes (VW oval 3-pin vs BMW 3-pin). 07K cam confirmed
@@ -286,9 +289,9 @@ connectors:
       - "INJ 6 → injector 6"                                 # 13  M52 only
       - "STUB — cavity plug (07K INJ 7)"                     # 14
       - "STUB — cavity plug (S2→S3 buffer)"                  # 15
-      - "Crank VR+ → M52 crank sensor pin 1"                 # 16
-      - "Crank VR- → M52 crank sensor pin 2"                 # 17
-      - "Crank shield → sensor shell (float)"                # 18
+      - "Crank VR+ → M52 crank sensor pin 1"                 # 16  (M52 only harness)
+      - "Crank VR- → M52 crank sensor pin 2"                 # 17  (M52 only harness; 07K: +5V supply)
+      - "Crank shield → sensor shell (float)"                # 18  (M52 only harness; 07K: Sensor GND)
       - "Cam Hall signal → BMW 12141726590 pin 2"            # 19
       - "STUB — cavity plug (07K cam not used — reuses pin 19)"  # 20
       - "STUB — cavity plug (S3→S4 buffer)"                  # 21
@@ -357,7 +360,10 @@ connectors:
       07K plug populates NEW pins vs M52: 14 (INJ 7), 22 (ETh Motor+ from C2 H4), 23 (ETh Motor-
         from C2 H2), 43–45 (knock 1/2/GND), 56 (DBW TPS2 / AIN 2 if fitted).
         Pin 34 = cavity-plug on BOTH M52 and 07K — 07K 5th cyl uses IGN 5 at pin 32.
-      07K pins UNCHANGED from M52: 16/17/18 (crank VR+/VR-/shield — different sensor body, same pins),
+      07K pins UNCHANGED from M52 (ECU pin destination, cabin-side): 16 (crank trigger signal→CMC H3).
+        07K requires cabin re-terminate: pin17 (VR-→G1 +5V) and pin18 (shield→H1 SensorGND).
+        ⚠️ Pins 17/18 cabin pigtails MUST be moved at 07K cabin harness build — see CRANK SENSOR note above.
+        Other pins unchanged from M52: 19 (cam Hall, different sensor body, same pin),
         19 (cam Hall — different sensor body, same pin), 35 (GPO3: VANOS→VVT solenoid),
         and all power/GND/injector/ignition pins.
       07K cavity-plugged (not needed): 20, 24, 41 (redundant stubs — see cabin side notes).
@@ -396,10 +402,11 @@ cables:
       - BK   # 15 Engine GND [‖2]
       - BU   # 16 IGN 5
       - BU   # 17 IGN 6
-      # === TRIGGER sub-loom (shielded STP — own sleeve, away from coil primaries) ===
-      - WH   # 18 Crank VR+
-      - BN   # 19 Crank VR-
-      - YE   # 20 Crank shield
+      # === TRIGGER sub-loom (shielded, own sleeve — M52 engine harness colors below) ===
+      # 07K engine harness uses different colors/routing: WH=signal, RD=+5V, BN=SensorGND (see W_CRANK)
+      - WH   # 18 Crank VR+ (M52) / Hall signal (07K)
+      - BN   # 19 Crank VR- (M52) / +5V supply re-terminate at cabin (07K)
+      - YE   # 20 Crank shield (M52) / Sensor GND re-terminate at cabin (07K)
       - WH   # 21 Cam Hall M52
       # === SENSORS sub-loom ===
       - WH   # 22 CLT
