@@ -1,9 +1,23 @@
 # firewall-bulkhead.wv
-# ⚠️  SUPERSEDED — see firewall-bulkhead-dual.wv for the active dual-bulkhead design.
-#     This file documents the single AS79 architecture (AS79 engine connector only, no Maven HD30).
-#     It is retained as a reference for single-connector builds but is NOT the build target for this project.
-#     Key gap: WBO2 signals (VS/VREF/IP/RCAL/Htr-) have no firewall crossing path in this design;
-#     in the active dual-bulkhead design they route through Maven HD30 A9–A13.
+# ⚠️  DEPRECATED — no longer the active build architecture.
+#
+# ACTIVE ARCHITECTURE (2026-08-26 onward):
+#   MaxxECU RACE H2O is mounted in the engine bay (OEM DME E-box cavity,
+#   intake side = passenger side of RHD car). All engine sensor / IGN / INJ /
+#   GPO signals stay engine-bay entirely. The AS79 79-way firewall bulkhead
+#   is no longer built. See:
+#     - harnesses/firewall-crossing-dt12.wv   (new active DT-12 crossing)
+#     - docs/vendor/maxxecu/MaxxECU_RACE_H2O.md   (H2O + engine-bay rationale)
+#
+# HISTORICAL CONTEXT (preserved below for archival reference only):
+#   This file documented the single-AS79 architecture (AS79 engine connector
+#   only, no Maven HD30) that assumed a cabin-mounted ECU. It was already
+#   marked superseded by firewall-bulkhead-dual.wv before the H2O decision;
+#   both files are now superseded by firewall-crossing-dt12.wv.
+#
+#   The AS79 pinout tables below are still useful as a reference for anyone
+#   comparing signal maps between the abandoned AS79 design and the new
+#   DT-12 crossing, but do NOT build to this file.
 #
 # E36 Firewall Bulkhead — Hybrid design: Deutsch Autosport AS79 (engine) + Maven HD30 35-pin (accessories)
 #

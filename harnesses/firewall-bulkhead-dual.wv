@@ -1,8 +1,25 @@
 # firewall-bulkhead-dual.wv
-# E36 Firewall Bulkhead — EXPERIMENTAL: Dual Maven HD30 (47-pin + 35-pin)
-# NOTE: In the chosen HYBRID design the 47-pin Connector B is replaced by the Deutsch Autosport AS79.
-#       See firewall-bulkhead.wv for the final hybrid AS79 engine connector.
-#       This file is retained for the 35-pin Connector A (accessories/stays) design reference.
+# ⚠️  DEPRECATED — no longer the active build architecture.
+#
+# ACTIVE ARCHITECTURE (2026-08-26 onward):
+#   MaxxECU RACE H2O in the engine bay (OEM DME E-box cavity, intake side =
+#   passenger side of RHD car). All engine sensor / IGN / INJ / GPO signals
+#   stay engine-bay entirely. Neither the AS79 79-way NOR the Maven HD30
+#   35-pin is built. See:
+#     - harnesses/firewall-crossing-dt12.wv   (new active DT-12 crossing)
+#     - docs/vendor/maxxecu/MaxxECU_RACE_H2O.md   (H2O + engine-bay rationale)
+#
+# HISTORICAL CONTEXT (preserved below for archival reference only):
+#   Original file title: "E36 Firewall Bulkhead — EXPERIMENTAL: Dual Maven
+#   HD30 (47-pin + 35-pin)". Later became the design for the "chosen hybrid"
+#   with the 47-pin Connector B replaced by an AS79 (see the deprecated
+#   firewall-bulkhead.wv). The Connector A (35-pin Maven HD30) architecture
+#   for accessories/stays is superseded because the H2O engine-bay mount
+#   places WBO2, 8HP, boost solenoid, EWP, and AC controls all on the same
+#   engine-bay side as the ECU — no bulkhead needed for those signals.
+#
+#   Tables below remain useful as a reference for the pin plan that WOULD
+#   have been used, but do NOT build to this file.
 #
 # Sources:
 #   MaxxECU GEN1 pinout:     maxxecu.com/webhelp/wirings-maxxecu_pinout.html
