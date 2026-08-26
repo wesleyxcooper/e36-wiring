@@ -520,6 +520,36 @@ DENYLIST: list[DenyRule] = [
         source="https://xtramotorsport.com/product/bosch-motorsport-combined-10-bar-pressure-temp-sensor-for-oil-and-fuel/",
         exclude=r"(?i)(NOT\s+4|5.pin|5\s+pin|was.*4.pin|4.pin.*was|NOT\s+a\s+4)",
     ),
+
+    # ── WBO2 LSU 4.9 ≠ M52 harness / Phase 1 ────────────────────────────────
+    # Audit round 5 (2026-08): Phase 1 pre-terminated MaxxECU M50 harness uses
+    # LSU 4.2 (verified live: maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html).
+    # Phase 3 (07K) custom harness uses LSU 4.9 — a new purchase with a different pinout.
+    # The two sensors and connectors are NOT interchangeable.
+    DenyRule(
+        pattern=r"(?i)(LSU\s*4\.9|4\.9\s*connector).{0,60}(same\s+as\s+M52|M52\s+harness|from\s+M52|carry.over)",
+        message="LSU 4.9 (Phase 3 / 07K) is NOT the same as the M52 harness WBO2 connector. "
+                "Phase 1 (M52) pre-terminated harness uses LSU 4.2 (verified live 2026-08-26: "
+                "maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html). "
+                "Phase 3 (07K) uses LSU 4.9 — different pinout, separate new purchase, new bung required. "
+                "Do NOT reuse the Phase 1 connector or sensor for Phase 3.",
+        source="https://www.maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html",
+        exclude=r"(?i)(NOT\s+the\s+same|different\s+from|new\s+purchase|4\.2\s+not\s+4\.9|≠)",
+    ),
+
+    # ── Phase 1 pre-terminated harness — do NOT use the old 'does not use' note ──
+    # Audit round 5 (2026-08): Phase 1 DOES use the pre-terminated harness.
+    # The old note in MaxxECU_M50_Terminated_Harness.md has been corrected.
+    # Catch any reversion to the old text.
+    DenyRule(
+        pattern=r"(?i)(build\s+does\s+NOT\s+use\s+the\s+pre.terminated|does\s+not\s+use\s+the\s+pre.terminated\s+harness)",
+        message="Phase 1 DOES use the MaxxECU M50 pre-terminated engine harness. "
+                "The old note 'This build does NOT use the pre-terminated harness' was incorrect and has been removed. "
+                "Source: docs/vendor/maxxecu/MaxxECU_M50_Terminated_Harness.md (corrected 2026-08-26); "
+                "E36_CSVs/E36_Phase1_Combined.csv Phase 1B ECU Wiring row.",
+        source="docs/vendor/maxxecu/MaxxECU_M50_Terminated_Harness.md",
+        exclude=r"(?i)(Phase\s+1\s+DOES\s+use|old\s+note|has\s+been\s+removed|corrected|was\s+incorrect)",
+    ),
 ]
 
 # ---------------------------------------------------------------------------

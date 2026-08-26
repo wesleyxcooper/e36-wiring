@@ -1,10 +1,24 @@
 # MaxxECU M50 Terminated Engine Harness
 
 Archived from: https://www.maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html  
-Product page: http://www.maxxecu.com/products/terminated_engine_harness/bmw_m50
+Product page: https://maxxecu.us/product/terminated-engine-harness-bmw-m50/ (US) · https://www.maxxecu.com/products/terminated_engine_harness/bmw_m50 (EU)  
+Content verified live: 2026-08-26
 
-> **Note:** This build does NOT use the pre-terminated harness. This page is kept as reference for
-> signal assignments, connector types, and the VANOS CAM sensor wiring requirement.
+> **Phase 1 (M52) uses this pre-terminated harness.** No custom M52 engine harness build is needed.
+> The harness runs CMC connector → firewall bushing (850 mm) → engine sensors. It passes through
+> the existing E36 firewall grommet — no AS79 bulkhead connector for Phase 1.
+>
+> **What still requires separate work:**
+> - **VANOS cam sensor** — harness is wired for non-VANOS head. Either swap cam sensor to BMW PN
+>   `12141726590`, or cut the CAM connector and rewire with a VANOS-compatible body + add switched +12V.
+>   See VANOS section below. Source: live page above.
+> - **WBO2** — harness terminates in LSU **4.2** connector (not 4.9). Buy Bosch LSU 4.2 sensor.
+>   Phase 3 (07K) switches to LSU 4.9 on a new custom harness.
+> - **12-pin and 16-pin extra connectors** — must be wired to PDM/cabin for power, GPOs, AIns (PST-F1,
+>   MAP, flex fuel), CAN. See connector tables below.
+> - **C2 (32-pin Molex)** — NOT on this harness. Not needed for Phase 1 (no DBW, no e-pedal,
+>   no knock sensors). Required for Phase 3 (07K) only.
+> - **`maxxecu-m52.wv`** — reference document for ECU pin assignments of this harness. Not a build doc.
 
 Compatible with: MaxxECU STREET / V1 / RACE / PRO
 

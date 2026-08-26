@@ -1,13 +1,28 @@
 # maxxecu-m52.wv
-# MaxxECU Race ↔ BMW M52 Engine Harness (Phase 1)
+# MaxxECU Race ↔ BMW M52 Engine Harness (Phase 1) — SIGNAL REFERENCE ONLY
+#
+# !! THIS IS NOT A BUILD DOCUMENT !!
+# Phase 1 uses the MaxxECU M50 pre-terminated engine harness.
+# Do NOT build a custom M52 harness. Do NOT order connectors/terminals from this file.
+# Source harness: https://maxxecu.us/product/terminated-engine-harness-bmw-m50/ (US)
+#                 https://www.maxxecu.com/products/terminated_engine_harness/bmw_m50 (EU)
+# See: docs/vendor/maxxecu/MaxxECU_M50_Terminated_Harness.md for full coverage, gaps, and
+#      Phase 1 install notes (VANOS cam, WBO2 LSU 4.2, extra connectors, firewall routing).
+#
+# This file documents the ECU pin assignments from the purchased harness (REV 2).
+# Use it as a reference when configuring MTune or troubleshooting signals.
+# The connector/cable blocks below reflect harness signal routing — not parts to order.
 #
 # Source: https://www.maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html
+# (Content verified live 2026-08-26 — matches archived doc in docs/vendor/maxxecu/)
 # Harness revision: REV 2
 # Note: Harness is built for non-VANOS M50 head.
 #       M52 VANOS cam sensor requires sensor swap to BMW 12141726590.
+#       Phase 1 firewall routing: harness passes through existing E36 firewall grommet/bushing.
+#       No AS79 bulkhead connector is used in Phase 1. AS79 is Phase 3 (07K) only.
 #
 # ─────────────────────────────────────────────────────────────────────────────
-# CRIMP TOOLS — which tool for which contact in this harness:
+# CRIMP TOOLS — for reference only (Phase 3 / 07K harness build, not Phase 1):
 #
 #   AS79 size-22 contacts           → Daniels AFM8 (M22520/2-01) + K42 positioner (pin) / K40 (socket)
 #   VAG/Bosch JMT/JPT pigtail contacts → Engineer PA-09
@@ -63,10 +78,10 @@
 #       in Phase 1). Phase 3 (07K): GPO 1 drives the boost solenoid.
 #       +12V for solenoid/relay comes from coil/inj rail (ECU_12PIN[1]).
 #
-# DONE: Firewall bulkhead connector — 79-way decided (Deutsch AS79 / Souriau 8STA).
-#       ~59 pins used/reserved; ~20 true spares for expansion.
-#       Cabin side permanent: MaxxECU, relay board, fuse block, 8HP powerhold relay.
-#       M52 engine harness terminates at engine-side mating plug (plug-and-play swap to 07K).
+# NOTE: Firewall bulkhead (AS79) — Phase 3 only, NOT used in Phase 1.
+#       Phase 1: pre-terminated harness passes through existing E36 firewall grommet/bushing.
+#       Phase 3: Deutsch AS79 / Souriau 8STA 79-way bulkhead installed; 07K engine-side plug
+#       terminates the custom harness (plug-and-play swap). ~59 pins used/reserved; ~20 spares.
 #       Full pin assignment: harnesses/firewall-bulkhead.wv
 #       Source: RaceSpec Online (racespeconline.com) — AS79 ~$120-180.
 #
