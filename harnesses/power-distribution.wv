@@ -4,9 +4,23 @@ metadata:
     Ecumaster PMU16 power management unit replaces relay board, fuse block,
     and DC SSR from earlier design. PMU16 provides 16 programmable MOSFET
     high-side outputs with per-channel digital fusing, current monitoring,
-    PWM capability, and CAN control from MaxxECU RACE.
+    PWM capability, and CAN control from MaxxECU RACE H2O.
+
+    MOUNT LOCATION: Engine bay, intake side (RHD passenger side), alongside
+    the MaxxECU RACE H2O in the OEM DME E-box cavity area. IP60 aluminium
+    enclosure (per PMU_Manual.pdf p.1) — shelter under the OEM E-box plastic
+    cover for splash protection. Operating temp AECQ100 Grade 1 (-40 to +125 C)
+    per Ecumaster manual, so engine-bay ambient is within spec.
+    Source: docs/vendor/ecumaster/PMU16_Manual_v101.pdf; details in
+            docs/vendor/maxxecu/MaxxECU_RACE_H2O.md §8.
+
+    IMPLICATION: With both PMU16 and MaxxECU H2O engine-bay-mounted, ECU +12V
+    (PMU16 O1) and 8HP TCU power (KL30/KL15) are engine-bay-to-engine-bay
+    runs. No firewall crossing for ECU or 8HP power lines.
+
     Phase 1 (M52 engine). All wire lengths are stubs -- confirm before building.
-    Cross-reference harnesses/maxxecu-m52.wv for ECU CAN pin assignments.
+    Cross-reference harnesses/maxxecu-m52.wv for ECU CAN pin assignments and
+    harnesses/8hp-can.wv for 8HP TCU KL30/KL15 destinations.
 
 # ── TODO list ──────────────────────────────────────────────────────────────────
 #
