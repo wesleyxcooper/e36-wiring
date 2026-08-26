@@ -1,0 +1,232 @@
+# firewall-crossing-dt12.wv
+# E36 Firewall Crossing — Deutsch DT-12 (cabin ↔ engine-bay ECU)
+#
+# ACTIVE ARCHITECTURE — see e36-wiring/docs/vendor/maxxecu/MaxxECU_RACE_H2O.md
+# for the design rationale.
+#
+# Context: With MaxxECU RACE H2O mounted in the engine bay (OEM DME E-box cavity,
+# intake side = passenger side of RHD car), the vast majority of ECU signals stay
+# entirely on the engine-bay side of the firewall. Only cabin-originated signals
+# and cabin-destined signals cross the firewall. This file defines that small,
+# dedicated crossing using a Deutsch DT-12 connector pair alongside the OEM E36
+# X20 25-pin body connector (which remains 100% OEM — see harnesses/body-x20.wv).
+#
+# The AS79 79-way and Maven HD30 35-pin from the previous (superseded)
+# architecture are no longer required — see firewall-bulkhead.wv and
+# firewall-bulkhead-dual.wv header comments for the migration note.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# SOURCES
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# ECU (MaxxECU RACE H2O):
+#   Product page:    https://maxxecu.com/products/race/
+#   Bare unit SKU:   https://maxxecu.com/store/engine-control-or-electronics/maxxecu-units/maxxecu-race-h2o-unit-with-no-accessories-in-box
+#   C1 pinout:       https://maxxecu.com/webhelp/wirings-maxxecu_pinout.html
+#   Full vendor doc: docs/vendor/maxxecu/MaxxECU_RACE_H2O.md
+#
+# CAN topology:
+#   ISO 11898-2:2016 (High-speed CAN transceiver, twisted-pair, 120Ω differential)
+#   Texas Instruments SLLA279 "Introduction to the CAN Physical Layer"
+#
+# APS e-pedal (BMW E46 accelerator pedal module — Phase 3):
+#   docs/dbw-pinouts.md (repo-internal, this build)
+#   Bosch DME driver documentation for BMW E46 APS module
+#
+# Deutsch DT connector series (TE Connectivity):
+#   DT product page: https://www.te.com/usa-en/products/connectors/pcb-connectors/circular-connectors.html
+#   DT catalog PDF:  te.com "Deutsch DT Series" — size-16 solid contacts, 13A per
+#                    contact rated continuous, IP67 mated
+#   Sealed USB cable (MaxxECU #1606): https://maxxecu.com/store/engine-control-or-electronics/maxxecu_usb_cables/maxxecu-pro-usb-cable-15m
+#
+# Tooling (already owned per this build):
+#   Deutsch HDT-48-00 crimper — covers all DT-family solid contacts
+#     (per docs/harness-build.md § Tools; firewall-bulkhead-dual.wv line 19-20)
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# ARCHITECTURE
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Firewall physical layout (RHD E36, this build):
+#   1. Rubber grommet in the firewall carries the cabin harness through
+#   2. DT-12 connector pair mates just inside the engine bay, at the firewall face
+#      - Cabin harness side: receptacle (matches repo convention — DT06-nS)
+#      - Engine harness side: plug (DT04-nP)
+#   3. SEPARATE weatherproof grommet nearby carries the MaxxECU sealed USB
+#      cable (#1606) — the sealed molded ECU-side connector will not pass
+#      through a DT cavity
+#
+# Signals crossing (see per-pin detail in DT12_CABIN pinlabels below):
+#   - CAN H/L (twisted pair, shielded)   → Gauge.S cluster, DCT shifter
+#   - APS ch1 (SGND1, +5V1, signal1)     → MaxxECU C1 APS1 AIN
+#   - APS ch2 (SGND2, +5V2, signal2)     → MaxxECU C1 APS2 AIN
+#   - Shield drain (single, ECU-side terminated only)
+#   - 3× spare cavities for future expansion
+#
+# Signals NOT crossing (change from previous architecture):
+#   - IGN, INJ, sensor, GPO actuator: all stay engine-bay (ECU is engine-bay)
+#   - Cluster feedback (RPM/CLT/oil): via CAN to Gauge.S — no discrete crossing
+#   - ECU +12V and GND: engine-bay PMU16 feeds engine-bay ECU directly
+#   - Ignition switched +12V: already crosses via OEM X20 pin 21 — tap in
+#     engine bay to wake up PMU16 and/or ECU IGN pin (no new crossing)
+#   - EPS: no ECU involvement (EPowerSteering KIT-33 is controller-managed,
+#     see walkthroughs/13-eps.md)
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# CONNECTOR SPEC
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Deutsch DT-12 (12-position):
+#   Cabin side (permanent, engine-bay face): DT06-12SA receptacle
+#     - Sockets on the cabin-harness end (safer if disconnected while cabin
+#       ignition is on — no exposed pins carrying voltage)
+#   Engine side (mates from ECU harness): DT04-12PA plug
+#   Contacts: size-16 solid barrel, 13A per contact rated continuous
+#     - Pin (0460-202-16141), Socket (0462-201-16141) — TE Connectivity catalog
+#     - Wire range: 14-20 AWG (fits all signals in this crossing)
+#   Wedgelock: W12S (matches DT06-12SA) and W12P (matches DT04-12PA)
+#   IP rating: IP67 mated (per TE Deutsch DT technical brochure)
+#   Crimper: Deutsch HDT-48-00 — ALREADY OWNED per this build's tool list
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+connectors:
+
+  # ── DT-12 firewall crossing — cabin harness side ────────────────────────────
+  # This is the FLANGE / RECEPTACLE side. Sockets. Permanent to the cabin
+  # harness that routes to the E46 APS pedal + cabin CAN devices (DCT shifter,
+  # Gauge.S cluster).
+
+  DT12_CABIN:
+    type: "Deutsch DT-12 receptacle (DT06-12SA)"
+    subtype: "Cabin side — permanent on cabin harness. Sockets, size-16 contacts."
+    pincount: 12
+    pinlabels:
+      - "CAN H (to Gauge.S + DCT shifter)"         # 1  22 AWG twisted pair with pin 2, shielded
+      - "CAN L (to Gauge.S + DCT shifter)"         # 2  22 AWG twisted pair with pin 1, shielded
+      - "CAN + APS shield drain"                    # 3  22 AWG — terminate at ECU end only
+      - "APS SGND 1 (E46 APS pedal pin 1)"         # 4  22 AWG twisted with pin 5
+      - "APS +5V 1 / VCC1 (E46 APS pedal pin 5)"   # 5  22 AWG twisted with pin 4
+      - "APS1 signal (E46 APS pedal pin 4)"        # 6  22 AWG
+      - "APS SGND 2 (E46 APS pedal pin 2)"         # 7  22 AWG twisted with pin 8
+      - "APS +5V 2 / VCC2 (E46 APS pedal pin 3)"   # 8  22 AWG twisted with pin 7
+      - "APS2 signal (E46 APS pedal pin 6)"        # 9  22 AWG
+      - "SPARE"                                     # 10 cavity-plug at build; future expansion
+      - "SPARE"                                     # 11 cavity-plug at build; future expansion
+      - "SPARE"                                     # 12 cavity-plug at build; future expansion
+    notes: >-
+      DT-12 is the ONLY dedicated firewall crossing for MaxxECU RACE H2O signals in this
+      build. The MaxxECU sits in the engine bay (OEM E-box cavity, intake side = passenger
+      side of RHD car — see docs/vendor/maxxecu/MaxxECU_RACE_H2O.md). All engine sensor,
+      IGN, INJ, and GPO actuator signals stay engine-bay entirely — no AS79 bulkhead, no
+      Maven HD30 crossing.
+
+      The OEM E36 X20 25-pin firewall connector (harnesses/body-x20.wv) is UNCHANGED and
+      carries only OEM body signals (A/C control, reverse light, ignition switch, alternator+).
+      No new ECU signals traverse X20.
+
+      CAN topology (pins 1/2/3): twisted pair with shield drain per ISO 11898-2:2016 (High-
+      speed CAN transceiver, twisted-pair, 120Ω differential). Shield drain terminates at
+      the ECU end only (single-end drain) to prevent ground loops. 120Ω termination lives
+      at MaxxECU (internal) and at the far end of the cabin CAN bus (Gauge.S or DCT shifter,
+      whichever is physically last).
+
+      APS topology (pins 4-9): two independent redundant channels per Bosch DBW safety
+      convention. Each channel has its own SGND and +5V — do NOT bridge SGND1↔SGND2 or
+      +5V1↔+5V2 anywhere. Twisted pairs (SGND with its own +5V) minimize common-mode
+      noise. Signal wires (pins 6, 9) are single-ended 0.5-4.5V ratiometric.
+
+      Sealed USB cable (MaxxECU #1606) routes through a SEPARATE weatherproof grommet
+      alongside the DT-12 — the sealed molded ECU-side connector will not pass through a
+      DT cavity. See docs/vendor/maxxecu/MaxxECU_RACE_H2O.md §5.
+
+  # ── DT-12 firewall crossing — engine bay harness side ───────────────────────
+  # This is the PLUG side. Pins. Terminates on the engine-bay ECU harness that
+  # routes to the MaxxECU C1 (48-pin Molex) at the ECU.
+
+  DT12_ENGINE:
+    type: "Deutsch DT-12 plug (DT04-12PA)"
+    subtype: "Engine bay side — mates DT12_CABIN. Pins, size-16 contacts."
+    pincount: 12
+    pinlabels:
+      - "CAN H → MaxxECU C1 E1 (CMC CAN H)"        # 1
+      - "CAN L → MaxxECU C1 E2 (CMC CAN L)"        # 2
+      - "Shield drain → MaxxECU C1 H1 (SGND) or backshell"  # 3
+      - "APS SGND 1 → MaxxECU C1 SGND (H1)"        # 4
+      - "APS +5V 1 → MaxxECU C1 G1 (+5V sensor)"   # 5
+      - "APS1 signal → MaxxECU C2 APS1 AIN"        # 6  MaxxECU C2 APS1 pin
+      - "APS SGND 2 → MaxxECU C1 SGND (H1)"        # 7
+      - "APS +5V 2 → MaxxECU C1 G1 (+5V sensor)"   # 8
+      - "APS2 signal → MaxxECU C2 APS2 AIN"        # 9  MaxxECU C2 APS2 pin
+      - "SPARE"                                     # 10
+      - "SPARE"                                     # 11
+      - "SPARE"                                     # 12
+    notes: >-
+      Mates DT12_CABIN at the firewall face on the engine-bay side of the firewall
+      grommet. Pin-side of the connector pair, so the removable engine harness holds the
+      pins. When unmated (harness pulled for engine service), pins are exposed on the
+      engine harness — no cabin-side voltages are present on pins in that state, which is
+      the safer configuration for this signal-level crossing.
+
+      Destination pin numbers refer to MaxxECU RACE C1 (48-pin) and C2 (32-pin) — see
+      docs/vendor/maxxecu/MaxxECU_GEN1_Pinout.md and docs/vendor/maxxecu/MaxxECU_RACE_REV9plus_Wiring.pdf.
+
+      ⚠️ Verify MaxxECU APS1/APS2 physical pin numbers on C2 against the RACE REV9+
+      wiring diagram at build time. C2 pin assignments are captured for the 07K phase in
+      harnesses/maxxecu-07k.wv (search: APS).
+
+
+cables:
+
+  W_DT12_CROSSING:
+    # Cable bundle that traverses the firewall grommet and terminates in DT12_CABIN
+    # at the engine-bay face of the firewall. The other end of each wire routes to its
+    # cabin destination (APS pedal module, CAN bus tap points, or the shield drain
+    # single-end-drain termination).
+    #
+    # Colors follow this build's convention (see docs/harness-build.md § Wire Color
+    # Convention). GN (green) is intentionally NOT used for signal wires here to keep
+    # GN reserved for GPO/actuator drives elsewhere in the build.
+    wirecount: 9
+    colors:
+      - WH   # 1  CAN H
+      - BU   # 2  CAN L
+      - YE   # 3  Shield drain
+      - BN   # 4  APS SGND 1
+      - RD   # 5  APS +5V 1
+      - WH   # 6  APS1 signal
+      - BN   # 7  APS SGND 2
+      - RD   # 8  APS +5V 2
+      - WH   # 9  APS2 signal
+    wirelabels:
+      - "CAN H (22 AWG TP-shld)"
+      - "CAN L (22 AWG TP-shld)"
+      - "Shield drain (22 AWG)"
+      - "APS SGND 1 (22 AWG)"
+      - "APS +5V 1 (22 AWG)"
+      - "APS1 sig (22 AWG)"
+      - "APS SGND 2 (22 AWG)"
+      - "APS +5V 2 (22 AWG)"
+      - "APS2 sig (22 AWG)"
+    length: 0.5 m
+    notes: >-
+      Length is a placeholder — measure from the cabin-side APS pedal + CAN devices
+      through the firewall grommet to the DT12_CABIN mating face on the engine-bay side.
+
+      SHIELD: CAN pair (wires 1/2) and APS pairs (4/5 and 7/8) should share a common
+      overall foil shield for the entire cable run. Shield drain (wire 3) terminates
+      only at the ECU end (in the engine bay). At the cabin end the shield floats.
+
+      TWISTING: within the shielded bundle, twist CAN H/L as one pair, APS SGND1+VCC1
+      as a second pair, APS SGND2+VCC2 as a third pair. This preserves the differential
+      /reference topology for each function.
+
+
+connections:
+
+  # DT-12 crossing: the connector pair itself. Cable W_DT12_CROSSING wires 1-9
+  # connect DT12_CABIN pins 1-9 to DT12_ENGINE pins 1-9. Pins 10/11/12 on both
+  # sides are cavity-plugged spares.
+  - - DT12_CABIN:  [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    - W_DT12_CROSSING: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    - DT12_ENGINE: [1, 2, 3, 4, 5, 6, 7, 8, 9]
