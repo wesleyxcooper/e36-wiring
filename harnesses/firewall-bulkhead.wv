@@ -134,7 +134,7 @@ connectors:
       - "Engine GND [‖2/3]"                    # 31  R2  Size 22D  Option A: spare
       - "IGN 5 (CMC C2)"                        # 32  R2  Size 22D  22 AWG
       - "IGN 6 (CMC C3) [M52; cavity-plug 07K]" # 33  R2  Size 22D  22 AWG
-      - "EXP: IGN 7 (07K 5th cyl, CMC D2)"     # 34  R2  Size 22D  22 AWG  cavity-plug on M52
+      - "STUB — cavity-plug both M52 and 07K (07K 5th cyl = IGN 5 at pin 32, not here)" # 34  R2  Size 22D  22 AWG
       # ══ SECTOR 2 R2 — INJ overflow + GPO actuators ══════════════════════
       # R2 ring 2, pins 35–40
       - "GPO 3 → VANOS (CMC D4 = pin 16) [M52] / VVT actuator [07K]"  # 35  R2  Size 22D  22 AWG  (solenoid pigtail stub engine-side can be heavier after splice)
@@ -238,7 +238,7 @@ connectors:
         Not CMC H1 (Sensor GND) — shield drain uses the dedicated shield ground pin.
         Both M52 and 07K crank sensors use these same three pins — only the engine-side
         connector body changes. Confirmed: 07K VW 60-2 VR sensor, same type as M52.
-        CMC: H3 (VR+, pin 31), H2 (VR-, pin 30), H1 ref (shield drain, pin 29).
+        CMC: H3 (VR+, pin 31), H2 (VR-, pin 30), E3 (shield drain, pin 19).
         Source: maxxecu-07k.wv trigger notes.
 
       07K CAM SIGNAL (pin 19): Both M52 and 07K cam Hall sensors use pin 19 — only the
@@ -257,7 +257,7 @@ connectors:
         TPS1 → CMC G2 (pin 26). TPS2 → CMC J2 (AIN 2, pin 34). +5V from pin 47, GND from pin 79.
 
       KNOCK SIGNALS (pins 43/44): 07K knock sensors should use shielded wire.
-        Shield terminates at Sensor GND (CMC H1, pin 79).
+        Shield terminates at CMC H1 (Sensor GND, CMC pin 29) via AS79 pin 45.
 
       BUFFER PINS (15, 21, 28, 40, 42, 46): Intentionally empty. These sit at sector
         boundaries to maximize angular separation between noise zones. Do not populate
@@ -457,8 +457,7 @@ cables:
       PST-F1 and flex fuel signal wires (pins 50, 51, 64) routed separately — add to cable
       or route as individual labeled wires depending on loom layout.
       Crank VR+/VR-/shield (pins 16–18) must be shielded twisted pair.
-      Shield (pin 18) connects at cabin side to Sensor GND (CMC H1) via pin 79.
-      Float at engine side.
+      Shield (pin 18) terminates at cabin side → CMC E3 (GND Shield, pin 19). Float at engine side.
       WBO2 Heater+ (LSU 4.9 pin 4 / H+) splices locally to +12V coil/inj rail (from pins 1+2+29+30)
       on the engine side — no separate bulkhead pin needed.
 

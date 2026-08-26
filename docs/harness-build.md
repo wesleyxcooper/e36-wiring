@@ -18,7 +18,7 @@ Reference for connector pinning, depinning, and harness assembly across all e36-
 | IAT sensor connector | 1J0973702 (2-pin NTC JPT) | 2 | Engineer PA-09 |
 | Knock sensor connector | 1J0973712 (2-pin flat) | 2 | Engineer PA-09 |
 | EV14 injector connectors ×5 | USCAR EV14 | 2 each | Engineer PA-09 |
-| M52 coil connectors ×6 | ⚠️ TODO — BMW 2-pin pencil coil connector PN to verify at build; common source: BMW e36 coil pigtail from ECS/FCP or aftermarket | 2 each | Engineer PA-09 |
+| M52 coil connectors ×6 | Pre-wired in MaxxECU M50 terminated harness — **not applicable to custom 07K harness build** | 2 each | n/a (pre-made) |
 | 07K COP connectors ×5 | 4B0973724 (4-pin COP) | 4 each | Engineer PA-09 |
 | EWP controller | Kostal 2+2 (4-pin) | 4 | Engineer PA-09 |
 | PST-F1 sensor | BSP M10×1.0 pigtail | 2 | Engineer PA-09 |
@@ -176,7 +176,14 @@ For slow NTC sensors (CLT, IAT) this error is negligible. For the knock sensors,
 Each sensor cable has its own BN wire (e.g., `W_CLT`, `W_IAT`, `W_TPS`, `W_CAM` all have a discrete BN "Sensor GND" wire). In the `connections:` blocks, all of them individually target `ECU_CMC: [29]` (H1 — Sensor GND) or `ECU_16PIN: [2]` (aux Sensor GND). This models star topology: each return path is independent from sensor to ECU. No trunk-level splice node is modeled.
 
 **Physical implementation note:**
-The MaxxECU CMC connector has one physical Sensor GND pin (H1 = pin 29). All the individual BN wires from CLT, IAT, TPS, CAM, crank shield, and knock shields need to join somewhere before that pin. The correct approach:
+The MaxxECU CMC connector has one physical Sensor GND pin (H1 = pin 29) and one dedicated GND Shield pin (E3 = pin 19). These are two separate ground buses — do not commingle them.
+
+- **BN sensor GND wires** (CLT, IAT, TPS, MAP, CAM signal return, knock shield drain via pin 45) → all terminate at CMC H1 (pin 29)
+- **YE shield drain wires** (crank, cam, WBO2 shields) → all terminate at CMC E3 (pin 19) — the dedicated shield ground, isolated from the sensor GND bus
+
+Mixing crank/cam shield drains into the H1 sensor GND bus injects switching noise from other sensor return currents into the VR trigger signal path, which can cause crank dropout at high RPM.
+
+**Physical implementation note for the H1 group:** The MaxxECU CMC has one physical H1 pin (29). All the individual BN sensor GND wires need to join somewhere before that pin. The correct approach:
 
 - Run individual BN wires separately through the trunk bundle (they are separate conductors, just co-routed)
 - Join them at a short Raychem or solder-and-shrink splice **within 150 mm of the ECU connector** (AS79 bulkhead cavity or ECU connector area)
@@ -238,10 +245,12 @@ Follow this order on every connector. Do not deviate for speed.
 2. Depress the locking lance while pulling the wire from the rear
 3. The terminal slides out the back of the connector — do not pull from the front
 
-**Deutsch AS size 20 (Deutsch 0411-240-2005):**
+**Deutsch AS size 22 — use the insertion/extraction tool included with the AS79 connector** (or M81969/14-01 equivalent):
 1. Insert extraction tool into the front face of the bulkhead
 2. Tool depresses the collet; pull wire from rear while holding tool engaged
 3. Contact exits from the rear
+
+> ⚠️ The Deutsch `0411-240-2005` is a DT/DTM series tool for size-16/20 contacts — it does **not** fit AS79 size-22 solid barrel contacts. Use only the tool that ships with the AS79 connector body.
 
 **Molex C1/C2 (PN 638132400 / 638132300):**
 1. Use the designated removal tool from the front face
@@ -346,11 +355,11 @@ At defined breakout points, groups of wires exit the main trunk and run as a sho
 | Knock | KS1, KS2, Knock GND — shielded, 07K only | 1/4" (6mm) | Below intake manifold |
 | WBO2 | Wideband signal, shielded own run | 1/4" (6mm) | WBO2 controller to ECU; away from coil primaries |
 
-### Tier 3 — Pigtails
+### Tier 3 — Sensor connectors (direct termination)
 
-At the end of each sub-loom, individual wires branch and join to pre-bought pigtails via a splice. The pigtail bridges from the harness splice point to the component connector (e.g., EV14 injector connector, 3B0973703G sensor connector).
+At the end of each sub-loom, individual wires branch to the component connector. This build uses **direct termination**: the harness wire runs end-to-end from the AS79 contact to the sensor connector terminal. There is no intermediate pigtail wire and no splice joint at the sensor end.
 
-Pigtails are **pre-bought items with the correct mating connector already on the component end.** You never make the component-side connector with raw terminals. See connector table at the top of this document for part numbers.
+**What to buy and how:** Purchase connector housings + individual terminals for each sensor connector family (EV14 injector, 4B0973724 COP coil, 3B0973703G 3-pin sensor, 1J0973702 2-pin NTC, 1J0973712 knock). Crimp a terminal directly onto the harness wire using the Engineer PA-09, then insert the terminal into the connector housing until the locking lance clicks. See the connector table at the top of this document for part numbers and the `26-07k-harness.md` Parts section for OE part numbers and sources.
 
 ### Wires per component — injectors and coils are not 1 wire each
 
@@ -484,7 +493,7 @@ A service loop is a small coil of extra wire (1–2 turns, ~30–50mm diameter) 
 **Exact sequence — critical order:**
 
 1. **Slide the heat-shrink boot onto the wire before any terminal work** — the boot cannot pass over a terminated connector body after the fact. Do this at the same time as PermaSleeve label sleeves.
-2. Crimp contacts onto the pigtail wires
+2. Crimp contacts onto the harness wire ends
 3. Insert contacts into connector body — verify seating click on each
 4. Coil 1–2 turns per wire around a Sharpie body or finger — wire holds shape on its own
 5. **For multi-wire connectors (Maven 35-pin, MaxxECU C1/C2): wrap the entire coiled bundle in a single piece of 3:1 adhesive-lined heat-shrink and shrink it** — locks all loops in their organized shape and gives the boot a clean round profile to seat against. Skip for single/dual-wire sensor connectors (crank, cam).
@@ -496,7 +505,7 @@ The finished result looks identical to a boot with no loop. The loop is visible 
 
 ### Splice types — no iron soldering
 
-The joint between a harness wire and a pigtail bare end is the only permanent connection in the system. Two acceptable methods:
+Splices are only needed for sensors that ship with an integral moulded pigtail (wire bonded to sensor body — e.g., a donor WBO2 sensor). All other sensor connectors use direct termination (no splice). Where a splice is unavoidable, two acceptable methods:
 
 | Method | How | When to use |
 |--------|-----|-------------|
@@ -678,13 +687,13 @@ Print all Type A and B labels before touching any wire. Print Type C and D label
 
 3. **Route the engine-side loom** — Lay the harness along the engine with the AS79 mating plug at the firewall position and the wire ends at their intended destinations. Confirm lengths reach components with sufficient slack. Trim or add at this stage — not after sleeving.
 
-4. **Splice pigtails** — At each branch point: cut the main harness wire to length, apply a PermaSleeve label to the wire end (signal name), apply a PermaSleeve label to the pigtail near its connector body (signal + cylinder), then join wire to pigtail with a Raychem SRGB solder sleeve or butt crimp. The pigtail connector body snaps onto the component.
+4. **Terminate sensor connectors** — At each branch point: cut the main harness wire to length, apply a PermaSleeve label to the wire end (signal name + cylinder), crimp a terminal directly onto the wire end using the Engineer PA-09, and insert the terminal into the sensor connector housing until the locking lance clicks. Connector body plugs onto the component. Exception: sensors with an integral moulded pigtail (e.g., donor WBO2) require one Raychem SRGB splice to join the sensor pigtail to the harness wire — see Splice types section.
 
 5. **Continuity test** — With the harness fully wired but completely un-sleeved, verify every signal end-to-end with a DMM against the `.wv` file. Verify no shorts between adjacent pins. **Do not sleeve until this step passes.**
 
 6. **Sleeve** — Main trunk first with 1/2" Techflex, sub-looms with 1/4" Techflex. Secure breakout transitions with 3:1 adhesive heat-shrink boots. Apply sub-loom PermaSleeve breakout labels before Techflex goes on each sub-loom.
 
-7. **Mount and connect** — Secure the loom to the engine with P-clips. Connect all pigtail connectors. Photograph the complete installed harness before the hood goes on.
+7. **Mount and connect** — Secure the loom to the engine with P-clips. Plug all sensor connectors onto their components. Photograph the complete installed harness before the hood goes on.
 
 ---
 

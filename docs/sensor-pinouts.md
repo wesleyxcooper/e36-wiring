@@ -386,6 +386,8 @@ Voltage characteristics (source: `.wv` file notes, citing HP Academy forum + ope
 | 4 | Ground | |
 | 5 | Temperature signal (NTC) | Use 4.6 kΩ pull-up to +5V at ECU AIN |
 
+> ⚠️ **Physical vs functional pin mapping:** The `.wv` files (`maxxecu-07k.wv`, `pst-f1-sensor.wv`) describe the sensor as a **4-function connector** (pins 1–4 = +5V / GND / Pressure / Temp) in functional order. The physical housing `F02U.B00.751-01` is a **5-pin body** using the numbering above (physical pin 1 unused). Wire by function label — do **not** treat `.wv` pin 1 as physical housing pin 1. Mapping: `.wv` pin 1 (+5V) = physical pin 3; `.wv` pin 2 (GND) = physical pin 4; `.wv` pin 3 (Pressure) = physical pin 2; `.wv` pin 4 (Temp) = physical pin 5.
+
 Source: Bosch Motorsport official datasheet for PST-F 1.
 ([bosch-motorsport.com PDF](https://www.bosch-motorsport.com/media/catalog_content/downloads_catalog/pdf_catalog/data_sheet_70496907_pressure_sensor_combined_pst-f_1.pdf))
 Corroborated by Bosch Motorsport product page and xtramotorsport.com product listing.

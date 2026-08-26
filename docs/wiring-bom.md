@@ -261,7 +261,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 | Run | Color | Gauge | Length | Shielded | Notes |
 |-----|-------|-------|--------|----------|-------|
 | CABLE_PWR_IN (BATT+ → PMU16 input) | RD | 10 AWG | 0.5 m | No | Fused 40A within 30 cm of battery. **Phase 3:** PMU16 O5+O14 (50A combined MOSFET) drives CWA400 directly — no relay. Ring terminal at battery. |
-| CABLE_PWR_OUT (PMU16 O5+O14 → CWA400 Pin 3) | RD | 10 AWG | 1.5 m | No | Switched +12V pump supply. 35.5A nominal — 10 AWG minimum. PMU16 manages post-shutdown cooling hold. |
+| CABLE_PWR_OUT (PMU16 O5+O14 → CWA400 Pin 3) | RD | 8 AWG | 1.5 m | No | Switched +12V pump supply. 35.5A nominal — **8 AWG** (10 AWG marginal at 35.5A / 1.5m in engine bay; System 1 and consolidated buy table both specify 8 AWG). PMU16 manages post-shutdown cooling hold. |
 | CABLE_GND (CWA400 Pin 4 → chassis GND) | BK | 10 AWG | 1.5 m | No | Dedicated ground. 10 AWG minimum. Both phases. |
 | CABLE_PWM (MaxxECU GPO → CWA400 Pin 1) | VT | 22 AWG | 2.0 m | Preferred | PWM signal (680 Hz). **Phase 3:** MaxxECU broadcasts EWP state over CAN1 to PMU16 — no direct GPO wire to CWA400. 22 AWG if retained for direct drive fallback. |
 | *Phase 1 only* relay coil wire 1 (relay pin 86 → IGN +12V) | GN | 18 AWG | 0.5 m | No | **Not used in Phase 3 (PMU16 direct drive).** |
@@ -326,7 +326,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | Qty | Item | Notes |
 |-----|------|-------|
 | 1 | Deutsch AS79 jam nut plug — engine side (07K) | Replaces M52 mating plug at bulkhead; same pin-numbering |
-| 5 | Bosch EV14 / USCAR injector pigtail, 2-pin | Replace M50 harness EV1 ends with EV14 (ID1050x). PN `0 280 156 127` pigtail or equivalent |
+| 5 | EV14 / USCAR injector connector housing + terminals | Direct termination — housing: Bosch `1 928 402 258` (or equiv USCAR 2-pin); terminal: Bosch `1 928 499 000` or Delphi `12129476`. ⚠️ `0 280 156 127` is a **Bosch injector** PN, not a connector PN — do not order it for wiring. |
 | 5 | VAG 4-way COP connector | IGN 1-5 ignition coils (07K firing order 1-2-4-5-3) |
 | 1 | VW 07K crank VR sensor, 3-pin | ⚠️ TODO: confirm exact body (Bosch Kombi-F or similar) at install |
 | 1 | VW 07K cam Hall sensor, 3-pin | ⚠️ TODO: confirm exact body at install (+5V type — different from M52 +12V) |
@@ -344,7 +344,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 | Run | Color(s) | Gauge | Length | Shielded | Notes |
 |-----|----------|-------|--------|----------|-------|
-| DBW TB Motor +/− | OG, VT | 20 AWG | 0.5 m ea | No | H-bridge output — 20 AWG min (3A). Verify polarity before crimping. |
+| DBW TB Motor +/− | OG, VT | 22 AWG | 0.5 m ea | No | H-bridge output — **22 AWG max** (AS79 size-22D contacts accept 22–26 AWG only; 20 AWG will not seat). 3A peak at 0.5 m — 22 AWG adequate. Verify polarity before crimping. |
 | DBW TB TPS 4-wire | RD, BK, WH, GN | 22 AWG | 0.5 m | Preferred | +5V, GND, TPS1, TPS2 signals |
 | Knock sensor 1 signal | WH | 22 AWG | 0.4 m | Preferred | KS1 signal wire; shield drain at ECU end |
 | Knock sensor 2 signal | WH | 22 AWG | 0.6 m | Preferred | KS2 signal wire |
@@ -579,7 +579,7 @@ One-time tooling purchase — covers all connector families in this build. See [
 | Open-barrel engine bay (general) | _(use IWS-2820M or IWS-2412M above per AWG)_ | — | **In the engine bay and anywhere exposed to moisture/vibration: use non-insulated barrel + adhesive-lined heat shrink** over every crimp. Adhesive liner seals against capillary wicking that pre-insulated connectors allow. Interior/cabin: pre-insulated nylon-sleeve crimps acceptable with the correct ratcheting tool. Source: StreetCarJoe Race Car Wiring Pt.1. |
 | **AS solid barrel crimper** | **Daniels M22520/2-01 (AFM8)** handle + **K42 positioner (M22520/2-09)** (pin contacts) + **K40 positioner (M22520/2-07)** (socket contacts) | AFM8: **$601.65** ([dmctools.com](https://dmctools.com/afm8)) · K42: **$112.64** ([deltaintl.com](https://deltaintl.com/products/k42)) · K40: **$93.86** ([dmctools.com](https://dmctools.com/k40)) — total ~$808 | **Required for Deutsch Autosport AS79 size-22 solid barrel contacts** (firewall bulkhead). Source: m-cal.com AS020-35SN "Primary Contacts Size: 22 AWG"; ecuplus.de AS620-35PN "79x 22 AWG, Required Positioner for DMC AFM8: K40". NOT the HDT-48-00 or clones (DT/DTM/DTP only, different contact geometry). NOT K43 (size-20 positioner — wrong for this build). No cheap substitute: wrong die geometry produces cold crimps that pass initial pull-test but fail under vibration. |
 | Ferrule crimper | **iCrimp AWG23-10** (HSC8 6-4A, [amazon.com/dp/B00XVB6B1C](https://www.amazon.com/dp/B00XVB6B1C)) | ~$25 | Stranded wire ends into screw-clamp terminals (ECU power/ground, DIN rail fuse block). Self-adjusting ratchet, 0.25–6mm² (AWG 23–10). ⚠️ PN IWS-10 does not exist in IWISS/iCrimp's catalog — corrected to AWG23-10. |
-| Deutsch contact extraction | **Deutsch 0411-240-2005** ([deutschconnector.com](https://www.deutschconnector.com/products/deutsch_connector_tools/deutsch_connector_removal_tools/0411-240-2005/)) | ~$15 | AS bulkhead size 20 contact removal — push in, releases retention lock cleanly. Do not use a screwdriver. Note: AS79 connector ships with one insertion/extraction tool included. ⚠️ PN 1680-73-01 does not exist in Deutsch/TE catalog — corrected to 0411-240-2005. |
+| AS79 size-22 contact extraction | **Use the tool included with the AS79 connector body** (or M81969/14-01 equiv) | included | AS bulkhead **size-22** solid barrel contact removal — push in from front, releases collet, contact exits rear. Note: `0411-240-2005` is a DT/DTM size-16/20 tool — it does **not** fit AS79 size-22 contacts. Do not use a screwdriver. |
 | VW/Bosch connector de-pinning picks | **Lisle 57750** | ~$20 | Sensor pigtails (3B0973703G, 1J0973702, 1J0973712), COP connectors — push-to-release housings. |
 | Rivnut tool + rivnut assortment | **Astro Pneumatic 1442** ([Amazon](https://www.amazon.com/Astro-Pneumatic-Tool-1442-Setter/dp/B003TODXQW) ~$71) + M4/M6 zinc rivnut kit | ~$75–90 | Installs threaded inserts into thin sheetmetal or carbon panels without backside access. Required for PMU16 bracket and ECU bracket mounting. Source: StreetCarJoe Race Car Wiring Pt.3. |
 | **Molex CMC crimp — small** | **63811-9200** | ~$200–250 | MaxxECU C1/C2 small terminals (643221029, 0.75mm²/~20 AWG) — 40 of 48 C1 pins and 24 of 32 C2 pins are this size. **Primary tool for ECU connector wiring.** Source: Digikey, Mouser. |
