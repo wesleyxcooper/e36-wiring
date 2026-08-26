@@ -65,11 +65,14 @@
 #     Center   (r≈0.055): pins 77–79   3 contacts  triangle: 77@12, 78@4, 79@8
 #
 # Power rail note:
-#   Option A (preferred): Route +12V Coils/Inj and Engine GND through a separate
-#     2-pin Deutsch DT/weatherpack connector via dedicated firewall grommet. Free
-#     pins 1–3, 29–31, 52 for expansion.
-#   Option B (documented below): Use 4 contacts in parallel for +12V (20A ÷ 5A = 4)
-#     and 3 contacts in parallel for Engine GND. Pins 1–3, 29–31, 52 are used.
+#   Option A (COMMITTED for 07K Phase 3 build): Route +12V Coils/Inj and Engine
+#     GND through a separate 2-pin Deutsch DT/weatherpack connector via dedicated
+#     firewall grommet. PMU16 O2 → 12 AWG → DT bypass → coil/inj rail. Pins 1–3,
+#     29–31, 52 are cavity-plugged in the 07K Phase 3 build. Source:
+#     34-ecu-harness-final.md line 141 "O2 | Coil + injector supply | 12 AWG, through DT bypass grommet".
+#   Option B (documented for reference): Use 4 contacts in parallel for +12V
+#     (20A ÷ 5A = 4) and 3 contacts in parallel for Engine GND. Pins 1–3, 29–31,
+#     52 used. Worst-case 22A exceeds 20A contact rating at high RPM. Not preferred.
 #
 # Connector hardware:
 #   AS79 flange receptacle:  Deutsch Autosport AS616-79PN or Souriau 8STA79PN equiv.
@@ -111,7 +114,7 @@ connectors:
       - "SPARE — S2→S3 boundary buffer"         # 15  R1  do not populate without review
       - "Crank VR+ (CMC H3 = pin 31) [M52 + 07K — same pin, swap connector body only]"  # 16  R1  Size 22D  22 AWG shielded pair with 17
       - "Crank VR- (CMC H2 = pin 30) [M52 + 07K — same pin, swap connector body only]"  # 17  R1  Size 22D  22 AWG shielded pair with 16
-      - "Crank shield drain [M52 + 07K]"        # 18  R1  Size 22D  22 AWG  float engine side; tie cabin→CMC H1
+      - "Crank shield drain [M52 + 07K]"        # 18  R1  Size 22D  22 AWG  float engine side; tie cabin side pin 18 → ECU CMC E3 (GND Shield, pin 19). NOT CMC H1 (Sensor GND). Source: maxxecu-07k.wv W_CRANK; wiring-bom.md line 516.
       - "Cam Hall signal (CMC H4 = pin 32) [M52 + 07K — same pin, swap connector body only]"  # 19  R1  Size 22D  22 AWG
       - "SPARE — 07K cam reuses pin 19 (same bulkhead pin; only engine-side connector body changes)"  # 20  R1  do not populate
       - "SPARE — S3→S4 boundary buffer"         # 21  R1  do not populate without review
@@ -231,7 +234,8 @@ connectors:
           (aero-electric.com/product/MIL-C-38999_SERIES_I/assembly_instructions.html)
 
       CRANK SHIELDED PAIR: Pins 16/17 must be shielded twisted pair. Shield drain (pin 18)
-        terminates at cabin-side sensor GND (CMC H1) via pin 79. Float at engine side.
+        terminates at cabin side pin 18 → ECU CMC E3 (GND Shield, pin 19). Float at engine side.
+        Not CMC H1 (Sensor GND) — shield drain uses the dedicated shield ground pin.
         Both M52 and 07K crank sensors use these same three pins — only the engine-side
         connector body changes. Confirmed: 07K VW 60-2 VR sensor, same type as M52.
         CMC: H3 (VR+, pin 31), H2 (VR-, pin 30), H1 ref (shield drain, pin 29).
@@ -375,26 +379,26 @@ cables:
       - RD   # 1  +12V Coils/Inj [‖1]
       - RD   # 2  +12V Coils/Inj [‖2]
       - BK   # 3  Engine GND [‖1]
-      - GY   # 4  IGN 1
-      - GY   # 5  IGN 2
-      - GY   # 6  IGN 3
-      - GY   # 7  IGN 4
+      - BU   # 4  IGN 1
+      - BU   # 5  IGN 2
+      - BU   # 6  IGN 3
+      - BU   # 7  IGN 4
       # === INJECTORS sub-loom ===
-      - GN   # 8  INJ 1
-      - GN   # 9  INJ 2
-      - GN   # 10 INJ 3
-      - GN   # 11 INJ 4
-      - GN   # 12 INJ 5
-      - GN   # 13 INJ 6
+      - GY   # 8  INJ 1
+      - GY   # 9  INJ 2
+      - GY   # 10 INJ 3
+      - GY   # 11 INJ 4
+      - GY   # 12 INJ 5
+      - GY   # 13 INJ 6
       # === COILS sub-loom (continued) ===
       - RD   # 14 +12V [‖3]
       - BK   # 15 Engine GND [‖2]
-      - GY   # 16 IGN 5
-      - GY   # 17 IGN 6
+      - BU   # 16 IGN 5
+      - BU   # 17 IGN 6
       # === TRIGGER sub-loom (shielded STP — own sleeve, away from coil primaries) ===
       - WH   # 18 Crank VR+
-      - BK   # 19 Crank VR-
-      - GY   # 20 Crank shield
+      - BN   # 19 Crank VR-
+      - YE   # 20 Crank shield
       - WH   # 21 Cam Hall M52
       # === SENSORS sub-loom ===
       - WH   # 22 CLT
@@ -406,13 +410,13 @@ cables:
       - GN   # 27 GPO3 VANOS
       - GN   # 28 GPO4 ICV-A
       - GN   # 29 GPO5 ICV-B
-      - YE   # 30 Starter trigger
-      - YE   # 31 Alt D+
+      - GN   # 30 Starter trigger
+      - GN   # 31 Alt D+
       # === SENSORS sub-loom (continued) ===
       - RD   # 32 +5V sensor [‖2]
       - WH   # 33 TPS signal
       - WH   # 34 MAP
-      - BK   # 35 Sensor GND
+      - BN   # 35 Sensor GND
     wirelabels:
       - "+12V Coils [‖1]"
       - "+12V Coils [‖2]"

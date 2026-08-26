@@ -335,7 +335,9 @@ connectors:
   #     43: Knock 1 signal (CMC K3)   44: Knock 2 signal (CMC K4)   45: Knock GND / shield drain
   #   Misc:
   #     64: Flex fuel signal (CMC C1 / DIN3)
-  #   Pins 20, 24, 41, 50–63, 65–78: SPARE / cavity-plug
+  #   Pins 20, 24, 41: SPARE / cavity-plug
+#   Pins 50, 51: PST-F1 pressure (AIN 3, CMC J3), PST-F1 temp (AIN 1, CMC J1) — NOT spare. Source: firewall-bulkhead.wv pins 50-51.
+#   Pins 52–63, 65–78: SPARE / cavity-plug
   #   Pins 72–79 (except 79): SPARE — APS is cabin-to-cabin, no bulkhead crossing needed
 
   # ── 07K engine sensors / actuators ─────────────────────────────────────────
@@ -837,6 +839,10 @@ connections:
     - W_CAM: [3, 2, 1]
     - ECU_CMC: [32, 29, 25]
 
+  # W_CAM shield drain → CMC E3 (GND Shield, pin 19); float at sensor side
+  - - W_CAM: [s]
+    - ECU_CMC: [19]
+
   # ── CLT ───────────────────────────────────────────────────────────────────────
   - - CLT: [1, 2]
     - W_CLT: [1, 2]
@@ -979,6 +985,10 @@ connections:
   - - WIDEBAND: [6, 2, 1, 5, 3]
     - W_WBO2: [1, 2, 3, 4, 5]
     - ECU_CMC: [24, 23, 27, 28, 13]
+
+  # W_WBO2 shield drain → CMC E3 (GND Shield, pin 19); single-end at ECU only
+  - - W_WBO2: [s]
+    - ECU_CMC: [19]
 
   # WBO2 heater positive: WIDEBAND pin 4 (H+) → splice to +12V coil/inj rail
   - - WIDEBAND: [4]

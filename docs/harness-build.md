@@ -51,7 +51,7 @@ All sensor connectors in the engine harness (injector, COP coil, cam/crank/MAP 3
 | Molex ratcheting crimper (small terminals) | 63811-9200 | MaxxECU C1/C2 small-gauge pins |
 | Molex ratcheting crimper (big 0.5–1.0 mm²) | 63811-8900 | MaxxECU C1/C2 large-gauge pins |
 | Molex ratcheting crimper (big 1–2 mm²) | 63811-9000 | MaxxECU C1/C2 large-gauge pins |
-| **Micro-pin crimper — VAG JMT/JPT pigtails** | **Engineer PA-09** (~$30–40, Amazon) — community standard for Bosch JMT 1.5mm and JPT 2.8mm contacts. Covers VAG cam/crank/MAP/CLT/IAT/knock/COP pigtail terminals in one tool. Budget: IWISS SN-2549 (~$17). ⚠️ `Knipex 97 52 68` (previously listed here) does not exist — that PN is not in the Knipex catalog. The Knipex 97 52 67 DT (~$427) is for Deutsch DT contacts only, not for Bosch JMT/JPT. | All VAG sensor pigtails, COP, EV14 injector pigtails |
+| **Micro-pin crimper — VAG JMT/JPT pigtails** | **Engineer PA-09** (~$30–40, Amazon) — community standard for Bosch JMT 1.5mm and JPT 2.8mm contacts. Covers VAG cam/crank/MAP/CLT/IAT/knock/COP pigtail terminals in one tool. Budget: IWISS SN-2549 (~$17). ⚠️ `Knipex 97 52 68` (previously listed here) does not exist — that PN is not in the Knipex catalog. The Knipex 97 52 67 DT (~$427) is for Deutsch DT contacts only, not for Bosch JMT/JPT. | All VAG sensor pigtails, COP, EV14 injector connectors |
 | **Deutsch HD30 / DT contacts crimper** | **Deutsch HDT-48-00** (~$350–465) or **JRready NEW-DT2** (~$169 budget) | Maven HD30 35-pin connector (size-16 and size-20) + DT 2-pin bypass connectors |
 | **AS solid barrel crimper** | Daniels M22520/2-01 (**AFM8**) handle — $601.65 ([dmctools.com](https://dmctools.com/afm8)) | **Firewall bulkhead Deutsch AS size-22 solid barrel contacts.** Mil-spec tool for AS contacts — NOT the HDT-48-00 or clones (DT/DTM/DTP only, different contact geometry). No cheap substitute — wrong die geometry produces cold crimps that pass pull-test but fail under vibration. Source: m-cal.com AS020-35SN "Primary Contacts Size: 22 AWG"; ecuplus.de AS620-35PN "79x 22 AWG". |
 | AS crimper positioner — pin | Daniels **K42** (M22520/2-09) — $112.64 ([deltaintl.com](https://deltaintl.com/products/k42)) | Size-22 **pin** contacts (38941-22), 22–26 AWG. Use with AFM8 frame for all AS79 pin crimps (engine-side plug). NOT K43 — that is for size-20 contacts. |
@@ -473,11 +473,11 @@ A service loop is a small coil of extra wire (1–2 turns, ~30–50mm diameter) 
 |-----------|--------|-----------|
 | AS79 engine-side mating plug | No individual loops — leave 200–300mm of harness slack near the connector exit, route with a gentle curve before the first P-clip | ~38 active wires (M52) / ~45 active wires (07K) through a 79-pin shell; individual loops inside the backshell are not practical at that density. Bundle-level slack provides the same function |
 | Maven HD30 35-pin accessories | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before boot | 35 wires. Loop each wire, wrap the coiled bundle in 3:1 adhesive heat-shrink before sliding the boot on — holds loops organized and gives the boot a clean round profile to seat against |
-| Crank VR+/VR− pigtail end | ✓ Individual loop, 1–2 turns | Most vibration-sensitive signal; crank sensor at front of block sees belt-drive vibration |
-| CAM sensor pigtail end | ✓ Individual loop, 1–2 turns | Same rationale |
+| Crank VR+/VR− connector end | ✓ Individual loop, 1–2 turns | Most vibration-sensitive signal; crank sensor at front of block sees belt-drive vibration |
+| CAM sensor connector end | ✓ Individual loop, 1–2 turns | Same rationale |
 | MaxxECU C1/C2 | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before backshell | Molex backshell has enough internal volume; intermediate wrap holds loops organized during backshell installation. Loop protects terminals during ECU removal/reinstall |
 | EV14 injector pigtails | No | The ~50mm bare wire between sub-loom exit and connector already provides compliant slack |
-| CLT / IAT / MAP pigtails | Optional | Same — bare wire section is usually sufficient |
+| CLT / IAT / MAP connectors | Optional | Same — bare wire section is usually sufficient |
 
 **No special tool required.** For 22 AWG TXL, coil the wire by hand around a Sharpie body (~13mm diameter) or your index finger (~18mm). One or two turns is all you need. TXL wire holds the loop shape without tape at this gauge.
 
@@ -487,7 +487,7 @@ A service loop is a small coil of extra wire (1–2 turns, ~30–50mm diameter) 
 2. Crimp contacts onto the pigtail wires
 3. Insert contacts into connector body — verify seating click on each
 4. Coil 1–2 turns per wire around a Sharpie body or finger — wire holds shape on its own
-5. **For multi-wire connectors (Maven 35-pin, MaxxECU C1/C2): wrap the entire coiled bundle in a single piece of 3:1 adhesive-lined heat-shrink and shrink it** — locks all loops in their organized shape and gives the boot a clean round profile to seat against. Skip for single/dual-wire pigtails (crank, cam).
+5. **For multi-wire connectors (Maven 35-pin, MaxxECU C1/C2): wrap the entire coiled bundle in a single piece of 3:1 adhesive-lined heat-shrink and shrink it** — locks all loops in their organized shape and gives the boot a clean round profile to seat against. Skip for single/dual-wire sensor connectors (crank, cam).
 6. Slide the boot forward to cover the connector body exit AND the wrapped loops
 7. Shrink the boot with a heat gun — loops permanently captured inside
 8. The connector is complete. **Plug into the component sensor last** — after the boot is fully shrunk.
@@ -516,8 +516,8 @@ Labels are the only way to identify wires and looms once the harness is sleeved.
 | Location | Label content | Tool |
 |----------|--------------|------|
 | Every main harness wire — both ends | AS79 pin number + signal name (e.g., `8 INJ1`) | Brady M210 + PermaSleeve M21-125-C-342 (22–16 AWG) |
-| Pigtail wire — connector end (before body snaps on) | Signal + cylinder number (e.g., `INJ1`, `COL3`, `CAM`, `CRANK`) | Same |
-| Pigtail wire — splice end (within 20mm of splice) | Signal name | Same |
+| Wire — sensor connector end (before body snaps on) | Signal + cylinder number (e.g., `INJ1`, `COL3`, `CAM`, `CRANK`) | Same |
+| Wire — AS79 terminal end (within 50mm of connector body) | AS79 pin number + signal name (e.g., `8 INJ1`) | Same |
 | Sub-loom at breakout from main trunk | Sub-loom name (e.g., `INJECTORS`, `COILS`, `SENSORS`) | Brady M210 + PermaSleeve M21-375-C-342 (3/8" cartridge, slides over 1/4" sub-loom before Techflex goes on) |
 | Main trunk at AS79 exit | Harness name (e.g., `ENGINE 07K PH3`) | Brady M210 + PermaSleeve M21-500-C-342 (1/2" cartridge) |
 
@@ -546,7 +546,7 @@ Print this list before touching any wire. Source: `firewall-bulkhead.wv` — BUL
 **Type A — Main harness wire labels** (Brady M21-125-C-342, ×2 per wire)
 
 - **End 1 — AS79 end:** slide onto wire before crimping the AS79 contact; position within ~50mm of the connector body after insertion. This is what you read when tracing wires at the bulkhead.
-- **End 2 — splice end:** slide onto wire before cutting to length; position within ~20mm of the bare wire tip. This label sits right at the splice point during Phase C so you can match each harness wire to the correct pigtail without tracing back to the AS79. It is at the tip of the wire, not at the sub-loom breakout (the sub-loom breakout has its own separate Type C label).
+- **End 2 — sensor connector end:** slide onto wire before cutting to length; position within ~50mm of the terminal/connector end. This label sits right at the sensor connector during build so you can confirm the signal identity without tracing back to the AS79. It is at the connector end of the wire, not at the sub-loom breakout (the sub-loom breakout has its own separate Type C label).
 
 | Pin | Label text | Sub-loom | M52 | 07K |
 |-----|-----------|---------|-----|-----|
@@ -604,7 +604,7 @@ Print this list before touching any wire. Source: `firewall-bulkhead.wv` — BUL
 
 ---
 
-**Type B — Pigtail connector labels** (Brady M21-125-C-342, ×1 per pigtail, applied near connector end before body snaps on)
+**Type B — Sensor connector labels** (Brady M21-125-C-342, ×1 per sensor connector, applied near connector end before body snaps on)
 
 | Label text | Connector type | Critical warning |
 |-----------|---------------|-----------------|
@@ -628,7 +628,7 @@ Print this list before touching any wire. Source: `firewall-bulkhead.wv` — BUL
 | `KS1` | 1J0973712 (2-pin flat) | 07K only |
 | `KS2` | 1J0973712 (2-pin flat) | 07K only |
 
-**Type B total:** M52 — 18 labels. 07K — 19 labels (adds KS1/KS2, swaps to COP pigtail format).
+**Type B total:** M52 — 18 labels. 07K — 19 labels (adds KS1/KS2, swaps to 07K COP 4-pin format).
 
 ---
 
@@ -661,7 +661,7 @@ Print this list before touching any wire. Source: `firewall-bulkhead.wv` — BUL
 | Type | Cartridge | M52 count | 07K count |
 |------|----------|----------|----------|
 | A — wire labels | M21-125-C-342 | 74 | 100 total |
-| B — pigtail labels | M21-125-C-342 | 18 | 19 |
+| B — sensor connector labels | M21-125-C-342 | 18 | 19 |
 | C — sub-loom breakout | M21-375-C-342 | 5 | 6 |
 | D — main trunk | M21-500-C-342 | 1 | 1 |
 | **Total** | | **98** | **126** |
@@ -702,7 +702,7 @@ If your multimeter does not have a dedicated continuity mode, use **resistance (
 
 **Check 1 — Continuity (every signal wire)**
 1. Open the `.wv` file (`firewall-bulkhead.wv` for the engine harness)
-2. For each populated pin: touch one probe to the AS79 cabin-side wire end (or the ECU C1/C2 connector pin), touch the other probe to the expected sensor pigtail pin at the far end
+2. For each populated pin: touch one probe to the AS79 cabin-side wire end (or the ECU C1/C2 connector pin), touch the other probe to the expected sensor connector pin at the far end
 3. Beep (or <0.5Ω) = wire seated correctly and circuit complete
 4. No beep = break — bad crimp, pin not fully seated, or wrong pin. Do NOT sleeve until resolved. Depin, inspect, re-crimp.
 5. Work through every signal pin in the label inventory table above, in pin order — check them off on a printed copy of the label inventory

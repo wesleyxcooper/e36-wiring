@@ -23,12 +23,16 @@ Mil-spec M22759 is what race teams use. It's fine but costs 5–10× more and is
 
 | Color | Use in harness | Suggested qty | Notes |
 |-------|---------------|---------------|-------|
-| Red | +12V power, sensor +5V | 50m | Most frequently used power color |
-| Black | All grounds | 50m | — |
-| White | Sensor signal inputs (analog) | 100m | Highest volume — sensors, triggers, cam, crank |
-| Grey | Ignition outputs (coil drives) | 25m | — |
-| Green | Injector outputs, GPO actuators | 25m | — |
-| Yellow | Starter trigger, alt D+ | 10m | Short runs only |
+| Red | +12V power, +5V sensor supply | 50m | Most frequently used power color |
+| Black | Power/chassis GND (never sensor GND) | 50m | Convention: BK = high-current return only. Never use Black for sensor GND wires. |
+| White | Sensor signal inputs (analog), WBO2 signals | 100m | Highest volume — sensors, triggers, cam, crank |
+| **Brown** | **Sensor GND / VR Signal−** | **25m** | **Required — every sensor GND wire and crank VR− return. Without Brown the sensor sub-loom cannot be built. Source: `harness-build.md` § Wire Color Convention.** |
+| **Blue** | **Ignition coil drive outputs (IGN 1–5)** | **25m** | **Required. Previously listed as Grey; correct color per MaxxECU convention and all .wv files is Blue (BU).** |
+| Grey | Injector drive outputs (INJ 1–5) | 25m | INJ signal wires only — not IGN. Previously mislabeled as IGN. |
+| Green | GPO actuator outputs only (VVT solenoid, boost solenoid) | 15m | GPO outputs only — not injectors. |
+| **Yellow** | **Shield GND drain wire only** | **10m** | **Convention: YE = shield drain (single-end, ECU end). Crank, cam, knock shields. Never use Yellow for Starter trigger or Alt D+.** |
+| Orange | DBW ETh Motor+ | 5m | 20 AWG minimum. |
+| Violet | DBW ETh Motor−, PWM signal wires | 5m | 20 AWG for motor leads; 22 AWG for PWM signals. |
 | White + Blue (WH/BU twisted pair) | CAN H / CAN L | 10m | Buy as pre-twisted pair (WiringPros sells by the foot). WH = CAN H, BU = CAN L — matches all .wv harness files. |
 
 Heavier gauge for specific runs (buy short lengths, not full spools):
@@ -137,7 +141,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 | BATT_NEG → chassis stud | BK | 4 AWG welding cable | TBD | Battery − → chassis ground stud M8 — body electrical returns |
 | **(optional) BATT_NEG → engine block (direct)** | BK | 4 AWG welding cable | TBD | Optional dedicated battery negative → engine block cable. Not required while factory M52 bonding strap is clean. |
 | IGN +12V → PMU16 pin 7 (+12V SW) | RD | 18 AWG | TBD | IGN-switched +12V → PMU16 on/off sense. Fuse at source: 5A. |
-| PMU16 CAN2 H/L → MaxxECU CAN1 H/L | GY/PU | 22 AWG shielded twisted pair | TBD | PMU16 pins 24/34 → MaxxECU CAN1H/CAN1L. Drain at MaxxECU end only. Route away from coil/injector wires. |
+| PMU16 CAN2 H/L → MaxxECU CAN1 H/L | GY/**VT** | 22 AWG shielded twisted pair | TBD | PMU16 pins 24/34 → MaxxECU CAN1H/CAN1L. Drain at MaxxECU end only. Route away from coil/injector wires. |
 | PMU16 O1 → ECU logic +12V | RD | 16 AWG | TBD | O1 (pin 38, 25A) → MaxxECU 12-pin pin 7 |
 | PMU16 O2 → coil+inj +12V | RD | 12 AWG | TBD | O2 (pin 39, 25A) → MaxxECU 12-pin pin 1 |
 | PMU16 O3 → SPAL fan | RD | 12 AWG | TBD | O3 (pin 26, 25A PWM) → fan motor + terminal |
@@ -201,8 +205,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 |-----|------|-------|
 | 1 | **BMW E46 Accelerator Pedal Module** | PN `35426786282` (manual) / `35426786281` (auto) — used, ~$80–120. See `docs/dbw-pinouts.md` for sourcing table. |
 | — | *OR* **Hella 6PV010946-141** | RHD fallback — standalone floor-mount, no OEM pedal box, ~$80–120 new |
-| 1 | Deutsch Autosport AS-series bulkhead — **cabin side** | Size 20 contacts, **pins 72-77** reserved for e-pedal (GND1/GND2/VCC2/APS1/VCC1/APS2) |
-| 1 | Deutsch Autosport AS-series bulkhead — **engine side** | Size 20 contacts, **pins 72-77** — engine side of same pass-through, wires to MaxxECU APS AIN |
+| 1 | Maven HD30 35-pin accessories bulkhead — Connector A | APS routes through **Connector A cabin face pins A14–A19** (cabin-to-cabin; no AS79 crossing needed). AS79 pins 72–77 remain SPARE. Source: `firewall-bulkhead-dual.wv`; `epedal-bmw-e46.wv`. |
 | 1 | MaxxECU RACE CMC — APS analog inputs | 6-pin CMC section — AIN, 5V SENS OUT, SGND — pins TBD |
 
 ### Cables
@@ -248,7 +251,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 | Qty | Item | Notes |
 |-----|------|-------|
 | 1 | **Pierburg CWA400 (PWM version)** | Kostal 2+2 connector, 150 LPM @ 0.85 bar — installed in lower radiator hose |
-| 1 | 40A automotive relay | Bosch `0 332 002 150` or equiv — standard 4- or 5-pin |
+| 1 | 40A automotive relay | **Phase 3 CWA400 control only — not used in Phase 1** (there is no EWP in Phase 1). Phase 3 supersedes this relay with PMU16 O5+O14 MOSFET direct drive. Relay listed here for reference only. Source: `34-ecu-harness-final.md` lines 144–147. |
 | 1 | Battery positive terminal | 🔁 Shared |
 | 1 | Chassis ground stud | 🔁 Shared |
 | 1 | MaxxECU RACE GPO | 🔁 Shared — GPO pin TBD |
@@ -257,12 +260,12 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 
 | Run | Color | Gauge | Length | Shielded | Notes |
 |-----|-------|-------|--------|----------|-------|
-| CABLE_PWR_IN (BATT+ → relay pin 30) | RD | 10 AWG | 0.5 m | No | Fused 40A within 30 cm of battery. Ring terminal at battery. |
-| CABLE_PWR_OUT (relay pin 87 → CWA400 Pin 3) | RD | 10 AWG | 1.5 m | No | Switched +12V pump supply. 35.5A nominal draw — 10 AWG minimum. |
-| CABLE_GND (CWA400 Pin 4 → chassis GND) | BK | 10 AWG | 1.5 m | No | Dedicated ground. 10 AWG minimum. |
-| CABLE_PWM (MaxxECU GPO → CWA400 Pin 1) | VT | 22 AWG | 2.0 m | Preferred | PWM signal (680 Hz). Drain at ECU end only. Keep from coil wires. |
-| CABLE_RELAY_COIL wire 1 (relay pin 86 → IGN +12V) | GN | 18 AWG | 0.5 m | No | Relay coil supply. |
-| CABLE_RELAY_COIL wire 2 (relay pin 85 → chassis GND) | BK | 18 AWG | 0.5 m | No | Relay coil return. |
+| CABLE_PWR_IN (BATT+ → PMU16 input) | RD | 10 AWG | 0.5 m | No | Fused 40A within 30 cm of battery. **Phase 3:** PMU16 O5+O14 (50A combined MOSFET) drives CWA400 directly — no relay. Ring terminal at battery. |
+| CABLE_PWR_OUT (PMU16 O5+O14 → CWA400 Pin 3) | RD | 10 AWG | 1.5 m | No | Switched +12V pump supply. 35.5A nominal — 10 AWG minimum. PMU16 manages post-shutdown cooling hold. |
+| CABLE_GND (CWA400 Pin 4 → chassis GND) | BK | 10 AWG | 1.5 m | No | Dedicated ground. 10 AWG minimum. Both phases. |
+| CABLE_PWM (MaxxECU GPO → CWA400 Pin 1) | VT | 22 AWG | 2.0 m | Preferred | PWM signal (680 Hz). **Phase 3:** MaxxECU broadcasts EWP state over CAN1 to PMU16 — no direct GPO wire to CWA400. 22 AWG if retained for direct drive fallback. |
+| *Phase 1 only* relay coil wire 1 (relay pin 86 → IGN +12V) | GN | 18 AWG | 0.5 m | No | **Not used in Phase 3 (PMU16 direct drive).** |
+| *Phase 1 only* relay coil wire 2 (relay pin 85 → chassis GND) | BK | 18 AWG | 0.5 m | No | **Not used in Phase 3 (PMU16 direct drive).** |
 
 ---
 
@@ -345,7 +348,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | DBW TB TPS 4-wire | RD, BK, WH, GN | 22 AWG | 0.5 m | Preferred | +5V, GND, TPS1, TPS2 signals |
 | Knock sensor 1 signal | WH | 22 AWG | 0.4 m | Preferred | KS1 signal wire; shield drain at ECU end |
 | Knock sensor 2 signal | WH | 22 AWG | 0.6 m | Preferred | KS2 signal wire |
-| Knock GND | BK | 22 AWG | 0.5 m | No | Shared knock GND (via bulkhead pin 71) |
+| Knock shield drain | YE | 22 AWG | 0.5 m | No | Shared knock sensor shield drain (via bulkhead **pin 45** → CMC H1 Sensor GND). Source: `maxxecu-07k.wv` comment; `firewall-bulkhead.wv` pin 45. Color YE = shield drain — never BK (power GND). |
 
 ---
 
@@ -552,7 +555,7 @@ Only items not already included with their respective purchased components (e.g.
 | 1 | BMW E36 X20 25-pin connector (cabin) | OEM or aftermarket — source from E36 donor or Molex catalog | Body |
 | 1 | BMW E36 X20 25-pin connector (engine side) | OEM | Body |
 | 1 | Gauge.S E36 PNP cluster connector, 6-pin | Ships with Gauge.S unit | Body |
-| 1 | Deutsch Autosport AS-series bulkhead shell + contacts | Cabin side + engine side mating pair — Size 20 contacts for all signal pins | E-pedal / all engine crossing |
+| 1 | Deutsch Autosport AS-series bulkhead shell + contacts | Cabin side + engine side mating pair — **Size 22 contacts** (22–26 AWG) for all signal pins. No size-20 contacts exist in the AS79 insert. Source: `firewall-bulkhead.wv`. | All engine crossing |
 | 1 | MaxxECU RACE C1, 48-pin Molex harness connector | [MaxxECU store ID 925](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-street-or-sport-or-race-or-pro-connector-1-48-pin-molex), $33.41 — **does NOT ship with ECU**; special Molex crimp tool required | M52 harness |
 | 1 | MaxxECU RACE C2, 32-pin Molex harness connector | [MaxxECU store ID 1982](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-mini-or-race-c2-or-pro-c4-32-pin-molex), $32.25 — same Molex crimp tool as C1 | M52 harness |
 | 1 | Bosch JPT 2-way (×2) | M52 CLT + VANOS solenoid | M52 harness |

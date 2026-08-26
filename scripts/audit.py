@@ -114,7 +114,7 @@ DENYLIST: list[DenyRule] = [
         source="https://m-cal.com/en-gb/883605120-mc03-as020-35sn-deutsch-autosport-as-connector-79-way-shell-size-20-pin-layout-20-35-style-0-flange-receptacle-red-n-keyway-sockets-standard",
         # Allow lines that are clarifying the *shell* size-20 vs contact size-22 distinction,
         # or that are explicitly warning against size-20 for AS79.
-        exclude=r"(?i)(NOT|not for|does not|cannot|shell\s+size.?20|layout.?20.?35)",
+        exclude=r"(?i)(NOT|\bNo\b|not for|does not|cannot|shell\s+size.?20|layout.?20.?35)",
     ),
     DenyRule(
         pattern=r"(?i)(firewall\s+bulkhead|AS\s*series).{0,60}size[-\s]?20\b",
@@ -123,7 +123,7 @@ DENYLIST: list[DenyRule] = [
         source="https://www.ecuplus.de/en/deutsch-autosport-as620-35pn-79x-22-awg.html",
         # Allow lines explaining that size-20 is NOT for the AS bulkhead,
         # or referencing the HD30's size-20 contacts in contrast.
-        exclude=r"(?i)(NOT|only|HD30|Maven|DT.?series|not for|cannot|does not)",
+        exclude=r"(?i)(NOT|\bNo\b|only|HD30|Maven|DT.?series|not for|cannot|does not)",
     ),
 
     # ── AS79 positioners ─────────────────────────────────────────────────────
