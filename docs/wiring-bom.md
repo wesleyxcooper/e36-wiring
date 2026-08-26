@@ -3,6 +3,16 @@
 Aggregated from all WireViz harness source files.
 Source harnesses: `maxxecu-m52.wv` · `maxxecu-07k.wv` · `firewall-bulkhead.wv` · `power-distribution.wv` · `epedal-bmw-e46.wv` · `epedal-hella-6pv.wv` · `fuel-pump-hanger.wv` · `ewp-controller.wv` · `body-x20.wv` · `8hp-can.wv` · `gauge-s-can.wv` · `dct-shifter.wv` · `pst-f1-sensor.wv` · `atf-temp-sensor.wv` *(optional)*
 
+> **Source-of-truth hierarchy:** `.wv` files → this BOM → CSVs (downstream purchase tracking)
+>
+> The `.wv` harness files define build architecture: what is custom-built vs. purchased,
+> connector families, signal assignments, and cable specs. This BOM aggregates from them.
+> The CSVs are downstream — they track purchase cost/status and reflect decisions already
+> made in the `.wv` files.
+>
+> If a `.wv` file says "build it" but the actual approach is "buy it pre-made," the `.wv`
+> file is wrong and must be corrected first. The BOM and CSVs follow from that correction.
+
 > **⚠️ TODO** = placeholder in source `.wv` — gauge, model, or pin not yet confirmed. Buy only after resolving.
 > **🔁 shared** = appears in multiple harnesses, buy once.
 > All wire lengths include ~10% slack. Add more for complex routing runs.
