@@ -165,4 +165,5 @@ If future dual-pump is ever needed (e.g., wet nitrous or methanol injection): Ra
 | Walbro F90000267 (pump only) | [realstreetperformance.com](https://www.realstreetperformance.com/walbro-universal-450lph-in-tank-fuel-pump-e85-version.html) |
 | MaxxECU PWM fuel pump control | [maxxecu.se/webhelp/output_functions-pwm_fuel_pump_control.html](https://www.maxxecu.se/webhelp/output_functions-pwm_fuel_pump_control.html) |
 | PMU16 power distribution | `harnesses/power-distribution.wv` |
-| WireViz harness | `harnesses/fuel-pump-hanger.wv` |
+| WireViz harness (Phase 1 discrete relay + JDT kit) | `harnesses/fuel-pump-hanger-phase1.wv` |
+| WireViz harness (Phase 3 PMU16 O4 direct-drive) | `harnesses/fuel-pump-hanger-phase3.wv` |

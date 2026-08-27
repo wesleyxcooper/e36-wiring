@@ -218,7 +218,7 @@ NCA = No Colour Assigned for shield drain).
 
 > ⚠️ MaxxECU RACE wires each knock sensor as Signal + Shield drain to the same ECU
 > connector entry. The shield drain runs separately from the signal wire back to CMC H1
-> (Sensor GND / pin 29 via AS79 bulkhead pin 45 in the 07K build). Do not terminate the
+> (Sensor GND / pin 29 direct-terminate in the 07K build under the H2O arch — no bulkhead in the engine-side path). Do not terminate the
 > shield to chassis GND — it must go to ECU Sensor GND. See `maxxecu-07k.wv`
 > connections block for the exact routing.
 

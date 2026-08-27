@@ -479,7 +479,7 @@ A service loop is a small coil of extra wire (1–2 turns, ~30–50mm diameter) 
 |-----------|--------|-----------|
 | MaxxECU CMC (C1 48-pin Molex) at engine-bay ECU | ✓ Individual loop per wire before entering the CMC boot | ~40 wires. Loop each wire in the harness exit area, then bundle into the CMC entry. This is the highest-density connector in the build; take the extra time. |
 | Maven HD30 dual bulkhead (Connector A + B, engine-side plugs) | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before boot | ~12 wires total across both plugs at Phase 3. Loop each wire, wrap the coiled bundle in 3:1 adhesive heat-shrink before sliding boots on. |
-| Maven HD30 35-pin accessories | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before boot | 35 wires. Loop each wire, wrap the coiled bundle in 3:1 adhesive heat-shrink before sliding the boot on — holds loops organized and gives the boot a clean round profile to seat against |
+| Maven HD30 Dual 16+16 firewall bulkhead (engine-side plugs) | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before boot | ~12 wires total across both connectors (Connector A CAN+DCT + Connector B APS). Loop each wire, wrap the coiled bundle in 3:1 adhesive heat-shrink before sliding the boot on — holds loops organized and gives the boot a clean round profile to seat against |
 | Crank VR+/VR− connector end | ✓ Individual loop, 1–2 turns | Most vibration-sensitive signal; crank sensor at front of block sees belt-drive vibration |
 | CAM sensor connector end | ✓ Individual loop, 1–2 turns | Same rationale |
 | MaxxECU C1/C2 | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before backshell | Molex backshell has enough internal volume; intermediate wrap holds loops organized during backshell installation. Loop protects terminals during ECU removal/reinstall |
@@ -494,7 +494,7 @@ A service loop is a small coil of extra wire (1–2 turns, ~30–50mm diameter) 
 2. Crimp contacts onto the harness wire ends
 3. Insert contacts into connector body — verify seating click on each
 4. Coil 1–2 turns per wire around a Sharpie body or finger — wire holds shape on its own
-5. **For multi-wire connectors (Maven 35-pin, MaxxECU C1/C2): wrap the entire coiled bundle in a single piece of 3:1 adhesive-lined heat-shrink and shrink it** — locks all loops in their organized shape and gives the boot a clean round profile to seat against. Skip for single/dual-wire sensor connectors (crank, cam).
+5. **For multi-wire connectors (MaxxECU C1 48-pin, MaxxECU C2 32-pin, Maven HD30 dual bulkhead engine-side plugs): wrap the entire coiled bundle in a single piece of 3:1 adhesive-lined heat-shrink and shrink it** — locks all loops in their organized shape and gives the boot a clean round profile to seat against. Skip for single/dual-wire sensor connectors (crank, cam).
 6. Slide the boot forward to cover the connector body exit AND the wrapped loops
 7. Shrink the boot with a heat gun — loops permanently captured inside
 8. The connector is complete. **Plug into the component sensor last** — after the boot is fully shrunk.

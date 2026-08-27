@@ -127,7 +127,7 @@ connectors:
     pinlabels: ["+12V fused (15A)"]
     notes: >
       Supply for relay contact pin 30 — independent of the coil supply.
-      Source from main fuse block battery rail (not from PMU16 in Phase 1;
+      Source from main fuse block battery rail (PMU16 is not yet installed in Phase 1;
       Phase 3 uses PMU16 direct so no separate fuse needed there).
       15A fuse is sufficient — reverse light bulbs draw ~4–8A total on E36.
 

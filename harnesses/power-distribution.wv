@@ -409,7 +409,7 @@ connectors:
 
   RADIUM_HANGER_STUB:
     type: "Stub: PMU16 O4 → Radium 20-1170 hanger pump stud"
-    subtype: "See harnesses/fuel-pump-hanger.wv -- replaces Crydom D1D40 SSR"
+    subtype: "See harnesses/fuel-pump-hanger-phase3.wv (PMU16 O4 direct-drive at 07K swap)"
     pincount: 1
     pinlabels: ["Pump+ stud (from PMU16 O4 PWM output)"]
     notes: >-

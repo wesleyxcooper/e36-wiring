@@ -42,7 +42,7 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 ---
 
 ### 3. Cabin Loom
-**Path:** Maven Connector A + B (cabin face, at firewall) → pedal box (APS + clutch pedal reservoir), gauge cluster (Gauge.S), shifter (DCT paddle)  
+**Path:** Maven Connector A (CAN + DCT cabin electronics) and Connector B (safety-critical APS throttle input, populated Phase 3) at the firewall face → cabin destinations: pedal box (E46 APS pedal wires terminate at Connector B), gauge cluster (Gauge.S — CAN from Connector A), shifter (DCT paddle)  
 **Route:** Behind lower dash panel, secured with P-clips to existing body studs  
 **Sub-looms:**
 
@@ -62,7 +62,7 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 
 | Sub-loom | Harness file | Notes |
 |----------|-------------|-------|
-| Fuel pump (full run, ~3.5–4m estimated) | `harnesses/fuel-pump-hanger.wv` | 12 AWG min; run separately from CAN to avoid PWM noise on bus |
+| Fuel pump (full run, ~3.5–4m estimated) | `harnesses/fuel-pump-hanger-phase1.wv` (Phase 1: discrete relay + JDT kit) → `harnesses/fuel-pump-hanger-phase3.wv` (Phase 3: PMU16 O4 direct) | 12 AWG min; run separately from CAN to avoid PWM noise on bus |
 | ATF temp sensor (inline -8AN adapter) | `harnesses/atf-temp-sensor.wv` | Runs along tunnel forward to engine-bay ECU (no bulkhead crossing under H2O arch — sensor and ECU both engine-bay-side of firewall) |
 | 8HP CAN + power (engine bay → ZF 8HP TCU) | `harnesses/8hp-can.wv` (reference only — pre-made MaxxECU 8HP GEN1 kit, plug-and-play) | Twisted pair — engine-bay-to-engine-bay under H2O arch |
 
