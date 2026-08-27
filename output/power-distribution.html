@@ -25,7 +25,7 @@
 <h2>Diagram</h2>
 
 <div id="description">
-  Ecumaster PMU16 power management unit replaces relay board, fuse block, and DC SSR from earlier design. PMU16 provides 16 programmable MOSFET high-side outputs with per-channel digital fusing, current monitoring, PWM capability, and CAN control from MaxxECU RACE. Phase 1 (M52 engine). All wire lengths are stubs -- confirm before building. Cross-reference harnesses/maxxecu-m52.wv for ECU CAN pin assignments.
+  ⚠️ PHASE 3 INSTALL FILE. PMU16 is NOT installed in the car during Phase 1 or Phase 2. Under Phase 1 (M52 + M50 pre-terminated harness), aftermarket loads that PMU16 will eventually drive are handled by:<br />  - Discrete aftermarket high-current relays (e.g., fuel pump — see<br />    harnesses/fuel-pump-hanger-phase1.wv)<br />  - MaxxECU GPO outputs driving small relay coils (e.g., reverse light —<br />    see harnesses/8hp-body-integrations-phase1.wv)<br />  - OEM E36 relays that remain in place until replaced (K6300 DME main,<br />    K21/K22 fan relays, K19 A/C compressor)<br />Phase 2 is offline harness/engine build — no in-car install work happens. At Phase 3 swap moment PMU16 arrives and replaces all of the above at once.<br />Ecumaster PMU16 power management unit replaces relay board, fuse block, and DC SSR from earlier design. PMU16 provides 16 programmable MOSFET high-side outputs with per-channel digital fusing, current monitoring, PWM capability, and CAN control from MaxxECU RACE H2O.<br />MOUNT LOCATION: Engine bay, intake side (RHD passenger side), alongside the MaxxECU RACE H2O in the OEM DME E-box cavity area. IP60 aluminium enclosure (per PMU_Manual.pdf p.1) — shelter under the OEM E-box plastic cover for splash protection. Operating temp AECQ100 Grade 1 (-40 to +125 C) per Ecumaster manual, so engine-bay ambient is within spec. Source: docs/vendor/ecumaster/PMU16_Manual_v101.pdf; details in<br />        docs/vendor/maxxecu/MaxxECU_RACE_H2O.md §8.<br /><br />IMPLICATION: With both PMU16 and MaxxECU H2O engine-bay-mounted, ECU +12V (PMU16 O1) and 8HP TCU power (KL30/KL15) are engine-bay-to-engine-bay runs. No firewall crossing for ECU or 8HP power lines.<br />Phase 3 install file. All wire lengths are stubs -- confirm before building. Cross-reference harnesses/maxxecu-07k.wv for ECU CAN pin assignments (Phase 3 ECU harness) and harnesses/8hp-can.wv for 8HP TCU KL30/KL15 destinations.
 </div>
 
 <div id="diagram">
@@ -883,12 +883,12 @@
 <polygon fill="#ffffff" stroke="black" points="19855.12,-1033.62 18524.88,-1033.62 18524.88,-907.12 19855.12,-907.12 19855.12,-1033.62"/>
 <polygon fill="none" stroke="black" points="18524.88,-1009.88 18524.88,-1033.62 19855.12,-1033.62 19855.12,-1009.88 18524.88,-1009.88"/>
 <text xml:space="preserve" text-anchor="start" x="19108.25" y="-1016.88" font-family="arial" font-size="14.00">RADIUM_HANGER_STUB</text>
-<polygon fill="none" stroke="black" points="18524.88,-986.12 18524.88,-1009.88 19044.79,-1009.88 19044.79,-986.12 18524.88,-986.12"/>
-<text xml:space="preserve" text-anchor="start" x="18615.71" y="-993.12" font-family="arial" font-size="14.00">Stub: PMU16 O4 → Radium 20&#45;1170 hanger pump stud</text>
-<polygon fill="none" stroke="black" points="19044.79,-986.12 19044.79,-1009.88 19643.46,-1009.88 19643.46,-986.12 19044.79,-986.12"/>
-<text xml:space="preserve" text-anchor="start" x="19135.62" y="-993.12" font-family="arial" font-size="14.00">See harnesses/fuel&#45;pump&#45;hanger.wv &#45;&#45; replaces Crydom D1D40 SSR</text>
-<polygon fill="none" stroke="black" points="19643.46,-986.12 19643.46,-1009.88 19855.12,-1009.88 19855.12,-986.12 19643.46,-986.12"/>
-<text xml:space="preserve" text-anchor="start" x="19734.29" y="-993.12" font-family="arial" font-size="14.00">1&#45;pin</text>
+<polygon fill="none" stroke="black" points="18524.88,-986.12 18524.88,-1009.88 19017.29,-1009.88 19017.29,-986.12 18524.88,-986.12"/>
+<text xml:space="preserve" text-anchor="start" x="18601.96" y="-993.12" font-family="arial" font-size="14.00">Stub: PMU16 O4 → Radium 20&#45;1170 hanger pump stud</text>
+<polygon fill="none" stroke="black" points="19017.29,-986.12 19017.29,-1009.88 19670.96,-1009.88 19670.96,-986.12 19017.29,-986.12"/>
+<text xml:space="preserve" text-anchor="start" x="19094.38" y="-993.12" font-family="arial" font-size="14.00">See harnesses/fuel&#45;pump&#45;hanger&#45;phase3.wv (PMU16 O4 direct&#45;drive at 07K swap)</text>
+<polygon fill="none" stroke="black" points="19670.96,-986.12 19670.96,-1009.88 19855.12,-1009.88 19855.12,-986.12 19670.96,-986.12"/>
+<text xml:space="preserve" text-anchor="start" x="19748.04" y="-993.12" font-family="arial" font-size="14.00">1&#45;pin</text>
 <polygon fill="none" stroke="black" points="18524.88,-962.38 18524.88,-986.12 19061,-986.12 19061,-962.38 18524.88,-962.38"/>
 <text xml:space="preserve" text-anchor="start" x="18789.19" y="-969.38" font-family="arial" font-size="14.00">1</text>
 <polygon fill="none" stroke="black" points="19061,-962.38 19061,-986.12 19855.12,-986.12 19855.12,-962.38 19061,-962.38"/>
@@ -1221,7 +1221,7 @@
   </tr>
   <tr>
     <td class="bom_col_id">15</td>
-    <td class="bom_col_description">Connector, Stub: PMU16 O4 → Radium 20-1170 hanger pump stud, See harnesses/fuel-pump-hanger.wv -- replaces Crydom D1D40 SSR, 1 pins</td>
+    <td class="bom_col_description">Connector, Stub: PMU16 O4 → Radium 20-1170 hanger pump stud, See harnesses/fuel-pump-hanger-phase3.wv (PMU16 O4 direct-drive at 07K swap), 1 pins</td>
     <td class="bom_col_qty">1</td>
     <td class="bom_col_unit"></td>
     <td class="bom_col_designators">RADIUM_HANGER_STUB</td>

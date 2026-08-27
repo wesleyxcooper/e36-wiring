@@ -20,7 +20,7 @@ The correct values depend on the specific TB's motor resistance, spring return f
 
 ## Pre-conditions before activation
 
-1. **Wiring verified:** All 6 pedal wires confirmed — APS is cabin-to-cabin (pedal footwell → Maven HD30 Connector A cabin face pins A14–A19 → MaxxECU C2). No firewall crossing. Verify APS1 and APS2 read correct voltages at idle (≈0.70V APS1, ≈0.36V APS2 with key on, no crank). Source: `harnesses/epedal-bmw-e46.wv`, `harnesses/firewall-bulkhead-dual.wv`.
+1. **Wiring verified:** All 6 pedal wires confirmed — APS crosses via Maven HD30 Connector B (safety-critical, populated Phase 3), cabin face pins 1-6 → engine-side plug → MaxxECU C2. Verify APS1 and APS2 read correct voltages at idle (≈0.70V APS1, ≈0.36V APS2 with key on, no crank). Source: `harnesses/epedal-bmw-e46.wv`, `harnesses/firewall-crossing-maven.wv`, `docs/dbw-pinouts.md` § Firewall Crossing Allocation.
 2. **TB wired:** All 6 TB connector pins confirmed (Motor+, Motor−, TPSGND, +5V, TPS1, TPS2). Verify TPS1 and TPS2 both read plausible voltages with key on.
 3. **TB motor disconnected:** Disconnect the TB motor power wires (Motor+ and Motor−) **before** enabling e-throttle in MTune for the first time. Leave sensor wires connected. This prevents runaway throttle from an uninitialised motor drive output.
 4. **MTune connected:** USB or wireless to MaxxECU, real-time data visible.

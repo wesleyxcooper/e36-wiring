@@ -93,9 +93,10 @@ with schemdraw.Drawing(show=False) as d:
 
     # ── Firewall bulkhead marker ──────────────────────────────────────────────
     # Vertical marker showing where wires cross from cabin to engine bay.
-    # In the actual harness, 6 wires pass through AS-series bulkhead pins TBD.
+    # In the actual harness, 6 APS wires cross via Maven HD30 dual bulkhead
+    # Connector B pins 1-6 (Phase 3 install). See harnesses/firewall-crossing-maven.wv.
     d.add(elm.Line().at((1.5, 3.0)).down().length(6.5).color('#888888'))
-    d.add(elm.Label().at((1.5, 3.3)).label('FIREWALL\nBULKHEAD\n(AS-series)', loc='center'))
+    d.add(elm.Label().at((1.5, 3.3)).label('FIREWALL\nMaven HD30\nConnector B', loc='center'))
     d.add(elm.Label().at((1.5, -3.5)).label('cabin side    |    engine side', loc='center'))
 
     # ── Notes at bottom ───────────────────────────────────────────────────────

@@ -1,18 +1,15 @@
 # atf-temp-sensor.wv
 # MaxxECU 1/8 NPT NTC temp sensor → MaxxECU AIN 2 (CMC J2)
-# Signal crosses firewall via bulkhead pin 56 (AIN 2 spare temp).
-# Canonical pin map (firewall-bulkhead.wv): AIN 1 / J1 → pin 51 (PST-F1 temp, occupied).
-#   AIN 2 / J2 → pin 56 (ATF temp spare — this signal).
 #
-# OPTIONAL — mechanical thermostat (TCH-102-T2) handles overcooling
-# protection without ECU input. This sensor adds ATF temp to MaxxECU
-# real-time data for logging and cold-shift map conditioning only.
+# Under the H2O engine-bay-mount architecture, both the ATF sensor (in the
+# transmission tunnel adapter fitting, mid-vehicle) and the MaxxECU (engine bay)
+# are UNDER the car / engine bay side of the firewall. The 2-wire NTC signal
+# runs from the sensor along the transmission tunnel forward to the engine-bay
+# ECU — no firewall crossing into the cabin needed.
 #
-# NOTE — Phase 3 (07K swap) pin conflict:
-#   Bulkhead pin 56 (AIN 2) is reassigned to DBW TPS2 in maxxecu-07k.wv.
-#   If retaining ATF temp sensor at Phase 3, reassign to a free AIN and
-#   a free expansion bulkhead pin (e.g., pin 58 / expansion stub AIN 6).
-#   Update both this file and maxxecu-07k.wv at Phase 3 harness build.
+# OPTIONAL — mechanical thermostat (TCH-102-T2) handles overcooling protection
+# without ECU input. This sensor adds ATF temp to MaxxECU real-time data for
+# logging and cold-shift map conditioning only.
 #
 # Hardware:
 #   Sensor:  MaxxECU 1/8 NPT NTC temp (ID 1280) — $48.39
@@ -40,24 +37,8 @@ connectors:
       (post-Setrab cooler, before TCH-102-T2 entry back to trans).
       Thread sealant on 1/8 NPT threads; do not apply to AN threads.
 
-  BULKHEAD_ENGINE:
-    type: "Deutsch AS79 bulkhead — engine side (ATF temp pin)"
-    subtype: "Pin 56 of 79-way engine mating plug"
-    pincount: 2
-    pinlabels:
-      - "Sensor GND (pin 27)"       # shared sensor GND — same group K
-      - "AIN 2 spare temp (pin 56)"
-
-  BULKHEAD_CABIN:
-    type: "Deutsch AS79 bulkhead — cabin side (ATF temp pin)"
-    subtype: "Pin 56 of 79-way cabin flange receptacle"
-    pincount: 2
-    pinlabels:
-      - "Sensor GND (pin 27)"
-      - "AIN 2 spare temp (pin 56)"
-
   ECU_CMC:
-    type: "MaxxECU RACE — Molex CMC 48-pin (C1)"
+    type: "MaxxECU RACE H2O — Molex CMC 48-pin (C1)"
     subtype: "AIN 2 (J2) temperature input — 2.5k internal pullup"
     pincount: 2
     pinlabels:
@@ -71,33 +52,22 @@ connectors:
 
 cables:
 
-  W_ATF_TEMP_ENGINE:
+  W_ATF_TEMP:
     wirecount: 2
     colors: [BN, WH]
     wirelabels: ["Sensor GND", "AIN 2 signal"]
     length: 2.5 m
     shield: true
-    notes: >
-      Sensor in transmission tunnel to bulkhead engine plug.
-      Shielded preferred -- noisy environment (near drivetrain, ignition).
-      Drain shield at bulkhead/ECU end only.
-      Route along transmission tunnel away from coil primary wires.
-
-  W_ATF_TEMP_CABIN:
-    wirecount: 2
-    colors: [BN, WH]
-    wirelabels: ["Sensor GND", "AIN 2 signal"]
-    length: 0.4 m
-    notes: "Bulkhead cabin plug to MaxxECU CMC. Short cabin-side run."
+    notes: >-
+      Sensor in transmission tunnel (mid-vehicle) forward along the tunnel to the
+      engine-bay MaxxECU RACE H2O. Both endpoints are on the engine-bay side of the
+      firewall under the H2O arch — no cabin routing, no firewall crossing.
+      Shielded preferred — noisy environment (near drivetrain, ignition).
+      Drain shield at ECU end only. Route away from coil primary wires.
 
 connections:
 
-  # Tunnel: sensor → bulkhead engine plug
+  # ATF sensor → engine-bay ECU CMC (direct run along tunnel, no bulkhead)
   - - ATF_SENSOR: [1, 2]
-    - W_ATF_TEMP_ENGINE: [2, 1]
-    - BULKHEAD_ENGINE: [2, 1]
-
-  # Cabin: bulkhead cabin plug → MaxxECU CMC
-  - - BULKHEAD_CABIN: [2, 1]
-    - W_ATF_TEMP_CABIN: [2, 1]
+    - W_ATF_TEMP: [2, 1]
     - ECU_CMC: [2, 1]

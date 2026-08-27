@@ -1,11 +1,36 @@
 metadata:
   project: E36 Restomod -- 12V Electric AC Compressor Wiring
+  phase: "Phase 3 (07K swap era — electric AC compressor + PWM controller installed)"
   description: >-
-    Alibaba PD2-18012AJA 12V electric scroll compressor (18cc, 10,000 BTU,
-    R134a) with included PWM speed controller. Controlled via cabin AC switch
-    + 100A relay; MaxxECU RACE DIN receives AC enable signal for idle-up
-    compensation. No belt drive -- compressor mounts anywhere in engine bay.
-    Cross-reference schematics/ac-compressor-pwm.py for circuit-level detail.
+    Alibaba PD2-18012AJA 12V electric scroll compressor (18cc, 10,000 BTU, R134a)
+    with included PWM speed controller. Phase 3 installation — the belt-driven OEM
+    A/C compressor is removed at the 07K swap; this electric unit replaces it.
+    No belt drive -- compressor mounts anywhere in engine bay.
+
+    Under the H2O engine-bay-mount architecture (see docs/vendor/maxxecu/MaxxECU_RACE_H2O.md):
+    MaxxECU is engine-bay-mounted. Signal chain:
+      1. Cabin AC switch (dash panel) closes to +12V/GND
+      2. → OEM E36 X20 pin 4 wire (A/C Compressor Relay, SW/BL) — already an OEM
+         cabin↔engine crossing, repurposed under the new arch. No new firewall
+         penetration. Preferred over adding a Maven Connector A cavity.
+      3. → Engine-bay MaxxECU DIN input — MaxxECU reads AC request for idle-up
+         compensation and CAN-commands PMU16 to enable the compressor
+      4. → PMU16 low-current output (~150 mA) drives the 100A relay COIL
+      5. → 100A relay CONTACT (from battery via appropriate fuse) delivers
+         switched +12V to the PWM controller +12V input
+      6. → PWM controller drives the compressor motor at variable duty cycle
+
+    Why a discrete 100A relay AND PMU16: the PD2-18012AJA running current
+    (~50-80 A) exceeds PMU16 per-output rating (25 A per output, 50 A even
+    paralleled per Ecumaster PMU_Manual.pdf p.1). So the relay is DISCRETE
+    (not part of PMU16), but PMU16 CONTROLS the relay coil. The 100A relay
+    handles the actual compressor current directly from battery.
+
+    Compressor power (100A relay contact) and the PWM controller are entirely
+    engine-bay-side.
+
+    Cross-reference schematics/ac-compressor-pwm.py for circuit-level detail
+    and harnesses/power-distribution.wv for PMU16 output allocation.
     Source: Rawrkee Episode 3 (YouTube) + @jfantis comments.
 
 # ── TODO list ──────────────────────────────────────────────────────────────────

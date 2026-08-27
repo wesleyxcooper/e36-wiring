@@ -1,19 +1,33 @@
 # 8hp-can.wv
-# MaxxECU <-> ZF 8HP70 TCU CAN + power wiring
+# MaxxECU RACE H2O <-> ZF 8HP70 TCU CAN + power wiring
 # Source: maxxecu.com/webhelp/advanced-8hp-wiring_information.html
 #
-# Signals cross firewall via bulkhead pins 2, 3, 9, 47, 48.
-# Phase 1 install — compatible through all phases (8HP stays, engine swaps above).
+# ⚠️ SCOPE: REFERENCE ONLY — NOT A BUILD FILE
+# The MaxxECU 8HP GEN1 CAN harness is a pre-made plug-and-play kit
+# (SKU: maxxecu.com/store/gearbox/8hp/maxxecu-8hp-gen1-cable-harness, ~$368 USD).
+# This file documents how the kit's terminated ends connect to the surrounding
+# components for troubleshooting / MTune configuration / phase-transition planning.
+# The user does NOT build these wires. Order the harness kit, plug it in.
+#
+# Under the H2O engine-bay-mount architecture:
+#   - MaxxECU RACE H2O: engine bay (OEM DME E-box cavity, intake side)
+#   - 8HP TCU: engine bay (mounted on/near the transmission)
+#   - PMU16: engine bay (intake side, alongside the H2O — see power-distribution.wv)
+# ALL 8HP wiring is engine-bay-to-engine-bay — no firewall crossing.
+#
+# Phase 1B (8HP swap) install; unchanged through all subsequent phases.
 #
 # CRITICAL POWER SEQUENCING (MaxxECU docs):
-#   KL30 main power (pin 2 / TCU pin 13) MUST be live >= 10-15 s before
-#   KL15 wakeup (pin 3 / TCU pin 9) is asserted. Powerhold relay ensures
-#   constant KL30 from first key-on; ECU-controlled relay for KL15.
+#   KL30 main power (TCU pin 13) MUST be live >= 10-15 s before KL15 wakeup
+#   (TCU pin 9) is asserted. Powerhold via PMU16 output ensures constant KL30
+#   from first key-on; separate PMU16 output for KL15 IGN-switched.
 #   Failure to observe sequencing prevents TCU initialization.
 #
-# CAN bus: 500 kbps. MaxxECU CAN 1 provides built-in 120Ω terminator (cabin).
-# Add 120Ω at 8HP TCU CAN pins (engine end) — see MaxxECU 8HP GEN1 harness kit.
-# MaxxECU 8HP GEN1 CAN harness: maxxecu.com/store/gearbox/8hp/maxxecu-8hp-gen1-cable-harness
+# CAN bus: 500 kbps. MaxxECU CAN 1 provides built-in 120Ω terminator (at ECU).
+# Add 120Ω at 8HP TCU CAN pins (transmission end) — included in the MaxxECU
+# 8HP GEN1 harness kit.
+#
+# MaxxECU 8HP GEN1 CAN harness (pre-made): maxxecu.com/store/gearbox/8hp/maxxecu-8hp-gen1-cable-harness
 # Verify hardware ID before purchase: maxxecu.com/webhelp/advanced-8hp-hardware_identifier.html
 
 connectors:
@@ -41,38 +55,24 @@ connectors:
       - "DIN 1"           # 16
     notes: "CAN H/L (pins 10/9) shared with Gauge.S — see CAN_BUS_JUNCTION in maxxecu-m52.wv."
 
-  POWERHOLD_RELAY:
-    type: "Powerhold relay output"
-    subtype: "Constant +12V — KL30 supply for 8HP TCU. See power-distribution.wv."
+  PMU16_MAIN:
+    type: "PMU16 high-side output — KL30 (constant +12V)"
+    subtype: "Engine-bay PMU16 output configured for constant +12V. See power-distribution.wv."
     pincount: 1
-    pinlabels: ["+12V CONST"]
-    notes: "Must remain live from first key-on. ECU must NOT cut this relay during run."
+    pinlabels: ["+12V CONST (KL30)"]
+    notes: "Must remain live from first key-on. Do NOT wire through any cut-off switch."
 
-  IGN_12V:
-    type: "Ignition relay output"
-    subtype: "Ignition-switched +12V — KL15 wakeup for 8HP TCU"
+  PMU16_IGN:
+    type: "PMU16 high-side output — KL15 (IGN-switched +12V)"
+    subtype: "Engine-bay PMU16 output configured for IGN-switched +12V."
     pincount: 1
-    pinlabels: ["+12V IGN"]
+    pinlabels: ["+12V IGN (KL15)"]
 
-  CHASSIS_GND:
+  ENG_GND:
     type: "Ring terminal"
-    subtype: "Chassis / battery GND — cabin distribution bar"
+    subtype: "Engine-bay chassis GND star point (near ECU mount)"
     pincount: 1
     pinlabels: [GND]
-
-  # Bulkhead passthrough — represents Deutsch AS79 firewall bulkhead.
-  # Cabin side connects to cabin harness; engine side connects to 8HP harness.
-  # Full 79-pin assignment: harnesses/firewall-bulkhead.wv
-  BULKHEAD_PASS:
-    type: "Deutsch AS79 bulkhead — 8HP / CAN pins"
-    subtype: "Relevant pins only; see firewall-bulkhead.wv for full 79-pin diagram"
-    pincount: 5
-    pinlabels:
-      - "+12V Main (pin 2 — KL30, CONSTANT)"   # 1
-      - "+12V Wakeup (pin 3 — KL15, IGN)"      # 2
-      - "GND (pin 9 — 8HP chassis GND)"        # 3
-      - "CAN H (pin 47)"                        # 4
-      - "CAN L (pin 48)"                        # 5
 
   HP8_TCU:
     type: "ZF 8HP70 TCU connector — relevant pins"
@@ -92,68 +92,54 @@ connectors:
 
 cables:
 
-  W_8HP_CAN_CABIN:
+  W_8HP_CAN:
     wirecount: 2
     colors: [WH, BU]
     wirelabels: ["CAN H", "CAN L"]
-    length: 0.5 m
-    notes: "Twisted pair, 22 AWG. From cabin CAN junction to bulkhead cabin side."
+    length: 1.5 m
+    notes: >-
+      Twisted pair, 22 AWG. Engine-bay run from MaxxECU 16-pin aux breakout to 8HP TCU
+      (via MaxxECU 8HP GEN1 harness). No firewall crossing under the H2O arch.
 
   W_8HP_MAIN:
     wirecount: 1
     colors: [RD]
     wirelabels: ["+12V CONST (14 AWG)"]
-    length: 0.5 m
+    length: 1.5 m
+    notes: "PMU16 KL30 output to 8HP TCU pin 13. Engine-bay direct run."
 
   W_8HP_WAKE:
     wirecount: 1
     colors: [RD]
     wirelabels: ["+12V IGN (18 AWG)"]
-    length: 0.5 m
+    length: 1.5 m
+    notes: "PMU16 KL15 output to 8HP TCU pin 9. Engine-bay direct run."
 
-  W_8HP_GND_CABIN:
+  W_8HP_GND:
     wirecount: 1
     colors: [BK]
     wirelabels: ["GND (14 AWG)"]
     length: 0.5 m
-
-  W_8HP_CAN_ENGINE:
-    wirecount: 2
-    colors: [WH, BU]
-    wirelabels: ["CAN H", "CAN L"]
-    length: 1.5 m
-    notes: "Twisted pair, 22 AWG. Bulkhead engine side to 8HP TCU (MaxxECU GEN1 harness)."
-
-  W_8HP_PWR_ENGINE:
-    wirecount: 3
-    colors: [RD, RD, BK]
-    wirelabels: ["+12V CONST (14 AWG)", "+12V IGN (18 AWG)", "GND (14 AWG)"]
-    length: 1.5 m
+    notes: "8HP TCU GND to engine-bay chassis GND star point (near ECU mount)."
 
 connections:
 
-  # Cabin side — to bulkhead
+  # CAN: ECU 16-pin aux → 8HP TCU (engine-bay direct)
   - - ECU_16PIN: [10, 9]
-    - W_8HP_CAN_CABIN: [1, 2]
-    - BULKHEAD_PASS: [4, 5]
-
-  - - POWERHOLD_RELAY: [1]
-    - W_8HP_MAIN: [1]
-    - BULKHEAD_PASS: [1]
-
-  - - IGN_12V: [1]
-    - W_8HP_WAKE: [1]
-    - BULKHEAD_PASS: [2]
-
-  - - CHASSIS_GND: [1]
-    - W_8HP_GND_CABIN: [1]
-    - BULKHEAD_PASS: [3]
-
-  # Engine side — bulkhead to 8HP TCU
-  - - BULKHEAD_PASS: [4, 5]
-    - W_8HP_CAN_ENGINE: [1, 2]
+    - W_8HP_CAN: [1, 2]
     - HP8_TCU: [4, 5]
 
-  - - BULKHEAD_PASS: [1, 2, 3]
-    - W_8HP_PWR_ENGINE: [1, 2, 3]
-    - HP8_TCU: [1, 2, 3]
+  # KL30 main power: PMU16 → 8HP TCU pin 13
+  - - PMU16_MAIN: [1]
+    - W_8HP_MAIN: [1]
+    - HP8_TCU: [1]
+
+  # KL15 wakeup: PMU16 → 8HP TCU pin 9
+  - - PMU16_IGN: [1]
+    - W_8HP_WAKE: [1]
+    - HP8_TCU: [2]
+
+  # GND: TCU → engine-bay chassis GND
+  - - HP8_TCU: [3]
+    - W_8HP_GND: [1]
+    - ENG_GND: [1]

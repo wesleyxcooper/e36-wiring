@@ -1,0 +1,115 @@
+metadata:
+  project: E36 Restomod -- GM/Continental Flex Fuel Sensor Wiring (PHASE 3)
+  phase: "Phase 3 (07K custom engine harness era — ECU-side wiring direct-terminate at CMC C1 pin 9)"
+  description: >-
+    PHASE 3 flex fuel sensor wiring: GM/Continental 3-wire ethanol content
+    sensor (GM 13577379 / Continental 21P1023) — SAME sensor and same mount
+    location as Phase 1 (see harnesses/flex-fuel-sensor-phase1.wv). What
+    changes at Phase 3 swap moment is only the ECU-side termination.
+
+    Under Phase 3 the M50 pre-terminated harness is retired and replaced by
+    the custom 07K engine harness (see harnesses/maxxecu-07k.wv). Flex fuel
+    signal now terminates directly at MaxxECU CMC C1 pin 9 (DIN 3) — no
+    intermediate 16-pin aux breakout in the path.
+
+    Rewiring at Phase 3 swap moment (minimal for flex fuel):
+      1. Disconnect the sensor's signal pigtail from the M50 harness 16-pin
+         aux breakout pin 5 (DIN 3).
+      2. Re-terminate that same signal wire into the custom 07K harness's
+         CMC C1 pin 9 direct contact.
+      3. Ground wire similarly re-terminates from 16-pin aux pin 2 to the
+         custom harness CMC C1 SGND pin (H1, pin 29).
+      4. +12V IGN supply wire — unchanged (still from OEM IGN rail via inline fuse).
+
+    The SENSOR itself and the shielded twisted-pair cable from sensor to
+    ECU stay in place. Only the ECU end changes housing.
+
+    Sensor part references and MaxxECU documentation URLs: see
+    harnesses/flex-fuel-sensor-phase1.wv (unchanged between phases).
+
+    Related fuel wiring at Phase 3:
+      - harnesses/fuel-pump-hanger-phase3.wv (PMU16 O4 direct-drive)
+      - harnesses/maxxecu-07k.wv (07K signal → CMC pin destinations)
+
+# ── TODO list ──────────────────────────────────────────────────────────────────
+#
+#   [ ] Confirm CMC C1 pin 9 (DIN 3) allocation preserved in maxxecu-07k.wv
+#       (as of last check — 07K signal→CMC block lists "Flex fuel signal → CMC C1
+#        (DIN 3, pin 9)")
+#   [ ] Verify MTune Digital Inputs → DIN 3 → Type: Frequency → Function: Flex fuel
+#       still assigns to CMC C1 (unchanged from Phase 1 semantics)
+#   [ ] Re-crimp existing sensor signal + ground wires into Molex CMC contacts
+#       (Molex 63811-9200 tool)
+
+# ── Connectors ─────────────────────────────────────────────────────────────────
+
+connectors:
+
+  FLEX_FUEL_SENSOR:
+    type: "GM 13577379 / Continental 21P1023 flex fuel sensor"
+    subtype: "3-wire ethanol content + fuel temperature sensor (UNCHANGED from Phase 1)"
+    pincount: 3
+    pinlabels:
+      - "A: +12V IGN supply"
+      - "B: Signal (variable frequency 50-150 Hz)"
+      - "C: Ground (sensor GND)"
+    notes: >
+      Same sensor as Phase 1 (see flex-fuel-sensor-phase1.wv for install detail
+      and pinout notes). Not removed at swap.
+
+  ECU_CMC_C1:
+    type: "MaxxECU RACE H2O — Molex CMC 48-pin (C1)"
+    subtype: "Direct-terminate at engine-bay ECU — Phase 3 custom 07K harness"
+    pincount: 2
+    pinlabels:
+      - "C1 pin 9 (DIN 3): Flex fuel signal input"
+      - "C1 pin 29 (H1, SGND): Sensor GND (shared sensor return bus)"
+    notes: >
+      Source: harnesses/maxxecu-07k.wv "07K signal → MaxxECU pin destinations"
+      block — Flex fuel signal maps to CMC C1 (DIN 3, pin 9). Sensor GND maps
+      to CMC H1 (pin 29, shared SGND rail).
+      Crimp tool: Molex 63811-9200 for CMC small contacts.
+
+  IGN_12V_BODY:
+    type: "OEM ignition relay — body harness switched +12V (UNCHANGED from Phase 1)"
+    subtype: "Sensor +12V supply"
+    pincount: 1
+    pinlabels: ["+12V IGN"]
+
+# ── Cables ─────────────────────────────────────────────────────────────────────
+
+cables:
+
+  W_FF_POWER:
+    wirecount: 1
+    colors: [RD]
+    wirelabels: ["+12V IGN → sensor pin A"]
+    length: 3.0 m
+    notes: >
+      UNCHANGED from Phase 1 — same 18 AWG wire, same 3A inline fuse, same
+      routing with fuel line.
+
+  W_FF_SIGNAL:
+    wirecount: 2
+    colors: [WH, BN]
+    wirelabels: ["Sensor pin B (signal)", "Sensor pin C (SGND)"]
+    length: 3.0 m
+    shield: true
+    notes: >
+      Same shielded twisted pair as Phase 1 — only the ECU-end housing changes
+      (16-pin aux breakout → CMC C1 direct pin). Drain shield at ECU end only.
+      22 AWG.
+
+# ── Connections ────────────────────────────────────────────────────────────────
+
+connections:
+
+  # ── Sensor +12V IGN supply (UNCHANGED from Phase 1) ──────────────────────────
+  - - IGN_12V_BODY: [1]
+    - W_FF_POWER: [1]
+    - FLEX_FUEL_SENSOR: [1]     # pin A
+
+  # ── Sensor signal + GND direct-terminate at MaxxECU CMC C1 ───────────────────
+  - - FLEX_FUEL_SENSOR: [2, 3]  # pins B, C
+    - W_FF_SIGNAL: [1, 2]
+    - ECU_CMC_C1: [1, 2]        # CMC C1 pin 9 (DIN 3), CMC pin 29 (H1 SGND)

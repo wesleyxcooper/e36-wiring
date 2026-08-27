@@ -1,22 +1,44 @@
-# 8hp-body-integrations.wv
-# ZF 8HP → E36 body harness integration circuits
+# 8hp-body-integrations-phase1.wv
+# ZF 8HP → E36 body harness integration — PHASE 1 (M52 + M50 pre-terminated harness era)
+#
+# Under the H2O engine-bay-mount architecture:
+#   - MaxxECU RACE H2O: engine bay (OEM DME E-box cavity, intake side of RHD car)
+#   - MaxxECU M50 pre-terminated engine harness: plugs into H2O CMC. Available
+#     cabin-side breakouts include BOOST_SOLENOID Superseal 2-pin (unpopulated in
+#     Phase 1 NA — hosts a spare GPO 1 signal)
+#   - PMU16: engine bay, alongside the H2O
+#   - Discrete reverse-light relay: engine bay (Bosch mini relay, near the OEM
+#     Front Power Distribution Box or in an added relay panel next to the PMU16)
+#
+# Phase-transition note: at Phase 3 (07K swap), the M50 pre-terminated harness is
+# retired and replaced with a custom 07K harness. The Phase 1 approach here (GPO
+# via BOOST_SOLENOID Superseal stub) no longer applies — see the Phase 3 file
+# harnesses/8hp-body-integrations-phase3.wv for the PMU16-direct-drive design.
+#
+# See harnesses/body-x20.wv (X20 pin 10 documentation) and
+#     docs/vendor/maxxecu/MaxxECU_RACE_H2O.md (ECU mounting).
 #
 # Covers two 8HP-specific signals that would previously have been handled
 # by the Getrag ZF S5-31 or ZF S5-D manual gearbox:
 #
 #   1. Reverse lights  — Getrag had a mechanical switch on the gearbox.
 #                        8HP has no mechanical switch.
-#                        MaxxECU GPO ("Transmission Reverse") → relay → X20 pin 10.
+#                        MaxxECU GPO 1 ("Transmission Reverse", low-side) → engine-bay
+#                        discrete relay coil → relay contact → X20 pin 10 → OEM cabin
+#                        body harness → reverse lights.
 #
 #   2. Starter inhibit — Getrag had no neutral safety switch (clutch switch
 #                        handled start inhibit for OEM cars).
 #                        8HP: configure MTune → Starter control → inhibit crank
 #                        in all gears except P and N. No relay or hardware needed
-#                        if MaxxECU is in the starter circuit.
+#                        if MaxxECU is in the starter circuit. UNCHANGED between phases.
 #
-# PMU16 note: neither circuit is affected by PMU16 installation.
-#   - Reverse light relay: the GPO drives a ~50 mA coil — not a PMU16 load.
-#   - Starter inhibit: software-only in MTune.
+# PMU16 note (Phase 1): the reverse-light relay coil is driven by the MaxxECU GPO 1
+# signal directly — NOT by a PMU16 output. The M50 pre-terminated harness exposes
+# GPO 1 at the BOOST_SOLENOID Superseal 2-pin connector, which is unused on an NA
+# M52. We tap that connector for the GPO wire. This is Phase 1's constraint —
+# under Phase 3's custom harness (see phase 3 file) PMU16 direct-drive replaces
+# this whole scheme.
 #
 # Source (X20 pinout): harnesses/body-x20.wv + 1998 BMW E36 ETM jonkensy.com
 # Source (reverse light switch path): BMW E36 ETM wiring diagram, section 0670
@@ -32,14 +54,6 @@
 #       (signal is pin 2 of that connector).
 #     - Splice a new wire from BOOST_SOLENOID pin 2 (GPO 1 signal) to REV_RELAY pin 85.
 #     - Configure MTune: Outputs → GPO 1 → Function: "Transmission Reverse".
-#
-#   Phase 3 (07K): GPO 3 freed from VANOS BUT immediately reused for the 07K
-#   intake cam VVT actuator (cam actuator pin 115 in ME7.1.1 — mapped via MaxxECU
-#   PWM solenoid output, closed-loop cam timing). GPO 3 is NOT available for
-#   reverse lights.
-#   GPO 5 freed from ICV B (removed in 07K — no ICV). Reassign reverse lights
-#   to GPO 5. Only an MTune change — no rewiring.
-#   GPO 1 → boost solenoid (now actually connected in Phase 3).
 #
 # ─────────────────────────────────────────────────────────────────────────────
 # Starter inhibit — software-only, no diagram needed:
@@ -59,7 +73,7 @@ connectors:
   # ── MaxxECU GPO output ───────────────────────────────────────────────────────
   MAXXECU_GPO_REV:
     type: "MaxxECU M50 terminated harness — BOOST_SOLENOID connector"
-    subtype: "GPO 1 (CMC B4) — Phase 1 recommendation. Reassign to GPO 3/5 at Phase 3."
+    subtype: "GPO 1 (CMC B4) — Phase 1 approach only. Phase 3 uses PMU16 direct."
     pincount: 1
     pinlabels: ["GPO 1 signal (low-side switch to GND)"]
     notes: >
@@ -68,9 +82,8 @@ connectors:
       Access: pin 2 of the Superseal 2-pin BOOST_SOLENOID breakout connector in the
       MaxxECU M50 terminated harness. Boost solenoid connector is unpopulated in
       M52 NA Phase 1. Leave connector unpopulated and splice from this wire.
-      Phase 3: reassign to GPO 5 (freed from ICV B — ICV removed in 07K swap) in MTune only.
-      GPO 3 is NOT available in Phase 3 — it is reused for the 07K intake cam VVT actuator
-      (ME7.1.1 cam actuator, pin 115; MaxxECU PWM solenoid output, closed-loop cam timing).
+      Phase 3: this connector no longer exists (custom 07K harness). See
+      harnesses/8hp-body-integrations-phase3.wv for the PMU16-direct-drive replacement.
 
   # ── Reverse light relay ──────────────────────────────────────────────────────
   REV_RELAY:
@@ -87,7 +100,8 @@ connectors:
         Cathode (banded end) → pin 86 / +12V.
         Anode → pin 85 / GPO.
       Prevents GPO output damage from coil back-EMF at relay de-energization.
-      Mount relay in engine bay fuse / relay area (same location as fan relay, fuel pump relay).
+      Mount relay in engine bay near the OEM Front Power Distribution Box or
+      alongside the PMU16 (either physical location works). Engine-bay-side only.
       Coil draws ~150 mA — well within MaxxECU GPO output spec.
 
   # ── X20 reverse light input ──────────────────────────────────────────────────
@@ -113,7 +127,8 @@ connectors:
     pinlabels: ["+12V fused (15A)"]
     notes: >
       Supply for relay contact pin 30 — independent of the coil supply.
-      Source from main fuse block battery rail (not from PMU16).
+      Source from main fuse block battery rail (PMU16 is not yet installed in Phase 1;
+      Phase 3 uses PMU16 direct so no separate fuse needed there).
       15A fuse is sufficient — reverse light bulbs draw ~4–8A total on E36.
 
   IGN_12V_BODY:
@@ -137,20 +152,21 @@ cables:
     notes: >
       From BOOST_SOLENOID connector pin 2 (GPO 1) to relay pin 85.
       18 AWG sufficient — carries only coil current (~150 mA).
+      Engine-bay-only run.
 
   W_REV_COIL_PWR:
     wirecount: 1
     colors: [RD]
     wirelabels: ["+12V IGN (coil +)"]
     length: 0.3 m
-    notes: "OEM IGN relay +12V to relay pin 86. 18 AWG."
+    notes: "OEM IGN relay +12V to relay pin 86. 18 AWG. Engine-bay-only run."
 
   W_REV_CONTACT_PWR:
     wirecount: 1
     colors: [RD]
     wirelabels: ["+12V fused (contact supply)"]
     length: 0.3 m
-    notes: "Fused +12V to relay pin 30 (contact input). 16 AWG."
+    notes: "Fused +12V to relay pin 30 (contact input). 16 AWG. Engine-bay-only run."
 
   W_REV_OUTPUT:
     wirecount: 1
@@ -161,7 +177,8 @@ cables:
       From relay pin 87 to X20 engine-side pin 10 (BL/GE).
       Replace the OEM connection at X20 pin 10 that previously received
       the mechanical gearbox reverse switch +12V.
-      16 AWG (matches OEM wire gauge).
+      16 AWG (matches OEM wire gauge). Engine-bay-only run — X20 pin 10
+      cabin side is unmodified OEM.
 
 
 connections:

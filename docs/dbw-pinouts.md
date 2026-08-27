@@ -1,9 +1,11 @@
 # DBW Wiring Pinouts
 
-Reference for `harnesses/maxxecu-07k.wv` and `harnesses/firewall-bulkhead.wv`.
+Reference for `harnesses/maxxecu-07k.wv`, `harnesses/epedal-bmw-e46.wv`, and `harnesses/firewall-crossing-maven.wv`.
 
-All signals pass through the Deutsch Autosport AS47/AS79 firewall bulkhead connector.
-Six pins must be reserved in the bulkhead for e-pedal; six more for the throttle body (already part of the 07K engine harness side).
+Under the H2O engine-bay-mount architecture (see `docs/vendor/maxxecu/MaxxECU_RACE_H2O.md`), the MaxxECU RACE H2O sits in the engine bay. The two DBW subsystems terminate as follows:
+
+- **APS e-pedal (cabin footwell)**: 6 wires cross the firewall via **Maven HD30 Connector B pins 1–6** (Phase 3 install). Connector B is the *safety-critical* Maven connector — APS is the throttle command input, and any fault must trigger e-throttle shutdown. See "APS e-pedal" section below.
+- **07K DBW throttle body (engine bay)**: 6 wires terminate directly at MaxxECU C1/C2 in the engine bay. **No firewall crossing** — both endpoints are engine-bay-side. See "07K DBW Throttle Body" section below.
 
 ---
 
@@ -136,39 +138,38 @@ MaxxECU has pre-defined profiles for this family. Use the identification method 
 
 ---
 
-## Firewall Bulkhead Pin Allocation (DBW)
+## Firewall Crossing Allocation (DBW)
 
-### APS e-pedal — cabin-to-cabin via Maven HD30 Connector A
+### APS e-pedal — crosses firewall via Maven HD30 Connector B (safety-critical)
 
-APS is **cabin-to-cabin only** — the E46 pedal is footwell-mounted, MaxxECU is cabin-mounted.
-No signal crosses to the engine side of the firewall.
+Connector B of the Maven HD30 dual bulkhead is **designated safety-critical** and reserved for APS wiring across the entire build. APS is the throttle command input — any fault (open wire, short, sensor mismatch between APS1 and APS2) must trigger MaxxECU e-throttle shutdown. Keeping APS on its own dedicated Maven connector prevents accidental mixing with less-critical CAN + DCT signals (which go on Connector A).
 
-The 6 APS wires terminate at **Maven HD30 Connector A cabin face (pins A14–A19)**, which acts
-as a cabin-side junction block. The engine side of these pins is cavity-plugged.
-AS79 (Connector B) is not used for APS.
+The 6 APS wires cross from cabin footwell (E46 pedal) to engine-bay MaxxECU via **Maven Connector B pins 1–6**. Cabin-side Maven receptacle is installed at Phase 3 (along with the pedal itself); engine-side plug on the 07K custom harness mates to it at 07K swap.
 
-| Signal | From | HD30 A pin | To |
+| Signal | From | Maven B pin | To (engine-bay MaxxECU) |
 |---|---|---|---|
-| APS GND 1 | E-pedal pin 1 | A14 | MaxxECU SGND (CMC H1) |
-| APS GND 2 | E-pedal pin 2 | A15 | MaxxECU SGND (CMC H1) |
-| APS VCC 2 | E-pedal pin 3 | A16 | MaxxECU +5V SENS OUT |
-| APS1 signal | E-pedal pin 4 | A17 | MaxxECU C2 E4 (AIN 6) |
-| APS VCC 1 | E-pedal pin 5 | A18 | MaxxECU +5V SENS OUT |
-| APS2 signal | E-pedal pin 6 | A19 | MaxxECU C2 F1 (AIN 7) |
+| APS GND 1 | E-pedal pin 1 | B1 | MaxxECU SGND (CMC H1, pin 29) |
+| APS GND 2 | E-pedal pin 2 | B2 | MaxxECU SGND (CMC H1, pin 29) |
+| APS VCC 2 | E-pedal pin 3 | B3 | MaxxECU +5V sensor rail (CMC G1, pin 25) |
+| APS1 signal | E-pedal pin 4 | B4 | MaxxECU C2 E4 (AIN 6) |
+| APS VCC 1 | E-pedal pin 5 | B5 | MaxxECU +5V sensor rail (CMC G1, pin 25) |
+| APS2 signal | E-pedal pin 6 | B6 | MaxxECU C2 F1 (AIN 7) |
 
-Pins A14–A19 are cavity-plugged in Phase 1 (M52); the cabin cable run (pedal → HD30 A cabin face)
-is added at Phase 3. Source: `harnesses/firewall-bulkhead-dual.wv`, `harnesses/epedal-bmw-e46.wv`.
+Connector B pins 7–16 (10 spare cavities) are cavity-plugged. Reserved for future safety-critical throttle-related expansion only (e.g., a redundant idle position sensor, a brake pressure input to Torque-Reduction-On-Brake logic).
 
-### TB motor and sensors — all cross the AS79 firewall bulkhead
+Source: `harnesses/firewall-crossing-maven.wv`, `harnesses/epedal-bmw-e46.wv`.
 
-TB wiring **does** cross the firewall — MaxxECU is cabin-mounted, the TB is engine-side.
-Source: `harnesses/maxxecu-07k.wv` lines confirming Motor+/− via AS79 pins 22/23.
+### 07K DBW throttle body — engine-bay direct-terminate (NO firewall crossing)
 
-| Signal | AS79 pin | MaxxECU terminal | Wire |
-|---|---|---|---|
-| ETh Motor+ | 22 | C2 H4 (MOTOR 1+) | **22 AWG** (AS79 size-22D; 20 AWG will not seat) |
-| ETh Motor− | 23 | C2 H2 (MOTOR 1−) | **22 AWG** (same) |
-| TPS1 | 48 | CMC G2 (C1 TPS input / was M52 TPS) | 22 AWG shielded |
-| TPS2 | 56 | CMC J2 (AIN 2) | 22 AWG shielded |
-| +5V sensor supply | 47 | CMC G1 (+5V SENS OUT) | 22 AWG |
-| Sensor GND | 79 | CMC H1 (SGND) | 22 AWG |
+Under the H2O arch, MaxxECU is engine-bay-mounted alongside the TB. All 6 TB wires (Motor+/−, TPS1, TPS2, +5V, SGND) run engine-bay-only and terminate directly at MaxxECU C1/C2. There is NO firewall bulkhead in this path. See `harnesses/maxxecu-07k.wv` "07K signal → MaxxECU pin destinations" block.
+
+| Signal | MaxxECU terminal (direct-terminate at engine bay) | Wire |
+|---|---|---|
+| ETh Motor+ | C2 H4 (MOTOR 1+) | 22 AWG — 3A H-bridge peak at 0.5m engine-bay run |
+| ETh Motor− | C2 H2 (MOTOR 1−) | 22 AWG (same) |
+| TPS1 | C1 G2 (pin 26, was M52 TPS wire — reused) | 22 AWG shielded |
+| TPS2 | C1 J2 (AIN 2, pin 34) | 22 AWG shielded |
+| +5V sensor supply | C1 G1 (pin 25, shared sensor rail) | 22 AWG |
+| Sensor GND | C1 H1 (pin 29, shared SGND) | 22 AWG |
+
+TB motor polarity: verify with volt meter and MTune e-throttle wizard before final crimp — swap Motor+/− at the TB connector if throttle runs in the wrong direction during the e-throttle wizard.

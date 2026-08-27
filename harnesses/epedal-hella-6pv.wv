@@ -7,8 +7,10 @@ metadata:
     Hella pedal is a universal floor-mount module with no OEM bracket dependency;
     mount position is fully custom-fabricated (aluminum plate + 3x M6 studs).
     MaxxECU has a native pre-defined profile for this pedal.
-    APS wiring is CABIN-TO-CABIN ONLY -- no firewall bulkhead crossing required
-    (same as E46 variant). MaxxECU is cabin-mounted.
+    Under the H2O engine-bay-mount architecture, the MaxxECU is engine-bay-mounted
+    (OEM DME E-box cavity, intake side of RHD car). APS signals cross the firewall
+    via the Maven HD30 dual bulkhead Connector B (see harnesses/firewall-crossing-maven.wv)
+    — Connector B is populated at Phase 3 when the pedal is installed.
     Confirmed C2 pin assignments: APS1 → C2 E4 (AIN 6), APS2 → C2 F1 (AIN 7).
     Source: MaxxECU RACE GEN1 C2 pinout (maxxecu.com/webhelp/wirings-maxxecu_pinout.html).
     Cross-reference docs/dbw-pinouts.md for specs and comparison.
@@ -23,7 +25,7 @@ metadata:
 #   [x] Confirm MaxxECU AIN pin numbers for APS1 and APS2
 #       CONFIRMED: APS1 → C2 E4 (AIN 6), APS2 → C2 F1 (AIN 7)
 #       Source: MaxxECU RACE GEN1 C2 pinout — maxxecu.com/webhelp/wirings-maxxecu_pinout.html
-#   [x] APS routing confirmed cabin-to-cabin; AS79 bulkhead NOT used for APS
+#   [x] APS routing: crosses firewall via Maven Connector B (Phase 3 install)
 #   [ ] Verify bench: APS1 and APS2 idle/WOT voltages before installing in car
 #   [ ] Load MaxxECU native Hella profile in MTune before calibration wizard
 #   [ ] Run e-throttle calibration wizard after wiring
@@ -93,8 +95,11 @@ cables:
     colors: [BN, RD, WH, BN, RD, WH]
     shield: true
     notes: >-
-      Cabin-only run: Hella pedal connector (footwell) → MaxxECU connector area (firewall).
-      No firewall crossing. Route along tunnel/sill, away from audio wiring.
+      Cabin footwell → Maven HD30 Connector B (cabin face, at firewall) — 6 wires
+      crossing to engine-bay MaxxECU via Connector B pins 1-6 under the H2O arch.
+      Cabin-side run only in this cable file — the engine-side hop is documented
+      in harnesses/firewall-crossing-maven.wv.
+      Route the cabin portion along tunnel/sill, away from audio wiring.
       24 AWG sufficient -- low-current sensor signals only.
       Shielded 6-conductor; drain shield at MaxxECU end only (single-end drain).
       Tie drain wire to CMC H1 (Sensor GND).
@@ -105,7 +110,7 @@ cables:
       Wire 5 RD: +5V1 (pedal pin 5) → MAXXECU_SUPPLY +5V rail (CMC G1).
       Wire 6 WH: TPS1/APS1 signal (pedal pin 6) → MAXXECU_C2 E4 (AIN 6).
       Note: wire-color order differs from E46 variant -- label both ends clearly.
-      AS79 bulkhead NOT used for APS -- cabin-to-cabin direct run.
+      APS crosses firewall via Maven Connector B (see harnesses/firewall-crossing-maven.wv).
 
 # ── Connections ────────────────────────────────────────────────────────────────
 

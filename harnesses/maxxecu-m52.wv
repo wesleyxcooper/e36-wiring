@@ -18,13 +18,16 @@
 # Harness revision: REV 2
 # Note: Harness is built for non-VANOS M50 head.
 #       M52 VANOS cam sensor requires sensor swap to BMW 12141726590.
-#       Phase 1 firewall routing: harness passes through existing E36 firewall grommet/bushing.
-#       No AS79 bulkhead connector is used in Phase 1. AS79 is Phase 3 (07K) only.
+#       Phase 1 firewall routing: pre-terminated harness passes through the existing
+#       E36 firewall grommet/bushing to the engine-bay MaxxECU RACE H2O.
+#       No firewall bulkhead connector is used in Phase 1. The Maven HD30 dual
+#       bulkhead is a Phase 2 install (see harnesses/firewall-crossing-maven.wv).
 #
 # ─────────────────────────────────────────────────────────────────────────────
-# CRIMP TOOLS — for reference only (Phase 3 / 07K harness build, not Phase 1):
+# CRIMP TOOLS — for reference only (Phase 2 / 07K harness build, not Phase 1):
 #
-#   AS79 size-22 contacts           → Daniels AFM8 (M22520/2-01) + K42 positioner (pin) / K40 (socket)
+#   Deutsch HD30 (Maven) size-16 contacts → Deutsch HDT-48-00 (covers all Deutsch
+#                                            solid contacts DT/DTM/DTP/DTHD/HD30/etc.)
 #   VAG/Bosch JMT/JPT pigtail contacts → Engineer PA-09
 #     (cam · crank · MAP · CLT · IAT · injector · M52 pencil coil pigtails)
 #   MaxxECU C1/C2 Molex contacts    → Molex 63811-9200 (small) / 63811-8900 (large)
@@ -78,12 +81,14 @@
 #       in Phase 1). Phase 3 (07K): GPO 1 drives the boost solenoid.
 #       +12V for solenoid/relay comes from coil/inj rail (ECU_12PIN[1]).
 #
-# NOTE: Firewall bulkhead (AS79) — Phase 3 only, NOT used in Phase 1.
-#       Phase 1: pre-terminated harness passes through existing E36 firewall grommet/bushing.
-#       Phase 3: Deutsch AS79 / Souriau 8STA 79-way bulkhead installed; 07K engine-side plug
-#       terminates the custom harness (plug-and-play swap). ~59 pins used/reserved; ~20 spares.
-#       Full pin assignment: harnesses/firewall-bulkhead.wv
-#       Source: RaceSpec Online (racespeconline.com) — AS79 ~$120-180.
+# NOTE: Firewall bulkhead — Maven HD30 dual 16+16 kit, Phase 2 install (NOT Phase 1).
+#       Phase 1: pre-terminated harness passes through existing E36 firewall grommet.
+#       Phase 2 (offline while M52 is running): install Maven bulkhead in firewall.
+#         Re-terminate cabin CAN + DCT shifter wires into Maven Connector A.
+#         Connector B cavity-plugged until Phase 3 APS pedal install.
+#       Full spec: harnesses/firewall-crossing-maven.wv
+#       Kit: mavenspeed.com/collections/b2t-engineering/products/dual-connector-bulkhead
+#         (16-pin & 16-pin config, $274 USD).
 #
 # TODO: Wire gauges throughout
 #       12-pin power wires (12V coils, ECU power, engine GND) require minimum 14 AWG.

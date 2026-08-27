@@ -854,12 +854,12 @@
 <polygon fill="#ffffff" stroke="black" points="19855.12,-1033.62 18524.88,-1033.62 18524.88,-907.12 19855.12,-907.12 19855.12,-1033.62"/>
 <polygon fill="none" stroke="black" points="18524.88,-1009.88 18524.88,-1033.62 19855.12,-1033.62 19855.12,-1009.88 18524.88,-1009.88"/>
 <text xml:space="preserve" text-anchor="start" x="19108.25" y="-1016.88" font-family="arial" font-size="14.00">RADIUM_HANGER_STUB</text>
-<polygon fill="none" stroke="black" points="18524.88,-986.12 18524.88,-1009.88 19044.79,-1009.88 19044.79,-986.12 18524.88,-986.12"/>
-<text xml:space="preserve" text-anchor="start" x="18615.71" y="-993.12" font-family="arial" font-size="14.00">Stub: PMU16 O4 → Radium 20&#45;1170 hanger pump stud</text>
-<polygon fill="none" stroke="black" points="19044.79,-986.12 19044.79,-1009.88 19643.46,-1009.88 19643.46,-986.12 19044.79,-986.12"/>
-<text xml:space="preserve" text-anchor="start" x="19135.62" y="-993.12" font-family="arial" font-size="14.00">See harnesses/fuel&#45;pump&#45;hanger.wv &#45;&#45; replaces Crydom D1D40 SSR</text>
-<polygon fill="none" stroke="black" points="19643.46,-986.12 19643.46,-1009.88 19855.12,-1009.88 19855.12,-986.12 19643.46,-986.12"/>
-<text xml:space="preserve" text-anchor="start" x="19734.29" y="-993.12" font-family="arial" font-size="14.00">1&#45;pin</text>
+<polygon fill="none" stroke="black" points="18524.88,-986.12 18524.88,-1009.88 19017.29,-1009.88 19017.29,-986.12 18524.88,-986.12"/>
+<text xml:space="preserve" text-anchor="start" x="18601.96" y="-993.12" font-family="arial" font-size="14.00">Stub: PMU16 O4 → Radium 20&#45;1170 hanger pump stud</text>
+<polygon fill="none" stroke="black" points="19017.29,-986.12 19017.29,-1009.88 19670.96,-1009.88 19670.96,-986.12 19017.29,-986.12"/>
+<text xml:space="preserve" text-anchor="start" x="19094.38" y="-993.12" font-family="arial" font-size="14.00">See harnesses/fuel&#45;pump&#45;hanger&#45;phase3.wv (PMU16 O4 direct&#45;drive at 07K swap)</text>
+<polygon fill="none" stroke="black" points="19670.96,-986.12 19670.96,-1009.88 19855.12,-1009.88 19855.12,-986.12 19670.96,-986.12"/>
+<text xml:space="preserve" text-anchor="start" x="19748.04" y="-993.12" font-family="arial" font-size="14.00">1&#45;pin</text>
 <polygon fill="none" stroke="black" points="18524.88,-962.38 18524.88,-986.12 19061,-986.12 19061,-962.38 18524.88,-962.38"/>
 <text xml:space="preserve" text-anchor="start" x="18789.19" y="-969.38" font-family="arial" font-size="14.00">1</text>
 <polygon fill="none" stroke="black" points="19061,-962.38 19061,-986.12 19855.12,-986.12 19855.12,-962.38 19061,-962.38"/>

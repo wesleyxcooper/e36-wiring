@@ -6,7 +6,7 @@ Content verified live: 2026-08-26
 
 > **Phase 1 (M52) uses this pre-terminated harness.** No custom M52 engine harness build is needed.
 > The harness runs CMC connector → firewall bushing (850 mm) → engine sensors. It passes through
-> the existing E36 firewall grommet — no AS79 bulkhead connector for Phase 1.
+> the existing E36 firewall grommet — no firewall bulkhead connector for Phase 1 (Maven HD30 dual bulkhead is a Phase 3 install; the deprecated AS79 approach is no longer used).
 >
 > **What still requires separate work:**
 > - **VANOS cam sensor** — harness is wired for non-VANOS head. Either swap cam sensor to BMW PN
