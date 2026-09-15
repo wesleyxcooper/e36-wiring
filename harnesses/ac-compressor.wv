@@ -50,6 +50,13 @@ metadata:
 #   [ ] Set PWM controller duty cycle to ~45% initially (3,000 RPM) --
 #       do not start at 95% (5,000 RPM causes near-stall idle dip)
 #   [ ] Test with engine running: monitor idle, adjust duty cycle in 5% increments
+#       -- CAP AT ~65%. Past 65-70% duty, current climbs fast while cooling
+#       plateaus (condenser becomes bottleneck). If cooling insufficient at 65%,
+#       address condenser/airflow, not more PWM. Ref: @jfantis on Rawrkee Ep. 3.
+#   [ ] Decel-to-idle catch: with AC on, push clutch in during decel. If idle
+#       droops or stalls, tune MaxxECU idle-air PID gain -- do NOT reduce
+#       compressor PWM to work around it. AC load droop is an engine-control
+#       problem (idle-air compensation), not a compressor-speed problem.
 
 # ── Connectors ─────────────────────────────────────────────────────────────────
 
@@ -145,6 +152,14 @@ connectors:
       This is a 3-phase inverter/VFD: DC 12V in, 3-phase PMSM drive out.
       Manual duty cycle knob: start at ~45% (3,000 RPM, 51-54 degF vent at
       90 degF ambient). Do NOT start at 95% (5,000 RPM -- near-stall idle dip).
+      TUNING CAP: iterate up to ~65% only. Past 65-70% duty, current draw
+      climbs fast while cooling gains plateau -- bottleneck moves from
+      compressor to condenser and higher PWM wastes amperage without
+      meaningful additional cold air. If target vent temps unmet at 65%,
+      fix is condenser/airflow side (see walkthroughs/37-ac.md Condenser
+      & Airflow section), NOT more PWM. Reference: @jfantis 4+ years on this
+      exact compressor cooling 220 sqft Atlanta showroom with 28k BTU evap
+      on high fan never exceeds ~55% duty even in Atlanta summer.
       Manual frequency knob: leave at factory default unless specified in manual.
       DC side connector: verify on delivery (ring terminals or proprietary).
       Motor side: 3 orange pigtail wires (U/V/W) -- confirmed from Alibaba product photos.
