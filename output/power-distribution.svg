@@ -733,21 +733,25 @@
 <!-- IGN_12V_SOURCE -->
 <g id="node9" class="node">
 <title>IGN_12V_SOURCE</title>
-<polygon fill="#ffffff" stroke="black" points="18602.12,-934.88 15259.62,-934.88 15259.62,-839.88 18602.12,-839.88 18602.12,-934.88"/>
-<polygon fill="none" stroke="black" points="15259.62,-911.12 15259.62,-934.88 18602.12,-934.88 18602.12,-911.12 15259.62,-911.12"/>
+<polygon fill="#ffffff" stroke="black" points="18046,-934.88 15815.75,-934.88 15815.75,-773.88 18046,-773.88 18046,-934.88"/>
+<polygon fill="none" stroke="black" points="15815.75,-911.12 15815.75,-934.88 18046,-934.88 18046,-911.12 15815.75,-911.12"/>
 <text xml:space="preserve" text-anchor="start" x="16869.75" y="-918.12" font-family="arial" font-size="14.00">IGN_12V_SOURCE</text>
-<polygon fill="none" stroke="black" points="15259.62,-887.38 15259.62,-911.12 16357.79,-911.12 16357.79,-887.38 15259.62,-887.38"/>
-<text xml:space="preserve" text-anchor="start" x="15740.46" y="-894.38" font-family="arial" font-size="14.00">Ignition&#45;switched +12V</text>
-<polygon fill="none" stroke="black" points="16357.79,-887.38 16357.79,-911.12 17610.46,-911.12 17610.46,-887.38 16357.79,-887.38"/>
-<text xml:space="preserve" text-anchor="start" x="16838.62" y="-894.38" font-family="arial" font-size="14.00">From ignition switch or X20 &#45;&#45; TODO confirm pin</text>
-<polygon fill="none" stroke="black" points="17610.46,-887.38 17610.46,-911.12 18602.12,-911.12 18602.12,-887.38 17610.46,-887.38"/>
-<text xml:space="preserve" text-anchor="start" x="18091.29" y="-894.38" font-family="arial" font-size="14.00">1&#45;pin</text>
-<polygon fill="none" stroke="black" points="15259.62,-863.62 15259.62,-887.38 17022.38,-887.38 17022.38,-863.62 15259.62,-863.62"/>
-<text xml:space="preserve" text-anchor="start" x="16045.75" y="-870.62" font-family="arial" font-size="14.00">+12V IGN → PMU16 +12V SW</text>
-<polygon fill="none" stroke="black" points="17022.38,-863.62 17022.38,-887.38 18602.12,-887.38 18602.12,-863.62 17022.38,-863.62"/>
-<text xml:space="preserve" text-anchor="start" x="17808.5" y="-870.62" font-family="arial" font-size="14.00">1</text>
-<polygon fill="none" stroke="black" points="15259.62,-839.88 15259.62,-863.62 18602.12,-863.62 18602.12,-839.88 15259.62,-839.88"/>
-<text xml:space="preserve" text-anchor="start" x="15263.62" y="-846.88" font-family="arial" font-size="14.00">Feeds PMU16 pin 7 (+12V SW) &#45;&#45; this is the PMU16 on/off sense input. When IGN is ON: PMU16 activates and begins executing programmed output logic. When IGN is OFF: PMU16 runs post&#45;shutdown logic (e.g. EWP cooling) then powers down. TODO: confirm which ignition switch terminal or X20 pin carries key&#45;on switched +12V for this RHD car. On E36, the ignition switch (pin 15) provides switched +12V. May be accessible at the fuse box or tapped from X20. Wire gauge: 18 AWG is sufficient (PMU16 +12V SW is a signal input, very low current).</text>
+<polygon fill="none" stroke="black" points="15815.75,-887.38 15815.75,-911.12 16543.42,-911.12 16543.42,-887.38 15815.75,-887.38"/>
+<text xml:space="preserve" text-anchor="start" x="16111.33" y="-894.38" font-family="arial" font-size="14.00">Ignition&#45;switched +12V</text>
+<polygon fill="none" stroke="black" points="16543.42,-887.38 16543.42,-911.12 17424.83,-911.12 17424.83,-887.38 16543.42,-887.38"/>
+<text xml:space="preserve" text-anchor="start" x="16839" y="-894.38" font-family="arial" font-size="14.00">X20 pin 21 (SW/GN, Ignition Switch terminal 15)</text>
+<polygon fill="none" stroke="black" points="17424.83,-887.38 17424.83,-911.12 18046,-911.12 18046,-887.38 17424.83,-887.38"/>
+<text xml:space="preserve" text-anchor="start" x="17720.42" y="-894.38" font-family="arial" font-size="14.00">1&#45;pin</text>
+<polygon fill="none" stroke="black" points="15815.75,-863.62 15815.75,-887.38 17022.38,-887.38 17022.38,-863.62 15815.75,-863.62"/>
+<text xml:space="preserve" text-anchor="start" x="16323.81" y="-870.62" font-family="arial" font-size="14.00">+12V IGN → PMU16 +12V SW</text>
+<polygon fill="none" stroke="black" points="17022.38,-863.62 17022.38,-887.38 18046,-887.38 18046,-863.62 17022.38,-863.62"/>
+<text xml:space="preserve" text-anchor="start" x="17530.44" y="-870.62" font-family="arial" font-size="14.00">1</text>
+<polygon fill="none" stroke="black" points="15815.75,-773.88 15815.75,-863.62 18046,-863.62 18046,-773.88 15815.75,-773.88"/>
+<text xml:space="preserve" text-anchor="start" x="15819.75" y="-846.88" font-family="arial" font-size="14.00">Feeds PMU16 pin 7 (+12V SW) &#45;&#45; this is the PMU16 on/off sense input. When IGN is ON: PMU16 activates and begins executing programmed output logic. When IGN is OFF: PMU16 runs post&#45;shutdown logic (e.g. EWP cooling) then powers down. X20 pin 21 = GN (green) = ignition switch terminal 15 = IGN&#45;switched +12V. Sources (both derived from 93&#45;95 E36 ETM):</text>
+<text xml:space="preserve" text-anchor="start" x="15819.75" y="-831.12" font-family="arial" font-size="14.00"> &#160;megasquirt.325ix.com/MS_to_Motronic/C101_to_X20.html — pin 21 = &quot;Ignition Switch&quot; (GN);</text>
+<text xml:space="preserve" text-anchor="start" x="15819.75" y="-815.38" font-family="arial" font-size="14.00"> &#160;r3vlimited.com/board/forum/e30&#45;technical&#45;forums/24v&#45;engine&#45;swaps/m50&#45;52&#45;s50&#45;52/42868&#45;x20&#45;pinout&#45;help</text>
+<text xml:space="preserve" text-anchor="start" x="15819.75" y="-799.62" font-family="arial" font-size="14.00"> &#160;— &quot;Pin 21 is connected to ignition switch (terminal 15). Provides IGN&#45;switched power to coils and DME pin 56.&quot;</text>
+<text xml:space="preserve" text-anchor="start" x="15819.75" y="-780.88" font-family="arial" font-size="14.00">⚠️ Verify against the BMW ETM for this car&#39;s specific model year before wiring. Tap engine&#45;side of X20 pin 21 in the engine bay. Fuse at source: 5A. Wire gauge: 18 AWG is sufficient (PMU16 +12V SW is a signal input, very low current).</text>
 </g>
 <!-- W_IGN_TO_PMU16 -->
 <g id="node23" class="node">
@@ -771,9 +775,9 @@
 <!-- IGN_12V_SOURCE&#45;&#45;W_IGN_TO_PMU16 -->
 <g id="edge13" class="edge">
 <title>IGN_12V_SOURCE:e&#45;&#45;W_IGN_TO_PMU16:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M18603.12,-873.5C19067.33,-873.5 19183.39,-872.63 19647.62,-872.63"/>
-<path fill="none" stroke="#ff0000" stroke-width="2" d="M18603.12,-875.5C19067.35,-875.5 19183.4,-874.62 19647.62,-874.62"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M18603.12,-877.5C19067.36,-877.5 19183.42,-876.62 19647.62,-876.62"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M18047,-873.5C18758.38,-873.5 18936.23,-872.63 19647.62,-872.63"/>
+<path fill="none" stroke="#ff0000" stroke-width="2" d="M18047,-875.5C18758.39,-875.5 18936.24,-874.62 19647.62,-874.62"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M18047,-877.5C18758.4,-877.5 18936.25,-876.62 19647.62,-876.62"/>
 </g>
 <!-- MAXXECU_CAN1_STUB -->
 <g id="node10" class="node">

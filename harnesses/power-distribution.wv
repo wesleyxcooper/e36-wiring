@@ -315,17 +315,20 @@ connectors:
   # ── Ignition-switched +12V source ─────────────────────────────────────────
   IGN_12V_SOURCE:
     type: "Ignition-switched +12V"
-    subtype: "From ignition switch or X20 -- TODO confirm pin"
+    subtype: "X20 pin 21 (SW/GN, Ignition Switch terminal 15)"
     pincount: 1
     pinlabels: ["+12V IGN → PMU16 +12V SW"]
     notes: >-
       Feeds PMU16 pin 7 (+12V SW) -- this is the PMU16 on/off sense input.
       When IGN is ON: PMU16 activates and begins executing programmed output logic.
       When IGN is OFF: PMU16 runs post-shutdown logic (e.g. EWP cooling) then powers down.
-      TODO: confirm which ignition switch terminal or X20 pin carries
-      key-on switched +12V for this RHD car.
-      On E36, the ignition switch (pin 15) provides switched +12V.
-      May be accessible at the fuse box or tapped from X20.
+      X20 pin 21 = GN (green) = ignition switch terminal 15 = IGN-switched +12V.
+      Sources (both derived from 93-95 E36 ETM):
+        megasquirt.325ix.com/MS_to_Motronic/C101_to_X20.html — pin 21 = "Ignition Switch" (GN);
+        r3vlimited.com/board/forum/e30-technical-forums/24v-engine-swaps/m50-52-s50-52/42868-x20-pinout-help
+        — "Pin 21 is connected to ignition switch (terminal 15). Provides IGN-switched power to coils and DME pin 56."
+      ⚠️ Verify against the BMW ETM for this car's specific model year before wiring.
+      Tap engine-side of X20 pin 21 in the engine bay. Fuse at source: 5A.
       Wire gauge: 18 AWG is sufficient (PMU16 +12V SW is a signal input, very low current).
 
   # ── Ecumaster PMU16 Power Management Unit ─────────────────────────────────
