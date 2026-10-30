@@ -125,11 +125,11 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 
 | Qty | Item | Notes |
 |-----|------|-------|
-| 1 | Battery positive terminal | Ring terminal, trunk/engine bay |
-| 1 | Battery negative terminal | Ring terminal — chassis stud. Engine block direct cable is **optional** (see below) |
-| 1 | Chassis ground stud, M8 | Engine bay — PMU16 GND lug + body electrical returns. MaxxECU engine GND goes to cylinder head (in ECU harness, not here) |
-| 1 (optional) | Engine block ground stud, M8 | **Optional** — only if running a dedicated battery→engine block direct cable (belt-and-suspenders; not required while factory M52 bonding straps are intact and clean) |
-| 1 (optional) | **4-post battery cutoff switch — Moroso 74108** ([Amazon](https://www.amazon.com/Moroso-74108-Battery-Alternator-Disconnect/dp/B01GWD2XUS) ~$101 / [moroso.com](https://www.moroso.com/battery-and-alternator-disconnect-switch74108/) $113) | **Optional** — not required on a dual-duty street/drift car with a working ignition key. Install only if HPDE org or track rules require it. If installed: must be 4-post (NOT 2-post). |
+| 1 | Battery positive terminal (trunk, driver's side) | LiFePO4 — Antigravity ATX20-HD (~$300) or Braille B2317 (~$200). Bentley manual section 020-12 requires vibration-resistant battery for E36 cabriolet. Battery is factory trunk-mounted — no relocation needed. Source: BimmerForums UK 1996 E36 convertible RHD; MotorsForum UK 1994 E36 320i SE RHD. |
+| 1 | Trunk chassis ground stud, M8 (`TRUNK_CHASSIS_GND`) | Structural point in trunk — weld seam, frame rail, or sill area. Battery negative terminates here (short local lead). Clean bare metal + star washer. |
+| 1 | Engine bay chassis ground stud, M8 (`CHASSIS_GND`) | Engine bay — PMU16 GND lug + body electrical returns + ENGINE_BLOCK_GND. MaxxECU engine GND goes to cylinder head (in ECU harness, not here). |
+| 1 | Engine block ground stud, M8 (`ENGINE_BLOCK_GND`) | Short 2/0 AWG cable from engine block stud → `CHASSIS_GND` engine bay stud. Required — prevents sensor voltage offset and bearing arc damage. W8JI: "Without a reliable connection, the vehicle chassis can electrically connect to the block through engine and transmission bearings." ([w8ji.com/battery_wiring.htm](http://www.w8ji.com/battery_wiring.htm)) |
+| 1 | **4-post battery cutoff switch — Moroso 74108** ([Amazon](https://www.amazon.com/Moroso-74108-Battery-Alternator-Disconnect/dp/B01GWD2XUS) ~$101 / [moroso.com](https://www.moroso.com/battery-and-alternator-disconnect-switch74108/) $113) | **Required** on any alternator-equipped car. A 2-post switch disconnects the battery but the alternator continues powering the car — it will not shut off. The 4-post loops the alternator through the switch so both disconnect simultaneously. Mount in trunk near battery. |
 | 2–3 | **Amphenol Radlok 8mm — M8×1.25 Male** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-male/), ~$15 CAD ea — thread into cylinder head and engine block GND strap bosses. Tool-free press-lock disconnect. Speeds up M52→07K swap. Secure cable within 3 cm; inspect annually. |
 | 1 | **Amphenol Radlok 8mm — M8×1.25 Female** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-female/), ~$22 CAD — threads onto M8 B+ stud of 07K alternator (`07K 903 023 A`). Tool-free disconnect at alternator removal. |
 | 1 | **Ecumaster PMU16** ([ecumasterusa.com](https://ecumasterusa.com/products/ecumaster-pmu16-power-management-unit) ~$500) | 16-output MOSFET PDM. Replaces relay board + fuse block + Crydom SSR. Outputs: O1 ECU logic · O2 coil/inj · O3 fan (PWM) · O4 pump (PWM) · O5+O14 EWP parallel (50A combined) · O6 condenser fan · O7 AC relay coil · O8 EPS Controller (Phase 3). Connector: 39-way Sicma/FCI. Power via M6 BATT+ stud. Manual: [ecumaster.com/files/PMU/PMU_Manual.pdf](https://www.ecumaster.com/files/PMU/PMU_Manual.pdf) · Pinout: [PMU-16_Pinout_v1.2.pdf](https://www.ecumaster.com/files/PMU/PMU-16_Pinout_v1.2.pdf) |
@@ -140,16 +140,16 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 
 ### Cables
 
-> ⚠️ All cable runs in `power-distribution.wv` are stubs — gauge and length TBD pending physical routing measurement. Do not buy until resolved.
+> ⚠️ Length TBD — measure the trunk-to-engine-bay run along the right sill before ordering. Gauge is confirmed; do not substitute 4 AWG (1.19V drop at 150A over a 30 ft round trip vs 0.41V for 2/0 AWG). Source: [W8JI](http://www.w8ji.com/battery_wiring.htm).
 
 | Run | Color | Gauge | Est. Length | Notes |
 |-----|-------|-------|-------------|-------|
-| BATT_POS → ANL fuse | RD | 4 AWG welding cable | TBD | Battery + → main ANL fuse (within 18 in of battery) → PMU16 M6 stud |
-| **(optional) BATT_POS → cutoff switch → ANL fuse** | RD | 4 AWG welding cable | TBD | If cutoff switch installed: BATT_POS → CUTOFF_4POST → ANL fuse → PMU16 M6 stud |
-| ANL fuse → PMU16 M6 stud | RD | 4 AWG welding cable | TBD | Fused batt+ directly to PMU16 power stud (replaces fuse block feed) |
-| PMU16 GND lug → chassis stud | BK | 4–8 AWG | TBD | PMU16 body GND lug → chassis ground stud M8. Keep short. All PMU output return currents flow here. |
-| BATT_NEG → chassis stud | BK | 4 AWG welding cable | TBD | Battery − → chassis ground stud M8 — body electrical returns |
-| **(optional) BATT_NEG → engine block (direct)** | BK | 4 AWG welding cable | TBD | Optional dedicated battery negative → engine block cable. Not required while factory M52 bonding strap is clean. |
+| BATT_POS → cutoff switch (trunk) | RD | **2/0 AWG OFC welding cable** | ~0.3 m | Battery + → CUTOFF_4POST batt-in post. Short run in trunk. |
+| Cutoff switch → ANL fuse (trunk) | RD | **2/0 AWG OFC welding cable** | ~0.3 m | CUTOFF_4POST output → ANL fuse holder. Mount fuse within 12" of cutoff output. |
+| ANL fuse → engine bay (trunk to engine bay long run) | RD | **2/0 AWG OFC welding cable** | TBD (~4.5 m) | ANL fuse output (trunk) → engine bay junction → PMU16 M6 stud. Routes along right sill (driver's side in RHD) through factory floor grommet. Phase 1: terminate at OEM engine bay positive stub. Phase 3: move ring terminal to PMU16 M6 stud — no re-routing, bolt swap only. |
+| PMU16 GND lug → chassis stud | BK | 4–8 AWG | ~0.3 m | PMU16 body GND lug → `CHASSIS_GND` engine bay stud M8. Keep short. All PMU output return currents flow here. |
+| BATT_NEG → trunk chassis stud | BK | **2/0 AWG OFC welding cable** | ~0.3 m | Battery − → `TRUNK_CHASSIS_GND` (short local run in trunk). Chassis carries return current forward to engine bay. Do NOT run a long trunk-to-block cable. |
+| Engine block → engine bay chassis stud | BK | **2/0 AWG welding cable** | ~0.5 m | `ENGINE_BLOCK_GND` stud → `CHASSIS_GND` engine bay stud. Short run at engine — both points are at the front of the car. |
 | IGN +12V → PMU16 pin 7 (+12V SW) | RD | 18 AWG | TBD | IGN-switched +12V → PMU16 on/off sense. Fuse at source: 5A. |
 | PMU16 CAN2 H/L → MaxxECU CAN1 H/L | GY/**VT** | 22 AWG shielded twisted pair | TBD | PMU16 pins 24/34 → MaxxECU CAN1H/CAN1L. Drain at MaxxECU end only. Route away from coil/injector wires. |
 | PMU16 O1 → ECU logic +12V | RD | 16 AWG | TBD | O1 (pin 38, 25A) → MaxxECU 12-pin pin 7 |
@@ -585,8 +585,8 @@ Only items not already included with their respective purchased components (e.g.
 | 1 | BMW E46 Accelerator Pedal Module `35426786282` | eBay used ~$80–120 — see `docs/dbw-pinouts.md` sourcing table | E-pedal |
 | 1 | Pierburg CWA400 PWM version connector | Kostal 2+2 `10098866` — SLK 2.8 ELA terminals `22124499560` (pins 1–2), SLK 5.8 ELA `22124544900` (pins 3–4) | EWP |
 | 1 | **Main ANL fuse + holder, 150A** | Blue Sea 5191 MRBF 150A or equiv ANL fuse holder. Confirmed: channel peak sum 104.8A × 1.2 = 125.8A → 150A matches PMU16 M6 stud 150A continuous rating. | Power dist |
-| 1 | **4-post battery cutoff switch — Moroso 74108** (or Longacre equiv) | **Optional** — not required on a dual-duty street/drift car with a working ignition key. Install only if your HPDE org or track rules require it. If installed: must be 4-post (NOT 2-post) — a 2-post switch will not shut off the engine on an alternator-equipped car. ~$60–80 at Summit Racing / Jegs. | Power dist |
-| 1 | Engine block ground stud (M8 bolt + lug) | Dedicated M8 bolt or welded stud on engine block for direct 4 AWG battery-negative ground cable. Separate from chassis stud. | Power dist |
+| 1 | **4-post battery cutoff switch — Moroso 74108** (or Longacre equiv) | **Required** on any alternator-equipped car — a 2-post switch does not disconnect the alternator. Mount in trunk near battery. ~$60–80 at Summit Racing / Jegs. | Power dist |
+| 1 | Engine block ground stud (M8 bolt + lug) | Required. Short 2/0 AWG cable from engine block → engine bay chassis stud. Separate from trunk chassis stud. | Power dist |
 
 | 1 | BMW E36 X20 25-pin connector (cabin) | OEM or aftermarket — source from E36 donor or Molex catalog | Body |
 | 1 | BMW E36 X20 25-pin connector (engine side) | OEM | Body |
