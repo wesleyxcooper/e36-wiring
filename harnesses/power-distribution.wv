@@ -115,10 +115,26 @@ metadata:
 #       ewp-controller.wv updated: MAIN_RELAY removed, PMU16 O5+O14 wire direct to Pin 3.
 #
 #   BATTERY / CUTOFF SWITCH:
-#   [ ] Confirm battery location (stock E36 = driver footwell OR engine bay)
-#   [ ] If trunk or footwell: run 4 AWG battery cable + separate ground
-#   [ ] Add ANL or MAXI fuse within 18 inches of battery positive
-#   [ ] **CUTOFF SWITCH MUST BE 4-POST (e.g. Moroso 74108)** -- NOT a 2-post switch.
+#   [x] Battery location: TRUNK -- right rear of boot/luggage compartment, same physical
+#       side in both LHD and RHD. In RHD (this car), right rear = DRIVER's side of boot.
+#       Evidence: MotorsForum UK (1994 E36 320i SE RHD): battery in boot; front jump
+#       terminal on "steering wheel side" (right side in RHD), confirming right-sill cable
+#       routing → right rear boot (motorsforum.com/bmw/e36-battery-dilemma-15589-.htm).
+#       BimmerForums UK (1996 E36 convertible RHD): "the cable runs from the battery in the
+#       boot" (bimmerforums.co.uk/threads/1996-e36-convert-ecu.29057/page-2).
+#       BMWFanatics (E36 Cabriolet): battery in boot confirmed, special vibration-resistant
+#       battery per Bentley manual (bmwfanatics.co.za/threads/e36-cabriolet-battery-concerns.29064).
+#       Note: battery is NOT in the footwell (earlier note in this file was incorrect).
+#   [x] Positive run: 2/0 AWG OFC welding cable, trunk to engine bay (~15 ft). 4 AWG is
+#       undersized for this run length -- see voltage drop calc below.
+#       VOLTAGE DROP CALC (V=IR, Ohm's law): Gear-reduction starter ~150A peak cranking.
+#         4 AWG: 0.000264 Ω/ft × 30 ft round trip = 0.00792 Ω → drop = 150A × 0.00792 = 1.19V
+#         2/0 AWG: 0.0000905 Ω/ft × 30 ft = 0.00272 Ω → drop = 150A × 0.00272 = 0.41V
+#       W8JI (Rauch, 40yr professional engineer, vehicle gauge designer): "Battery hot wire
+#       is 2/0 ('two-ought') welding cable, about 15-feet long" for his trunk-battery build.
+#       Source: w8ji.com/battery_wiring.htm
+#   [x] Add 150-200A ANL fuse within 12-18 inches of battery positive terminal
+#   [x] **CUTOFF SWITCH MUST BE 4-POST (e.g. Moroso 74108)** -- NOT a 2-post switch.
 #       A standard 2-post switch only disconnects the battery; with an alternator present
 #       the car will not actually shut off because the alternator keeps producing current.
 #       The Moroso 74108 4-post loops the alternator through the switch:
@@ -127,18 +143,27 @@ metadata:
 #       When switch is OFF: both battery AND alternator are disconnected simultaneously.
 #       Source: StreetCarJoe Race Car Wiring Series Pt.2 (youtube.com/watch?v=PNyScqftGQw)
 #
-#   GROUND STRATEGY -- TWO SEPARATE LEADS OFF BATTERY NEGATIVE:
-#   [x] Lead 1: Battery negative → chassis stud (engine bay) -- 4 AWG welding cable
-#   [x] Lead 2: Battery negative → engine block directly -- 4 AWG welding cable (DEDICATED)
-#       *** Do NOT rely on engine→chassis→battery chain. Run a direct cable from battery
-#           negative terminal all the way up to the engine block. This eliminates the
-#           vast majority of race-car electrical issues. Keep the chassis lead as well --
-#           you want both, not one or the other. ***
-#       Source: StreetCarJoe Race Car Wiring Series Pt.2 (youtube.com/watch?v=PNyScqftGQw)
-#   [ ] Separate cylinder head ground strap (head → chassis or head → battery) -- for
-#       coil packs: each bank of coils needs a secondary ground to the cylinder head
-#       (in addition to the main coil power/GND running directly to the battery).
-#   [ ] E36 has known ground issues -- run all new straps, do not rely on OEM
+#   GROUND STRATEGY -- TRUNK BATTERY (revised per W8JI):
+#   [x] Lead 1: Battery negative → trunk chassis stud (short, local) -- 2/0 AWG
+#       "The battery should be high-current grounded to the vehicle chassis with short
+#       direct leads." -- W8JI (w8ji.com/battery_wiring.htm)
+#   [x] Lead 2 (at engine end, NOT from battery): Engine block → engine bay chassis stud
+#       "The engine block should be high-current grounded to the vehicle chassis."
+#       "With distances more than a few feet, the chassis path through any steel unibody
+#       vehicle is far less resistance than any practical size of copper cable. Use the
+#       chassis for long grounds, such as from a rear mounted battery to the front."
+#       -- W8JI (w8ji.com/battery_wiring.htm)
+#       The E36 unibody steel carries the return current from engine bay to trunk.
+#       Do NOT run a direct trunk-to-engine-block cable -- the chassis is a lower-
+#       resistance path over that distance.
+#       DSPORT Magazine (dsportmag.com/the-tech/education/how-to-avoid-and-fix-automotive-
+#       electrical-issues/): "Whenever there is resistance between one of the grounding
+#       points on the chassis and the battery, a voltage drop will be present. Grounding
+#       loops are not desirable as they cause small currents to be conducted due to the
+#       voltage offset and they can also produce noise."
+#   [x] Separate cylinder head ground strap (head → chassis) -- for coil packs: each bank
+#       of coils needs a secondary ground to the cylinder head.
+#   [x] E36 has known ground issues -- run all new straps, do not rely on OEM
 #
 #   ECU AND COIL POWER/GROUND -- MUST GO DIRECTLY TO BATTERY TERMINALS:
 #   [ ] MaxxECU main power (PMU16 O1 output) and ECU GND must ultimately reference battery
@@ -163,26 +188,37 @@ connectors:
   # ── Battery ────────────────────────────────────────────────────────────────
   BATT_POS:
     type: "Battery positive terminal"
-    subtype: "12V lead-acid or AGM"
+    subtype: "Antigravity ATX20-HD or Braille B2317 LiFePO4"
     pincount: 1
     pinlabels: ["+12V BATT"]
     notes: >-
-      TODO: confirm battery location and cable run length.
-      E36 stock location is driver-side footwell -- long cable run.
-      Many builds relocate battery to engine bay or trunk for weight.
+      Location: right rear of boot -- driver's side in this RHD car. Right rear is the same
+      physical side for both LHD and RHD E36s (cable routes along right sill).
+      Sources: motorsforum.com/bmw/e36-battery-dilemma-15589-.htm (RHD UK 1994 320i SE:
+      battery in boot, front jump terminal on steering wheel/right side confirming right
+      sill routing); bimmerforums.co.uk/threads/1996-e36-convert-ecu.29057/page-2 (RHD UK
+      1996 E36 convertible: "cable runs from the battery in the boot").
+      E36 cabriolet requires vibration-resistant battery per Bentley manual (body scuttle).
+      LiFePO4 (ATX20-HD or Braille B2317) satisfies this. No lead-acid AGM.
       Positive goes to CUTOFF_4POST battery-in post first.
+      Cable: 2/0 AWG OFC welding cable -- sized for trunk-to-engine-bay voltage drop.
 
   BATT_NEG:
     type: "Battery negative terminal"
-    subtype: "12V lead-acid or AGM"
-    pincount: 2
-    pinlabels: ["BATT GND → chassis stud", "BATT GND → engine block (direct)"]
+    subtype: "Antigravity ATX20-HD or Braille B2317 LiFePO4"
+    pincount: 1
+    pinlabels: ["BATT GND → trunk chassis stud"]
     notes: >-
-      TWO separate leads from battery negative terminal:
-      Pin 1: 4 AWG welding cable → chassis stud (engine bay) -- W_BATT_NEG_CHASSIS
-      Pin 2: 4 AWG welding cable → engine block directly -- W_BATT_NEG_ENGINE (dedicated run)
-      Do NOT rely on engine-block-to-chassis strap to complete the battery ground path.
-      Run both leads. Ring lug both ends. Welding cable preferred (EWCS 4 AWG or equiv).
+      ONE lead from battery negative: trunk chassis stud (short, local run -- 2/0 AWG).
+      The chassis carries return current to the engine bay. Do NOT run a long direct
+      cable from trunk battery to engine block -- the E36 unibody steel is lower
+      resistance over that distance than any practical copper cable.
+      ENGINE_BLOCK_GND is grounded to CHASSIS_GND at the engine bay (separate, front-end
+      connection -- not from the battery).
+      Source: W8JI (Charles T. Rauch Jr., professional engineer): "With distances more
+      than a few feet, the chassis path through any steel unibody vehicle is far less
+      resistance than any practical size of copper cable." (w8ji.com/battery_wiring.htm)
+      Ring lug both ends. Clean bare metal + star washer at chassis stud.
 
   # ── 4-post battery cutoff switch ────────────────────────────────────────────
   CUTOFF_4POST:
@@ -209,20 +245,24 @@ connectors:
       and Pt.2 (youtube.com/watch?v=PNyScqftGQw)
       Part: Moroso 74108 (standard), or Longacre or equivalent 4-post racing cutoff.
 
-  # ── Engine block ground (direct from battery negative) ──────────────────────
+  # ── Engine block ground (block → engine bay chassis stud) ───────────────────
   ENGINE_BLOCK_GND:
     type: "Engine block ground stud"
     subtype: "M8 bolt -- existing block boss or welded stud"
     pincount: 1
     pinlabels: ["ENGINE BLOCK GND"]
     notes: >-
-      Direct 4 AWG welding cable from battery negative terminal to engine block.
-      This is a SEPARATE lead from the chassis ground -- do NOT merge these.
-      Run both: battery→chassis AND battery→engine block (two cables, both 4 AWG).
-      Ring lug both ends. Clean ground contact (no paint under lug).
-      This eliminates the majority of race-car electrical noise/ground-offset issues.
-      Separate from the M52 head-to-chassis strap (which stays in place for EMC).
-      Reference: StreetCarJoe Race Car Wiring Series Pt.2 (youtube.com/watch?v=PNyScqftGQw)
+      Heavy cable (2/0 AWG) from engine block stud to engine bay chassis stud (CHASSIS_GND).
+      This is a SHORT run at the engine -- NOT a long cable from the trunk battery.
+      The chassis carries return current from engine bay to trunk; the battery negative
+      connects to the trunk chassis stud (TRUNK_CHASSIS_GND), not here.
+      "The engine block should be high-current grounded to the vehicle chassis." and
+      "Even a small voltage difference between the engine block and vehicle chassis can
+      change sensor readings at the EEC." -- W8JI (w8ji.com/battery_wiring.htm)
+      W8JI also: "Without a reliable connection, the vehicle chassis can electrically
+      connect to the block through engine and transmission bearings. This can not only
+      damage bearings through arc pitting of bearing surfaces." (w8ji.com/battery_wiring.htm)
+      Ring lug both ends. Clean bare metal + star washer. No paint under lug.
 
   # ── Main fuse (close to battery) ───────────────────────────────────────────
   MAIN_FUSE:
@@ -240,21 +280,37 @@ connectors:
       Blue Sea 5191 (MRBF) or equivalent.
       Product: https://www.bluesea.com/products/5191/MRBF_Terminal_Fuse_Block_-_30_to_300A
 
-  # ── Chassis ground stud ────────────────────────────────────────────────────
+  # ── Engine bay chassis ground stud ─────────────────────────────────────────
   CHASSIS_GND:
     type: "Chassis ground stud"
     subtype: "M8 engine bay stud"
     pincount: 1
     pinlabels: ["GND"]
     notes: >-
-      Primary battery negative lead terminates here.
+      ENGINE_BLOCK_GND terminates here (heavy cable, engine block to this stud).
       PMU16 GND lug terminates here (W_PMU16_GND).
       Fan motor GND, condenser fan GND, and body electrical returns terminate here.
       E36 engine bay ground stud is on the strut tower or firewall.
-      TODO: confirm exact stud location for this car.
-      Keep M52 factory engine block-to-chassis bonding strap -- it provides the
-      starter/alternator current return path from engine back to battery via chassis.
-      Verify it is clean (no paint under lug, star washer, tight nut).
+      TODO: confirm exact stud location for this RHD car.
+      The chassis carries return current rearward to the trunk battery via the unibody.
+      W8JI: "the chassis path through any steel unibody vehicle is far less resistance
+      than any practical size of copper cable." (w8ji.com/battery_wiring.htm)
+
+  # ── Trunk chassis ground stud ───────────────────────────────────────────────
+  TRUNK_CHASSIS_GND:
+    type: "Chassis ground stud"
+    subtype: "M8 stud -- weld seam, frame rail, or sill area in trunk"
+    pincount: 1
+    pinlabels: ["TRUNK GND"]
+    notes: >-
+      Battery negative terminates here (short local run -- 2/0 AWG).
+      Use a structural point: weld seam, frame rail, or sill -- not bare floor sheet metal.
+      Remove paint to bare metal. Star washer under nut for oxide penetration.
+      This is the only negative connection from the battery; the chassis carries
+      return current forward to CHASSIS_GND at the engine bay.
+      Second chassis stud required for this build because battery is in trunk.
+      W8JI: "The battery should be high-current grounded to the vehicle chassis
+      with short direct leads." (w8ji.com/battery_wiring.htm)
 
   # ── Ignition-switched +12V source ─────────────────────────────────────────
   IGN_12V_SOURCE:
@@ -448,38 +504,55 @@ cables:
     wirecount: 1
     colors: [RD]
     wirelabels: ["+12V batt → cutoff"]
-    notes: "4 AWG welding cable (EWCS). Red. Battery positive terminal → CUTOFF_4POST batt-in post. Ring lug both ends. Keep run short -- cutoff should be near battery."
+    notes: >-
+      2/0 AWG OFC welding cable. Red. Battery positive terminal (trunk) → CUTOFF_4POST
+      batt-in post (trunk, near battery). Keep this segment short -- cutoff should be
+      mounted in trunk near battery. Ring lug both ends.
+      2/0 AWG required for trunk run: 4 AWG at ~150A over 30 ft round trip = 1.19V drop
+      (unacceptable). 2/0 AWG = 0.41V drop. Source: W8JI (w8ji.com/battery_wiring.htm)
+      who uses 2/0 welding cable for his own 15-ft trunk build.
 
   W_CUTOFF_TO_ANL:
     wirecount: 1
     colors: [RD]
     wirelabels: ["+12V cutoff out → ANL"]
-    notes: "4 AWG welding cable. Red. CUTOFF_4POST output post → MAIN_FUSE input. ANL fuse within 18 in of cutoff switch output. Ring lug both ends."
+    notes: "2/0 AWG OFC welding cable. Red. CUTOFF_4POST output post → MAIN_FUSE input (within 12-18 in of cutoff, also in trunk). Ring lug both ends."
 
-  W_MAIN_TO_PMU16:
+  W_TRUNK_TO_ENGINE:
     wirecount: 1
     colors: [RD]
-    wirelabels: ["+12V fused batt → PMU16 stud"]
-    notes: "4 AWG welding cable. Red. MAIN_FUSE output → PMU16 M6 BATT+ stud. Ring lug at fuse end. M6 ring lug at PMU16 stud. Keep run as short as practical."
-
-  # ── Battery negative: two separate leads ────────────────────────────────────
-  W_BATT_NEG_CHASSIS:
-    wirecount: 1
-    colors: [BK]
-    wirelabels: ["batt GND → chassis"]
-    notes: "4 AWG welding cable (EWCS). Black. Battery negative terminal → chassis stud (engine bay). Ring lug both ends. One of TWO ground leads from battery negative."
-
-  W_BATT_NEG_ENGINE:
-    wirecount: 1
-    colors: [BK]
-    wirelabels: ["batt GND → engine block (direct)"]
+    wirelabels: ["+12V fused batt → engine bay"]
     notes: >-
-      4 AWG welding cable (EWCS). Black. Battery negative terminal → engine block
-      ground stud directly. Ring lug both ends. SEPARATE from chassis lead.
-      This is the critical direct-to-battery ground that eliminates ground offset
-      and electrical noise. Do NOT merge with W_BATT_NEG_CHASSIS at either end.
-      Route through cabin or alongside fuel pump run. P-clamp every 12 inches.
-      Reference: StreetCarJoe Race Car Wiring Series Pt.2 (youtu.be/PNyScqftGQw)
+      2/0 AWG OFC welding cable. Red. MAIN_FUSE output (trunk) → engine bay junction
+      point (starter B+, PMU16 stud). ~15 ft run. Ring lug both ends. Route passenger
+      side under carpet/sill, through existing grommet, into engine bay. P-clamp every
+      12 in through cabin. Heat sleeve over any exhaust-adjacent section.
+      Full path from ANL fuse (trunk) to PMU16 stud (engine bay) in one cable run.
+
+
+  # ── Battery negative: trunk to chassis stud (local) ─────────────────────────
+  W_BATT_NEG_TRUNK:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: ["batt GND → trunk chassis stud"]
+    notes: >-
+      2/0 AWG welding cable. Black. Battery negative terminal → TRUNK_CHASSIS_GND
+      (short local run in trunk). Ring lug both ends. Star washer at chassis stud.
+      The chassis carries return current forward to the engine bay; no long cable needed.
+      W8JI: "The vehicle chassis should be the ground lead" for trunk batteries.
+      (w8ji.com/battery_wiring.htm)
+
+  # ── Engine block to engine bay chassis stud (short run at front) ─────────────
+  W_ENGINE_BLOCK_TO_CHASSIS:
+    wirecount: 1
+    colors: [BK]
+    wirelabels: ["engine block GND → chassis"]
+    notes: >-
+      2/0 AWG welding cable. Black. ENGINE_BLOCK_GND stud → CHASSIS_GND stud (engine bay).
+      Short run -- both points are at the front of the car. Ring lug both ends.
+      Clean bare metal + star washer at both lugs.
+      W8JI: "The engine block should be high-current grounded to the vehicle chassis."
+      (w8ji.com/battery_wiring.htm)
 
   # ── PMU16 power and control wiring ──────────────────────────────────────────
   W_PMU16_GND:
@@ -569,7 +642,7 @@ cables:
 
 connections:
 
-  # ── Main power path: BATT+ → 4-post cutoff → ANL fuse → PMU16 stud ──────────
+  # ── Main power path: BATT+ → 4-post cutoff → ANL fuse → engine bay → PMU16 ──
   - - BATT_POS: [1]
     - W_BATT_POS_TO_CUTOFF: [1]
     - CUTOFF_4POST: [1]
@@ -579,19 +652,19 @@ connections:
     - MAIN_FUSE: [1]
 
   - - MAIN_FUSE: [2]
-    - W_MAIN_TO_PMU16: [1]
+    - W_TRUNK_TO_ENGINE: [1]
     - PMU16: [1]
 
-  # ── Battery negative: two separate leads ─────────────────────────────────────
-  # Lead 1: battery → chassis stud (PMU16 GND, body returns, fan/pump GND)
+  # ── Battery negative: trunk chassis stud (local, short run) ──────────────────
+  # Chassis carries return current forward to engine bay; no long cable from battery
   - - BATT_NEG: [1]
-    - W_BATT_NEG_CHASSIS: [1]
-    - CHASSIS_GND: [1]
+    - W_BATT_NEG_TRUNK: [1]
+    - TRUNK_CHASSIS_GND: [1]
 
-  # Lead 2: battery → engine block directly (ECU GND, coil GND reference)
-  - - BATT_NEG: [2]
-    - W_BATT_NEG_ENGINE: [1]
-    - ENGINE_BLOCK_GND: [1]
+  # ── Engine block → engine bay chassis stud (front-end, short run) ─────────────
+  - - ENGINE_BLOCK_GND: [1]
+    - W_ENGINE_BLOCK_TO_CHASSIS: [1]
+    - CHASSIS_GND: [1]
 
   # ── PMU16 GND and IGN sense ───────────────────────────────────────────────────
   - - CHASSIS_GND: [1]
