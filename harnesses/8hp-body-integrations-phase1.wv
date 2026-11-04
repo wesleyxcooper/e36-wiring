@@ -1,19 +1,30 @@
 # 8hp-body-integrations-phase1.wv
 # ZF 8HP → E36 body harness integration — PHASE 1 (M52 + M50 pre-terminated harness era)
 #
+# ⚠️ IF PMU16 IS INSTALLED AT PHASE 1 (recommended):
+#    Skip this file entirely for the reverse light relay GPO wiring.
+#    PMU16 drives the reverse light relay coil via CAN-commanded output — no GPO
+#    wire from BOOST_SOLENOID stub is needed. The relay hardware (Bosch mini relay,
+#    X20 pin 10 connection) stays identical; only the coil drive source changes.
+#    Refer to harnesses/8hp-body-integrations-phase3.wv for the PMU16-direct-drive
+#    approach (same logic, just PMU16 instead of GPO). With PMU16 at Phase 1:
+#      - GPO 1 (BOOST_SOL stub) is free from day one — available for the boost
+#        solenoid immediately at Phase 3a with no Phase 2a reroute needed.
+#      - GPO 8 (16-pin pin 4/E) also stays free.
+#
+# IF PMU16 IS DEFERRED TO PHASE 3b (discrete relay path):
 # Under the H2O engine-bay-mount architecture:
 #   - MaxxECU RACE H2O: engine bay (OEM DME E-box cavity, intake side of RHD car)
 #   - MaxxECU M50 pre-terminated engine harness: plugs into H2O CMC. Available
 #     cabin-side breakouts include BOOST_SOLENOID Superseal 2-pin (unpopulated in
 #     Phase 1 NA — hosts a spare GPO 1 signal)
-#   - PMU16: engine bay, alongside the H2O
 #   - Discrete reverse-light relay: engine bay (Bosch mini relay, near the OEM
-#     Front Power Distribution Box or in an added relay panel next to the PMU16)
+#     Front Power Distribution Box)
 #
-# Phase-transition note: at Phase 3b (07K swap), the M50 pre-terminated harness is
-# retired and replaced with a custom 07K harness. The Phase 1 approach here (GPO
-# via BOOST_SOLENOID Superseal stub) no longer applies — see the Phase 3b file
-# harnesses/8hp-body-integrations-phase3.wv for the PMU16-direct-drive design.
+# Phase-transition note (if discrete relay used): at Phase 3b (07K swap), the M50
+# pre-terminated harness is retired and replaced with a custom 07K harness. The
+# Phase 1 approach here (GPO via BOOST_SOLENOID Superseal stub) no longer applies —
+# see harnesses/8hp-body-integrations-phase3.wv for the PMU16-direct-drive design.
 #
 # See harnesses/body-x20.wv (X20 pin 10 documentation) and
 #     docs/vendor/maxxecu/MaxxECU_RACE_H2O.md (ECU mounting).
@@ -26,6 +37,7 @@
 #                        MaxxECU GPO 1 ("Transmission Reverse", low-side) → engine-bay
 #                        discrete relay coil → relay contact → X20 pin 10 → OEM cabin
 #                        body harness → reverse lights.
+#                        SKIP if PMU16 at Phase 1 — PMU16 drives relay coil directly.
 #
 #   2. Starter inhibit — Getrag had no neutral safety switch (clutch switch
 #                        handled start inhibit for OEM cars).
@@ -33,12 +45,10 @@
 #                        in all gears except P and N. No relay or hardware needed
 #                        if MaxxECU is in the starter circuit. UNCHANGED between phases.
 #
-# PMU16 note (Phase 1): the reverse-light relay coil is driven by the MaxxECU GPO 1
-# signal directly — NOT by a PMU16 output. The M50 pre-terminated harness exposes
-# GPO 1 at the BOOST_SOLENOID Superseal 2-pin connector, which is unused on an NA
-# M52. We tap that connector for the GPO wire. This is Phase 1's constraint —
-# under Phase 3b's custom harness (see phase 3 file) PMU16 direct-drive replaces
-# this whole scheme.
+# PMU16 note (discrete relay path only): the reverse-light relay coil is driven by
+# MaxxECU GPO 1 from the BOOST_SOLENOID Superseal 2-pin connector (unused on NA M52).
+# This is a Phase 1 constraint only — Phase 3b and the PMU16-at-Phase-1 path both
+# use PMU16 direct-drive instead.
 #
 # Source (X20 pinout): harnesses/body-x20.wv + 1998 BMW E36 ETM jonkensy.com
 # Source (reverse light switch path): BMW E36 ETM wiring diagram, section 0670

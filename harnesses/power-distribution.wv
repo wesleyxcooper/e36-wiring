@@ -1,23 +1,39 @@
 metadata:
   project: E36 Restomod -- Power Distribution (PMU16 install)
-  phase: "Phase 3b (07K swap moment — PMU16 physically installed for the first time)"
+  phase: "Phase 1 (optional, recommended) or Phase 3b (default if deferred)"
   description: >-
-    ⚠️ PHASE 3 INSTALL FILE. PMU16 is NOT installed in the car during Phase 1 or Phase 2b.
-    Under Phase 1 (M52 + M50 pre-terminated harness), aftermarket loads that PMU16
-    will eventually drive are handled by:
-      - Discrete aftermarket high-current relays (e.g., fuel pump — see
-        harnesses/fuel-pump-hanger-phase1.wv)
-      - MaxxECU GPO outputs driving small relay coils (e.g., reverse light —
-        see harnesses/8hp-body-integrations-phase1.wv)
-      - OEM E36 relays that remain in place until replaced (K6300 DME main,
-        K21/K22 fan relays, K19 A/C compressor)
-    Phase 2b is offline harness/engine build — no in-car install work happens.
-    At Phase 3b swap moment PMU16 arrives and replaces all of the above at once.
+    PMU16 INSTALL TIMING — TWO VALID OPTIONS:
 
-    Ecumaster PMU16 power management unit replaces relay board, fuse block,
-    and DC SSR from earlier design. PMU16 provides 16 programmable MOSFET
-    high-side outputs with per-channel digital fusing, current monitoring,
-    PWM capability, and CAN control from MaxxECU RACE H2O.
+    Option A — PMU16 at Phase 1 (recommended):
+      Install PMU16 alongside the MaxxECU H2O at Phase 1. Skip the Phase 1
+      discrete relay files entirely (fuel-pump-hanger-phase1.wv relay section,
+      8hp-body-integrations-phase1.wv GPO path). Wire O1/O3/O4/O8 for Phase 1
+      loads; O7 optional if electric AC is also installed at Phase 1.
+      At Phase 3b, add O5 (EWP) and O2 (DBW TB power), reconfigure as needed.
+      No relay board to build and throw away.
+
+    Option B — PMU16 deferred to Phase 3b (original default):
+      Under Phase 1 (M52 + M50 pre-terminated harness), loads are handled by:
+        - Discrete aftermarket relay for fuel pump (fuel-pump-hanger-phase1.wv)
+        - MaxxECU GPO 1 driving reverse light relay (8hp-body-integrations-phase1.wv)
+        - OEM E36 relays for fan and ECU main (K6300, K21/K22)
+      At Phase 3b, all of the above are removed and PMU16 replaces them.
+
+    PHASE 1 CHANNEL ALLOCATION (if Option A):
+      O1: MaxxECU ECU +12V (replaces K6300 OEM DME relay — always wire at Phase 1)
+      O3: Cooling fan PWM (replaces K21/K22 OEM relays and M50 harness GPO 6 path)
+      O4: Fuel pump 25A PWM (replaces Phase 1 discrete relay + JDT kit relay)
+      O7: AC compressor 100A relay coil (optional — wire if electric AC at Phase 1)
+      O8: EPS IGN-switched 10A (EPowerSteering.com E36 kit — same as Phase 3b target)
+
+    PHASE 3b ADDITIONS (both options):
+      O5: EWP Pierburg CWA400 (07K specific — M52 uses mechanical water pump)
+      O2: DBW throttle body power (07K specific)
+      Maven bulkhead: 07K firewall crossing for cabin signals — independent of PMU16
+
+    Ecumaster PMU16 power management unit: 16 programmable MOSFET high-side outputs
+    with per-channel digital fusing, current monitoring, PWM capability, and CAN
+    control from MaxxECU RACE H2O.
 
     MOUNT LOCATION: Engine bay, intake side (RHD passenger side), alongside
     the MaxxECU RACE H2O in the OEM DME E-box cavity area. IP60 aluminium
@@ -31,7 +47,7 @@ metadata:
     (PMU16 O1) and 8HP TCU power (KL30/KL15) are engine-bay-to-engine-bay
     runs. No firewall crossing for ECU or 8HP power lines.
 
-    Phase 3b install file. All wire lengths are stubs -- confirm before building.
+    All wire lengths are stubs -- confirm before building.
     Cross-reference harnesses/maxxecu-07k.wv for ECU CAN pin assignments (Phase 3b
     ECU harness) and harnesses/8hp-can.wv for 8HP TCU KL30/KL15 destinations.
 

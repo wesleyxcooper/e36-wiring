@@ -47,20 +47,25 @@ Click any link to view the interactive diagram with full BOM in your browser —
 
 The M50 pre-terminated harness covers all M52 engine management signals (injectors, coils, crank, cam, MAP, IAT, CLT, TPS, VANOS, O2, ICV). Everything below is **supplemental wiring** — what you build or modify on top of the purchased harness.
 
-| Harness | Interactive HTML | Source |
-|---|---|---|
-| MaxxECU ↔ M52 signal reference (pre-terminated M50 harness — SIGNAL REF, do not build) | [maxxecu-m52.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/maxxecu-m52.html) | `harnesses/maxxecu-m52.wv` |
-| EWS2 chassis bypass | [ews2-bypass.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ews2-bypass.html) | `harnesses/ews2-bypass.wv` |
-| Fuel pump hanger — Phase 1 (discrete relay + JDT rewire kit) | [fuel-pump-hanger-phase1.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/fuel-pump-hanger-phase1.html) | `harnesses/fuel-pump-hanger-phase1.wv` |
-| Continental flex fuel sensor — Phase 1 | [flex-fuel-sensor-phase1.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/flex-fuel-sensor-phase1.html) | `harnesses/flex-fuel-sensor-phase1.wv` |
-| ZF 8HP70 TCU CAN + power (pre-made MaxxECU 8HP GEN1 kit) | [8hp-can.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/8hp-can.html) | `harnesses/8hp-can.wv` |
-| 8HP body integrations — Phase 1 (reverse light relay via GPO 1) | [8hp-body-integrations-phase1.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/8hp-body-integrations-phase1.html) | `harnesses/8hp-body-integrations-phase1.wv` |
-| Gauge.S CAN cluster (cabin, 500 kbps, Default 1.3) | [gauge-s-can.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/gauge-s-can.html) | `harnesses/gauge-s-can.wv` |
-| DCT Shifter paddle → MaxxECU DIN (cabin-to-cabin, 3-wire) | [dct-shifter.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/dct-shifter.html) | `harnesses/dct-shifter.wv` |
-| E36 X20 body connector | [body-x20.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/body-x20.html) | `harnesses/body-x20.wv` |
-| Bosch PST-F1 oil temp+pressure (Phase 1: pigtail to M50 16-pin AUX breakout) | [pst-f1-sensor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/pst-f1-sensor.html) | `harnesses/pst-f1-sensor.wv` |
-| ATF temp sensor — MaxxECU NTC 1/8 NPT, engine-bay direct-terminate *(optional)* | [atf-temp-sensor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/atf-temp-sensor.html) | `harnesses/atf-temp-sensor.wv` |
-| EPowerSteering.com E36 column-assist EPS (cabin-only, no MaxxECU/CAN interface) | [eps-column.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/eps-column.html) | `harnesses/eps-column.wv` |
+> **PMU16 install timing — two valid paths:**
+> - **Option A (recommended):** Install PMU16 at Phase 1 alongside the MaxxECU H2O. Skip the discrete relay files (`fuel-pump-hanger-phase1.wv` relay section, `8hp-body-integrations-phase1.wv` GPO path) — use `power-distribution.wv` instead. PMU16 channels O1/O3/O4/O8 cover ECU power, fan, fuel pump, and EPS from day one. O7 optional if electric AC is added at Phase 1. No relay board to rip out at Phase 3b.
+> - **Option B (original default):** Defer PMU16 to Phase 3b (07K swap moment). Build discrete relay files now; replace at Phase 3b. Use the starred ★ files below.
+
+| Harness | Interactive HTML | Source | PMU16 at Phase 1? |
+|---|---|---|---|
+| MaxxECU ↔ M52 signal reference (pre-terminated M50 harness — SIGNAL REF, do not build) | [maxxecu-m52.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/maxxecu-m52.html) | `harnesses/maxxecu-m52.wv` | Always |
+| EWS2 chassis bypass | [ews2-bypass.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ews2-bypass.html) | `harnesses/ews2-bypass.wv` | Always |
+| ★ Fuel pump hanger — discrete relay + JDT rewire kit | [fuel-pump-hanger-phase1.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/fuel-pump-hanger-phase1.html) | `harnesses/fuel-pump-hanger-phase1.wv` | Option B only — skip relay section if PMU16 at Phase 1 |
+| Continental flex fuel sensor — Phase 1 | [flex-fuel-sensor-phase1.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/flex-fuel-sensor-phase1.html) | `harnesses/flex-fuel-sensor-phase1.wv` | Always |
+| ZF 8HP70 TCU CAN + power (pre-made MaxxECU 8HP GEN1 kit) | [8hp-can.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/8hp-can.html) | `harnesses/8hp-can.wv` | Always |
+| ★ 8HP body integrations — reverse light relay via GPO 1 (discrete relay path) | [8hp-body-integrations-phase1.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/8hp-body-integrations-phase1.html) | `harnesses/8hp-body-integrations-phase1.wv` | Option B only — skip entirely if PMU16 at Phase 1 |
+| Power distribution — Ecumaster PMU16 (optional Phase 1 install, default Phase 3b) | [power-distribution.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/power-distribution.html) | `harnesses/power-distribution.wv` | Option A — install at Phase 1 |
+| Gauge.S CAN cluster (cabin, 500 kbps, Default 1.3) | [gauge-s-can.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/gauge-s-can.html) | `harnesses/gauge-s-can.wv` | Always |
+| DCT Shifter paddle → MaxxECU DIN (cabin-to-cabin, 3-wire) | [dct-shifter.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/dct-shifter.html) | `harnesses/dct-shifter.wv` | Always |
+| E36 X20 body connector | [body-x20.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/body-x20.html) | `harnesses/body-x20.wv` | Always |
+| Bosch PST-F1 oil temp+pressure (Phase 1: pigtail to M50 16-pin AUX breakout) | [pst-f1-sensor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/pst-f1-sensor.html) | `harnesses/pst-f1-sensor.wv` | Always |
+| ATF temp sensor — MaxxECU NTC 1/8 NPT, engine-bay direct-terminate *(optional)* | [atf-temp-sensor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/atf-temp-sensor.html) | `harnesses/atf-temp-sensor.wv` | Always |
+| EPowerSteering.com E36 column-assist EPS (cabin-only, no MaxxECU/CAN interface) | [eps-column.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/eps-column.html) | `harnesses/eps-column.wv` | Always (O8 from PMU16 if Option A) |
 
 ---
 
