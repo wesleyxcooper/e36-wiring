@@ -1,33 +1,25 @@
 metadata:
   project: E36 Restomod -- Power Distribution (PMU16 install)
-  phase: "Phase 1 (optional, recommended) or Phase 3b (default if deferred)"
+  phase: "Phase 1 — install alongside MaxxECU H2O (all engine paths)"
   description: >-
-    PMU16 INSTALL TIMING — TWO VALID OPTIONS:
+    PMU16 installs at Phase 1 alongside the MaxxECU H2O, before the 8HP swap,
+    regardless of which engine path follows (NA M52, turbo M52, or 07K).
+    No discrete relay board is built. The 8hp-body-integrations-phase1.wv
+    and fuel-pump-hanger-phase1.wv discrete relay files are superseded.
 
-    Option A — PMU16 at Phase 1 (recommended):
-      Install PMU16 alongside the MaxxECU H2O at Phase 1. Skip the Phase 1
-      discrete relay files entirely (fuel-pump-hanger-phase1.wv relay section,
-      8hp-body-integrations-phase1.wv GPO path). Wire O1/O3/O4/O8 for Phase 1
-      loads; O7 optional if electric AC is also installed at Phase 1.
-      At Phase 3b, add O5 (EWP) and O2 (DBW TB power), reconfigure as needed.
-      No relay board to build and throw away.
+    COMMISSIONING NOTE: Configure O1 (ECU +12V) as auto-on at PMU16 startup
+    so MaxxECU gets power before it can send CAN commands. Keep the OEM K6300
+    relay wired in parallel until O1 is verified, then remove K6300.
 
-    Option B — PMU16 deferred to Phase 3b (original default):
-      Under Phase 1 (M52 + M50 pre-terminated harness), loads are handled by:
-        - Discrete aftermarket relay for fuel pump (fuel-pump-hanger-phase1.wv)
-        - MaxxECU GPO 1 driving reverse light relay (8hp-body-integrations-phase1.wv)
-        - OEM E36 relays for fan and ECU main (K6300, K21/K22)
-      At Phase 3b, all of the above are removed and PMU16 replaces them.
-
-    PHASE 1 CHANNEL ALLOCATION (if Option A):
-      O1: MaxxECU ECU +12V (replaces K6300 OEM DME relay — always wire at Phase 1)
-      O3: Cooling fan PWM (replaces K21/K22 OEM relays and M50 harness GPO 6 path)
-      O4: Fuel pump 25A PWM (replaces Phase 1 discrete relay + JDT kit relay)
+    PHASE 1 CHANNEL ALLOCATION:
+      O1: MaxxECU ECU +12V (replaces K6300 OEM DME relay — auto-on at startup)
+      O3: Cooling fan PWM (replaces K21/K22 OEM relays and M50 harness GPO 6)
+      O4: Fuel pump 25A PWM (replaces JDT rewire kit discrete relay)
       O7: AC compressor 100A relay coil (optional — wire if electric AC at Phase 1)
-      O8: EPS IGN-switched 10A (EPowerSteering.com E36 kit — same as Phase 3b target)
+      O8: EPS IGN-switched 10A (EPowerSteering.com E36 kit)
 
-    PHASE 3b ADDITIONS (both options):
-      O5: EWP Pierburg CWA400 (07K specific — M52 uses mechanical water pump)
+    PHASE 3b ADDITIONS (07K-specific):
+      O5: EWP Pierburg CWA400 (M52 uses mechanical water pump — not needed until 07K)
       O2: DBW throttle body power (07K specific)
       Maven bulkhead: 07K firewall crossing for cabin signals — independent of PMU16
 

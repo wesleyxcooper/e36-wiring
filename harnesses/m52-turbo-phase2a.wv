@@ -18,31 +18,16 @@
 # WHAT CHANGES IN PHASE 2a VS PHASE 1 (NA M52)
 #
 #   1. BOOST SOLENOID WIRING (new)
-#      GPO 1 is freed from the Phase 1 reverse light relay tap.
-#      The BOOST_SOL Superseal 2-way stub now carries its intended signal:
+#      GPO 1 (BOOST_SOL stub) has been free from Phase 1 — PMU16 drives the reverse
+#      light relay via CAN from day one, so GPO 1 was never used for it.
+#      At Phase 2a, connect the BOOST_SOL stub to the boost solenoid:
 #        Pin 1: +12V coil/inj supply → solenoid coil high-side
 #        Pin 2: GPO 1 (low-side, GND when solenoid active) → solenoid coil low-side
 #      Add: flyback diode (1N4007) across solenoid terminals.
 #      MTune: Outputs → GPO 1 → Function: "Boost Control" (PWM solenoid).
 #      Source: docs/walkthroughs/19b-m5x-turbo.md lines 135–137.
 #
-#   2. REVERSE LIGHT RELAY REROUTE (GPO 1 → GPO 8)
-#      ⚠️ SKIP THIS STEP IF PMU16 WAS INSTALLED AT PHASE 1.
-#      If PMU16 is in the car from Phase 1, it already drives the reverse light relay
-#      coil via CAN — GPO 1 was never used for the relay. No reroute is needed and
-#      GPO 1 (BOOST_SOL stub) has been free since day one for the boost solenoid.
-#
-#      ONLY NEEDED if PMU16 was deferred to Phase 3b (discrete relay path):
-#      Phase 1 tapped GPO 1 from the BOOST_SOL stub for the reverse light relay coil.
-#      Phase 2a: remove that tap. The relay coil (pin 85) now connects to
-#        GPO 8/TACHO on the 16-pin aux breakout (pin 4 / label E).
-#      GPO 8 is otherwise unused — the Gauge.S CAN cluster handles tachometer via
-#        CAN (MaxxECU Default 1.3 protocol), so GPO 8's TACHO output function is not needed.
-#      MTune: Outputs → GPO 8 → Function: "Transmission Reverse" (replaces GPO 1).
-#      See harnesses/8hp-body-integrations-phase1.wv for the Phase 1 relay circuit
-#        (relay coil circuit, relay BOM, X20 connection — UNCHANGED, only the GPO wire moves).
-#
-#   3. IAT2 CHARGE AIR TEMP SENSOR (new)
+#   2. IAT2 CHARGE AIR TEMP SENSOR (new)
 #      NTC temperature sensor mounted on the charge pipe, post-intercooler, pre-throttle body.
 #      Connector: Bosch JMT 1.5mm 2-pin housing 1J0973702 (female, harness side).
 #      MaxxECU input: 16-pin aux breakout pin 13 (label M) = AIN 2 (temperature input).
@@ -140,41 +125,6 @@ connectors:
         Anode → pin 2 (GPO / low-side).
       Prevents MaxxECU GPO output damage from inductive kick at de-energization.
 
-  # ── Reverse light relay — GPO reassignment only (SKIP if PMU16 at Phase 1) ───
-  # If PMU16 was installed at Phase 1: skip these two connectors and the
-  # W_REV_GPO8 cable below. PMU16 already drives the relay coil via CAN.
-  # GPO 1 (BOOST_SOL stub) has been free from Phase 1 — no reroute needed.
-  M50_AUX_16PIN_GPO8:
-    type: "MaxxECU M50 terminated harness — 16-pin aux breakout"
-    subtype: "GPO 8/TACHO output — pin 4 (label E) — SKIP if PMU16 at Phase 1"
-    pincount: 1
-    pinlabels:
-      - "Pin 4 (E): GPO 8/TACHO (Transmission Reverse — discrete relay path only)"
-    notes: >
-      Only needed if PMU16 was deferred to Phase 3b (discrete relay path).
-      Phase 2a: GPO 8 replaces GPO 1 as the reverse light relay driver.
-      GPO 8 is configured as a low-side switch (sinks to GND when active).
-      The Gauge.S CAN cluster handles tachometer display via MaxxECU CAN 1
-      (Default 1.3 protocol) — GPO 8's TACHO output function is not needed.
-      MTune: Outputs → GPO 8 → Function: "Transmission Reverse".
-      Reverse light relay BOM and X20 connection: see harnesses/8hp-body-integrations-phase1.wv.
-      Only the wire from GPO to relay pin 85 changes — all other relay wiring stays.
-
-  REV_RELAY_PIN85:
-    type: "Reverse light relay — coil low-side only (SKIP if PMU16 at Phase 1)"
-    subtype: "Bosch mini relay, same unit as Phase 1 — only the GPO connection changes"
-    pincount: 1
-    pinlabels:
-      - "Pin 85 — coil low-side (from GPO 8, discrete relay path only)"
-    notes: >
-      Only needed if PMU16 was deferred to Phase 3b.
-      Phase 1: relay pin 85 was wired to BOOST_SOL stub pin 2 (GPO 1).
-      Phase 2a: re-terminate that wire to 16-pin aux pin 4 (GPO 8).
-      Or: cut the Phase 1 wire at the relay end, add a new 18 AWG wire from pin 4/E
-        to relay pin 85. Engine-bay run only (~0.8 m).
-      All other relay connections (pin 86 IGN+, pin 30 fused +12V, pin 87 → X20 pin 10)
-        remain from Phase 1 — see harnesses/8hp-body-integrations-phase1.wv.
-
   # ── IAT2 charge air temp sensor ──────────────────────────────────────────────
   IAT2_SENSOR:
     type: "NTC temperature sensor — charge pipe, post-FMIC, pre-throttle body"
@@ -222,17 +172,6 @@ cables:
       Solenoid native connector type: depends on brand — make a Superseal→solenoid adapter
         or solder the pigtail directly to the solenoid terminals if spade-type.
 
-  W_REV_GPO8:
-    wirecount: 1
-    colors: [GN]
-    wirelabels: ["GPO 8 → reverse light relay pin 85 (discrete relay path only)"]
-    length: 0.8 m
-    notes: >
-      SKIP if PMU16 was installed at Phase 1 — PMU16 already controls relay coil.
-      18 AWG. Engine-bay only. From 16-pin aux breakout pin 4 (E) to relay pin 85.
-      Replaces the Phase 1 wire that ran from BOOST_SOL stub pin 2 to relay pin 85.
-      Remove the Phase 1 wire before or at the same time as adding this wire.
-
   W_IAT2:
     wirecount: 2
     colors: [WH, BN]
@@ -251,11 +190,6 @@ connections:
   - - BOOST_SOL_STUB: ["+12V coil/inj supply", "GPO 1 (CMC B4) low-side"]
     - W_BOOST_SOL: [1, 2]
     - BOOST_SOLENOID: ["Coil high-side (+12V)", "Coil low-side (GPO)"]
-
-  # ── Reverse light relay — GPO 8 replaces GPO 1 ──────────────────────────────
-  - - M50_AUX_16PIN_GPO8: ["Pin 4 (E): GPO 8/TACHO (now Transmission Reverse)"]
-    - W_REV_GPO8: [1]
-    - REV_RELAY_PIN85: ["Pin 85 — coil low-side (now from GPO 8 instead of GPO 1)"]
 
   # ── IAT2 charge air temp sensor ──────────────────────────────────────────────
   - - IAT2_SENSOR: ["Signal (NTC)", "Sensor GND"]
