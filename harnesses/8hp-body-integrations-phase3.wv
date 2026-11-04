@@ -8,7 +8,7 @@
 # reverse light circuit as a direct high-side output — no separate relay needed.
 #
 # Under the H2O engine-bay-mount architecture (unchanged from Phase 1):
-#   - MaxxECU RACE H2O: engine bay (OEM DME E-box cavity, intake side of RHD car)
+#   - MaxxECU RACE H2O: engine bay (OEM DME mounting location, intake side of RHD car)
 #   - PMU16: engine bay, alongside the H2O
 #   - Custom 07K harness: direct-terminate at MaxxECU CMC
 #   - No discrete reverse-light relay in Phase 3b (PMU16 replaces it)

@@ -1,6 +1,8 @@
 # 8hp-can.wv
 # MaxxECU RACE H2O <-> ZF 8HP70 TCU CAN + power wiring
 # Source: maxxecu.com/webhelp/advanced-8hp-wiring_information.html
+# Control capabilities, drive modes, torque management, and Turbolamik comparison:
+#   docs/vendor/maxxecu/MaxxECU_8HP_Control.md
 #
 # ⚠️ SCOPE: REFERENCE ONLY — NOT A BUILD FILE
 # The MaxxECU 8HP GEN1 CAN harness is a pre-made plug-and-play kit
@@ -10,7 +12,7 @@
 # The user does NOT build these wires. Order the harness kit, plug it in.
 #
 # Under the H2O engine-bay-mount architecture:
-#   - MaxxECU RACE H2O: engine bay (OEM DME E-box cavity, intake side)
+#   - MaxxECU RACE H2O: engine bay (OEM DME mounting location, intake side)
 #   - 8HP TCU: engine bay (mounted on/near the transmission)
 #   - PMU16: engine bay (intake side, alongside the H2O — see power-distribution.wv)
 # ALL 8HP wiring is engine-bay-to-engine-bay — no firewall crossing.

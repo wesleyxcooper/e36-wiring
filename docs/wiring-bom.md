@@ -393,7 +393,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 *Source: `firewall-crossing-maven.wv`*
 
 > **Active architecture: Maven HD30 dual 16+16 bulkhead.**
-> With MaxxECU RACE H2O engine-bay-mounted (OEM DME E-box cavity, intake side per `docs/vendor/maxxecu/MaxxECU_RACE_H2O.md`), all engine sensor / IGN / INJ / GPO signals stay engine-bay entirely. The firewall crossing shrinks to a small dedicated Deutsch HD30 dual bulkhead for cabin-originated signals only.
+> With MaxxECU RACE H2O engine-bay-mounted (OEM DME mounting location, intake side per `docs/vendor/maxxecu/MaxxECU_RACE_H2O.md`), all engine sensor / IGN / INJ / GPO signals stay engine-bay entirely. The firewall crossing shrinks to a small dedicated Deutsch HD30 dual bulkhead for cabin-originated signals only.
 >
 > - **Connector A (16-pin, Phase 2b install):** CAN H/L/shield to Gauge.S cluster (3 pins) + DCT shifter paddle UP/DOWN/GND (3 pins). 8 spare cavities. Populated at Phase 2b offline harness build.
 > - **Connector B (16-pin, Phase 3b population):** APS e-pedal — ch1 SGND/+5V/sig + ch2 SGND/+5V/sig (6 pins). 10 spare cavities. Cabin-side receptacle installed at Phase 2b with all cavities plugged; populated at Phase 3b when the E46 APS pedal is installed.

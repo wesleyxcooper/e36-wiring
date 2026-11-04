@@ -10,7 +10,7 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 ## Loom Runs
 
 ### 1. Engine Bay Trunk Loom
-**Path:** MaxxECU RACE H2O (OEM E-box cavity, intake side of RHD car) → PMU16 (co-mounted alongside H2O) → engine-bay actuators / sensors  
+**Path:** MaxxECU RACE H2O (OEM DME mounting area, intake side of RHD car) → PMU16 (co-mounted alongside H2O) → engine-bay actuators / sensors  
 **Route:** Intake side inner fender rail (RHD passenger side, away from exhaust which is on driver side), secured to existing body grommets  
 **Sleeve:** Expandable braid, DR-25 over sensor sub-looms  
 **Sub-looms that branch off this trunk:**
@@ -94,7 +94,7 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 
 The Ecumaster PMU16 replaces the relay board, blade fuse block, and Crydom SSR.
 Mounting location: **engine bay, intake side (RHD passenger side), alongside the
-MaxxECU RACE H2O in / adjacent to the OEM DME E-box cavity area**. This keeps:
+MaxxECU RACE H2O in / adjacent to the OEM DME mounting location**. This keeps:
 - MaxxECU H2O and PMU16 physically adjacent for the shortest ECU +12V feed run
 - Both units on the intake side, away from exhaust heat (driver side in RHD)
 - BATT+ run from ANL fuse to PMU16 M6 stud as short as practical
@@ -139,7 +139,7 @@ The 39-pin Sicma connector faces down/inboard for harness routing to engine-bay 
 ## TODO — Fill In During Build
 
 - [ ] Confirm Maven bulkhead pass-through hole location (intake side preferred; height from floor)
-- [ ] Confirm PMU16 + RACE H2O co-mount location on intake-side firewall — verify OEM DME E-box cavity accepts the H2O 155×195mm footprint (may need fabricated mounting plate — measure during Phase 1 mockup)
+- [ ] Confirm PMU16 + RACE H2O co-mount location on intake-side firewall — verify OEM DME mounting location accepts the H2O 155×195mm footprint (may need fabricated mounting plate — measure during Phase 1 mockup)
 - [ ] Measure engine bay trunk run: PMU16 → each sensor breakout → MaxxECU CMC
 - [ ] Confirm fuel pump loom total length (PMU16 O4 → Radium hanger, est. 3.5–4m tunnel run)
 - [ ] Confirm 8HP CAN run length (ECU → ZF 8HP TCU connector)

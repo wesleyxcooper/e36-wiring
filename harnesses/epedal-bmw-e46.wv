@@ -3,7 +3,7 @@ metadata:
   description: >-
     BMW E46 accelerator pedal module (35426786282 manual / 35426786281 auto)
     wired to MaxxECU RACE H2O. Phase 3b install (07K engine + APS pedal). MaxxECU
-    is ENGINE-BAY mounted (OEM DME E-box cavity, intake side of RHD car). APS
+    is ENGINE-BAY mounted (OEM DME mounting location, intake side of RHD car). APS
     signals cross the firewall via the Maven HD30 dual bulkhead Connector B
     (see harnesses/firewall-crossing-maven.wv). Six wires run from the pedal
     (cabin footwell) to Maven B_CABIN pins 1-6, then engine-bay side to MaxxECU

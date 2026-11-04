@@ -8,7 +8,7 @@
 # CONTEXT: MaxxECU RACE H2O in engine bay
 # ─────────────────────────────────────────────────────────────────────────────
 #
-# With the MaxxECU RACE H2O mounted in the engine bay (OEM DME E-box cavity,
+# With the MaxxECU RACE H2O mounted in the engine bay (OEM DME mounting location,
 # intake side = passenger side of RHD car), all engine sensor / IGN / INJ / GPO
 # signals stay engine-bay entirely. The only signals that need to cross the
 # firewall are cabin-originated inputs to the ECU:

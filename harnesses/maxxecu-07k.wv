@@ -7,7 +7,7 @@
 # ARCHITECTURE
 # ─────────────────────────────────────────────────────────────────────────────
 #
-# MaxxECU RACE H2O is engine-bay-mounted (OEM DME E-box cavity, intake side =
+# MaxxECU RACE H2O is engine-bay-mounted (OEM DME mounting location, intake side =
 # passenger side of RHD car). All engine sensors, IGN, INJ, and GPO signals
 # terminate DIRECTLY at MaxxECU C1/C2 CMC pins — no firewall bulkhead crossing.
 # See docs/vendor/maxxecu/MaxxECU_RACE_H2O.md for full ECU + mount rationale.

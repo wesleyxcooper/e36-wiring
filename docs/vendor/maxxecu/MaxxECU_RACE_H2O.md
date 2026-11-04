@@ -69,7 +69,7 @@ Where the H2O **does** differ from the RACE: the USB port is sealed. Standard Ma
 - Length and end-form confirmed by NZ distributor <https://maxxecu.co.nz/product/maxxecu-pro-race-h2o-usb/> — *"This water proof USB cable is 1.5m long"* — sealed connector on the ECU end, standard USB-A on the laptop end.
 - Included in the RACE H2O PREMIUM kits (SKU 1897 for LSU 4.2, SKU 2252 for LSU 4.9). Not required to purchase separately if buying the PREMIUM kit.
 
-Routing plan for this build: sealed end at engine-bay ECU → 1.5 m cable through a dedicated weatherproof grommet in the firewall → USB-A end mounted in the cabin (glove box or under-dash panel) for laptop connection during tuning. The 1.5 m length is enough for an OEM-E-box-cavity ECU mount to a cabin-side mount.
+Routing plan for this build: sealed end at engine-bay ECU → 1.5 m cable through a dedicated weatherproof grommet in the firewall → USB-A end mounted in the cabin (glove box or under-dash panel) for laptop connection during tuning. The 1.5 m length is enough for an intake-side ECU mount to a cabin-side mount.
 
 ---
 
@@ -88,25 +88,25 @@ For this build, either SKU works. The M52 pre-terminated harness (`docs/vendor/m
 
 ## 7. Mounting recommendation for this RHD E36 build
 
-**Location: OEM DME (E-box) cavity, LEFT side of engine bay firewall (RHD passenger side = intake side of M52 and 07K).**
+**Location: OEM DME mounting location, LEFT side of engine bay firewall (RHD passenger side = intake side of M52 and 07K).**
 
 Rationale (with sources):
 
-1. **This car's OEM DME cavity is on the passenger side of a RHD E36 — confirmed on the car by the build owner.** In RHD the driver is on the right, so passenger side = left side of engine bay. Corroborating source for the general RHD layout: [bimmerforums.co.uk thread on E36 tds ECU location](https://www.bimmerforums.co.uk/threads/e36-tds-ecu-location.334033/) — *"It's behind the fusebox on RHD cars in the bulkhead behind a plastic panel. LHD cars have it on the opposite site to the fusebox, but still inside the bulkhead behind a panel."* The E36 DME location follows the passenger side in both LHD and RHD; because the interior mirrors between variants, "passenger side" maps to opposite physical sides of the car (right in LHD, left in RHD).
+1. **The E36 OEM DME is on the passenger side — confirmed in both RHD and LHD.** The DME sits behind the fuse box, inside the bulkhead, behind a plastic panel. Sources: (a) [bimmerforums.co.uk — E36 tds ECU location](https://www.bimmerforums.co.uk/threads/e36-tds-ecu-location.334033/) post by TheEnd (10,501 posts): *"It's behind the fusebox on RHD cars in the bulkhead behind a plastic panel. LHD cars have it on the opposite site to the fusebox, but still inside the bulkhead behind a panel."* (b) [bimmerforums.co.uk — 1997 E36 328i thread](https://www.bimmerforums.co.uk/threads/1997-e36-328i-can-you-help-identify-these.30638/) post #6: *"Ecu is hidden in a compartment behind the bulkhead on the passenger side, where it can be accessed by removing the soundproofing stuff then a metal cover."* In RHD the driver is on the right so passenger side = left of engine bay. The DME location follows the passenger side in both LHD and RHD — the interior mirrors between variants.
 
-2. **Intake side = passenger side = left side of engine bay in RHD.** The BMW M50/M52/M54/S52/S54 engine family keeps the same physical orientation in RHD as in LHD (the engine is not mirrored), and per the build owner's on-car observation, this puts the intake manifold on the passenger side of a RHD car. The 07K engine retains the same orientation post-swap (engine remains longitudinal with the same intake side). Exhaust manifold, downpipe, and (Phase 3b) turbo are on the driver side — the OPPOSITE side of the engine bay from the OEM DME cavity.
+2. **Intake side = passenger side = left side of engine bay in RHD.** The BMW M50/M52/M54/S52/S54 engine family keeps the same physical orientation in RHD as in LHD (the engine is not mirrored), and per the build owner's on-car observation, this puts the intake manifold on the passenger side of a RHD car. The 07K engine retains the same orientation post-swap (engine remains longitudinal with the same intake side). Exhaust manifold, downpipe, and (Phase 3b) turbo are on the driver side — the OPPOSITE side of the engine bay from the OEM DME mounting area.
 
 3. **Thermally favorable** — intake side is opposite the exhaust manifold, downpipe, and turbo. Aligns with MaxxECU's error-code-92 documentation recommendation to "mount away from heat sources."
 
-4. **Sheltered by OEM E-box cover** — pre-existing plastic cover was designed to shelter the DME from spray. IP67 rating of the H2O gives additional margin.
+4. **Sheltered by OEM DME plastic cover** — pre-existing plastic cover was designed to shelter the DME from spray. IP67 rating of the H2O gives additional margin.
 
-**Physical fit check:** RACE H2O footprint (155×195 mm) is larger than the OEM Bosch DME (~180×110 mm approx). The OEM E-box cavity may or may not accept the H2O directly. Options:
+**Physical fit check:** RACE H2O footprint (155×195 mm) is larger than the OEM Bosch DME (~180×110 mm approx). The OEM DME mounting area may or may not accept the H2O directly. Options:
 
-- (A) Fabricate a mounting plate that occupies the E-box cavity opening; H2O bolts to the plate; discard the OEM plastic cover
-- (B) Mount the H2O just outside the E-box cavity on the firewall face itself with OEM cover removed
-- (C) Move the H2O to the adjacent inner-fender area on the intake side, extending the OEM cavity area
+- (A) Fabricate a custom adapter plate using the OEM DME mounting provisions; H2O bolts to the plate. This approach is confirmed by commercial products for other ECUs: [Adapt-Lab E36 EMU Black / Haltech Elite ECU Bracket](https://adapt-lab.com/product/e36-emu-black-haltech-elite-ecu-bracket) ($119.95 stainless) and [Strom Motorsports E36 MoTeC M122/M130 Mounting Kit](https://strommotorsports.com/products/e36-m122-mounting-kit) ($89) both use the OEM E36 DME mounting provisions with a custom base plate and no drilling. The H2O footprint is different from both — a custom plate is needed. Use JLC CNC with a STEP file derived from the H2O mounting hole pattern.
+- (B) Mount the H2O on the firewall face adjacent to the OEM DME location with OEM cover removed
+- (C) Move the H2O to the adjacent intake-side inner-fender area
 
-Measure the specific car's E-box cavity dimensions during Phase 1 mockup before committing to a mounting plate design.
+Measure the specific car's OEM DME mounting area dimensions during Phase 1 mockup before committing to a plate design.
 
 ---
 
@@ -118,7 +118,7 @@ Ecumaster PMU16 alongside the ECU on the intake side. Details:
 - **IP60** (dust protected, no water immersion rating). Same source. Requires splash-shielded mounting.
 - **Operating temp: AECQ100 Grade 1 (-40 to +125 °C)**. Same source. Better temp margin than the RACE H2O; PMU16 is not the thermal bottleneck.
 
-Combined intake-side footprint: ~450 cm² (H2O + PMU16 side-by-side). Compare to OEM E-box footprint of ~200 cm² — an expanded mounting plate will be needed. Measure your car's available firewall real estate on the intake side during Phase 1 mockup.
+Combined intake-side footprint: ~450 cm² (H2O + PMU16 side-by-side). Compare to OEM DME mounting footprint of ~200 cm² — an expanded mounting plate will be needed. Measure your car's available firewall real estate on the intake side during Phase 1 mockup.
 
 ---
 
@@ -141,7 +141,7 @@ The **X20 OEM firewall connector stays 100 % untouched** for cluster feedback an
 
 ## 10. Open items requiring on-car verification
 
-- OEM E-box cavity actual dimensions on this RHD E36 (accept the H2O without modification, or need mounting plate?)
+- OEM DME mounting area actual dimensions on this RHD E36 (accept the H2O without modification, or need mounting plate?)
 - Physical position of RHD fusebox relative to OEM DME cavity (confirms bimmerforums.co.uk thread against this specific car)
 - Available firewall real estate for PMU16 alongside the H2O
 - Route path for sealed USB #1606 to a cabin mount point (glove box vs under-dash)

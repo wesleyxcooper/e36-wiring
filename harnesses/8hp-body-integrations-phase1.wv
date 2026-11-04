@@ -8,7 +8,7 @@
 #
 # DISCRETE RELAY PATH (reference only, not built):
 # Under the H2O engine-bay-mount architecture:
-#   - MaxxECU RACE H2O: engine bay (OEM DME E-box cavity, intake side of RHD car)
+#   - MaxxECU RACE H2O: engine bay (OEM DME mounting location, intake side of RHD car)
 #   - MaxxECU M50 pre-terminated engine harness: plugs into H2O CMC. Available
 #     cabin-side breakouts include BOOST_SOLENOID Superseal 2-pin (unpopulated in
 #     Phase 1 NA — hosts a spare GPO 1 signal)

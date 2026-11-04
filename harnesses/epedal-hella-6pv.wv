@@ -8,7 +8,7 @@ metadata:
     mount position is fully custom-fabricated (aluminum plate + 3x M6 studs).
     MaxxECU has a native pre-defined profile for this pedal.
     Under the H2O engine-bay-mount architecture, the MaxxECU is engine-bay-mounted
-    (OEM DME E-box cavity, intake side of RHD car). APS signals cross the firewall
+    (OEM DME mounting location, intake side of RHD car). APS signals cross the firewall
     via the Maven HD30 dual bulkhead Connector B (see harnesses/firewall-crossing-maven.wv)
     — Connector B is populated at Phase 3b when the pedal is installed.
     Confirmed C2 pin assignments: APS1 → C2 E4 (AIN 6), APS2 → C2 F1 (AIN 7).

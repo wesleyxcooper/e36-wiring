@@ -28,8 +28,8 @@ metadata:
     control from MaxxECU RACE H2O.
 
     MOUNT LOCATION: Engine bay, intake side (RHD passenger side), alongside
-    the MaxxECU RACE H2O in the OEM DME E-box cavity area. IP60 aluminium
-    enclosure (per PMU_Manual.pdf p.1) — shelter under the OEM E-box plastic
+    the MaxxECU RACE H2O in the OEM DME mounting location. IP60 aluminium
+    enclosure (per PMU_Manual.pdf p.1) — shelter under the OEM DME plastic
     cover for splash protection. Operating temp AECQ100 Grade 1 (-40 to +125 C)
     per Ecumaster manual, so engine-bay ambient is within spec.
     Source: docs/vendor/ecumaster/PMU16_Manual_v101.pdf; details in
