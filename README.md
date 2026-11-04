@@ -62,6 +62,44 @@ The M50 pre-terminated harness covers all M52 engine management signals (injecto
 | ATF temp sensor — MaxxECU NTC 1/8 NPT, engine-bay direct-terminate *(optional)* | [atf-temp-sensor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/atf-temp-sensor.html) | `harnesses/atf-temp-sensor.wv` |
 | EPowerSteering.com E36 column-assist EPS (cabin-only, no MaxxECU/CAN interface) | [eps-column.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/eps-column.html) | `harnesses/eps-column.wv` |
 
+---
+
+> **Build path branch point.** After Phase 1 the project diverges into two engine choices:
+> - **Path A — Turbo M52B28 (Phases 2a → 3a):** Iron-block M52B28 built by VAC, turbo + 8HP, MaxxECU. Keeps the M50 pre-terminated harness; supplemental wiring only.
+> - **Path B — VW 07K (Phases 2b → 3b):** Custom 07K 5-cyl harness, Maven bulkhead, PMU16, EWP, DBW throttle. Full harness replacement.
+
+---
+
+### Phase 2a — Turbo M52B28 offline prep (while VAC builds the engine)
+
+The M50 pre-terminated harness stays installed. Everything here is a **delta from Phase 1** — only what changes or is added.
+
+| Harness | Interactive HTML | Source |
+|---|---|---|
+| Turbo M52 supplemental — boost solenoid (GPO 1 BOOST_SOL stub), IAT2 charge temp sensor, reverse light reroute GPO 1 → GPO 8 | [m52-turbo-phase2a.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/m52-turbo-phase2a.html) | `harnesses/m52-turbo-phase2a.wv` |
+
+**GPO changes in Phase 2a:**
+
+| GPO | Phase 1 | Phase 2a |
+|---|---|---|
+| GPO 1 (BOOST_SOL stub) | Reverse light relay coil low-side | Boost solenoid coil low-side |
+| GPO 7/DIN3 (16-pin pin 5) | Flex fuel sensor — unchanged | Flex fuel sensor — unchanged |
+| GPO 8/TACHO (16-pin pin 4) | Unused | Reverse light relay coil low-side |
+
+**MAP sensor swap (no wiring change):** Swap OEM 1-bar MAP sensor → 3-bar absolute unit (JMT 1.5mm 3-pin housing `3B0973703G` — verify connector compatibility at purchase). MTune calibration update required. See `harnesses/m52-turbo-phase2a.wv` for sensor options.
+
+### Phase 3a — Turbo M52B28 install day
+
+The engine returns from VAC and replaces the NA M52. All Phase 2a wiring is pre-routed — this is a plug-in and configure operation.
+
+| Harness | Interactive HTML | Source |
+|---|---|---|
+| Turbo M52 install day checklist — connections, MTune config, boost prevention, pre-tune steps | [m52-turbo-phase3a.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/m52-turbo-phase3a.html) | `harnesses/m52-turbo-phase3a.wv` |
+
+**At Phase 3a:** plug boost solenoid into BOOST_SOL stub, connect IAT2 at charge pipe, swap MAP sensor (component only), verify GPO 8 reverse light. FMIC outlet physically disconnected until Phase 4a dyno tune. See `19d-m5x-turbo-calibration.md` for the pre-tune safety checklist.
+
+---
+
 ### Phase 2b — 07K harness build (offline bench build)
 
 | Harness | Interactive HTML | Source |
@@ -120,6 +158,18 @@ Walbro F90000267 driven by a discrete high-current relay (via JDT Racing rewire 
 | `harnesses/pst-f1-sensor.wv` | Bosch PST-F1 oil temp+pressure — Phase 1: pigtail to M50 16-pin AUX breakout (pins 1/2/12/14); Phase 3b: direct-terminate at MaxxECU CMC | [§ PST-F1 row L67](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L67) |
 | `harnesses/atf-temp-sensor.wv` | ATF temp sensor — MaxxECU NTC 1/8 NPT, Vibrant 16488 adapter, engine-bay direct-terminate at CMC J2 AIN 2 *(optional)* | [§ Cooling row L96](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L96) |
 | `harnesses/eps-column.wv` | EPowerSteering.com E36 column-assist EPS (KIT-33) — cabin-only, no MaxxECU/CAN interface. Power from Phase 1 relay board IGN output; transitions to PMU16 O8 at Phase 3b. | [§ Power Steering row L369](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L369) |
+
+### Phase 2a — Turbo M52B28 offline prep
+
+| File | Description |
+|---|---|
+| `harnesses/m52-turbo-phase2a.wv` | M52 turbo supplemental delta: boost solenoid (GPO 1 BOOST_SOL stub → 3-port PWM solenoid, flyback diode), reverse light reroute (GPO 1 freed; relay coil pin 85 moves to GPO 8/TACHO on 16-pin pin 4/E), IAT2 charge temp sensor (JMT 1.5mm 2-pin, 16-pin AIN 2 pin 13/M), MAP sensor swap note (component swap, no wiring) |
+
+### Phase 3a — Turbo M52B28 install day
+
+| File | Description |
+|---|---|
+| `harnesses/m52-turbo-phase3a.wv` | Install day checklist: plug boost solenoid, connect IAT2, swap MAP sensor (3-bar), verify GPO 8 reverse light. MTune config: boost control, IAT2 AIN, MAP calibration, GPO 8 reassignment. Pre-tune safety (FMIC outlet disconnect, MAP cut at 102 kPa, spring-only wastegate). |
 
 ### Phase 2b — 07K harness build (offline)
 

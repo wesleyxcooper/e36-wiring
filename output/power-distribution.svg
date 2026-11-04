@@ -272,7 +272,7 @@
 <text xml:space="preserve" text-anchor="start" x="21417.25" y="-634.12" font-family="arial" font-size="14.00"> &#160;PMU16 M6 stud is BATT+ always (not IGN&#45;switched), enabling this behavior.</text>
 <text xml:space="preserve" text-anchor="start" x="21417.25" y="-618.38" font-family="arial" font-size="14.00">EWP parallel outputs: O5+O14 wired together to CWA400 Pin 3, configured as</text>
 <text xml:space="preserve" text-anchor="start" x="21417.25" y="-602.62" font-family="arial" font-size="14.00"> &#160;a parallel pair in PMU software. Combined 50A rating handles CWA400 35.5A.</text>
-<text xml:space="preserve" text-anchor="start" x="21417.25" y="-586.88" font-family="arial" font-size="14.00">AC relay coil: O7 drives relay pin 86. AC switch feeds MaxxECU DIN (not coil direct). Spare outputs: O8&#45;O13, O15&#45;O16. O8 assigned to EPS Controller (Phase 3). CAN1 (PHYS pins 23/35): reserved for PC programming via Ecumaster USB&#45;CAN.</text>
+<text xml:space="preserve" text-anchor="start" x="21417.25" y="-586.88" font-family="arial" font-size="14.00">AC relay coil: O7 drives relay pin 86. AC switch feeds MaxxECU DIN (not coil direct). Spare outputs: O8&#45;O13, O15&#45;O16. O8 assigned to EPS Controller (Phase 3b). CAN1 (PHYS pins 23/35): reserved for PC programming via Ecumaster USB&#45;CAN.</text>
 <text xml:space="preserve" text-anchor="start" x="21417.25" y="-571.12" font-family="arial" font-size="14.00"> &#160;Do NOT connect CAN1 to MaxxECU &#45;&#45; CAN1 is PC&#45;only on PMU16.</text>
 </g>
 <!-- W_CAN2_PMU16 -->

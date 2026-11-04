@@ -1,0 +1,133 @@
+# m52-turbo-phase3a.wv
+# M52 Turbo Install Day — Phase 3a (iron-block M52B28 returns from VAC and goes in the car)
+#
+# !! INSTALL DAY CHECKLIST — NOT A BUILD DOCUMENT !!
+# All new wiring for the turbo M52 path was completed in Phase 2a (see
+# harnesses/m52-turbo-phase2a.wv). Phase 3a is the engine install moment.
+# The electrical work at Phase 3a is minimal — connecting pre-prepared circuits.
+#
+# Source: docs/walkthroughs/19b-m5x-turbo.md (turbo system install)
+# Source: docs/walkthroughs/19d-m5x-turbo-calibration.md (pre-tune safety checks)
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# PHASE 3a WIRING CHECKLIST — AT ENGINE INSTALL
+#
+# Engine bay access:
+# [ ] Remove NA M52 and all associated engine-side connectors from the M50 harness.
+#     The M50 harness stays in the car; engine-side connectors are disconnected and
+#     re-plugged into the returning turbo iron-block M52B28.
+# [ ] Verify the EWS2 bypass is still intact (harnesses/ews2-bypass.wv).
+#     Bridge pins 1+3, pin 4 isolated — confirm before first crank.
+#
+# Boost solenoid:
+# [ ] Reconnect the BOOST_SOL Superseal 2-way stub to the boost solenoid.
+#     The solenoid was wired and mounted in Phase 2a — this is a plug-in connection.
+# [ ] Route wastegate actuator vacuum lines (3-port solenoid pneumatics — mechanical).
+#     Port 1: from charge pipe or turbo compressor outlet
+#     Port 2: to wastegate actuator
+#     Port 3: to atmosphere or pre-turbo intake
+#
+# MAP sensor:
+# [ ] Swap OEM 1-bar MAP sensor for 3-bar absolute unit.
+#     Connector: JMT 1.5mm 3-pin housing 3B0973703G — verify 3-bar sensor uses same body.
+#     Mount location: same as OEM (manifold MAP port or dedicated bung on intake manifold/plenum).
+#     The M50 harness MAP hose and connector carry over unchanged.
+# [ ] MTune: Sensors → MAP Sensor → update calibration table from 1-bar to 3-bar curve.
+#     Confirm MAP sensor calibration before enabling boost control.
+#
+# IAT2 charge air temp:
+# [ ] Connect IAT2 sensor pigtail (pre-routed in Phase 2a) to the charge pipe sensor bung.
+#     Sensor mounted post-FMIC, pre-throttle body. Snap connector into the
+#     JMT 1.5mm 2-pin sensor socket.
+#
+# Reverse light check:
+# [ ] Verify reverse light relay still wired (Phase 2a reroute: relay pin 85 → GPO 8).
+#     GPO 8 configured in MTune as "Transmission Reverse" — test in R gear before driving.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# MTUNE CONFIGURATION — BEFORE FIRST START
+#
+# Required before firing the turbo M52B28:
+#
+#   MAP sensor calibration: Sensors → MAP → type = 3-bar absolute → load calibration
+#     curve from sensor datasheet (or use MaxxECU-listed curve if using MaxxECU sensor)
+#
+#   Boost control: Outputs → GPO 1 → Function: "Boost Control" → PWM 10–20 Hz
+#     Boost target: set conservatively at 7–8 psi (spring pressure) initially.
+#     Do NOT increase boost target until after the Phase 4a dyno tune.
+#
+#   IAT2 (charge temp): Analog Inputs → AIN 2 → Type: Temperature → Function: IAT 2
+#     Confirm that AIN 2 reads a reasonable temperature (ambient air at start).
+#
+#   GPO 8 reverse light: Outputs → GPO 8 → Function: "Transmission Reverse"
+#     (Replaces Phase 1 GPO 1 assignment)
+#
+#   Flex fuel: Digital Inputs → DIN 3 → Function: Ethanol sensor → verify reading
+#     (flex fuel sensor wired in Phase 1, unchanged)
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# MECHANICAL BOOST PREVENTION BEFORE TUNE (from 19d-m5x-turbo-calibration.md)
+#
+# DO NOT drive under boost until Phase 4a dyno tune is complete.
+# Three-layer approach:
+#
+# Layer 1 (hardware, ECU-independent):
+#   Leave the FMIC outlet pipe physically disconnected from the throttle body.
+#   The turbo spins and pressurizes the FMIC, but the outlet is open to atmosphere.
+#   No boost reaches the intake. Reconnect at VAC immediately before the tune.
+#
+# Layer 2 (MTune MAP protection):
+#   Set Engine Protection → Max MAP = 102 kPa.
+#   Any positive boost pressure triggers an ignition cut before boost builds.
+#
+# Layer 3 (wastegate spring-only):
+#   Leave boost solenoid GPO 1 unassigned in MTune (or set duty cycle = 0%).
+#   Wastegate defaults to spring pressure only (~7 psi).
+#   At spring pressure only, the charge pipe disconnect is the primary safeguard.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# WHAT CARRIES FORWARD UNCHANGED
+#
+# From Phase 1 (all still active):
+#   - M50 pre-terminated harness: all engine sensors — same connectors, same harness
+#   - EWS2 bypass: no change
+#   - Fuel pump hanger: no change (discrete relay + JDT kit)
+#   - Flex fuel sensor: no change (DIN 3)
+#   - 8HP CAN harness: no change
+#   - Gauge.S CAN: no change
+#   - DCT shifter paddle: no change
+#   - X20 body connector: no change
+#   - PST-F1 oil sensor: no change (re-plug at turbo M52 engine connection)
+#   - EPS column: no change
+#
+# From Phase 2a (new, now connecting to the installed engine):
+#   - Boost solenoid: plug BOOST_SOL stub → solenoid (solenoid was mounted in Phase 2a)
+#   - IAT2 charge temp: plug to sensor at charge pipe (wire was run in Phase 2a)
+#   - Reverse light relay: GPO 8 wired in Phase 2a — verify at install
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# AFTER RUNNING (BEFORE PHASE 4a TUNE)
+#
+# See docs/walkthroughs/19d-m5x-turbo-calibration.md for pre-tune checklist:
+#   - NA base map loaded (MaxxECU M52 base map or custom from Phase 1 calibration)
+#   - Boost solenoid wiring verified (GPO 1 → BOOST_SOL stub → solenoid)
+#   - MAP sensor 3-bar calibration confirmed in MTune logs (shows positive MAP correctly)
+#   - IAT2 reading correctly in MTune at ambient temperature
+#   - No boost events before Phase 4a tune (FMIC outlet disconnected as hardware lock)
+#
+# Phase 4a: VAC Motorsports dyno tune (maxxecu.com platform, Philadelphia PA)
+#   See docs/walkthroughs/19d-m5x-turbo-calibration.md for full Phase 4a protocol.
+
+metadata:
+  project: E36 Restomod — Turbo M52B28 Install Checklist, Phase 3a
+  description: >-
+    Phase 3a install day checklist for the turbo iron-block M52B28.
+    All new wiring was completed in Phase 2a. This file documents:
+    connections to make at engine install, MTune configuration before first
+    start, mechanical boost prevention strategy, and what carries forward
+    unchanged from Phase 1 and Phase 2a.
+    Not a harness build file — no new wire builds at Phase 3a.
+
+connectors: {}
+cables: {}
+connections: []

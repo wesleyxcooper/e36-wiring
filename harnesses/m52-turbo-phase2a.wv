@@ -1,0 +1,251 @@
+# m52-turbo-phase2a.wv
+# M52 Turbo Supplemental Wiring — Phase 2a (offline prep while VAC builds the iron-block M52B28)
+#
+# !! DELTA FROM PHASE 1 — M50 TERMINATED HARNESS CONTINUES IN USE !!
+# The M50 pre-terminated engine harness remains installed throughout the M52 path.
+# This file documents ONLY what changes or is added versus Phase 1.
+# Do NOT remove or modify any M50 harness wiring that is not explicitly listed here.
+#
+# Phase 2a is the period when the iron-block M52B28 is at VAC Motorsports being built.
+# All work in this file is done IN THE CAR (or at the bench) while the engine is away.
+#
+# Source (wiring additions table): docs/walkthroughs/19b-m5x-turbo.md lines 141–152
+# Source (boost solenoid): docs/walkthroughs/19b-m5x-turbo.md line 137
+# Source (GPO 1 BOOST_SOL stub): harnesses/maxxecu-m52.wv lines 78–82
+# Source (16-pin aux breakout pinout): docs/vendor/maxxecu/MaxxECU_M50_Terminated_Harness.md
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# WHAT CHANGES IN PHASE 2a VS PHASE 1 (NA M52)
+#
+#   1. BOOST SOLENOID WIRING (new)
+#      GPO 1 is freed from the Phase 1 reverse light relay tap.
+#      The BOOST_SOL Superseal 2-way stub now carries its intended signal:
+#        Pin 1: +12V coil/inj supply → solenoid coil high-side
+#        Pin 2: GPO 1 (low-side, GND when solenoid active) → solenoid coil low-side
+#      Add: flyback diode (1N4007) across solenoid terminals.
+#      MTune: Outputs → GPO 1 → Function: "Boost Control" (PWM solenoid).
+#      Source: docs/walkthroughs/19b-m5x-turbo.md lines 135–137.
+#
+#   2. REVERSE LIGHT RELAY REROUTE (GPO 1 → GPO 8)
+#      Phase 1 tapped GPO 1 from the BOOST_SOL stub for the reverse light relay coil.
+#      Phase 2a: remove that tap. The relay coil (pin 85) now connects to
+#        GPO 8/TACHO on the 16-pin aux breakout (pin 4 / label E).
+#      GPO 8 is otherwise unused — the Gauge.S CAN cluster handles tachometer via
+#        CAN (MaxxECU Default 1.3 protocol), so GPO 8's TACHO output function is not needed.
+#      MTune: Outputs → GPO 8 → Function: "Transmission Reverse" (replaces GPO 1).
+#      See harnesses/8hp-body-integrations-phase1.wv for the Phase 1 relay circuit
+#        (relay coil circuit, relay BOM, X20 connection — UNCHANGED, only the GPO wire moves).
+#
+#   3. IAT2 CHARGE AIR TEMP SENSOR (new)
+#      NTC temperature sensor mounted on the charge pipe, post-intercooler, pre-throttle body.
+#      Connector: Bosch JMT 1.5mm 2-pin housing 1J0973702 (female, harness side).
+#      MaxxECU input: 16-pin aux breakout pin 13 (label M) = AIN 2 (temperature input).
+#      Note: AIN 2 is also used for ATF temp sensor (optional). If ATF sensor is installed,
+#        route IAT2 to MaxxECU CMC C2 AIN instead — verify before wiring.
+#      MTune: Analog Inputs → AIN 2 → Type: Temperature → Function: IAT 2 (charge temp).
+#      Source: docs/walkthroughs/19b-m5x-turbo.md line 148.
+#
+#   4. MAP SENSOR SWAP (component swap — no wiring change)
+#      The M50 harness MAP connector (JMT 1.5mm 3-pin, housing 3B0973703G) remains.
+#      Replace the OEM 1-bar absolute MAP sensor with a 3-bar absolute unit.
+#      Connector compatibility: verify that the chosen 3-bar sensor uses JMT 1.5mm 3-pin
+#        (Bosch/VW style) OR order a pigtail adapter at purchase.
+#      Recommended options:
+#        - MaxxECU MAP sensor (maxxecu.com store, part ID 1131, 3.5 bar)
+#        - AEM 30-2130-50 (3 bar; verify connector compatibility at purchase)
+#      MTune: Sensors → MAP Sensor → update calibration table from 1-bar to 3-bar curve.
+#      Source: docs/walkthroughs/19b-m5x-turbo.md line 147.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# WHAT IS UNCHANGED FROM PHASE 1 (do not modify)
+#
+#   - M50 pre-terminated harness: all engine sensors, coils, injectors — no change
+#   - EWS2 bypass: harnesses/ews2-bypass.wv — no change
+#   - Fuel pump hanger: discrete relay + JDT kit — no change
+#   - Flex fuel sensor: 16-pin DIN 3 (GPO 7/DIN3, pin 5/D) — no change
+#   - 8HP CAN harness — no change
+#   - Gauge.S CAN — no change
+#   - DCT shifter paddle — no change
+#   - X20 body connector — no change
+#   - PST-F1 oil sensor — no change
+#   - EPS column — no change
+#   - Reverse light relay BOM (relay, diode, X20 connection) — UNCHANGED;
+#     only the GPO wire at pin 85 moves from BOOST_SOL stub to 16-pin pin 4/E
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# BOOST SOLENOID SELECTION
+#
+#   Use a 3-port PWM-capable boost control solenoid.
+#   Common choices (source: docs/walkthroughs/19b-m5x-turbo.md line 137):
+#     - Turbosmart boost control solenoid (TS-0301-1001 or current equivalent)
+#     - Synapse Engineering boost control solenoid
+#     - MAC 35A-AAA-DDBA-1BA (OEM BMW spec; widely available, known connector)
+#   The BOOST_SOL stub is a Bosch Superseal 2-pin connector:
+#     - Contact size: verify at harness — M50 harness may use Superseal 1.5mm or 2.5mm
+#     - Mate with matching female housing + sockets (Superseal 1.5mm: housing 1-967640-1,
+#       sockets 1-967067-2; Superseal 2.5mm: housing 282080-1, sockets 1-967067-1)
+#     - Solenoid side connector: varies by brand — may need Superseal→spade or
+#       Superseal→Metripack pigtail depending on solenoid choice. Verify at purchase.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+metadata:
+  project: E36 Restomod — M52 Turbo Supplemental Wiring, Phase 2a
+  description: >-
+    Phase 2a delta wiring vs Phase 1 NA M52.
+    Covers boost solenoid (GPO 1 BOOST_SOL stub), reverse light relay reroute
+    from GPO 1 to GPO 8/TACHO (16-pin pin 4), and IAT2 charge air temp sensor
+    (16-pin AIN 2, pin 13). MAP sensor swap is documented as a component note only
+    (no new wiring required). The M50 pre-terminated harness remains in place.
+
+connectors:
+
+  # ── Boost solenoid ───────────────────────────────────────────────────────────
+  BOOST_SOL_STUB:
+    type: "MaxxECU M50 terminated harness — BOOST_SOL connector stub"
+    subtype: "Bosch Superseal 2-pin (GPO 1 + coil/inj +12V)"
+    pincount: 2
+    pinlabels:
+      - "+12V coil/inj supply"
+      - "GPO 1 (CMC B4) low-side"
+    notes: >
+      This connector stub is in the M50 pre-terminated harness, engine-bay side.
+      In Phase 1 (NA M52), the GPO 1 wire (pin 2) was tapped for the reverse
+      light relay — that tap must be REMOVED before connecting the boost solenoid.
+      Reconnect the relay coil wire to 16-pin pin 4 (GPO 8) instead (see below).
+      MTune: Outputs → GPO 1 → Function: "Boost Control" (PWM @ 10–20 Hz typical).
+      Source: harnesses/maxxecu-m52.wv lines 78–82.
+
+  BOOST_SOLENOID:
+    type: "3-port PWM boost control solenoid (Turbosmart, Synapse, or MAC)"
+    subtype: "2-pin, coil-only electrical connection — see header for PN selection"
+    pincount: 2
+    pinlabels:
+      - "Coil high-side (+12V)"
+      - "Coil low-side (GPO)"
+    notes: >
+      Solenoid native connector type varies by brand — verify at purchase.
+      Mount solenoid in engine bay on a bracket; route vacuum hoses:
+        Port 1 (inlet): from turbo compressor outlet or charge pipe pre-FMIC
+        Port 2 (outlet): to wastegate actuator
+        Port 3 (vent): to atmosphere or pre-turbo intake (recirculate)
+      Flyback diode: 1N4007 across coil terminals.
+        Cathode (banded) → pin 1 (+12V / high-side).
+        Anode → pin 2 (GPO / low-side).
+      Prevents MaxxECU GPO output damage from inductive kick at de-energization.
+
+  # ── Reverse light relay — GPO reassignment only ──────────────────────────────
+  M50_AUX_16PIN_GPO8:
+    type: "MaxxECU M50 terminated harness — 16-pin aux breakout"
+    subtype: "GPO 8/TACHO output — pin 4 (label E)"
+    pincount: 1
+    pinlabels:
+      - "Pin 4 (E): GPO 8/TACHO (now Transmission Reverse)"
+    notes: >
+      Phase 2a: GPO 8 replaces GPO 1 as the reverse light relay driver.
+      GPO 8 is configured as a low-side switch (sinks to GND when active).
+      The Gauge.S CAN cluster handles tachometer display via MaxxECU CAN 1
+      (Default 1.3 protocol) — GPO 8's TACHO output function is not needed.
+      MTune: Outputs → GPO 8 → Function: "Transmission Reverse".
+      Reverse light relay BOM and X20 connection: see harnesses/8hp-body-integrations-phase1.wv.
+      Only the wire from GPO to relay pin 85 changes — all other relay wiring stays.
+
+  REV_RELAY_PIN85:
+    type: "Reverse light relay — coil low-side only"
+    subtype: "Bosch mini relay, same unit as Phase 1 — only the GPO connection changes"
+    pincount: 1
+    pinlabels:
+      - "Pin 85 — coil low-side (now from GPO 8 instead of GPO 1)"
+    notes: >
+      Phase 1: relay pin 85 was wired to BOOST_SOL stub pin 2 (GPO 1).
+      Phase 2a: re-terminate that wire to 16-pin aux pin 4 (GPO 8).
+      Or: cut the Phase 1 wire at the relay end, add a new 18 AWG wire from pin 4/E
+        to relay pin 85. Engine-bay run only (~0.8 m).
+      All other relay connections (pin 86 IGN+, pin 30 fused +12V, pin 87 → X20 pin 10)
+        remain from Phase 1 — see harnesses/8hp-body-integrations-phase1.wv.
+
+  # ── IAT2 charge air temp sensor ──────────────────────────────────────────────
+  IAT2_SENSOR:
+    type: "NTC temperature sensor — charge pipe, post-FMIC, pre-throttle body"
+    subtype: "Bosch JMT 1.5mm 2-pin housing 1J0973702 (or equivalent NTC 2-pin)"
+    pincount: 2
+    pinlabels:
+      - "Signal (NTC)"
+      - "Sensor GND"
+    notes: >
+      Mount on the charge pipe between FMIC outlet and throttle body inlet.
+      Use a weld bung or push-lock fitting on the aluminum charge pipe.
+      Sensor options (any 2-wire NTC compatible with MaxxECU calibration tables):
+        - MaxxECU NTC temperature sensor ID 1286 (maxxecu.com store, 1/8 NPT)
+        - Bosch 0 280 130 085 (OEM M52 IAT — matches M50 harness calibration)
+      MTune: Analog Inputs → AIN 2 → Type: Temperature → Sensor: NTC → Calibrate
+        (or use pre-loaded curve if sensor matches MaxxECU's internal NTC tables).
+      Source: docs/walkthroughs/19b-m5x-turbo.md line 148.
+
+  M50_AUX_16PIN_AIN2:
+    type: "MaxxECU M50 terminated harness — 16-pin aux breakout"
+    subtype: "AIN 2 temperature input — pin 13 (label M)"
+    pincount: 2
+    pinlabels:
+      - "Pin 2 (label G): Sensor GND"
+      - "Pin 13 (label M): AIN 2 (temperature input)"
+    notes: >
+      AIN 2 is a temperature (NTC/thermistor) input.
+      Note: AIN 2 is also the ATF temp sensor pin (harnesses/atf-temp-sensor.wv).
+      If ATF temp sensor IS installed: use MaxxECU CMC C2 AIN instead of this pin.
+        C2 temperature AINs: C2 pins G4/H1/H2/H3/H4 — confirm in MaxxECU pinout doc.
+      If ATF temp sensor IS NOT installed: use AIN 2 here for IAT2.
+      Sensor GND (pin 2/G) is shared — additional NTC sensors share the same bus.
+
+cables:
+
+  W_BOOST_SOL:
+    wirecount: 2
+    colors: [RD, BK]
+    wirelabels: ["+12V coil high-side", "GPO 1 coil low-side"]
+    length: 0.5 m
+    notes: >
+      Short pigtail from BOOST_SOL stub to boost solenoid.
+      18 AWG (solenoid coil current ~1–2 A — 18 AWG adequate).
+      Flyback diode (1N4007) installed at the solenoid terminals (not inline in the wire).
+      Solenoid native connector type: depends on brand — make a Superseal→solenoid adapter
+        or solder the pigtail directly to the solenoid terminals if spade-type.
+
+  W_REV_GPO8:
+    wirecount: 1
+    colors: [GN]
+    wirelabels: ["GPO 8 → reverse light relay pin 85"]
+    length: 0.8 m
+    notes: >
+      18 AWG. Engine-bay only. From 16-pin aux breakout pin 4 (E) to reverse light relay pin 85.
+      Replaces the Phase 1 wire that ran from BOOST_SOL stub pin 2 to relay pin 85.
+      Remove the Phase 1 wire before or at the same time as adding this wire.
+
+  W_IAT2:
+    wirecount: 2
+    colors: [WH, BN]
+    wirelabels: ["IAT2 signal (NTC)", "Sensor GND"]
+    shield: true
+    length: 2.0 m
+    notes: >
+      Shielded twisted pair from charge pipe IAT2 sensor to 16-pin aux breakout.
+      22 AWG. Route along the charge pipe and then through the firewall grommet
+        alongside the M50 harness (or through a separate grommet if full already).
+      Drain shield at the ECU end only (single-end drain to Sensor GND at breakout pin 2/G).
+
+connections:
+
+  # ── Boost solenoid (GPO 1 high + low side) ──────────────────────────────────
+  - - BOOST_SOL_STUB: ["+12V coil/inj supply", "GPO 1 (CMC B4) low-side"]
+    - W_BOOST_SOL: [1, 2]
+    - BOOST_SOLENOID: ["Coil high-side (+12V)", "Coil low-side (GPO)"]
+
+  # ── Reverse light relay — GPO 8 replaces GPO 1 ──────────────────────────────
+  - - M50_AUX_16PIN_GPO8: ["Pin 4 (E): GPO 8/TACHO (now Transmission Reverse)"]
+    - W_REV_GPO8: [1]
+    - REV_RELAY_PIN85: ["Pin 85 — coil low-side (now from GPO 8 instead of GPO 1)"]
+
+  # ── IAT2 charge air temp sensor ──────────────────────────────────────────────
+  - - IAT2_SENSOR: ["Signal (NTC)", "Sensor GND"]
+    - W_IAT2: [1, 2]
+    - M50_AUX_16PIN_AIN2: ["Pin 13 (label M): AIN 2 (temperature input)", "Pin 2 (label G): Sensor GND"]
