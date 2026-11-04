@@ -4,7 +4,7 @@ Reference for `harnesses/maxxecu-07k.wv`, `harnesses/epedal-bmw-e46.wv`, and `ha
 
 Under the H2O engine-bay-mount architecture (see `docs/vendor/maxxecu/MaxxECU_RACE_H2O.md`), the MaxxECU RACE H2O sits in the engine bay. The two DBW subsystems terminate as follows:
 
-- **APS e-pedal (cabin footwell)**: 6 wires cross the firewall via **Maven HD30 Connector B pins 1–6** (Phase 3 install). Connector B is the *safety-critical* Maven connector — APS is the throttle command input, and any fault must trigger e-throttle shutdown. See "APS e-pedal" section below.
+- **APS e-pedal (cabin footwell)**: 6 wires cross the firewall via **Maven HD30 Connector B pins 1–6** (Phase 3b install). Connector B is the *safety-critical* Maven connector — APS is the throttle command input, and any fault must trigger e-throttle shutdown. See "APS e-pedal" section below.
 - **07K DBW throttle body (engine bay)**: 6 wires terminate directly at MaxxECU C1/C2 in the engine bay. **No firewall crossing** — both endpoints are engine-bay-side. See "07K DBW Throttle Body" section below.
 
 ---
@@ -144,7 +144,7 @@ MaxxECU has pre-defined profiles for this family. Use the identification method 
 
 Connector B of the Maven HD30 dual bulkhead is **designated safety-critical** and reserved for APS wiring across the entire build. APS is the throttle command input — any fault (open wire, short, sensor mismatch between APS1 and APS2) must trigger MaxxECU e-throttle shutdown. Keeping APS on its own dedicated Maven connector prevents accidental mixing with less-critical CAN + DCT signals (which go on Connector A).
 
-The 6 APS wires cross from cabin footwell (E46 pedal) to engine-bay MaxxECU via **Maven Connector B pins 1–6**. Cabin-side Maven receptacle is installed at Phase 3 (along with the pedal itself); engine-side plug on the 07K custom harness mates to it at 07K swap.
+The 6 APS wires cross from cabin footwell (E46 pedal) to engine-bay MaxxECU via **Maven Connector B pins 1–6**. Cabin-side Maven receptacle is installed at Phase 3b (along with the pedal itself); engine-side plug on the 07K custom harness mates to it at 07K swap.
 
 | Signal | From | Maven B pin | To (engine-bay MaxxECU) |
 |---|---|---|---|

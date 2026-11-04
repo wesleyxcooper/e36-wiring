@@ -43,25 +43,46 @@ This applies to all harness routing notes, connector location descriptions, and 
 
 Click any link to view the interactive diagram with full BOM in your browser — no code checkout needed.
 
+### Phase 1 — M52 baseline (NA M52 + 8HP + MaxxECU)
+
+The M50 pre-terminated harness covers all M52 engine management signals (injectors, coils, crank, cam, MAP, IAT, CLT, TPS, VANOS, O2, ICV). Everything below is **supplemental wiring** — what you build or modify on top of the purchased harness.
+
 | Harness | Interactive HTML | Source |
 |---|---|---|
-| MaxxECU ↔ M52 engine harness | [maxxecu-m52.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/maxxecu-m52.html) | `harnesses/maxxecu-m52.wv` |
-| MaxxECU ↔ VW 07K engine harness (Phase 3) | [maxxecu-07k.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/maxxecu-07k.html) | `harnesses/maxxecu-07k.wv` |
+| MaxxECU ↔ M52 signal reference (pre-terminated M50 harness — SIGNAL REF, do not build) | [maxxecu-m52.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/maxxecu-m52.html) | `harnesses/maxxecu-m52.wv` |
+| EWS2 chassis bypass | [ews2-bypass.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ews2-bypass.html) | `harnesses/ews2-bypass.wv` |
+| Fuel pump hanger — Phase 1 (discrete relay + JDT rewire kit) | [fuel-pump-hanger-phase1.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/fuel-pump-hanger-phase1.html) | `harnesses/fuel-pump-hanger-phase1.wv` |
+| Continental flex fuel sensor — Phase 1 | [flex-fuel-sensor-phase1.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/flex-fuel-sensor-phase1.html) | `harnesses/flex-fuel-sensor-phase1.wv` |
+| ZF 8HP70 TCU CAN + power (pre-made MaxxECU 8HP GEN1 kit) | [8hp-can.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/8hp-can.html) | `harnesses/8hp-can.wv` |
+| 8HP body integrations — Phase 1 (reverse light relay via GPO 1) | [8hp-body-integrations-phase1.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/8hp-body-integrations-phase1.html) | `harnesses/8hp-body-integrations-phase1.wv` |
+| Gauge.S CAN cluster (cabin, 500 kbps, Default 1.3) | [gauge-s-can.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/gauge-s-can.html) | `harnesses/gauge-s-can.wv` |
+| DCT Shifter paddle → MaxxECU DIN (cabin-to-cabin, 3-wire) | [dct-shifter.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/dct-shifter.html) | `harnesses/dct-shifter.wv` |
+| E36 X20 body connector | [body-x20.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/body-x20.html) | `harnesses/body-x20.wv` |
+| Bosch PST-F1 oil temp+pressure (Phase 1: pigtail to M50 16-pin AUX breakout) | [pst-f1-sensor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/pst-f1-sensor.html) | `harnesses/pst-f1-sensor.wv` |
+| ATF temp sensor — MaxxECU NTC 1/8 NPT, engine-bay direct-terminate *(optional)* | [atf-temp-sensor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/atf-temp-sensor.html) | `harnesses/atf-temp-sensor.wv` |
+| EPowerSteering.com E36 column-assist EPS (cabin-only, no MaxxECU/CAN interface) | [eps-column.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/eps-column.html) | `harnesses/eps-column.wv` |
+
+### Phase 2b — 07K harness build (offline bench build)
+
+| Harness | Interactive HTML | Source |
+|---|---|---|
+| MaxxECU ↔ VW 07K engine harness | [maxxecu-07k.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/maxxecu-07k.html) | `harnesses/maxxecu-07k.wv` |
+
+### Phase 3b — 07K swap day
+
+The Maven HD30 dual bulkhead and all PMU16-dependent wiring arrive at Phase 3b (07K swap moment). None of this applies to the M52 path.
+
+| Harness | Interactive HTML | Source |
+|---|---|---|
 | Maven HD30 Dual 16+16 firewall bulkhead (Connector A = CAN + DCT, Connector B = safety-critical APS) | [firewall-crossing-maven.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/firewall-crossing-maven.html) | `harnesses/firewall-crossing-maven.wv` |
-| E46 DBW pedal → Maven Connector B (safety-critical) → engine-bay MaxxECU APS (primary) | [epedal-bmw-e46.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/epedal-bmw-e46.html) | `harnesses/epedal-bmw-e46.wv` |
-| Hella 6PV pedal → Maven Connector B → engine-bay MaxxECU APS (RHD fallback) | [epedal-hella-6pv.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/epedal-hella-6pv.html) | `harnesses/epedal-hella-6pv.wv` |
-| ZF 8HP70 TCU CAN + power wiring (engine-bay direct — pre-made MaxxECU 8HP GEN1 kit) | [8hp-can.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/8hp-can.html) | `harnesses/8hp-can.wv` |
-| Gauge.S CAN cluster (cabin — crosses via Maven Connector A pins 1/2/3) | [gauge-s-can.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/gauge-s-can.html) | `harnesses/gauge-s-can.wv` |
-| DCT Shifter paddle → engine-bay MaxxECU DIN (crosses via Maven Connector A pins 4/5/6) | [dct-shifter.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/dct-shifter.html) | `harnesses/dct-shifter.wv` |
-| Bosch PST-F1 oil temp+pressure sensor (direct-terminate at engine-bay CMC) | [pst-f1-sensor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/pst-f1-sensor.html) | `harnesses/pst-f1-sensor.wv` |
-| E36 X20 body connector (OEM body signals — no ECU signals traverse X20) | [body-x20.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/body-x20.html) | `harnesses/body-x20.wv` |
-| Power distribution (Ecumaster PMU16 PDM) | [power-distribution.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/power-distribution.html) | `harnesses/power-distribution.wv` |
+| E46 DBW pedal → Maven Connector B → MaxxECU APS (primary) | [epedal-bmw-e46.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/epedal-bmw-e46.html) | `harnesses/epedal-bmw-e46.wv` |
+| Hella 6PV pedal → Maven Connector B → MaxxECU APS (RHD fallback) | [epedal-hella-6pv.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/epedal-hella-6pv.html) | `harnesses/epedal-hella-6pv.wv` |
+| Power distribution (Ecumaster PMU16) | [power-distribution.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/power-distribution.html) | `harnesses/power-distribution.wv` |
 | Pierburg CWA400 electric water pump | [ewp-controller.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ewp-controller.html) | `harnesses/ewp-controller.wv` |
-| Radium 20-1170 fuel pump hanger — Phase 1 (discrete relay + JDT rewire kit) | [fuel-pump-hanger-phase1.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/fuel-pump-hanger-phase1.html) | `harnesses/fuel-pump-hanger-phase1.wv` |
-| Radium 20-1170 fuel pump hanger — Phase 3 (PMU16 O4 direct-drive) | [fuel-pump-hanger-phase3.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/fuel-pump-hanger-phase3.html) | `harnesses/fuel-pump-hanger-phase3.wv` |
-| PD2-18012AJA 12V electric AC compressor + PWM controller + MaxxECU idle-up | [ac-compressor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ac-compressor.html) | `harnesses/ac-compressor.wv` |
-| ATF temp sensor — MaxxECU NTC 1/8 NPT in Vibrant 16488 inline -8AN adapter *(optional)* | [atf-temp-sensor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/atf-temp-sensor.html) | `harnesses/atf-temp-sensor.wv` |
-| EPowerSteering.com e36 column-assist EPS (Steering ECU, Controller, Adjustment Knob) | [eps-column.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/eps-column.html) | `harnesses/eps-column.wv` |
+| Fuel pump hanger — Phase 3b (PMU16 O4 direct-drive replaces Phase 1 relay) | [fuel-pump-hanger-phase3.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/fuel-pump-hanger-phase3.html) | `harnesses/fuel-pump-hanger-phase3.wv` |
+| PD2-18012AJA 12V electric AC compressor + PWM controller | [ac-compressor.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ac-compressor.html) | `harnesses/ac-compressor.wv` |
+| 8HP body integrations — Phase 3b (PMU16 direct-drive replaces Phase 1 relay) | [8hp-body-integrations-phase3.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/8hp-body-integrations-phase3.html) | `harnesses/8hp-body-integrations-phase3.wv` |
+| Continental flex fuel sensor — Phase 3b | [flex-fuel-sensor-phase3.html](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/flex-fuel-sensor-phase3.html) | `harnesses/flex-fuel-sensor-phase3.wv` |
 
 > Click any diagram to open the full interactive WireViz HTML view via htmlpreview.
 
@@ -69,77 +90,61 @@ Click any link to view the interactive diagram with full BOM in your browser —
 
 [![MaxxECU M52 Harness](output/maxxecu-m52.svg)](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/maxxecu-m52.html)
 
-### Maven HD30 Dual 16+16 firewall bulkhead
-
-[![Maven HD30 Dual Firewall Bulkhead](output/firewall-crossing-maven.svg)](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/firewall-crossing-maven.html)
-
-Connector A (CAN + DCT shifter, populated Phase 3 rewire from Phase 1 OEM grommet routing) + Connector B (E46 APS pedal, safety-critical, populated Phase 3 with pedal install). All engine sensor / IGN / INJ / GPO signals stay engine-bay-side under the H2O engine-bay-mount arch — the Maven bulkhead only carries cabin-originated signals. Cross-reference `harnesses/firewall-crossing-maven.wv` and `docs/wiring-bom.md` System 8.
-
 ### E36 X20 body connector
 
 [![E36 X20 Body Connector](output/body-x20.svg)](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/body-x20.html)
 
-100% OEM E36 body signals. No ECU signals traverse X20. Three OEM pins are repurposed engine-side under the new arch (pin 4 A/C compressor relay → MaxxECU AC-request DIN; pin 10 reverse light → PMU16 output at Phase 3; pin 21 IGN sense → PMU16 IGN sense input). Cabin-side wiring of X20 is unchanged from OEM.
+100% OEM E36 body signals. No ECU signals traverse X20. Three OEM pins are repurposed engine-side: pin 4 (A/C compressor relay → MaxxECU AC-request DIN), pin 10 (reverse light → discrete relay in Phase 1 / PMU16 output in Phase 3b), pin 21 (IGN sense → PMU16 IGN sense input at Phase 3b). Cabin-side wiring of X20 is unchanged from OEM.
 
-### Power distribution — Ecumaster PMU16 *(Phase 3 install)*
-
-[![Power Distribution](output/power-distribution.svg)](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/power-distribution.html)
-
-PMU16 mounts engine-bay-side alongside the MaxxECU RACE H2O in the OEM DME E-box cavity area (intake side of RHD car). See `harnesses/power-distribution.wv` metadata block for the full OEM E36 Front Power Distribution Box relay replacement map (K6300, K6301, K19, K21, K22, K6304 → PMU16 outputs; K2/K4/K10/K13/K16/K47/K125 stay OEM).
-
-### Pierburg CWA400 electric water pump *(Phase 3 install)*
-
-[![CWA400 EWP Harness](output/ewp-controller.svg)](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ewp-controller.html)
-
-### Radium 20-1170 fuel pump hanger — Phase 1 (discrete relay via JDT rewire kit)
+### Fuel pump hanger — Phase 1
 
 [![Fuel Pump Hanger — Phase 1](output/fuel-pump-hanger-phase1.svg)](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/fuel-pump-hanger-phase1.html)
 
-Walbro F90000267 driven by a discrete high-current relay (via JDT Racing rewire kit — $193.19 bundle at [jdtracing.com](https://jdtracing.com/products/walbro-ti-f90000267-450lph-fuel-pump-w-install-kit-rewire-kit-e85-compatible)), coil triggered by MaxxECU GPO 2 through the M50 pre-terminated harness 12-pin extra pin 3. PMU16 is NOT installed in Phase 1 — it arrives at Phase 3.
-
-### Radium 20-1170 fuel pump hanger — Phase 3 (PMU16 O4 direct-drive)
-
-[![Fuel Pump Hanger — Phase 3](output/fuel-pump-hanger-phase3.svg)](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/fuel-pump-hanger-phase3.html)
-
-Discrete relay REMOVED at 07K swap; PMU16 O4 (25A, PWM-capable) direct-drives the pump on the same 12 AWG cabin/tunnel wire. Cross-reference `fuel-pump-hanger-reference.md` and `schematics/fuel-pump-pwm.py`.
-
-### Alibaba PD2-18012AJA 12V electric AC compressor *(Phase 3 install)*
-
-[![AC Compressor Harness](output/ac-compressor.svg)](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/ac-compressor.html)
-
-Posung PD2-18012AJA (18cc, 3.65 kW / 12,454 BTU, Three-phase PMSM) + included 3-phase inverter/controller + 100A relay. AC enable signal from cabin AC switch reaches engine-bay MaxxECU DIN via OEM X20 pin 4. PMU16 drives the 100A relay coil (compressor running current ~50–80 A exceeds PMU16 per-output rating so the relay is discrete). Cross-reference `harnesses/ac-compressor.wv` and `schematics/ac-compressor-pwm.py`.
-
-### ATF temperature sensor *(optional)*
-
-[![ATF Temp Sensor Harness](output/atf-temp-sensor.svg)](https://htmlpreview.github.io/?https://github.com/wesleyxcooper/e36-wiring/blob/main/output/atf-temp-sensor.html)
-
-MaxxECU 1/8 NPT NTC sensor (ID 1280) threaded into Vibrant 16488 inline -8AN adapter on the ATF return line. Direct-terminate at engine-bay MaxxECU CMC J2 (AIN 2) — both sensor and ECU are engine-bay-side under the H2O arch, so no firewall crossing. Mechanical thermostat (TCH-102-T2) provides overcooling protection independently — this sensor is logging/cold-shift map only. Cross-reference `harnesses/atf-temp-sensor.wv`.
+Walbro F90000267 driven by a discrete high-current relay (via JDT Racing rewire kit — $193.19 bundle at [jdtracing.com](https://jdtracing.com/products/walbro-ti-f90000267-450lph-fuel-pump-w-install-kit-rewire-kit-e85-compatible)), coil triggered by MaxxECU GPO 2 through the M50 pre-terminated harness 12-pin extra pin 3. PMU16 is NOT installed in Phase 1 — it arrives at Phase 3b.
 
 ## Harnesses
 
-| File | Description | Phase | Project Plan |
-|---|---|---|---|
-| `harnesses/maxxecu-m52.wv` | MaxxECU Race ↔ M52 engine harness (Phase 1); includes 8HP virtual clutch position sensor → C2 AIN 5 (cabin-side, no bulkhead) | 1 | [§ harness table L387](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L387) |
-| `harnesses/maxxecu-07k.wv` | MaxxECU Race ↔ VW 07K 5-cyl harness: DBW TB, EV14 injectors, 2x knock, VW sensors; GPO 3/4 freed for ETh motor; single-plug bulkhead swap from M52; virtual clutch circuit carries unchanged from M52 | 3 | [§ transition L531](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L531) |
-| `harnesses/ewp-controller.wv` | Pierburg CWA400 (PWM version) + MaxxECU RACE GPO control | 3 | [§ EWP row L461](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L461) |
-| `harnesses/fuel-pump-hanger-phase1.wv` / `harnesses/fuel-pump-hanger-phase3.wv` | Radium 20-1170 hanger + Walbro F90000267. Phase 1: discrete high-current relay via JDT rewire kit driven by MaxxECU GPO 2 (M50 12-pin extra pin 3). Phase 3: relay REMOVED, PMU16 O4 (25A PWM) direct-drives the pump on the same cabin/tunnel wire. | 1 | [§ Fuel System L200](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L200) |
-| `harnesses/ac-compressor.wv` | Alibaba PD2-18012AJA 12V scroll compressor + included PWM controller + 100A relay + MaxxECU DIN idle-up | 2 | [§ AC row L525](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L525) |
-| `harnesses/8hp-can.wv` | MaxxECU CAN + power wiring → ZF 8HP70 TCU (through bulkhead pins 2/3/9/47/48) | 1 | [§ CAN harness L91](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L91) |
-| `harnesses/gauge-s-can.wv` | MaxxECU CAN 1 → Gauge.S E36 cluster (cabin-to-cabin, 500 kbps, Default 1.3) | 1 | [§ Gauge.S row L65](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L65) |
-| `harnesses/firewall-crossing-maven.wv` | Maven HD30 Dual 16+16 firewall bulkhead — Connector A (CAN + DCT shifter) + Connector B (safety-critical APS throttle input). $274 kit incl. plate + template. Cabin side permanent, engine-side plug at Phase 3 07K harness install. | 1 | [§ bulkhead callout L391](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L391) |
-| `harnesses/epedal-bmw-e46.wv` | BMW E46 accelerator pedal (35426786282) → bulkhead → MaxxECU APS1/APS2 (**primary option**) | 3 | [§ project plan](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md) |
-| `harnesses/epedal-hella-6pv.wv` | Hella 6PV010946-141 accelerator pedal → bulkhead → MaxxECU APS1/APS2 (**RHD fallback**) | 3 | [§ project plan](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md) |
-| `harnesses/body-x20.wv` | E36 X20 body connector interface (MaxxECU outputs → dash/instruments) | 1 | [§ X20 note L527](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L527) |
-| `harnesses/dct-shifter.wv` | DCT Shifter paddle → MaxxECU DIN 1/DIN 2 (cabin-to-cabin, 3-wire, no bulkhead) | 1 | [§ Shifter row L93](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L93) |
-| `harnesses/pst-f1-sensor.wv` | Bosch PST-F1 oil temp+pressure → MaxxECU AIN 1/AIN 3 (through bulkhead pins 27/30/33/34) | 1 | [§ PST-F1 row L67](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L67) |
-| `harnesses/atf-temp-sensor.wv` | ATF temp sensor — MaxxECU NTC 1/8 NPT in Vibrant 16488 inline -8AN adapter, bulkhead pin 56, AIN 2 CMC J2 (**optional**) | 1 | [§ Cooling row L96](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L96) |
-| `harnesses/eps-column.wv` | EPowerSteering.com e36 column-assist EPS — Steering ECU + EPS Controller + Adjustment Knob + Motor Assembly, cabin-only, no MaxxECU/CAN interface | 3 | [§ Power Steering row L369](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L369) |
-| `harnesses/8hp-body-integrations-phase1.wv` / `harnesses/8hp-body-integrations-phase3.wv` | 8HP → E36 body harness: Phase 1 = discrete reverse-light relay driven by MaxxECU GPO 1 via M50 BOOST_SOL Superseal stub → X20 pin 10. Phase 3 = PMU16 output direct-drive replaces the discrete relay → X20 pin 10 (no relay). Starter inhibit unchanged between phases (MTune software-only, no relay). | 1 | — |
+### Phase 1
+
+| File | Description | Project Plan |
+|---|---|---|
+| `harnesses/maxxecu-m52.wv` | MaxxECU Race ↔ M52 signal reference (SIGNAL REF ONLY — pre-terminated M50 harness, do not build). Includes 8HP virtual clutch position sensor → C2 AIN 5 (cabin-side) | [§ harness table L387](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L387) |
+| `harnesses/ews2-bypass.wv` | EWS2 chassis bypass — bridge EWS connector pins 1+3 (starter enable), isolate pin 4 (IMMO line to DME). Required for MaxxECU to start M52. | — |
+| `harnesses/fuel-pump-hanger-phase1.wv` | Radium 20-1170 hanger + Walbro F90000267, discrete high-current relay via JDT rewire kit, GPO 2 trigger | [§ Fuel System L200](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L200) |
+| `harnesses/flex-fuel-sensor-phase1.wv` | Continental GM 13577429 flex fuel sensor → MaxxECU DIN 3 | — |
+| `harnesses/8hp-can.wv` | MaxxECU CAN + power → ZF 8HP70 TCU (pre-made MaxxECU 8HP GEN1 kit) | [§ CAN harness L91](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L91) |
+| `harnesses/8hp-body-integrations-phase1.wv` | 8HP body signals Phase 1: discrete reverse-light relay via GPO 1 (M50 BOOST_SOL stub) → X20 pin 10 | — |
+| `harnesses/gauge-s-can.wv` | MaxxECU CAN 1 → Gauge.S E36 cluster (cabin-to-cabin, 500 kbps, Default 1.3) | [§ Gauge.S row L65](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L65) |
+| `harnesses/dct-shifter.wv` | DCT Shifter paddle → MaxxECU DIN 1/DIN 2 (cabin-to-cabin, 3-wire) | [§ Shifter row L93](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L93) |
+| `harnesses/body-x20.wv` | E36 X20 body connector (OEM body signals, no ECU signals traverse X20) | [§ X20 note L527](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L527) |
+| `harnesses/pst-f1-sensor.wv` | Bosch PST-F1 oil temp+pressure — Phase 1: pigtail to M50 16-pin AUX breakout (pins 1/2/12/14); Phase 3b: direct-terminate at MaxxECU CMC | [§ PST-F1 row L67](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L67) |
+| `harnesses/atf-temp-sensor.wv` | ATF temp sensor — MaxxECU NTC 1/8 NPT, Vibrant 16488 adapter, engine-bay direct-terminate at CMC J2 AIN 2 *(optional)* | [§ Cooling row L96](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L96) |
+| `harnesses/eps-column.wv` | EPowerSteering.com E36 column-assist EPS (KIT-33) — cabin-only, no MaxxECU/CAN interface. Power from Phase 1 relay board IGN output; transitions to PMU16 O8 at Phase 3b. | [§ Power Steering row L369](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L369) |
+
+### Phase 2b — 07K harness build (offline)
+
+| File | Description | Project Plan |
+|---|---|---|
+| `harnesses/maxxecu-07k.wv` | MaxxECU Race ↔ VW 07K 5-cyl harness: DBW TB, EV14 injectors, 2x knock, VW sensors, VVT solenoid GPO 3, direct-terminate at engine-bay MaxxECU CMC (no firewall bulkhead in engine-side path) | [§ transition L531](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L531) |
+
+### Phase 3b — 07K swap day
+
+| File | Description | Project Plan |
+|---|---|---|
+| `harnesses/firewall-crossing-maven.wv` | Maven HD30 Dual 16+16 firewall bulkhead — Connector A (CAN + DCT shifter) + Connector B (safety-critical APS). $274 kit. Cabin side permanent; engine-side plug-in on swap day. | [§ bulkhead callout L391](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L391) |
+| `harnesses/epedal-bmw-e46.wv` | BMW E46 accelerator pedal (35426786282) → Maven Connector B → MaxxECU APS1/APS2 (**primary**) | — |
+| `harnesses/epedal-hella-6pv.wv` | Hella 6PV010946-141 accelerator pedal → Maven Connector B → MaxxECU APS1/APS2 (**RHD fallback**) | — |
+| `harnesses/power-distribution.wv` | Ecumaster PMU16 — replaces Phase 1 discrete relay board; mounts engine-bay-side | [§ EWP row L461](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L461) |
+| `harnesses/ewp-controller.wv` | Pierburg CWA400 (PWM version) + PMU16 control | [§ EWP row L461](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L461) |
+| `harnesses/fuel-pump-hanger-phase3.wv` | Radium 20-1170 hanger — PMU16 O4 (25A PWM) replaces Phase 1 discrete relay on the same 12 AWG cabin/tunnel wire | [§ Fuel System L200](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L200) |
+| `harnesses/ac-compressor.wv` | PD2-18012AJA 12V scroll compressor + included PWM controller + 100A relay + MaxxECU DIN idle-up | [§ AC row L525](https://github.com/wesleyxcooper/e36-build-docs/blob/main/E36_9000RPM_Project_Plan_Verified.md#L525) |
+| `harnesses/8hp-body-integrations-phase3.wv` | 8HP body signals Phase 3b: PMU16 direct-drive replaces Phase 1 discrete relay → X20 pin 10 | — |
+| `harnesses/flex-fuel-sensor-phase3.wv` | Continental flex fuel sensor — Phase 3b integration into 07K custom harness | — |
 
 ## Key interfaces
 
 - **MaxxECU Race connector:** Molex CMC — C1 (48-pin, connector 1) used in M52/07K harnesses; C2 (32-pin, connector 2) AIN 5 (pin G3) wired for **8HP virtual clutch pedal position** (cabin-side, no bulkhead crossing). C2 also carries EGT 1–8, AIN 6–8, DIN 4–5, motor H-bridge 1–2 (deferred). ⚠️ C2 purchase deferred until Binary5 TCU firmware is confirmed available for Dodge TCU `1034420288` — see `docs/wiring-bom.md` §9F. Crimp tools: Molex 63811-9200 (small/20 AWG), 63811-8900 (big/0.5–1mm²). Source: [maxxecu.com pinout](https://www.maxxecu.com/webhelp/wirings-maxxecu_pinout.html)
-- **Firewall bulkhead:** Maven HD30 Dual 16+16 kit — Connector A (CAN + DCT shifter) + Connector B (safety-critical APS throttle). Under the H2O engine-bay-mount arch, engine sensor / IGN / INJ / GPO signals direct-terminate at the engine-bay MaxxECU CMC (no bulkhead in the engine-side path). Only cabin-originated signals cross via Maven. Pin assignment: `harnesses/firewall-crossing-maven.wv`. Full spec: `docs/wiring-bom.md` System 8.
+- **Firewall bulkhead (Phase 3b — 07K only):** Maven HD30 Dual 16+16 kit — Connector A (CAN + DCT shifter) + Connector B (safety-critical APS throttle). Installed at 07K swap day, not on the M52 path. In Phase 1, the M50 harness and cabin signal wires pass through the OEM firewall grommet. Engine sensor / IGN / INJ / GPO signals always direct-terminate at the engine-bay MaxxECU CMC under the H2O arch — the Maven bulkhead only carries cabin-originated signals. Pin assignment: `harnesses/firewall-crossing-maven.wv`. Full spec: `docs/wiring-bom.md` System 8.
 - **E36 X20:** Chassis-to-engine-bay interface — MaxxECU RPM/temp/pressure signals to OEM instrument cluster
 - **8HP CAN:** MaxxECU GEN1 8HP CAN harness (native control — no TurboLamik)
 - **Gauge.S CAN:** 500kbps, MaxxECU Default 1.3 output protocol
@@ -268,7 +273,7 @@ open schematics/ac-compressor-pwm.svg
 
 Shows the Alibaba PD2-18012AJA + included PWM controller circuit: BATT+ through 100A fuse to AC relay (100A ISO mini), relay contact to PWM controller +IN, PWM controller output to compressor motor, IGN-switched AC button to relay coil, and AC enable signal tap to MaxxECU DIN for idle-up compensation. Duty cycle guidance annotated: start at ~45% (≈3,000 RPM, 51–54°F vent at 90°F ambient) — do not run at 95% (≈5,000 RPM causes near-stall idle dip).
 
-Shows the Radium 20-1170 + Walbro F90000267 circuit under two phase-split .wv files: `harnesses/fuel-pump-hanger-phase1.wv` (Phase 1 with a discrete high-current relay + 30A fuse via JDT rewire kit, coil driven by MaxxECU GPO 2) and `harnesses/fuel-pump-hanger-phase3.wv` (Phase 3 with PMU16 O4 direct-drive replacing the relay on the same 12 AWG cabin/tunnel wire). MaxxECU commands pump speed via GPO (Phase 1) or CAN → PMU16 (Phase 3, duty table 65% idle → 100% WOT/boost). See `fuel-pump-hanger-reference.md` for full specs and MTune config.
+Shows the Radium 20-1170 + Walbro F90000267 circuit under two phase-split .wv files: `harnesses/fuel-pump-hanger-phase1.wv` (Phase 1 with a discrete high-current relay + 30A fuse via JDT rewire kit, coil driven by MaxxECU GPO 2) and `harnesses/fuel-pump-hanger-phase3.wv` (Phase 3b with PMU16 O4 direct-drive replacing the relay on the same 12 AWG cabin/tunnel wire). MaxxECU commands pump speed via GPO (Phase 1) or CAN → PMU16 (Phase 3b, duty table 65% idle → 100% WOT/boost). See `fuel-pump-hanger-reference.md` for full specs and MTune config.
 
 ### How to read the schematic
 

@@ -30,9 +30,9 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 ---
 
 ### 2. Firewall Bulkhead
-**Connector:** Maven HD30 Dual 16+16 kit ($274) — Phase 2 install.
-- Connector A (16-pin, populated Phase 2): CAN + DCT shifter (6 wires used, 8 spare)
-- Connector B (16-pin, populated Phase 3): APS e-pedal (6 wires used, 10 spare)
+**Connector:** Maven HD30 Dual 16+16 kit ($274) — Phase 2b install.
+- Connector A (16-pin, populated Phase 2b): CAN + DCT shifter (6 wires used, 8 spare)
+- Connector B (16-pin, populated Phase 3b): APS e-pedal (6 wires used, 10 spare)
 - Plate: 2.6" × 5.25" CNC billet aluminum, black anodized, template included
 - Phase 1: no bulkhead — 6 wires (CAN + DCT) route through OEM E36 firewall grommet as individual wires alongside the pre-terminated M50 harness  
 **Location:** TODO — firewall pass-through location TBD at fitment. Recommended: driver-opposite side of firewall (intake side = passenger side of RHD car) for shortest run to the engine-bay MaxxECU  
@@ -42,15 +42,15 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 ---
 
 ### 3. Cabin Loom
-**Path:** Maven Connector A (CAN + DCT cabin electronics) and Connector B (safety-critical APS throttle input, populated Phase 3) at the firewall face → cabin destinations: pedal box (E46 APS pedal wires terminate at Connector B), gauge cluster (Gauge.S — CAN from Connector A), shifter (DCT paddle)  
+**Path:** Maven Connector A (CAN + DCT cabin electronics) and Connector B (safety-critical APS throttle input, populated Phase 3b) at the firewall face → cabin destinations: pedal box (E46 APS pedal wires terminate at Connector B), gauge cluster (Gauge.S — CAN from Connector A), shifter (DCT paddle)  
 **Route:** Behind lower dash panel, secured with P-clips to existing body studs  
 **Sub-looms:**
 
 | Sub-loom | Harness file | Firewall crossing |
 |----------|-------------|-------------------|
-| E-pedal (E46 pedal → Maven Connector B) | `harnesses/epedal-bmw-e46.wv` | Maven Connector B (6 wires, Phase 3) |
-| Gauge.S CAN (ECU → cluster) | `harnesses/gauge-s-can.wv` | Maven Connector A pins 1/2/3 (Phase 2+; Phase 1 uses OEM grommet) |
-| DCT Shifter paddle | `harnesses/dct-shifter.wv` | Maven Connector A pins 4/5/6 (Phase 2+; Phase 1 uses OEM grommet) |
+| E-pedal (E46 pedal → Maven Connector B) | `harnesses/epedal-bmw-e46.wv` | Maven Connector B (6 wires, Phase 3b) |
+| Gauge.S CAN (ECU → cluster) | `harnesses/gauge-s-can.wv` | Maven Connector A pins 1/2/3 (Phase 2b+; Phase 1 uses OEM grommet) |
+| DCT Shifter paddle | `harnesses/dct-shifter.wv` | Maven Connector A pins 4/5/6 (Phase 2b+; Phase 1 uses OEM grommet) |
 | Body X20 signals | `harnesses/body-x20.wv` | OEM X20 (unchanged from OEM E36 — no ECU signals traverse X20) |
 
 ---
@@ -62,7 +62,7 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 
 | Sub-loom | Harness file | Notes |
 |----------|-------------|-------|
-| Fuel pump (full run, ~3.5–4m estimated) | `harnesses/fuel-pump-hanger-phase1.wv` (Phase 1: discrete relay + JDT kit) → `harnesses/fuel-pump-hanger-phase3.wv` (Phase 3: PMU16 O4 direct) | 12 AWG min; run separately from CAN to avoid PWM noise on bus |
+| Fuel pump (full run, ~3.5–4m estimated) | `harnesses/fuel-pump-hanger-phase1.wv` (Phase 1: discrete relay + JDT kit) → `harnesses/fuel-pump-hanger-phase3.wv` (Phase 3b: PMU16 O4 direct) | 12 AWG min; run separately from CAN to avoid PWM noise on bus |
 | ATF temp sensor (inline -8AN adapter) | `harnesses/atf-temp-sensor.wv` | Runs along tunnel forward to engine-bay ECU (no bulkhead crossing under H2O arch — sensor and ECU both engine-bay-side of firewall) |
 | 8HP CAN + power (engine bay → ZF 8HP TCU) | `harnesses/8hp-can.wv` (reference only — pre-made MaxxECU 8HP GEN1 kit, plug-and-play) | Twisted pair — engine-bay-to-engine-bay under H2O arch |
 
@@ -77,7 +77,7 @@ Electrical connections are in the `.wv` harness files. This document covers phys
 | Sensor sub-looms (in sleeve) | DR-25 or Raychem SCL | Separate sleeve within engine bay trunk |
 | Injector/coil sub-looms | DR-25 | Separate from sensor sleeve — isolation critical |
 | Cabin / tunnel | Expandable braid | Lower heat exposure |
-| Firewall transition boots | Adhesive-lined heat shrink + boot | Seal breakout from sleeve at Maven bulkhead entry (Phase 2+); OEM firewall grommet (Phase 1) |
+| Firewall transition boots | Adhesive-lined heat shrink + boot | Seal breakout from sleeve at Maven bulkhead entry (Phase 2b+); OEM firewall grommet (Phase 1) |
 
 ---
 

@@ -6,18 +6,18 @@ Content verified live: 2026-08-26
 
 > **Phase 1 (M52) uses this pre-terminated harness.** No custom M52 engine harness build is needed.
 > The harness runs CMC connector → firewall bushing (850 mm) → engine sensors. It passes through
-> the existing E36 firewall grommet — no firewall bulkhead connector for Phase 1 (Maven HD30 dual bulkhead is a Phase 3 install; the deprecated AS79 approach is no longer used).
+> the existing E36 firewall grommet — no firewall bulkhead connector for Phase 1 (Maven HD30 dual bulkhead is a Phase 3b install; the deprecated AS79 approach is no longer used).
 >
 > **What still requires separate work:**
 > - **VANOS cam sensor** — harness is wired for non-VANOS head. Either swap cam sensor to BMW PN
 >   `12141726590`, or cut the CAM connector and rewire with a VANOS-compatible body + add switched +12V.
 >   See VANOS section below. Source: live page above.
 > - **WBO2** — harness terminates in LSU **4.2** connector (not 4.9). Buy Bosch LSU 4.2 sensor.
->   Phase 3 (07K) switches to LSU 4.9 on a new custom harness.
+>   Phase 3b (07K) switches to LSU 4.9 on a new custom harness.
 > - **12-pin and 16-pin extra connectors** — must be wired to PDM/cabin for power, GPOs, AIns (PST-F1,
 >   MAP, flex fuel), CAN. See connector tables below.
 > - **C2 (32-pin Molex)** — NOT on this harness. Not needed for Phase 1 (no DBW, no e-pedal,
->   no knock sensors). Required for Phase 3 (07K) only.
+>   no knock sensors). Required for Phase 3b (07K) only.
 > - **`maxxecu-m52.wv`** — reference document for ECU pin assignments of this harness. Not a build doc.
 
 Compatible with: MaxxECU STREET / V1 / RACE / PRO

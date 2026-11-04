@@ -4,7 +4,7 @@
 #
 # Cabin-to-cabin. No firewall bulkhead crossing.
 # CAN tap shares cabin-side bus with 8HP TCU (see maxxecu-m52.wv CAN_BUS_JUNCTION).
-# Compatible Phase 1 → Phase 3 (cluster and MaxxECU unchanged through engine swap).
+# Compatible Phase 1 → Phase 3b (cluster and MaxxECU unchanged through engine swap).
 #
 # Termination: MaxxECU has built-in 120Ω at its CAN 1 port (near end).
 # Verify whether Gauge.S has internal 120Ω; if not, add external terminator at Gauge.S pins.

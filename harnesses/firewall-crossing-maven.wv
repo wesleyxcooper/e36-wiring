@@ -19,11 +19,11 @@
 #     Total: 6 wires — route through OEM firewall grommet as individual wires.
 #     PHASE 1 DOES NOT USE THIS CONNECTOR (see Phase timeline below).
 #
-#   Phase 2 (07K harness build offline, install this Maven bulkhead):
+#   Phase 2b (07K harness build offline, install this Maven bulkhead):
 #     Same 6 wires as Phase 1, but re-terminated into Connector A of this
 #     Maven bulkhead. Connector B fully cavity-plugged.
 #
-#   Phase 3 (07K engine swap + E46 APS pedal install):
+#   Phase 3b (07K engine swap + E46 APS pedal install):
 #     Add APS ch1 (SGND / +5V / signal) and ch2 (SGND / +5V / signal)
 #     into Connector B. Engine-side plugs on both connectors mate to the 07K
 #     engine harness.
@@ -81,7 +81,7 @@
 #     ISO 11898-2:2016 (High-speed CAN transceiver — twisted pair, 120Ω differential)
 #     Texas Instruments SLLA279 "Introduction to the CAN Physical Layer"
 #
-# APS (E46 accelerator pedal module — Phase 3):
+# APS (E46 accelerator pedal module — Phase 3b):
 #   Repo-internal: docs/dbw-pinouts.md
 #
 # DCT Shifter paddle (3-wire, NOT CAN — DIN inputs to MaxxECU):
@@ -93,7 +93,7 @@
 #   Product listing:     https://dctshifter.com/collections/clutch-simulators
 #   Repo-internal:       docs/vendor/dctshifter/DCT_Clutch_Simulator.md
 #
-# Tooling (Phase 2 purchase, shared with any Deutsch series):
+# Tooling (Phase 2b purchase, shared with any Deutsch series):
 #   Deutsch HDT-48-00 hand crimper — covers ALL solid contacts in DT/DTM/DTP/DTHD/
 #   HD10/HD30/HDP20/DRC/DRB/DTV/AEC/STRIKE/Jiffy Splice series.
 #   Sources:
@@ -110,7 +110,7 @@
 #                         firewall grommet as individual wires with in-line connectors
 #                         at each end. No firewall structural changes.
 #
-# Phase 2 (07K prep offline):
+# Phase 2b (07K prep offline):
 #   1. Drill firewall to Maven template (two round holes, 2.6"×5.25" plate footprint)
 #   2. Install Maven billet plate + both cabin-side receptacles (Connector A + B)
 #   3. Re-terminate Phase 1 cabin harness (CAN + DCT) into Connector A cabin side
@@ -118,10 +118,10 @@
 #   5. Build 07K engine harness with engine-side plugs pre-crimped for both connectors
 #   6. Bench-test the assembled Maven pair + 07K harness before install
 #
-# Phase 3 (engine swap):
+# Phase 3b (engine swap):
 #   1. Remove M52 + M50 pre-terminated harness (cabin-side leaves through OEM grommet
 #      remain in place until swap moment; then re-route through Maven Connector A cabin
-#      side — done during Phase 2, so no cabin work at swap time)
+#      side — done during Phase 2b, so no cabin work at swap time)
 #   2. Install E46 APS pedal in cabin, wire to Connector B cabin side (6 wires)
 #   3. Install 07K engine + 07K harness
 #   4. Mate 07K engine-side plugs to both Maven receptacles
@@ -131,14 +131,14 @@
 
 connectors:
 
-  # ── Connector A (16-pin, cabin side) — Phase 2 install ──────────────────────
-  # Populated with Phase 1 cabin signals re-terminated during Phase 2 offline prep.
+  # ── Connector A (16-pin, cabin side) — Phase 2b install ──────────────────────
+  # Populated with Phase 1 cabin signals re-terminated during Phase 2b offline prep.
   # Signal set: CAN (Gauge.S cluster) + DCT shifter paddle + spare +5V/SGND rails.
-  # After Phase 2: 8 positions used, 8 spare cavities (cavity-plugged).
+  # After Phase 2b: 8 positions used, 8 spare cavities (cavity-plugged).
 
   MAVEN_A_CABIN:
     type: "Maven / Deutsch HD30 shell-size-24 16-way flange receptacle"
-    subtype: "Cabin side — permanent from Phase 2 install onward. Sockets, size-16 contacts."
+    subtype: "Cabin side — permanent from Phase 2b install onward. Sockets, size-16 contacts."
     pincount: 16
     pinlabels:
       - "CAN H (to Gauge.S cluster CAN input)"                    # 1  22 AWG TP-shld, twisted with pin 2
@@ -147,8 +147,8 @@ connectors:
       - "DCT shifter UP (paddle Black wire → MaxxECU DIN 2)"      # 4  22 AWG discrete switch to GND
       - "DCT shifter DOWN (paddle Blue wire → MaxxECU DIN 1)"     # 5  22 AWG discrete switch to GND
       - "DCT shifter GND (paddle Brown wire → MaxxECU SGND)"      # 6  22 AWG signal-GND reference
-      - "SPARE — reserved as cabin sensor +5V rail"               # 7  cavity-plug at Phase 2; can be run to ECU G1 later
-      - "SPARE — reserved as cabin sensor GND rail"               # 8  cavity-plug at Phase 2; can be run to ECU H1 later
+      - "SPARE — reserved as cabin sensor +5V rail"               # 7  cavity-plug at Phase 2b; can be run to ECU G1 later
+      - "SPARE — reserved as cabin sensor GND rail"               # 8  cavity-plug at Phase 2b; can be run to ECU H1 later
       - "SPARE"                                                   # 9
       - "SPARE"                                                   # 10
       - "SPARE"                                                   # 11
@@ -160,7 +160,7 @@ connectors:
     notes: >-
       Connector A carries Phase 1/2 signals — CAN to Gauge.S cluster and DCT shifter paddle
       inputs. Both signal sets are active from Phase 1 (via OEM grommet as individual wires
-      until Phase 2 Maven install re-terminates them here).
+      until Phase 2b Maven install re-terminates them here).
 
       CAN TOPOLOGY (pins 1/2/3): twisted differential pair with shield per ISO 11898-2:2016.
       Shield drain terminates at the ECU end only (single-end drain — prevents ground loops).
@@ -174,11 +174,11 @@ connectors:
       SPARE PIN STRATEGY (pins 7-16): pins 7 and 8 pre-reserved for future +5V/SGND rails
       if additional cabin analog sensors are added. Remaining 8 positions cavity-plugged.
 
-  # ── Connector A (16-pin, engine side) — Phase 3 mating plug ─────────────────
+  # ── Connector A (16-pin, engine side) — Phase 3b mating plug ─────────────────
 
   MAVEN_A_ENGINE:
     type: "Maven / Deutsch HD30 shell-size-24 16-way jam-nut plug"
-    subtype: "Engine side — installed at Phase 3 with 07K harness. Pins, size-16 contacts."
+    subtype: "Engine side — installed at Phase 3b with 07K harness. Pins, size-16 contacts."
     pincount: 16
     pinlabels:
       - "CAN H → MaxxECU C1 E1 (CMC CAN H)"                       # 1
@@ -201,13 +201,13 @@ connectors:
       Mates MAVEN_A_CABIN via 1/4-turn coupling ring. Destination pins reference MaxxECU RACE C1
       (48-pin) per docs/vendor/maxxecu/MaxxECU_GEN1_Pinout.md and the RACE REV9+ wiring PDF.
 
-  # ── Connector B (16-pin, cabin side) — Phase 3 population ───────────────────
-  # Installed physically at Phase 2 with Connector A, but all 16 cavities remain
-  # cavity-plugged until Phase 3 when the E46 APS pedal is installed and wired.
+  # ── Connector B (16-pin, cabin side) — Phase 3b population ───────────────────
+  # Installed physically at Phase 2b with Connector A, but all 16 cavities remain
+  # cavity-plugged until Phase 3b when the E46 APS pedal is installed and wired.
 
   MAVEN_B_CABIN:
     type: "Maven / Deutsch HD30 shell-size-24 16-way flange receptacle"
-    subtype: "Cabin side — permanent from Phase 2 install; populated Phase 3. Sockets, size-16 contacts."
+    subtype: "Cabin side — permanent from Phase 2b install; populated Phase 3b. Sockets, size-16 contacts."
     pincount: 16
     pinlabels:
       - "APS SGND 1 (E46 APS pedal pin 1)"                        # 1  22 AWG, twisted with pin 2
@@ -227,7 +227,7 @@ connectors:
       - "SPARE"                                                   # 15
       - "SPARE"                                                   # 16
     notes: >-
-      All 16 positions CAVITY-PLUGGED during Phase 2 install. Populated at Phase 3 when the
+      All 16 positions CAVITY-PLUGGED during Phase 2b install. Populated at Phase 3b when the
       E46 APS pedal module is installed. Two INDEPENDENT REDUNDANT CHANNELS — do NOT bridge
       SGND1↔SGND2 or +5V1↔+5V2 at any point; the redundancy is what enables MaxxECU E-Throttle
       to fault-detect a channel failure. See docs/dbw-pinouts.md for E46 APS pinout confirmation.
@@ -240,11 +240,11 @@ connectors:
 
       10 spare cavities remaining after APS install (pins 7-16). Sized for future expansion.
 
-  # ── Connector B (16-pin, engine side) — Phase 3 mating plug ─────────────────
+  # ── Connector B (16-pin, engine side) — Phase 3b mating plug ─────────────────
 
   MAVEN_B_ENGINE:
     type: "Maven / Deutsch HD30 shell-size-24 16-way jam-nut plug"
-    subtype: "Engine side — installed at Phase 3 with 07K harness. Pins, size-16 contacts."
+    subtype: "Engine side — installed at Phase 3b with 07K harness. Pins, size-16 contacts."
     pincount: 16
     pinlabels:
       - "APS SGND 1 → MaxxECU C1 H1 (SGND)"                       # 1
@@ -272,7 +272,7 @@ connectors:
 cables:
 
   W_MAVEN_A:
-    # Cable bundle Phase 2 → Phase 3+: cabin harness routing from Gauge.S cluster + DCT
+    # Cable bundle Phase 2b → Phase 3b+: cabin harness routing from Gauge.S cluster + DCT
     # shifter paddle → MAVEN_A_CABIN.
     #
     # Colors follow this build's convention (docs/harness-build.md § Wire Color Convention).
@@ -295,7 +295,7 @@ cables:
     length: 0.5 m
     notes: >-
       Length is a placeholder — measure from the cabin-side Gauge.S cluster and DCT paddle
-      through the firewall to the Maven Connector A mating face at Phase 2 install.
+      through the firewall to the Maven Connector A mating face at Phase 2b install.
 
       SHIELD: CAN pair (wires 1/2) inside a foil shield with drain (wire 3). Terminate the
       drain only at the ECU end (engine bay). DCT wires (4/5/6) can share the outer jacket
@@ -303,8 +303,8 @@ cables:
       switch signals and are not noise-critical.
 
   W_MAVEN_B:
-    # Cable bundle Phase 3 addition: E46 APS pedal module → MAVEN_B_CABIN. Populated
-    # only when the APS pedal is physically installed (Phase 3).
+    # Cable bundle Phase 3b addition: E46 APS pedal module → MAVEN_B_CABIN. Populated
+    # only when the APS pedal is physically installed (Phase 3b).
     wirecount: 6
     colors:
       - BN   # 1  APS SGND 1
@@ -323,7 +323,7 @@ cables:
     length: 0.6 m
     notes: >-
       Length is a placeholder — measure from the driver footwell E46 APS pedal module through
-      the firewall to the Maven Connector B mating face at Phase 3 install.
+      the firewall to the Maven Connector B mating face at Phase 3b install.
 
       TWISTING: twist SGND1+VCC1 (wires 1 and 2) as one pair; SGND2+VCC2 (wires 4 and 5) as a
       second pair. Signal wires (3 and 6) are single-ended.
@@ -335,15 +335,15 @@ cables:
 
 connections:
 
-  # Connector A: Phase 2 install — 6 cabin signals populate cavities 1-6, cavities 7-16
+  # Connector A: Phase 2b install — 6 cabin signals populate cavities 1-6, cavities 7-16
   # remain cavity-plugged on both cabin and engine sides.
   - - MAVEN_A_CABIN: [1, 2, 3, 4, 5, 6]
     - W_MAVEN_A:     [1, 2, 3, 4, 5, 6]
     - MAVEN_A_ENGINE: [1, 2, 3, 4, 5, 6]
 
-  # Connector B: Phase 3 addition — 6 APS signals populate cavities 1-6, cavities 7-16
+  # Connector B: Phase 3b addition — 6 APS signals populate cavities 1-6, cavities 7-16
   # remain cavity-plugged on both cabin and engine sides. Cabin-side receptacle already
-  # installed at Phase 2; only the wires and mating engine-side plug are added at Phase 3.
+  # installed at Phase 2b; only the wires and mating engine-side plug are added at Phase 3b.
   - - MAVEN_B_CABIN: [1, 2, 3, 4, 5, 6]
     - W_MAVEN_B:     [1, 2, 3, 4, 5, 6]
     - MAVEN_B_ENGINE: [1, 2, 3, 4, 5, 6]

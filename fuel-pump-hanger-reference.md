@@ -1,6 +1,6 @@
 # Fuel Pump Hanger Wiring Reference — Radium 20-1170 + F90000267 + MaxxECU PWM
 
-**Build context:** E36 restomod, 07K / 8HP swap, MaxxECU RACE, Aeromotive 13129 FPR (return-style). Radium 20-1170 hanger installed at Phase 1 — carries through 07K Phase 3 with zero re-work. F90000267 is a single-pump install covering all phases through 600whp E85. MaxxECU controls pump speed via PWM GPO through a DC solid state relay (SSR).
+**Build context:** E36 restomod, 07K / 8HP swap, MaxxECU RACE, Aeromotive 13129 FPR (return-style). Radium 20-1170 hanger installed at Phase 1 — carries through 07K Phase 3b with zero re-work. F90000267 is a single-pump install covering all phases through 600whp E85. MaxxECU controls pump speed via PWM GPO through a DC solid state relay (SSR).
 
 ---
 
@@ -91,13 +91,13 @@ outputs PWM on O4. No separate SSR or relay needed. Source: `harnesses/power-dis
 | PWM frequency | 100–500 Hz (set in PMU software on O4) |
 | MTune path | Outputs → Output config → Function: PWM fuel pump control |
 
-**Phase 3 PWM duty table** (PMU16 O4; not applicable to Phase 1 relay):
+**Phase 3b PWM duty table** (PMU16 O4; not applicable to Phase 1 relay):
 
 | Operating condition | Duty Cycle | Notes |
 | :--- | :--- | :--- |
 | Key-on / pre-crank | 100% (brief) | Prime the rail — 2-3 seconds at startup |
-| Idle / low boost (Phase 3) | 75% | 07K at part load |
-| Full boost / WOT (Phase 3) | 100% | 07K 600whp E85 — full duty |
+| Idle / low boost (Phase 3b) | 75% | 07K at part load |
+| Full boost / WOT (Phase 3b) | 100% | 07K 600whp E85 — full duty |
 
 > ⚠️ **Duty cycle floor:** Do not run a brushed pump below ~50% duty continuously — insufficient flow through the pump body causes heat buildup. At idle, 75% is the safe floor.
 
@@ -123,9 +123,9 @@ speed whenever the relay closes. Full-speed continuous operation is safe for the
 
 ---
 
-## Power Wiring — Phase 3 (07K, PMU16)
+## Power Wiring — Phase 3b (07K, PMU16)
 
-Phase 3 replaces the relay with **PMU16 O4** (25A, PWM-capable). MaxxECU commands pump speed
+Phase 3b replaces the relay with **PMU16 O4** (25A, PWM-capable). MaxxECU commands pump speed
 via CAN → PMU16 maps to O4 PWM. No physical relay. Source: `harnesses/power-distribution.wv`.
 
 | Wire | Spec | Notes |
@@ -147,9 +147,9 @@ via CAN → PMU16 maps to O4 PWM. No physical relay. Source: `harnesses/power-di
 
 ---
 
-## Post-Phase 3 Notes (07K)
+## Post-Phase 3b Notes (07K)
 
-No fuel system changes required at 07K swap. The Radium 20-1170 hanger, F90000267 pump, and swivel fittings are already Phase 3 spec. Re-tune the MaxxECU fuel pump duty table for 07K boost map — all hardware stays.
+No fuel system changes required at 07K swap. The Radium 20-1170 hanger, F90000267 pump, and swivel fittings are already Phase 3b spec. Re-tune the MaxxECU fuel pump duty table for 07K boost map — all hardware stays.
 
 If future dual-pump is ever needed (e.g., wet nitrous or methanol injection): Radium 20-1170 supports a second pump slot. Add second pump, new dedicated relay/fuse circuit per Radium's dual-pump wiring note — the hanger is already pre-drilled.
 
@@ -166,4 +166,4 @@ If future dual-pump is ever needed (e.g., wet nitrous or methanol injection): Ra
 | MaxxECU PWM fuel pump control | [maxxecu.se/webhelp/output_functions-pwm_fuel_pump_control.html](https://www.maxxecu.se/webhelp/output_functions-pwm_fuel_pump_control.html) |
 | PMU16 power distribution | `harnesses/power-distribution.wv` |
 | WireViz harness (Phase 1 discrete relay + JDT kit) | `harnesses/fuel-pump-hanger-phase1.wv` |
-| WireViz harness (Phase 3 PMU16 O4 direct-drive) | `harnesses/fuel-pump-hanger-phase3.wv` |
+| WireViz harness (Phase 3b PMU16 O4 direct-drive) | `harnesses/fuel-pump-hanger-phase3.wv` |

@@ -13,7 +13,7 @@
 # momentary switches close UP/DOWN to GND. Do not confuse with Gauge.S cluster
 # which IS CAN-based (see harnesses/body-x20.wv GAUGES_CAN_FEED).
 #
-# Compatible Phase 1 → Phase 3 (shifter paddle unchanged through engine swap).
+# Compatible Phase 1 → Phase 3b (shifter paddle unchanged through engine swap).
 
 connectors:
 

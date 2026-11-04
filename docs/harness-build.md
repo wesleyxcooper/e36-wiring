@@ -478,7 +478,7 @@ A service loop is a small coil of extra wire (1–2 turns, ~30–50mm diameter) 
 | Connector | Method | Rationale |
 |-----------|--------|-----------|
 | MaxxECU CMC (C1 48-pin Molex) at engine-bay ECU | ✓ Individual loop per wire before entering the CMC boot | ~40 wires. Loop each wire in the harness exit area, then bundle into the CMC entry. This is the highest-density connector in the build; take the extra time. |
-| Maven HD30 dual bulkhead (Connector A + B, engine-side plugs) | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before boot | ~12 wires total across both plugs at Phase 3. Loop each wire, wrap the coiled bundle in 3:1 adhesive heat-shrink before sliding boots on. |
+| Maven HD30 dual bulkhead (Connector A + B, engine-side plugs) | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before boot | ~12 wires total across both plugs at Phase 3b. Loop each wire, wrap the coiled bundle in 3:1 adhesive heat-shrink before sliding boots on. |
 | Maven HD30 Dual 16+16 firewall bulkhead (engine-side plugs) | ✓ Individual loop per wire + intermediate heat-shrink wrap over bundle before boot | ~12 wires total across both connectors (Connector A CAN+DCT + Connector B APS). Loop each wire, wrap the coiled bundle in 3:1 adhesive heat-shrink before sliding the boot on — holds loops organized and gives the boot a clean round profile to seat against |
 | Crank VR+/VR− connector end | ✓ Individual loop, 1–2 turns | Most vibration-sensitive signal; crank sensor at front of block sees belt-drive vibration |
 | CAM sensor connector end | ✓ Individual loop, 1–2 turns | Same rationale |
@@ -604,7 +604,7 @@ Print this list before touching any wire. Source: `harnesses/maxxecu-07k.wv` —
 | 64 | `64 FLEX-SIG` | SENSORS | ✓ | ✓ |
 | 79 | `79 SENS-GND` | SENSORS | ✓ | ✓ |
 
-**Type A totals:** M52 Phase 1 plug — 37 wires × 2 = **74 labels**. 07K Phase 3 plug adds 6 new-position wires (pins 14, 22, 23, 43, 44, 45) × 2 = **12 more labels → 86 total**. Pins 16/17/18/19/35/37 reuse M52 positions (relabel on 07K plug only — same physical positions). Pins 20, 24, 34, 41 = cavity-plug both phases (no label needed).
+**Type A totals:** M52 Phase 1 plug — 37 wires × 2 = **74 labels**. 07K Phase 3b plug adds 6 new-position wires (pins 14, 22, 23, 43, 44, 45) × 2 = **12 more labels → 86 total**. Pins 16/17/18/19/35/37 reuse M52 positions (relabel on 07K plug only — same physical positions). Pins 20, 24, 34, 41 = cavity-plug both phases (no label needed).
 
 ---
 
@@ -656,7 +656,7 @@ Print this list before touching any wire. Source: `harnesses/maxxecu-07k.wv` —
 | Label text | When |
 |-----------|------|
 | `ENGINE M52 PH1` | M52 Phase 1 engine-side plug |
-| `ENGINE 07K PH3` | 07K Phase 3 engine-side plug |
+| `ENGINE 07K PH3` | 07K Phase 3b engine-side plug |
 
 ---
 

@@ -1,7 +1,7 @@
 # 8hp-body-integrations-phase3.wv
 # ZF 8HP → E36 body harness integration — PHASE 3 (07K + custom engine harness era)
 #
-# At the Phase 3 swap, the M50 pre-terminated harness is retired. The custom 07K
+# At the Phase 3b swap, the M50 pre-terminated harness is retired. The custom 07K
 # harness (see harnesses/maxxecu-07k.wv) does NOT have the M50 harness's spare
 # BOOST_SOLENOID Superseal 2-pin connector that Phase 1 used for GPO 1 access.
 # Under the new arch we also have PMU16 fully integrated, which can drive the
@@ -11,13 +11,13 @@
 #   - MaxxECU RACE H2O: engine bay (OEM DME E-box cavity, intake side of RHD car)
 #   - PMU16: engine bay, alongside the H2O
 #   - Custom 07K harness: direct-terminate at MaxxECU CMC
-#   - No discrete reverse-light relay in Phase 3 (PMU16 replaces it)
+#   - No discrete reverse-light relay in Phase 3b (PMU16 replaces it)
 #
 # See harnesses/8hp-body-integrations-phase1.wv for the Phase 1 (M50 harness era)
 # implementation that this file replaces at the 07K swap.
 #
 # ─────────────────────────────────────────────────────────────────────────────
-# Signal chain — Phase 3 reverse lights:
+# Signal chain — Phase 3b reverse lights:
 #
 #   1. MaxxECU MTune: "Transmission Reverse" function assigned to a CAN output
 #      channel that PMU16 subscribes to (e.g., MaxxECU broadcasts "8HP gear = R"
@@ -80,7 +80,7 @@ connectors:
     notes: >
       Same X20 pin 10 as Phase 1 — cabin side is unmodified OEM. Only the
       engine-side connection changes: Phase 1 wired to discrete relay pin 87;
-      Phase 3 wires directly to PMU16 output.
+      Phase 3b wires directly to PMU16 output.
       X20 pin 22 (GN/WS, EGS path) stays floating.
       Source: harnesses/body-x20.wv pin 10; BMW E36 ETM section 0670 (jonkensy.com).
 

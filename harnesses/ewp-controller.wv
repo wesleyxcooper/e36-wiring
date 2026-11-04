@@ -1,12 +1,12 @@
 metadata:
   project: E36 Restomod -- CWA400 Electric Water Pump Wiring (PHASE 3)
-  phase: "Phase 3 (07K swap moment — electric water pump replaces belt-driven OEM pump; PMU16 arrives concurrently)"
+  phase: "Phase 3b (07K swap moment — electric water pump replaces belt-driven OEM pump; PMU16 arrives concurrently)"
   description: >-
     ⚠️ PHASE 3 INSTALL FILE. The CWA400 electric water pump is installed at the
     07K engine swap — the belt-driven OEM water pump is removed with the M52.
     Under Phase 1 (M52 in car) the OEM belt-driven pump is still spinning and
-    NO electric pump wiring exists. PMU16 also arrives at Phase 3 (see
-    harnesses/power-distribution.wv), so all EWP wiring is Phase 3 install.
+    NO electric pump wiring exists. PMU16 also arrives at Phase 3b (see
+    harnesses/power-distribution.wv), so all EWP wiring is Phase 3b install.
 
     Pierburg CWA400 (PWM version) powered by Ecumaster PMU16 O5+O14 parallel
     outputs (50A combined) and controlled by MaxxECU RACE H2O via PWM GPO.
@@ -41,7 +41,7 @@ metadata:
 #       ignition-on before transitioning to CLT duty-cycle map
 #   [ ] Bleeding procedure: tie Pin 1 to +12V (forces emergency run) +
 #       Pin 3 direct to BATT+ before PMU16 connection for pre-fire bleed/leak test
-#   [ ] Confirm Kostal 2+2 connector and terminals sourced before Phase 3 build
+#   [ ] Confirm Kostal 2+2 connector and terminals sourced before Phase 3b build
 
 # ── Connectors ─────────────────────────────────────────────────────────────────
 

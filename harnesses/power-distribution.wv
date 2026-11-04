@@ -1,8 +1,8 @@
 metadata:
   project: E36 Restomod -- Power Distribution (PMU16 install)
-  phase: "Phase 3 (07K swap moment — PMU16 physically installed for the first time)"
+  phase: "Phase 3b (07K swap moment — PMU16 physically installed for the first time)"
   description: >-
-    ⚠️ PHASE 3 INSTALL FILE. PMU16 is NOT installed in the car during Phase 1 or Phase 2.
+    ⚠️ PHASE 3 INSTALL FILE. PMU16 is NOT installed in the car during Phase 1 or Phase 2b.
     Under Phase 1 (M52 + M50 pre-terminated harness), aftermarket loads that PMU16
     will eventually drive are handled by:
       - Discrete aftermarket high-current relays (e.g., fuel pump — see
@@ -11,8 +11,8 @@ metadata:
         see harnesses/8hp-body-integrations-phase1.wv)
       - OEM E36 relays that remain in place until replaced (K6300 DME main,
         K21/K22 fan relays, K19 A/C compressor)
-    Phase 2 is offline harness/engine build — no in-car install work happens.
-    At Phase 3 swap moment PMU16 arrives and replaces all of the above at once.
+    Phase 2b is offline harness/engine build — no in-car install work happens.
+    At Phase 3b swap moment PMU16 arrives and replaces all of the above at once.
 
     Ecumaster PMU16 power management unit replaces relay board, fuse block,
     and DC SSR from earlier design. PMU16 provides 16 programmable MOSFET
@@ -31,8 +31,8 @@ metadata:
     (PMU16 O1) and 8HP TCU power (KL30/KL15) are engine-bay-to-engine-bay
     runs. No firewall crossing for ECU or 8HP power lines.
 
-    Phase 3 install file. All wire lengths are stubs -- confirm before building.
-    Cross-reference harnesses/maxxecu-07k.wv for ECU CAN pin assignments (Phase 3
+    Phase 3b install file. All wire lengths are stubs -- confirm before building.
+    Cross-reference harnesses/maxxecu-07k.wv for ECU CAN pin assignments (Phase 3b
     ECU harness) and harnesses/8hp-can.wv for 8HP TCU KL30/KL15 destinations.
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -54,7 +54,7 @@ metadata:
 #   K21    Normal Speed Relay (A/C fan low)         →  PMU16 O3  (fan control)
 #   K22    High Speed Relay (A/C fan high)          →  PMU16 O3  (same PWM channel,
 #          duty controlled by MaxxECU → CAN → PMU16)
-#   K6304  Secondary Air Pump Relay                 →  DELETED (Phase 3 no SAI on 07K)
+#   K6304  Secondary Air Pump Relay                 →  DELETED (Phase 3b no SAI on 07K)
 #
 # STAYS OEM (relay remains in the Front Power Distribution Box; wires unchanged):
 #   K2     Horn Relay                               (cabin horn switch → relay → horn)
@@ -378,7 +378,7 @@ connectors:
       EWP parallel outputs: O5+O14 wired together to CWA400 Pin 3, configured as
         a parallel pair in PMU software. Combined 50A rating handles CWA400 35.5A.
       AC relay coil: O7 drives relay pin 86. AC switch feeds MaxxECU DIN (not coil direct).
-      Spare outputs: O8-O13, O15-O16. O8 assigned to EPS Controller (Phase 3).
+      Spare outputs: O8-O13, O15-O16. O8 assigned to EPS Controller (Phase 3b).
       CAN1 (PHYS pins 23/35): reserved for PC programming via Ecumaster USB-CAN.
         Do NOT connect CAN1 to MaxxECU -- CAN1 is PC-only on PMU16.
 

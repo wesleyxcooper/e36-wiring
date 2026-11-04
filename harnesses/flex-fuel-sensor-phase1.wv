@@ -11,7 +11,7 @@ metadata:
     wire terminates at this breakout pin. MTune Analog Inputs configured to
     interpret the pulse train as ethanol %.
 
-    Under Phase 3 (07K custom engine harness), the M50 harness is retired.
+    Under Phase 3b (07K custom engine harness), the M50 harness is retired.
     The flex fuel signal moves to MaxxECU CMC C1 pin 9 (DIN 3) — same ECU
     input but different physical harness termination. See
     harnesses/flex-fuel-sensor-phase3.wv for that variant.

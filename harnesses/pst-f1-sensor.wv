@@ -12,7 +12,7 @@
 #     Ref: docs/vendor/maxxecu/MaxxECU_M50_Terminated_Harness.md § 16-pin extra connector.
 #     ECU_16PIN block below documents the breakout for reference (it's a purchase, not a build).
 #
-#   Phase 3 (07K custom harness):
+#   Phase 3b (07K custom harness):
 #     Pigtail integrates into the custom 07K engine-side harness and terminates
 #     directly at MaxxECU CMC pins G1 (+5V, pin 25) / H1 (SGND, pin 29) / J3 (AIN 3
 #     pressure, pin 37) / J1 (AIN 1 temp, pin 33). See harnesses/maxxecu-07k.wv.
@@ -22,7 +22,7 @@
 # See docs/vendor/maxxecu/MaxxECU_RACE_H2O.md.
 #
 # Mount: M52 VANOS banjo bolt path (M14x1.5 → M10x1.0 adapter → PST-F1).
-# Phase 3: moves to iABED 07K oil housing M10x1.0 port — no wiring changes needed.
+# Phase 3b: moves to iABED 07K oil housing M10x1.0 port — no wiring changes needed.
 #
 # MaxxECU channels:
 #   Pressure: AIN 3 (0-5V, calibrate 0-10 bar / 0-145 psi)
@@ -45,7 +45,7 @@ connectors:
       Pressure output: 0.5V = 0 bar, 4.5V = 10 bar (ratiometric, 5V supply).
       Temp output: NTC — calibrate in MTune against resistance table.
       Mount adapter: M14x1.5 female → M10x1.0 male.
-      Phase 3: moves to 07K iABED oil housing (M10x1.0 port) unchanged.
+      Phase 3b: moves to 07K iABED oil housing (M10x1.0 port) unchanged.
 
   ECU_16PIN:
     type: "MaxxECU M50 terminated harness — 16-pin aux breakout"

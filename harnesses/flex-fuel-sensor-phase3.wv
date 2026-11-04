@@ -1,18 +1,18 @@
 metadata:
   project: E36 Restomod -- GM/Continental Flex Fuel Sensor Wiring (PHASE 3)
-  phase: "Phase 3 (07K custom engine harness era — ECU-side wiring direct-terminate at CMC C1 pin 9)"
+  phase: "Phase 3b (07K custom engine harness era — ECU-side wiring direct-terminate at CMC C1 pin 9)"
   description: >-
     PHASE 3 flex fuel sensor wiring: GM/Continental 3-wire ethanol content
     sensor (GM 13577379 / Continental 21P1023) — SAME sensor and same mount
     location as Phase 1 (see harnesses/flex-fuel-sensor-phase1.wv). What
-    changes at Phase 3 swap moment is only the ECU-side termination.
+    changes at Phase 3b swap moment is only the ECU-side termination.
 
-    Under Phase 3 the M50 pre-terminated harness is retired and replaced by
+    Under Phase 3b the M50 pre-terminated harness is retired and replaced by
     the custom 07K engine harness (see harnesses/maxxecu-07k.wv). Flex fuel
     signal now terminates directly at MaxxECU CMC C1 pin 9 (DIN 3) — no
     intermediate 16-pin aux breakout in the path.
 
-    Rewiring at Phase 3 swap moment (minimal for flex fuel):
+    Rewiring at Phase 3b swap moment (minimal for flex fuel):
       1. Disconnect the sensor's signal pigtail from the M50 harness 16-pin
          aux breakout pin 5 (DIN 3).
       2. Re-terminate that same signal wire into the custom 07K harness's
@@ -27,7 +27,7 @@ metadata:
     Sensor part references and MaxxECU documentation URLs: see
     harnesses/flex-fuel-sensor-phase1.wv (unchanged between phases).
 
-    Related fuel wiring at Phase 3:
+    Related fuel wiring at Phase 3b:
       - harnesses/fuel-pump-hanger-phase3.wv (PMU16 O4 direct-drive)
       - harnesses/maxxecu-07k.wv (07K signal → CMC pin destinations)
 
@@ -59,7 +59,7 @@ connectors:
 
   ECU_CMC_C1:
     type: "MaxxECU RACE H2O — Molex CMC 48-pin (C1)"
-    subtype: "Direct-terminate at engine-bay ECU — Phase 3 custom 07K harness"
+    subtype: "Direct-terminate at engine-bay ECU — Phase 3b custom 07K harness"
     pincount: 2
     pinlabels:
       - "C1 pin 9 (DIN 3): Flex fuel signal input"

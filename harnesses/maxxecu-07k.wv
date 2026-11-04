@@ -1,7 +1,7 @@
 # maxxecu-07k.wv
 # MaxxECU Race H2O <-> VW 07K (CBUA/BGP 2.5L inline-5) Engine Harness
-# Build: Phase 2 (offline, while M52 is still running).
-# Install: Phase 3 (engine swap — plug into engine-bay ECU + mate Maven engine-side plugs).
+# Build: Phase 2b (offline, while M52 is still running).
+# Install: Phase 3b (engine swap — plug into engine-bay ECU + mate Maven engine-side plugs).
 #
 # ─────────────────────────────────────────────────────────────────────────────
 # ARCHITECTURE
@@ -14,8 +14,8 @@
 #
 # Firewall crossing: Maven HD30 dual 16+16 bulkhead (harnesses/firewall-crossing-maven.wv)
 # carries ONLY cabin-originated signals: CAN to Gauge.S cluster + DCT shifter
-# paddle inputs (Connector A, populated Phase 2) and APS e-pedal (Connector B,
-# populated Phase 3). All other 07K harness wires terminate at the engine-bay
+# paddle inputs (Connector A, populated Phase 2b) and APS e-pedal (Connector B,
+# populated Phase 3b). All other 07K harness wires terminate at the engine-bay
 # ECU with no bulkhead involvement.
 #
 # Same MaxxECU RACE H2O ECU as M52 phase — zero ECU cost at swap.
@@ -193,7 +193,7 @@ connectors:
   # Source: maxxecu.com/webhelp/wirings-maxxecu_pinout.html
   # GPO 3 (D4/pin 16): freed from VANOS → VVT actuator (07K intake cam)
   # GPO 4 (E4/pin 20): freed from ICV A → SPARE (NOT Motor- — see C2 below)
-  # GPO 5 (A1/pin 1):  freed from ICV B → reassigned to reverse light relay (Phase 3).
+  # GPO 5 (A1/pin 1):  freed from ICV B → reassigned to reverse light relay (Phase 3b).
   #                    MTune change only: remap GPO 5 to reverse lights output. No rewiring needed.
   #                    Source: 34-ecu-harness-final.md line 23, 8hp-body-integrations.wv lines 40-41.
   # ETh Motor+/Motor-: MaxxECU C2 H4 (MOTOR 1+) and C2 H2 (MOTOR 1-). NOT GPO3/GPO4.
@@ -376,7 +376,7 @@ connectors:
   #     Knock 2 signal → CMC K4 (DIN/VR2, pin 40)
   #     Knock shield drain → CMC H1 (Sensor GND) at ECU end (single-end drain)
   #     Knock GND → sensor body via M8 mounting bolt to block (no wire)
-  #   Cabin↔engine crossings (via Maven HD30 Connector B, Phase 3 install):
+  #   Cabin↔engine crossings (via Maven HD30 Connector B, Phase 3b install):
   #     APS ch1 SGND / +5V / signal → C1 H1 / C1 G1 / C2 APS1
   #     APS ch2 SGND / +5V / signal → C1 H1 / C1 G1 / C2 APS2
   #     (See harnesses/firewall-crossing-maven.wv for Maven pin assignments)
@@ -625,7 +625,7 @@ connectors:
     notes: >
       GM 13577429 / Continental SE1004S. Pin A=+12V (system voltage — NOT 5V), Pin B=GND, Pin C=signal.
       Signal encodes ethanol % (frequency) and fuel temperature (pulse width) on one wire.
-      Inline on fuel feed — position unchanged from M52. Zero wiring changes at Phase 3.
+      Inline on fuel feed — position unchanged from M52. Zero wiring changes at Phase 3b.
       +12V from coil/inj relay (ECU_12PIN[1]) — see connection block for correct routing.
 
 

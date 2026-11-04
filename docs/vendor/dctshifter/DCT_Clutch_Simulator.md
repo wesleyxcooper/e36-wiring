@@ -159,8 +159,8 @@ Per <https://dctshifter.com/pages/installation> §4 *"Controller Calibration (CP
 ## 9. Phase timeline
 
 - **Phase 1B (8HP swap)**: Install Simulator during the 8HP swap window. The 8HP swap removes the OEM slave cylinder anyway — replace with the Simulator at the same time. See `e36-docs/walkthroughs/07-8hp-swap.md` for the surrounding 8HP procedure.
-- **Phase 2**: No changes to Simulator (it lives in the engine bay independent of engine choice).
-- **Phase 3 (07K swap)**: Simulator stays. CPS wiring stays. No re-work.
+- **Phase 2b**: No changes to Simulator (it lives in the engine bay independent of engine choice).
+- **Phase 3b (07K swap)**: Simulator stays. CPS wiring stays. No re-work.
 
 ---
 

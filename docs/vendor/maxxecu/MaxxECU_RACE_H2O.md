@@ -82,7 +82,7 @@ Two SKUs directly relevant to this build:
 | **1895** MaxxECU RACE H2O unit only, no accessories | $1,727.88 | ECU only | <https://maxxecu.com/store/engine-control-or-electronics/maxxecu-units/maxxecu-race-h2o-unit-with-no-accessories-in-box> |
 | **MaxxECU RACE H2O PREMIUM (LSU 4.2)** | $2,050.42 | 1896 H2O unit + 871 flying-lead harness (C1) + 1787 RACE harness 2 (C2, EGT, E-Throttle) + 1533 LSU 4.9 6-way connector + 1606 sealed USB cable 1.5m + 1911 printed wiring diagram + LSU 4.2 sensor + accessories | <https://maxxecu.com/store/engine-control-or-electronics/maxxecu-standalone-ecu/maxxecu-race-h2o-engine-management-flying-lead-kit> |
 
-For this build, either SKU works. The M52 pre-terminated harness (`docs/vendor/maxxecu/MaxxECU_M50_Terminated_Harness.md`) replaces the 871 flying-lead C1 harness for the M52 phase. For Phase 3, the custom 07K harness replaces it. The 1787 C2 loom is still useful for EGT/E-Throttle/knock even if the M52 phase doesn't use those.
+For this build, either SKU works. The M52 pre-terminated harness (`docs/vendor/maxxecu/MaxxECU_M50_Terminated_Harness.md`) replaces the 871 flying-lead C1 harness for the M52 phase. For Phase 3b, the custom 07K harness replaces it. The 1787 C2 loom is still useful for EGT/E-Throttle/knock even if the M52 phase doesn't use those.
 
 ---
 
@@ -94,7 +94,7 @@ Rationale (with sources):
 
 1. **This car's OEM DME cavity is on the passenger side of a RHD E36 — confirmed on the car by the build owner.** In RHD the driver is on the right, so passenger side = left side of engine bay. Corroborating source for the general RHD layout: [bimmerforums.co.uk thread on E36 tds ECU location](https://www.bimmerforums.co.uk/threads/e36-tds-ecu-location.334033/) — *"It's behind the fusebox on RHD cars in the bulkhead behind a plastic panel. LHD cars have it on the opposite site to the fusebox, but still inside the bulkhead behind a panel."* The E36 DME location follows the passenger side in both LHD and RHD; because the interior mirrors between variants, "passenger side" maps to opposite physical sides of the car (right in LHD, left in RHD).
 
-2. **Intake side = passenger side = left side of engine bay in RHD.** The BMW M50/M52/M54/S52/S54 engine family keeps the same physical orientation in RHD as in LHD (the engine is not mirrored), and per the build owner's on-car observation, this puts the intake manifold on the passenger side of a RHD car. The 07K engine retains the same orientation post-swap (engine remains longitudinal with the same intake side). Exhaust manifold, downpipe, and (Phase 3) turbo are on the driver side — the OPPOSITE side of the engine bay from the OEM DME cavity.
+2. **Intake side = passenger side = left side of engine bay in RHD.** The BMW M50/M52/M54/S52/S54 engine family keeps the same physical orientation in RHD as in LHD (the engine is not mirrored), and per the build owner's on-car observation, this puts the intake manifold on the passenger side of a RHD car. The 07K engine retains the same orientation post-swap (engine remains longitudinal with the same intake side). Exhaust manifold, downpipe, and (Phase 3b) turbo are on the driver side — the OPPOSITE side of the engine bay from the OEM DME cavity.
 
 3. **Thermally favorable** — intake side is opposite the exhaust manifold, downpipe, and turbo. Aligns with MaxxECU's error-code-92 documentation recommendation to "mount away from heat sources."
 

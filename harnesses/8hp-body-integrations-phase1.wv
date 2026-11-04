@@ -10,9 +10,9 @@
 #   - Discrete reverse-light relay: engine bay (Bosch mini relay, near the OEM
 #     Front Power Distribution Box or in an added relay panel next to the PMU16)
 #
-# Phase-transition note: at Phase 3 (07K swap), the M50 pre-terminated harness is
+# Phase-transition note: at Phase 3b (07K swap), the M50 pre-terminated harness is
 # retired and replaced with a custom 07K harness. The Phase 1 approach here (GPO
-# via BOOST_SOLENOID Superseal stub) no longer applies — see the Phase 3 file
+# via BOOST_SOLENOID Superseal stub) no longer applies — see the Phase 3b file
 # harnesses/8hp-body-integrations-phase3.wv for the PMU16-direct-drive design.
 #
 # See harnesses/body-x20.wv (X20 pin 10 documentation) and
@@ -37,7 +37,7 @@
 # signal directly — NOT by a PMU16 output. The M50 pre-terminated harness exposes
 # GPO 1 at the BOOST_SOLENOID Superseal 2-pin connector, which is unused on an NA
 # M52. We tap that connector for the GPO wire. This is Phase 1's constraint —
-# under Phase 3's custom harness (see phase 3 file) PMU16 direct-drive replaces
+# under Phase 3b's custom harness (see phase 3 file) PMU16 direct-drive replaces
 # this whole scheme.
 #
 # Source (X20 pinout): harnesses/body-x20.wv + 1998 BMW E36 ETM jonkensy.com
@@ -73,7 +73,7 @@ connectors:
   # ── MaxxECU GPO output ───────────────────────────────────────────────────────
   MAXXECU_GPO_REV:
     type: "MaxxECU M50 terminated harness — BOOST_SOLENOID connector"
-    subtype: "GPO 1 (CMC B4) — Phase 1 approach only. Phase 3 uses PMU16 direct."
+    subtype: "GPO 1 (CMC B4) — Phase 1 approach only. Phase 3b uses PMU16 direct."
     pincount: 1
     pinlabels: ["GPO 1 signal (low-side switch to GND)"]
     notes: >
@@ -82,7 +82,7 @@ connectors:
       Access: pin 2 of the Superseal 2-pin BOOST_SOLENOID breakout connector in the
       MaxxECU M50 terminated harness. Boost solenoid connector is unpopulated in
       M52 NA Phase 1. Leave connector unpopulated and splice from this wire.
-      Phase 3: this connector no longer exists (custom 07K harness). See
+      Phase 3b: this connector no longer exists (custom 07K harness). See
       harnesses/8hp-body-integrations-phase3.wv for the PMU16-direct-drive replacement.
 
   # ── Reverse light relay ──────────────────────────────────────────────────────
@@ -128,7 +128,7 @@ connectors:
     notes: >
       Supply for relay contact pin 30 — independent of the coil supply.
       Source from main fuse block battery rail (PMU16 is not yet installed in Phase 1;
-      Phase 3 uses PMU16 direct so no separate fuse needed there).
+      Phase 3b uses PMU16 direct so no separate fuse needed there).
       15A fuse is sufficient — reverse light bulbs draw ~4–8A total on E36.
 
   IGN_12V_BODY:

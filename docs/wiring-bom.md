@@ -132,7 +132,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 | 1 | **4-post battery cutoff switch — Moroso 74108** ([Amazon](https://www.amazon.com/Moroso-74108-Battery-Alternator-Disconnect/dp/B01GWD2XUS) ~$101 / [moroso.com](https://www.moroso.com/battery-and-alternator-disconnect-switch74108/) $113) | **Required** on any alternator-equipped car. A 2-post switch disconnects the battery but the alternator continues powering the car — it will not shut off. The 4-post loops the alternator through the switch so both disconnect simultaneously. Mount in trunk near battery. |
 | 2–3 | **Amphenol Radlok 8mm — M8×1.25 Male** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-male/), ~$15 CAD ea — thread into cylinder head and engine block GND strap bosses. Tool-free press-lock disconnect. Speeds up M52→07K swap. Secure cable within 3 cm; inspect annually. |
 | 1 | **Amphenol Radlok 8mm — M8×1.25 Female** | [Racing History Co.](https://www.racinghistorycompany.com/product/radlok-8mm-stud-m8x1-25-female/), ~$22 CAD — threads onto M8 B+ stud of 07K alternator (`07K 903 023 A`). Tool-free disconnect at alternator removal. |
-| 1 | **Ecumaster PMU16** ([ecumasterusa.com](https://ecumasterusa.com/products/ecumaster-pmu16-power-management-unit) ~$500) | 16-output MOSFET PDM. Replaces relay board + fuse block + Crydom SSR. Outputs: O1 ECU logic · O2 coil/inj · O3 fan (PWM) · O4 pump (PWM) · O5+O14 EWP parallel (50A combined) · O6 condenser fan · O7 AC relay coil · O8 EPS Controller (Phase 3). Connector: 39-way Sicma/FCI. Power via M6 BATT+ stud. Manual: [ecumaster.com/files/PMU/PMU_Manual.pdf](https://www.ecumaster.com/files/PMU/PMU_Manual.pdf) · Pinout: [PMU-16_Pinout_v1.2.pdf](https://www.ecumaster.com/files/PMU/PMU-16_Pinout_v1.2.pdf) |
+| 1 | **Ecumaster PMU16** ([ecumasterusa.com](https://ecumasterusa.com/products/ecumaster-pmu16-power-management-unit) ~$500) | 16-output MOSFET PDM. Replaces relay board + fuse block + Crydom SSR. Outputs: O1 ECU logic · O2 coil/inj · O3 fan (PWM) · O4 pump (PWM) · O5+O14 EWP parallel (50A combined) · O6 condenser fan · O7 AC relay coil · O8 EPS Controller (Phase 3b). Connector: 39-way Sicma/FCI. Power via M6 BATT+ stud. Manual: [ecumaster.com/files/PMU/PMU_Manual.pdf](https://www.ecumaster.com/files/PMU/PMU_Manual.pdf) · Pinout: [PMU-16_Pinout_v1.2.pdf](https://www.ecumaster.com/files/PMU/PMU-16_Pinout_v1.2.pdf) |
 | 1 | **Ecumaster USB-CAN adapter** ([ecumasterusa.com](https://ecumasterusa.com) ~$85) | Required for initial PMU16 programming. One-time setup tool. |
 | 1 | Inline ANL or MAXI fuse holder, **150A** | Channel peaks: ECU 8A + coil/inj 20A + fan 15A + pump 14A + EWP 35.5A + condenser 12A + AC coil 0.2A = 104.8A worst-case all-on. ×1.2 headroom = 125.8A → **150A** (matches PMU16 M6 stud 150A continuous rating). Blue Sea 5191 MRBF 150A or equiv. |
 | 1 | IGN switched 12V source — **X20 pin 21** (GN, green wire) | Confirmed: X20 pin 21 = ignition switch terminal 15 = IGN-switched +12V. Green wire. Feeds PMU16 39-pin pin 7 (+12V SW on/off sense). Fuse at X20 source: 5A. Source: E36 ETM / r3vlimited / megasquirt.325ix.com X20 pinout. |
@@ -146,7 +146,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 |-----|-------|-------|-------------|-------|
 | BATT_POS → cutoff switch (trunk) | RD | **2/0 AWG OFC welding cable** | ~0.3 m | Battery + → CUTOFF_4POST batt-in post. Short run in trunk. |
 | Cutoff switch → ANL fuse (trunk) | RD | **2/0 AWG OFC welding cable** | ~0.3 m | CUTOFF_4POST output → ANL fuse holder. Mount fuse within 12" of cutoff output. |
-| ANL fuse → engine bay (trunk to engine bay long run) | RD | **2/0 AWG OFC welding cable** | TBD (~4.5 m) | ANL fuse output (trunk) → engine bay junction → PMU16 M6 stud. Routes along right sill (driver's side in RHD) through factory floor grommet. Phase 1: terminate at OEM engine bay positive stub. Phase 3: move ring terminal to PMU16 M6 stud — no re-routing, bolt swap only. |
+| ANL fuse → engine bay (trunk to engine bay long run) | RD | **2/0 AWG OFC welding cable** | TBD (~4.5 m) | ANL fuse output (trunk) → engine bay junction → PMU16 M6 stud. Routes along right sill (driver's side in RHD) through factory floor grommet. Phase 1: terminate at OEM engine bay positive stub. Phase 3b: move ring terminal to PMU16 M6 stud — no re-routing, bolt swap only. |
 | PMU16 GND lug → chassis stud | BK | 4–8 AWG | ~0.3 m | PMU16 body GND lug → `CHASSIS_GND` engine bay stud M8. Keep short. All PMU output return currents flow here. |
 | BATT_NEG → trunk chassis stud | BK | **2/0 AWG OFC welding cable** | ~0.3 m | Battery − → `TRUNK_CHASSIS_GND` (short local run in trunk). Chassis carries return current forward to engine bay. Do NOT run a long trunk-to-block cable. |
 | Engine block → engine bay chassis stud | BK | **2/0 AWG welding cable** | ~0.5 m | `ENGINE_BLOCK_GND` stud → `CHASSIS_GND` engine bay stud. Short run at engine — both points are at the front of the car. |
@@ -172,7 +172,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 > are pre-crimped and included. The C1 (48-pin Molex) ECU connector is also included.
 > Source: https://www.maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html (verified 2026-08-26)
 >
-> Harness routes through the existing E36 firewall grommet/bushing to the engine-bay MaxxECU RACE H2O. No firewall bulkhead connector for Phase 1 — the Maven HD30 dual bulkhead is a Phase 2 install (see System 8).
+> Harness routes through the existing E36 firewall grommet/bushing to the engine-bay MaxxECU RACE H2O. No firewall bulkhead connector for Phase 1 — the Maven HD30 dual bulkhead is a Phase 2b install (see System 8).
 
 ### Connectors — additional items NOT included in the pre-terminated harness
 
@@ -214,7 +214,7 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 |-----|------|-------|
 | 1 | **BMW E46 Accelerator Pedal Module** | PN `35426786282` (manual) / `35426786281` (auto) — used, ~$80–120. See `docs/dbw-pinouts.md` for sourcing table. |
 | — | *OR* **Hella 6PV010946-141** | RHD fallback — standalone floor-mount, no OEM pedal box, ~$80–120 new |
-| 1 | Maven HD30 dual 16+16 bulkhead — Connector B (Phase 3) | APS routes through **Connector B pins 1–6** (6 wires: ch1 SGND/+5V/sig, ch2 SGND/+5V/sig). Cabin-side receptacle installed at Phase 2; wires populated at Phase 3 with the E46 APS pedal. See System 8 for full Maven bulkhead spec. Source: `harnesses/firewall-crossing-maven.wv`; `harnesses/epedal-bmw-e46.wv`. |
+| 1 | Maven HD30 dual 16+16 bulkhead — Connector B (Phase 3b) | APS routes through **Connector B pins 1–6** (6 wires: ch1 SGND/+5V/sig, ch2 SGND/+5V/sig). Cabin-side receptacle installed at Phase 2b; wires populated at Phase 3b with the E46 APS pedal. See System 8 for full Maven bulkhead spec. Source: `harnesses/firewall-crossing-maven.wv`; `harnesses/epedal-bmw-e46.wv`. |
 | 1 | MaxxECU RACE CMC — APS analog inputs | 6-pin CMC section — AIN, 5V SENS OUT, SGND — pins TBD |
 
 ### Cables
@@ -232,10 +232,10 @@ The WBO2 sensor bung and the CLT sensor (cylinder-1 exhaust face) are adjacent t
 
 *Sources: `fuel-pump-hanger-phase1.wv` (discrete relay era) · `fuel-pump-hanger-phase3.wv` (PMU16 direct-drive)*
 
-> Radium Engineering 20-1170 hanger + Walbro F90000267 (465 LPH E85) installed at Phase 1. Wiring approach changes between phases because PMU16 is not installed until Phase 3.
+> Radium Engineering 20-1170 hanger + Walbro F90000267 (465 LPH E85) installed at Phase 1. Wiring approach changes between phases because PMU16 is not installed until Phase 3b.
 >
 > - **Phase 1**: Discrete high-current relay + 30A fuse in engine bay. Relay coil driven by MaxxECU GPO 2 (12-pin extra connector pin 3). Relay contact feeds 12 AWG through cabin/tunnel to hanger pump(+) stud.
-> - **Phase 3**: Discrete relay REMOVED at 07K swap. PMU16 O4 direct-drives the same 12 AWG cabin/tunnel wire (relay end lands on PMU16 O4 output pin). Minimal Phase 3 rework — cabin/tunnel/hanger wiring unchanged.
+> - **Phase 3b**: Discrete relay REMOVED at 07K swap. PMU16 O4 direct-drives the same 12 AWG cabin/tunnel wire (relay end lands on PMU16 O4 output pin). Minimal Phase 3b rework — cabin/tunnel/hanger wiring unchanged.
 
 ### Phase 1 — Discrete Relay Purchase
 
@@ -259,7 +259,7 @@ Two purchase paths (both cover the relay + fuse + heavy-gauge wire + terminals):
 | 1 | Pass-through grommet (firewall or trunk floor) | Included in JDT bundle Option A or Option B. |
 | 1 | Chassis ground stud | 🔁 Shared with power distribution |
 
-### Connectors (Phase 3 PMU16 direct-drive)
+### Connectors (Phase 3b PMU16 direct-drive)
 
 | Qty | Item | Notes |
 |-----|------|-------|
@@ -267,13 +267,13 @@ Two purchase paths (both cover the relay + fuse + heavy-gauge wire + terminals):
 | 1 | Radium 20-1170 hanger terminals | Same as Phase 1 (no change at swap). |
 | 1 | Chassis ground stud | 🔁 Shared. |
 
-**Phase 3 removes**: the Phase 1 discrete relay, 30A fuse, coil-side wires. Everything else stays.
+**Phase 3b removes**: the Phase 1 discrete relay, 30A fuse, coil-side wires. Everything else stays.
 
 ### Cables (both phases — same physical wire)
 
 | Run | Color | Gauge | Length | Shielded | Notes |
 |-----|-------|-------|--------|----------|-------|
-| CABLE_PWR (relay pin 87 / PMU16 O4 → hanger pump+) | RD | 12 AWG (or 10 AWG if JDT bundle used) | ~4.0 m | No | Full run engine bay → fuel tank (est. 3.5–4m; measure on car). Route through transmission tunnel. Phase 1: relay contact + 30A fuse protection. Phase 3: no separate fuse — PMU16 O4 overcurrent protection handles this. |
+| CABLE_PWR (relay pin 87 / PMU16 O4 → hanger pump+) | RD | 12 AWG (or 10 AWG if JDT bundle used) | ~4.0 m | No | Full run engine bay → fuel tank (est. 3.5–4m; measure on car). Route through transmission tunnel. Phase 1: relay contact + 30A fuse protection. Phase 3b: no separate fuse — PMU16 O4 overcurrent protection handles this. |
 | CABLE_GND (hanger pump− → chassis GND) | BK | 12 AWG | 0.5 m | No | Dedicated ground — do not share with ECU sensor GND. Ring terminals both ends. Unchanged between phases. |
 
 ---
@@ -287,7 +287,7 @@ Two purchase paths (both cover the relay + fuse + heavy-gauge wire + terminals):
 | Qty | Item | Notes |
 |-----|------|-------|
 | 1 | **Pierburg CWA400 (PWM version)** | Kostal 2+2 connector, 150 LPM @ 0.85 bar — installed in lower radiator hose |
-| 1 | 40A automotive relay | **Phase 3 CWA400 control only — not used in Phase 1** (there is no EWP in Phase 1). Phase 3 supersedes this relay with PMU16 O5+O14 MOSFET direct drive. Relay listed here for reference only. Source: `34-ecu-harness-final.md` lines 144–147. |
+| 1 | 40A automotive relay | **Phase 3b CWA400 control only — not used in Phase 1** (there is no EWP in Phase 1). Phase 3b supersedes this relay with PMU16 O5+O14 MOSFET direct drive. Relay listed here for reference only. Source: `34-ecu-harness-final.md` lines 144–147. |
 | 1 | Battery positive terminal | 🔁 Shared |
 | 1 | Chassis ground stud | 🔁 Shared |
 | 1 | MaxxECU RACE GPO | 🔁 Shared — GPO pin TBD |
@@ -296,12 +296,12 @@ Two purchase paths (both cover the relay + fuse + heavy-gauge wire + terminals):
 
 | Run | Color | Gauge | Length | Shielded | Notes |
 |-----|-------|-------|--------|----------|-------|
-| CABLE_PWR_IN (BATT+ → PMU16 input) | RD | 10 AWG | 0.5 m | No | Fused 40A within 30 cm of battery. **Phase 3:** PMU16 O5+O14 (50A combined MOSFET) drives CWA400 directly — no relay. Ring terminal at battery. |
+| CABLE_PWR_IN (BATT+ → PMU16 input) | RD | 10 AWG | 0.5 m | No | Fused 40A within 30 cm of battery. **Phase 3b:** PMU16 O5+O14 (50A combined MOSFET) drives CWA400 directly — no relay. Ring terminal at battery. |
 | CABLE_PWR_OUT (PMU16 O5+O14 → CWA400 Pin 3) | RD | 8 AWG | 1.5 m | No | Switched +12V pump supply. 35.5A nominal — **8 AWG** (10 AWG marginal at 35.5A / 1.5m in engine bay; System 1 and consolidated buy table both specify 8 AWG). PMU16 manages post-shutdown cooling hold. |
 | CABLE_GND (CWA400 Pin 4 → chassis GND) | BK | 10 AWG | 1.5 m | No | Dedicated ground. 10 AWG minimum. Both phases. |
-| CABLE_PWM (MaxxECU GPO → CWA400 Pin 1) | VT | 22 AWG | 2.0 m | Preferred | PWM signal (680 Hz). **Phase 3:** MaxxECU broadcasts EWP state over CAN1 to PMU16 — no direct GPO wire to CWA400. 22 AWG if retained for direct drive fallback. |
-| *Phase 1 only* relay coil wire 1 (relay pin 86 → IGN +12V) | GN | 18 AWG | 0.5 m | No | **Not used in Phase 3 (PMU16 direct drive).** |
-| *Phase 1 only* relay coil wire 2 (relay pin 85 → chassis GND) | BK | 18 AWG | 0.5 m | No | **Not used in Phase 3 (PMU16 direct drive).** |
+| CABLE_PWM (MaxxECU GPO → CWA400 Pin 1) | VT | 22 AWG | 2.0 m | Preferred | PWM signal (680 Hz). **Phase 3b:** MaxxECU broadcasts EWP state over CAN1 to PMU16 — no direct GPO wire to CWA400. 22 AWG if retained for direct drive fallback. |
+| *Phase 1 only* relay coil wire 1 (relay pin 86 → IGN +12V) | GN | 18 AWG | 0.5 m | No | **Not used in Phase 3b (PMU16 direct drive).** |
+| *Phase 1 only* relay coil wire 2 (relay pin 85 → chassis GND) | BK | 18 AWG | 0.5 m | No | **Not used in Phase 3b (PMU16 direct drive).** |
 
 ---
 
@@ -351,17 +351,17 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 ---
 
-## System 7 — VW 07K Engine Harness (Phase 3)
+## System 7 — VW 07K Engine Harness (Phase 3b)
 
 *Source: `maxxecu-07k.wv`*
 
-> Phase 3 engine harness — direct-terminate at the engine-bay MaxxECU RACE H2O CMC (C1/C2). Phase 1 used the pre-terminated M50 harness through the OEM firewall grommet; Phase 3 replaces that with a custom 07K harness that plugs into the same engine-bay ECU. See `harnesses/maxxecu-07k.wv`. The Maven bulkhead engine-side plugs (Connectors A + B) mate to the pre-installed cabin-side receptacles for cabin↔engine signals — see System 8.
+> Phase 3b engine harness — direct-terminate at the engine-bay MaxxECU RACE H2O CMC (C1/C2). Phase 1 used the pre-terminated M50 harness through the OEM firewall grommet; Phase 3b replaces that with a custom 07K harness that plugs into the same engine-bay ECU. See `harnesses/maxxecu-07k.wv`. The Maven bulkhead engine-side plugs (Connectors A + B) mate to the pre-installed cabin-side receptacles for cabin↔engine signals — see System 8.
 
 ### Connectors
 
 | Qty | Item | Notes |
 |-----|------|-------|
-| 1 | Maven HD30 dual bulkhead — engine-side plugs (Connectors A + B) | Included with the Maven kit (System 8). Populate engine-side pins with the 07K harness at Phase 3 build. See `harnesses/firewall-crossing-maven.wv` for pin assignments. |
+| 1 | Maven HD30 dual bulkhead — engine-side plugs (Connectors A + B) | Included with the Maven kit (System 8). Populate engine-side pins with the 07K harness at Phase 3b build. See `harnesses/firewall-crossing-maven.wv` for pin assignments. |
 | 5 | EV14 / USCAR injector connector housing + terminals | Direct termination — housing: Bosch `1 928 402 258` (or equiv USCAR 2-pin); terminal: Bosch `1 928 499 000` or Delphi `12129476`. ⚠️ `0 280 156 127` is a **Bosch injector** PN, not a connector PN — do not order it for wiring. |
 | 5 | VAG 4-way COP connector | IGN 1-5 ignition coils (07K firing order 1-2-4-5-3) |
 | 1 | VW 07K crank Hall sensor OE# 07K906433B, 3-pin | Hall effect (confirmed — Valeo 366675 datasheet "Sensor Type: Hall Sensor"). Connector body: 3B0973703G (same as cam — label CRANK at crimp time). Pinout: +5V/Signal/SensorGND. ⚠️ Verify exact body at install. |
@@ -370,7 +370,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 | 1 | VW 07K IAT sensor connector | ⚠️ TODO: confirm connector body at install |
 | 1 | VW 07K DBW throttle body connector | ⚠️ TODO: confirm 6-pin body (Motor+/Motor−/TPS1+TPS2 +5V/GND) at install |
 | 2 | Bosch flat knock sensor connector, 1-pin | KS1 + KS2 (Bosch flat-type, M8 mount) — signal only; GND via mounting bolt |
-| 1 | Bosch LSU 4.9 6-way connector | WBO2 — new purchase for Phase 3. Phase 1 harness uses LSU 4.2 (different pinout — do NOT reuse). New bung required in 07K manifold. |
+| 1 | Bosch LSU 4.9 6-way connector | WBO2 — new purchase for Phase 3b. Phase 1 harness uses LSU 4.2 (different pinout — do NOT reuse). New bung required in 07K manifold. |
 | 1 | Bosch PST-F1 5-pin Bosch Trapezoid | 🔁 Same connector as M52 — new mount on 07K oil housing iABED M10×1.0 port. Kit F02U.B00.751-01. |
 | 1 | Superseal 2-way | 🔁 Same boost solenoid as M52 |
 | 1 | VW/Tyco Micro Timer 1.5mm Sealed, 2-pin — `1J0 973 702` female pigtail | N205 VVT solenoid (cam adjustment valve). Solenoid male body: `1J0 973 802`. Pre-made pigtail: automotive-connectors.com `42121600-PT` (~30 cm leads) or Amazon B0D8FH4S8T (~170 mm leads). Terminals 0.35–0.5 mm² (22 AWG) — crimp with IWISS IWS-2820M. Source: VW BGP/BGQ workshop manual + automotivetechinfo.com 2010 Golf valve timing repair. |
@@ -395,13 +395,13 @@ These connectors/termination points appear in multiple harness BOMs — source o
 > **Active architecture: Maven HD30 dual 16+16 bulkhead.**
 > With MaxxECU RACE H2O engine-bay-mounted (OEM DME E-box cavity, intake side per `docs/vendor/maxxecu/MaxxECU_RACE_H2O.md`), all engine sensor / IGN / INJ / GPO signals stay engine-bay entirely. The firewall crossing shrinks to a small dedicated Deutsch HD30 dual bulkhead for cabin-originated signals only.
 >
-> - **Connector A (16-pin, Phase 2 install):** CAN H/L/shield to Gauge.S cluster (3 pins) + DCT shifter paddle UP/DOWN/GND (3 pins). 8 spare cavities. Populated at Phase 2 offline harness build.
-> - **Connector B (16-pin, Phase 3 population):** APS e-pedal — ch1 SGND/+5V/sig + ch2 SGND/+5V/sig (6 pins). 10 spare cavities. Cabin-side receptacle installed at Phase 2 with all cavities plugged; populated at Phase 3 when the E46 APS pedal is installed.
+> - **Connector A (16-pin, Phase 2b install):** CAN H/L/shield to Gauge.S cluster (3 pins) + DCT shifter paddle UP/DOWN/GND (3 pins). 8 spare cavities. Populated at Phase 2b offline harness build.
+> - **Connector B (16-pin, Phase 3b population):** APS e-pedal — ch1 SGND/+5V/sig + ch2 SGND/+5V/sig (6 pins). 10 spare cavities. Cabin-side receptacle installed at Phase 2b with all cavities plugged; populated at Phase 3b when the E46 APS pedal is installed.
 > - **NO high-current relay bypass needed:** with PMU16 engine-bay-mounted alongside the H2O (see `harnesses/power-distribution.wv`), fan / EWP / AC relay outputs are engine-bay-to-engine-bay direct — no firewall crossing.
 >
 > **OEM E36 X20 25-pin firewall connector (`harnesses/body-x20.wv`) stays 100% OEM body signals — no ECU signals traverse X20.**
 >
-> Phase 1 note: this Maven bulkhead is NOT installed for Phase 1. Phase 1 CAN + DCT wires (6 total) route through the existing OEM E36 firewall grommet as individual wires alongside the pre-terminated M50 harness. Phase 2 offline prep installs the Maven bulkhead and re-terminates the Phase 1 wires into Connector A.
+> Phase 1 note: this Maven bulkhead is NOT installed for Phase 1. Phase 1 CAN + DCT wires (6 total) route through the existing OEM E36 firewall grommet as individual wires alongside the pre-terminated M50 harness. Phase 2b offline prep installs the Maven bulkhead and re-terminates the Phase 1 wires into Connector A.
 
 ### 8 — Maven HD30 Dual 16+16 Bulkhead Kit
 
@@ -409,7 +409,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 |-----|------|-------|
 | 1 | Maven Performance Products **Dual Connector Bulkhead — 16 PIN & 16 PIN** | [mavenspeed.com](https://mavenspeed.com/collections/b2t-engineering/products/dual-connector-bulkhead) — $274 USD (config: "16 PIN & 16 PIN"). Includes: CNC billet aluminum plate (2.6" × 5.25", black anodized) + 2× Deutsch HD30 shell-size-24 16-pin connectors (both sides — flange receptacle + jam-nut plug for each) + all size-16 solid contacts + paper installation template + stainless steel fasteners. Boots sold separately. |
 | — | HD30 size-16 solid contacts (included in Maven kit) | Sockets and pins for both connectors both sides. 13A per contact rated continuous, 14-20 AWG. Signal-level wiring in this crossing is 22 AWG. |
-| — | HD30 cavity plugs (order separately if not included) | Seal unused cavities on both sides — required for IP67. Connector A: 8 spare cavities Phase 2+. Connector B: 10 spare cavities Phase 3+ (16 spare Phase 2). |
+| — | HD30 cavity plugs (order separately if not included) | Seal unused cavities on both sides — required for IP67. Connector A: 8 spare cavities Phase 2b+. Connector B: 10 spare cavities Phase 3b+ (16 spare Phase 2b). |
 | — | HD30 backshells / boots (optional, Maven or generic) | Recommended for cable strain relief and additional environmental sealing. Style depends on cable OD; not included with the Maven kit. |
 
 > ⚠️ **Crimping tool:** **Deutsch HDT-48-00** — covers all Deutsch solid contacts across DT / DTM / DTP / DTHD / HD10 / HD30 / HDP20 / DRC series. Sources:
@@ -451,7 +451,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 ### 9D — Bosch PST-F1 Sensor (`pst-f1-sensor.wv`)
 
-> Same wiring as M52 phase — connector, gauge, and routing unchanged. New mounting location: iABED M10×1.0 port on 07K oil housing. No new wire purchases required for Phase 3.
+> Same wiring as M52 phase — connector, gauge, and routing unchanged. New mounting location: iABED M10×1.0 port on 07K oil housing. No new wire purchases required for Phase 3b.
 
 ### 9E — ATF Temperature Sensor *(optional — logging / MaxxECU cold-shift protection)*
 
@@ -504,7 +504,7 @@ These connectors/termination points appear in multiple harness BOMs — source o
 
 **MTune:** Advanced → 8HP → 8HP clutch control → `Enabled, Virtual clutch`. Analog Inputs → AIN 5 → type = `0-5V`, function = `Clutch Position`. Vendor calibration note: *"set 0% to at least 0.6V"* (0.5V is the sensor's resting value; leave headroom). Set clutch clamp start / end per MaxxECU 8HP settings page — these are critical for correct pressure modulation.
 
-**Phase-to-phase:** Install at Phase 1B (8HP swap). Simulator + wiring carry unchanged through Phase 2 and Phase 3.
+**Phase-to-phase:** Install at Phase 1B (8HP swap). Simulator + wiring carry unchanged through Phase 2b and Phase 3b.
 
 **Bleeding:** Standard brake-fluid bleeding procedure per [dctshifter.com/pages/installation](https://dctshifter.com/pages/installation) §3 — open Simulator bleed screw, pump pedal 3–5 times, close, repeat until pedal feel is firm.
 
@@ -593,7 +593,7 @@ Only items not already included with their respective purchased components (e.g.
 | 1 | Gauge.S E36 PNP cluster connector, 6-pin | Ships with Gauge.S unit | Body |
 | 1 | **Maven HD30 Dual 16+16 Bulkhead Kit** | mavenspeed.com/collections/b2t-engineering/products/dual-connector-bulkhead — $274 USD (config "16 PIN & 16 PIN"). Includes plate + both sides of both connectors + all size-16 contacts + template. See System 8 for full spec. | Cabin↔engine crossing |
 | 1 | **BMW sensor PN `12141726590`** — VANOS cam sensor | Required before Phase 1 can fire — VANOS head cam sensor swap. Not a connector; this is the replacement sensor that matches the pre-terminated harness CAM connector. | M52 Phase 1 |
-| 1 | MaxxECU RACE C2, 32-pin Molex harness connector | [MaxxECU store ID 1982](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-mini-or-race-c2-or-pro-c4-32-pin-molex), $32.25 — C1 comes with the pre-terminated harness; C2 is separate. Phase 1: AIN 5 (G3) for 8HP virtual clutch. Phase 3: DBW, knock, e-pedal. Molex 63811-9200 crimp tool. | Phase 1 + 07K |
+| 1 | MaxxECU RACE C2, 32-pin Molex harness connector | [MaxxECU store ID 1982](https://www.maxxecu.com/store/engine-control-or-electronics/maxxecu-connectors/maxxecu-mini-or-race-c2-or-pro-c4-32-pin-molex), $32.25 — C1 comes with the pre-terminated harness; C2 is separate. Phase 1: AIN 5 (G3) for 8HP virtual clutch. Phase 3b: DBW, knock, e-pedal. Molex 63811-9200 crimp tool. | Phase 1 + 07K |
 | 1 | VW `1J0 973 702` 2-pin Micro Timer pigtail | N205 VVT solenoid — automotive-connectors.com `42121600-PT` or Amazon B0D8FH4S8T | 07K harness |
 
 ---

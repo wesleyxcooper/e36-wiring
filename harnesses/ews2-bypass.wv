@@ -1,0 +1,256 @@
+# ews2-bypass.wv
+# E36 M52 EWS2 Chassis Bypass + Starter / Alternator Supplemental Wiring — Phase 1
+#
+# !! CHASSIS MODIFICATION — NOT A HARNESS BUILD !!
+# This file documents the OEM chassis wiring changes required when replacing the
+# OEM MS41 DME with MaxxECU. MaxxECU has no EWS rolling-code communication,
+# so the EWS2 immobilizer must be bypassed. Without bypass: cranks, will not fire.
+#
+# Source: https://falkmfg.com/blogs/news/how-to-bypass-ews2-for-e36-bmw
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# BACKGROUND — EWS2 System
+#
+#   EWS2 (Electronic Vehicle Immobilizer 2) is fitted to OBD2 E36 M52 cars
+#   (1995–1998 US spec). The EWS2 module sits behind the glovebox and reads
+#   the key transponder via the ignition lock ring antenna.
+#
+#   Starter inhibit path:
+#     Kl.15 IGN (+12V) → EWS2 module pin 1
+#     If key transponder valid: EWS2 passes signal to pin 3 → starter relay coil
+#     If key transponder invalid: pin 3 is open → starter relay never energizes → no crank
+#
+#   IMMO signal path:
+#     EWS2 module pin 4 → serial K-line rolling code to OEM MS41 DME
+#     If code matches: DME enables fuel/spark
+#     With MaxxECU replacing the DME: this wire goes nowhere useful;
+#     MaxxECU ignores it entirely.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# EWS2 MODULE LOCATION
+#
+#   Behind the glovebox — the glovebox drops on the lower hinge to expose the
+#   EWS2 module mounted to the structural cross-member. 4-pin Bosch connector
+#   (gray housing) + ring antenna lead (2-wire, to ignition lock ring).
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# EWS2 CONNECTOR PINOUT (4-pin, gray housing, behind glovebox)
+#
+#   Pin 1 — Kl.15 IGN ON  : +12V from ignition switch (key positions II, III)
+#   Pin 2 — GND            : Chassis ground
+#   Pin 3 — Starter enable : Output to starter relay coil (EWS-controlled)
+#   Pin 4 — IMMO K-line    : Serial rolling-code line to OEM DME MS41 pin
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# BYPASS PROCEDURE — HARD-WIRE METHOD
+#
+# Step 1 — Bridge pins 1 and 3 at the EWS2 connector
+#   Cut or pull pin 4 from the EWS2 connector. Install a short jumper wire
+#   (18 AWG minimum) bridging pin 1 (IGN+) and pin 3 (starter relay coil).
+#   Effect: starter relay coil now gets +12V directly whenever the key is in
+#   the START position, bypassing EWS gate.
+#
+#   WARNING: The OEM park/neutral switch (auto transmission inhibit relay) is
+#   not affected by this bypass. However, with MaxxECU 8HP GEN1 control, the
+#   8HP TCU reports range position (P/R/N/D) to MaxxECU via CAN. MTune can
+#   implement a software starter inhibit using the 8HP range position — no
+#   additional hardware relay is needed. Configure MTune :: 8HP :: Starter
+#   inhibit to allow crank only in P or N before first start.
+#
+# Step 2 — Isolate pin 4 (IMMO K-line)
+#   Remove pin 4 from the EWS2 connector body or cut and tape the wire back.
+#   This line connected to the OEM DME MS41 — with MaxxECU replacing the DME,
+#   the wire stub goes nowhere. Isolating it prevents any residual EWS2 signal
+#   from floating. The EWS2 module will log a "key mismatch" fault code but
+#   this does not cause a CEL and has no effect on MaxxECU operation.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# ALTERNATOR D+ EXCITE WIRE — M50 Harness 12-pin Extra Pin 12 (M)
+#
+# Source: maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html
+#         Installation step 8
+#
+#   The M52 alternator is internally-regulated (Bosch IR/EL-type). The D+
+#   terminal (alternator excitation input) requires a small current path to
+#   +12V IGN to initiate charging. Without this wire, the alternator will not
+#   regulate output below ~1,500–2,000 RPM and the battery will not charge.
+#
+#   Wiring: IGN +12V (switched, relay-protected) → charge bulb (3–5W dashboard
+#   bulb, e.g., W5W bayonet) → 12-pin extra connector pin 12 (M) → alternator D+
+#
+#   The charge bulb illuminates as a "battery" warning light when the alternator
+#   is not charging; extinguishes once alternator output voltage exceeds IGN supply.
+#   This is the standard "battery warning" indicator behavior — wire through the
+#   OEM instrument cluster battery warning bulb if desired, or use a standalone
+#   bulb in the engine bay.
+#
+#   Wire: 18 AWG, yellow/black or yellow (OEM charge lamp color convention)
+#   Fuse: 5A inline, source side of the bulb
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# STARTER TRIGGER SIGNAL — M50 Harness 12-pin Extra Pin 6 (F)
+#
+# Source: maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html
+#         Installation step 9; 12-pin connector REV2 pinout, pin 6 (F)
+#
+#   Pin 6 (F) is the ENGINE STARTER TRIGGER input to MaxxECU. This is NOT the
+#   high-current starter motor wire — it is a signal wire that tells MaxxECU
+#   when the key is in the START position. MaxxECU uses this for cranking
+#   enrichment, anti-stall during start, and starter inhibit logic.
+#
+#   Wiring: Ignition switch START position (+12V, key position III only) →
+#           12-pin extra connector pin 6 (F)
+#
+#   The high-current starter motor circuit is unchanged from OEM E36 wiring
+#   (battery → fuse → starter solenoid main terminal; starter relay contact
+#   → starter solenoid control). Only the EWS2 coil-side bypass (steps 1–2
+#   above) modifies the starter relay control circuit.
+#
+#   Wire: 18 AWG, red/yellow (OEM start signal color convention)
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# PHASE 1 WIRING CHECKLIST — M52 + MaxxECU M50 Harness SUPPLEMENTAL
+#
+# Items COVERED by the M50 pre-terminated harness (do not build):
+#   - Injectors 1–6 (JPT/EV1 connectors)
+#   - Coil-on-plug ignition 1–6 (VAG 4-way COP connectors)
+#   - Crank sensor (60-2 VR, BMW connector)
+#   - Cam/HOME sensor (requires swap to BMW 12141726590 for VANOS head)
+#   - IAT sensor
+#   - CLT sensor
+#   - TPS (OEM M52 throttle body)
+#   - MAP sensor (hose included in harness)
+#   - Wideband O2 — LSU 4.2 (Bosch 6-pin connector)
+#   - VANOS solenoid — GPO 3 (JPT 2-way connector)
+#   - ICV idle control valve — GPO 4 + GPO 5 (JPT 3-way connector)
+#   - BOOST_SOL/GPO 1 stub (Superseal 2-way — repurposed for reverse light relay)
+#   - Fuel pump relay trigger — GPO 2 (12-pin extra pin 3 / C)
+#   - Fan relay trigger — GPO 6 (12-pin extra pin 4 / D)
+#   - ECU +12V power — 12-pin extra pin 7 (G)
+#   - Coil/INJ +12V — 12-pin extra pin 1 (A)
+#   - Engine GND — 12-pin extra pin 2 (B) + cylinder head GND (brown wire)
+#
+# Items NOT in the M50 harness — must be wired separately (Phase 1):
+#   [ ] EWS2 bypass (this file, Steps 1–2 above)
+#   [ ] Alternator D+ excite — 12-pin pin 12 (M) + charge bulb (this file)
+#   [ ] Starter trigger signal — 12-pin pin 6 (F) (this file)
+#   [ ] Fuel pump hanger — harnesses/fuel-pump-hanger-phase1.wv
+#   [ ] Flex fuel sensor — harnesses/flex-fuel-sensor-phase1.wv
+#   [ ] 8HP CAN + power — harnesses/8hp-can.wv
+#   [ ] 8HP reverse light relay — harnesses/8hp-body-integrations-phase1.wv
+#   [ ] Gauge.S CAN cluster — harnesses/gauge-s-can.wv
+#   [ ] DCT shifter paddle — harnesses/dct-shifter.wv
+#   [ ] X20 body connector — harnesses/body-x20.wv
+#   [ ] PST-F1 oil sensor — harnesses/pst-f1-sensor.wv
+#   [ ] ATF temp sensor (optional) — harnesses/atf-temp-sensor.wv
+#   [ ] EPS column-assist — harnesses/eps-column.wv
+#   [ ] ID850 injector adapters — EV1-to-USCAR, ID PN 90.1, qty 6
+#       (MaxxECU M50 harness uses EV1/JPT sockets; ID850 ships USCAR/EV6)
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+metadata:
+  project: E36 Restomod — Phase 1 EWS2 Bypass + Starter/Alternator Supplemental
+  description: >-
+    EWS2 chassis bypass for MaxxECU M52 install.
+    This is a chassis modification spec, not a harness build.
+    See header comments for full procedure. Also documents the
+    alternator D+ excite wire and starter trigger signal from the
+    M50 pre-terminated harness 12-pin extra connector.
+
+connectors:
+  EWS2_MOD:
+    type: EWS2 Module Connector (4-pin, gray, behind glovebox)
+    pincount: 4
+    pinlabels: [IGN_15, GND, STARTER_ENABLE, IMMO_KLINE]
+    notes: >-
+      MODIFICATION: short pins 1 and 3 (bridge IGN_15 to STARTER_ENABLE);
+      remove or cut pin 4 (isolate IMMO_KLINE). The EWS2 module body can remain
+      in place or be removed. Remove the ring antenna from the ignition lock ring
+      if EWS2 module is physically removed.
+
+  HARNESS_12PIN:
+    type: MaxxECU M50 terminated harness — 12-pin extra connector (REV2)
+    pincount: 12
+    pinlabels:
+      - "+12V_COIL_INJ"
+      - ENGINE_GND
+      - "GPO2_FUELPUMP"
+      - "GPO6_FAN"
+      - NC
+      - STARTER_TRIGGER
+      - "+12V_ECU"
+      - NC
+      - NC
+      - NC
+      - NC
+      - "ALT_D_PLUS"
+    notes: >-
+      This connector is on the purchased M50 pre-terminated harness.
+      Pins 1 (A), 2 (B), 3 (C), 4 (D), 7 (G) are connected to the
+      power distribution relay board (Phase 1 discrete relay setup).
+      Pin 6 (F): starter trigger signal to MaxxECU.
+      Pin 12 (M): alternator D+ — connect via charge bulb to IGN+.
+
+  CHARGE_BULB:
+    type: Charge lamp — 3W–5W bayonet (W5W or equiv.)
+    pincount: 2
+    pinlabels: [IGN_SIDE, ALT_SIDE]
+    notes: >-
+      Inline between +12V IGN (fused 5A) and 12-pin pin 12 (ALT_D_PLUS).
+      Illuminates as battery warning when alternator is not charging;
+      extinguishes once alternator output exceeds IGN supply voltage.
+      Can route through OEM instrument cluster battery bulb holder if desired.
+
+  IGN_SWITCH_START:
+    type: Ignition switch — START position output
+    pincount: 1
+    pinlabels: ["+12V_START"]
+    notes: >-
+      +12V present ONLY when key is held to START position (Kl.50).
+      Connects to EWS2 pin 1 (and via bypass bridge to pin 3) and to
+      HARNESS_12PIN pin 6 (STARTER_TRIGGER to MaxxECU).
+
+cables:
+  EWS_BYPASS_BRIDGE:
+    wirecount: 1
+    colors: [RD]
+    gauge: 18 AWG
+    length: 0.1 m
+    notes: Short jumper wire bridging EWS2 connector pins 1 and 3
+
+  STARTER_SIGNAL:
+    wirecount: 1
+    colors: [RDBK]
+    gauge: 18 AWG
+    length: 2.0 m
+    notes: >-
+      Ignition switch START output to MaxxECU 12-pin extra pin 6 (F).
+      Routed from cabin ignition lock area through firewall grommet to engine bay.
+
+  ALT_EXCITE:
+    wirecount: 1
+    colors: [YEBK]
+    gauge: 18 AWG
+    length: 0.5 m
+    notes: >-
+      Alternator D+ excite: from charge bulb ALT_SIDE to 12-pin pin 12 (M).
+      Engine-bay-side only; charge bulb and IGN source wire are cabin-side.
+
+connections:
+  -
+    - IGN_SWITCH_START: ["+12V_START"]
+    - EWS_BYPASS_BRIDGE: [1]
+    - EWS2_MOD: [IGN_15]
+  -
+    - EWS2_MOD: [STARTER_ENABLE]
+    - EWS_BYPASS_BRIDGE: [1]
+    # Note: EWS_BYPASS_BRIDGE wire connects pin 1 to pin 3 (direct jumper)
+  -
+    - IGN_SWITCH_START: ["+12V_START"]
+    - STARTER_SIGNAL: [1]
+    - HARNESS_12PIN: [STARTER_TRIGGER]
+  -
+    - CHARGE_BULB: [ALT_SIDE]
+    - ALT_EXCITE: [1]
+    - HARNESS_12PIN: ["ALT_D_PLUS"]

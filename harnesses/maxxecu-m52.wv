@@ -21,10 +21,10 @@
 #       Phase 1 firewall routing: pre-terminated harness passes through the existing
 #       E36 firewall grommet/bushing to the engine-bay MaxxECU RACE H2O.
 #       No firewall bulkhead connector is used in Phase 1. The Maven HD30 dual
-#       bulkhead is a Phase 2 install (see harnesses/firewall-crossing-maven.wv).
+#       bulkhead is a Phase 2b install (see harnesses/firewall-crossing-maven.wv).
 #
 # ─────────────────────────────────────────────────────────────────────────────
-# CRIMP TOOLS — for reference only (Phase 2 / 07K harness build, not Phase 1):
+# CRIMP TOOLS — for reference only (Phase 2b offline 07K harness build, not Phase 1):
 #
 #   Deutsch HD30 (Maven) size-16 contacts → Deutsch HDT-48-00 (covers all Deutsch
 #                                            solid contacts DT/DTM/DTP/DTHD/HD30/etc.)
@@ -54,21 +54,21 @@
 #       Same firing order as injectors. Confirm IGN 1-6 coil numbering from
 #       MaxxTune :: Engine :: Ignition :: Coil assignments.
 #
-# TODO: Alternator D+ wiring
-#       12-pin pin 12 (M) = Alternator +12V (D+ excite terminal).
-#       Must be wired in series with a charge bulb (or resistor) to +12V ignition.
-#       Without this the alternator will not regulate charging below ~1500 RPM.
-#       Confirm wire gauge and bulb spec from MaxxECU install guide.
+# Alternator D+ excite — see harnesses/ews2-bypass.wv.
+#       12-pin pin 12 (M) = Alternator D+ excite terminal.
+#       Wire: IGN+12V (5A fused) → charge bulb (3–5W W5W) → pin 12 (M).
+#       Without this the alternator will not regulate charging below ~1,500 RPM.
+#       Source: maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html
+#               Installation step 8 (REV2 12-pin connector pinout, pin 12 = Alternator +12V).
 #
-# TODO: EWS2 bypass wiring
-#       M52 (OBD2) has EWS2 immobilizer — MaxxECU has no EWS protocol.
-#       Without bypass: cranks but will not fire.
-#       Option A (preferred): EWS delete emulator module — confirm pinout and
-#         which X20 / ECU connector pins are affected.
-#       Option B: hard-wire bypass at ECU connector.
-#       Research MaxxECU community for current preferred method before install.
-#       Ref: https://falkmfg.com/blogs/news/how-to-bypass-ews2-for-e36-bmw
-#       Document bypass connections here once method is confirmed.
+# EWS2 bypass — see harnesses/ews2-bypass.wv for full procedure.
+#       M52 (OBD2) has EWS2 immobilizer — MaxxECU has no EWS rolling-code
+#       protocol. Without bypass: cranks but will not fire.
+#       Method: hard-wire bypass at the EWS2 module connector (behind glovebox).
+#         Bridge pins 1+3 (IGN to starter relay coil); isolate pin 4 (IMMO K-line).
+#       Source: https://falkmfg.com/blogs/news/how-to-bypass-ews2-for-e36-bmw
+#       8HP starter inhibit: implement via MTune 8HP software interlock (CAN range
+#         position P/N = allow crank). No additional hardware relay needed.
 #
 # DONE: Idle air control valve (IDLE_VALVE) GPO 4 + GPO 5 CMC pins
 #       GPO 4 = E4 = CMC pin 20 (ICV coil A).
@@ -78,14 +78,16 @@
 # DONE: GPO 1 (M50 harness BOOST_SOL connector stub, Superseal 2-way) = CMC pin B4 = CMC pin 8.
 #       Phase 1 (M52 NA): GPO 1 drives the reverse light relay low-side. The BOOST_SOL
 #       connector stub is repurposed as the relay coil low-side access point (no boost solenoid
-#       in Phase 1). Phase 3 (07K): GPO 1 drives the boost solenoid.
+#       in Phase 1). Phase 3b (07K): GPO 1 drives the boost solenoid.
 #       +12V for solenoid/relay comes from coil/inj rail (ECU_12PIN[1]).
 #
-# NOTE: Firewall bulkhead — Maven HD30 dual 16+16 kit, Phase 2 install (NOT Phase 1).
-#       Phase 1: pre-terminated harness passes through existing E36 firewall grommet.
-#       Phase 2 (offline while M52 is running): install Maven bulkhead in firewall.
+# NOTE: Firewall bulkhead — Maven HD30 dual 16+16 kit, Phase 3b install (07K swap day only).
+#       The Maven bulkhead does NOT apply to the M52 path.
+#       Phase 1 (M52): pre-terminated harness passes through existing E36 firewall grommet.
+#         Cabin CAN + DCT shifter wires also route through the OEM grommet in Phase 1.
+#       Phase 3b (07K swap): install Maven bulkhead in firewall.
 #         Re-terminate cabin CAN + DCT shifter wires into Maven Connector A.
-#         Connector B cavity-plugged until Phase 3 APS pedal install.
+#         Connector B populated with APS pedal wiring on the same day.
 #       Full spec: harnesses/firewall-crossing-maven.wv
 #       Kit: mavenspeed.com/collections/b2t-engineering/products/dual-connector-bulkhead
 #         (16-pin & 16-pin config, $274 USD).
@@ -112,7 +114,7 @@
 #       (line ~703), and connections block (line ~981) are all present.
 #       Sensor: Bosch LSU 4.2. MaxxECU M50 terminated harness explicitly specifies
 #       LSU 4.2 connector (source: maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html).
-#       Phase 3 (07K) uses LSU 4.9 — different pinout; do NOT substitute sensors between phases.
+#       Phase 3b (07K) uses LSU 4.9 — different pinout; do NOT substitute sensors between phases.
 # ─────────────────────────────────────────────────────────────────────────────
 #
 # This build adds to the base harness:
@@ -337,8 +339,8 @@ connectors:
       Wire colors: black=VS(1), green=RCAL(2), grey=H+(3), white=H-(4), yellow=VREF(5), red=IP(6).
       Phase 1: This is a TERMINATED harness — sensor connector is pre-wired by MaxxECU. Do not re-pin.
       Bung: 18mm×1.5 welded in exhaust.
-      ⚠️ Phase 3 (07K) uses LSU 4.9 — different pinout. Do NOT substitute sensors between phases.
-      At Phase 3, install new LSU 4.9 bung in 07K exhaust header.
+      ⚠️ Phase 3b (07K) uses LSU 4.9 — different pinout. Do NOT substitute sensors between phases.
+      At Phase 3b, install new LSU 4.9 bung in 07K exhaust header.
 
   # ── Boost ────────────────────────────────────────────────────────────────────
 
@@ -351,7 +353,7 @@ connectors:
       Phase 1 (M52 NA): connector stub is repurposed as the reverse light relay low-side access point.
       Pin 1 (+12V) to relay coil +12V; Pin 2 (GPO 1) to relay coil GND/signal side.
       No boost solenoid installed in Phase 1 — NA engine. GPO 1 = reverse light trigger.
-      Phase 3 (07K turbo): GPO 1 drives boost solenoid. MaxxECU GPO 1 :: PWM duty control.
+      Phase 3b (07K turbo): GPO 1 drives boost solenoid. MaxxECU GPO 1 :: PWM duty control.
       Boost solenoid budget alt: Bosch N75 0280142431.
       Flyback diode: 1N4007 at connector, cathode (banded end) to +12V pin, anode to GPO signal pin.
 
@@ -416,7 +418,7 @@ connectors:
       Mount: M52 VANOS banjo bolt (M14x1.5 :: M10x1.0 adapter :: PST-F1).
       Pressure :: AIN 3 (0-5V, 0-10 bar / 0-145 psi).
       Temp :: AIN 1 (NTC, -40 to +140°C).
-      Moves to iABED 07K oil housing M10x1.0 port at Phase 3 with no wiring changes.
+      Moves to iABED 07K oil housing M10x1.0 port at Phase 3b with no wiring changes.
 
   CAN_BUS_JUNCTION:
     type: "Splice / junction"

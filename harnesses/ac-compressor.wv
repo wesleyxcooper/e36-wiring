@@ -1,9 +1,9 @@
 metadata:
   project: E36 Restomod -- 12V Electric AC Compressor Wiring
-  phase: "Phase 3 (07K swap era — electric AC compressor + PWM controller installed)"
+  phase: "Phase 3b (07K swap era — electric AC compressor + PWM controller installed)"
   description: >-
     Alibaba PD2-18012AJA 12V electric scroll compressor (18cc, 10,000 BTU, R134a)
-    with included PWM speed controller. Phase 3 installation — the belt-driven OEM
+    with included PWM speed controller. Phase 3b installation — the belt-driven OEM
     A/C compressor is removed at the 07K swap; this electric unit replaces it.
     No belt drive -- compressor mounts anywhere in engine bay.
 
@@ -45,7 +45,7 @@ metadata:
 #   [ ] Configure MaxxECU idle-up: DIN type = ON/OFF switch, target +150-200 RPM
 #       when AC enable input is HIGH
 #   [ ] Flush AC system: remove all PAG oil, replace receiver/drier before commissioning
-#   [ ] Fill with POE 68 oil (not PAG) -- see plan doc Phase 2 AC row
+#   [ ] Fill with POE 68 oil (not PAG) -- see plan doc Phase 2b AC row
 #   [ ] Wire condenser fan circuit (fan MUST be present or controller won't enable)
 #   [ ] Set PWM controller duty cycle to ~45% initially (3,000 RPM) --
 #       do not start at 95% (5,000 RPM causes near-stall idle dip)

@@ -59,7 +59,7 @@ metadata:
 #       OEM IGN circuit (e.g. the OEM ignition relay switched-output feed shared
 #       by the fan/fuel relay coils in maxxecu-m52.wv). Kit-supplied 10A Mini ATM
 #       fuse protects this feed. One wire end moves at 07K swap (see below).
-#       07K Phase 3: remapped to PMU16 spare output O8 (10A channel, power-distribution.wv)
+#       07K Phase 3b: remapped to PMU16 spare output O8 (10A channel, power-distribution.wv)
 #       at PMU16 installation. Single-wire retermination from relay board → PMU16 O8.
 #   [ ] Confirm 60A Maxi fuse mounting point near battery -- coordinate with
 #       MAIN_FUSE in power-distribution.wv (separate fuse, do not combine)
@@ -173,7 +173,7 @@ connectors:
 
   IGN_12V_TAP:
     type: "Stub -- IGN-switched +12V source, two-phase assignment"
-    subtype: "M5x Phase 1: relay board IGN output | 07K Phase 3: PMU16 O8"
+    subtype: "M5x Phase 1: relay board IGN output | 07K Phase 3b: PMU16 O8"
     pincount: 1
     pinlabels: ["+12V IGN"]
     notes: >-
@@ -184,7 +184,7 @@ connectors:
       used for fuel pump / fan relay coil pin 86 in maxxecu-m52.wv), or use a
       fuse-tap on an OEM IGN circuit from the body harness. No additional relay
       is needed -- just fuse this feed with the supplied 10A Mini ATM.
-      07K Phase 3: at PMU16 installation, move this one wire end from the relay
+      07K Phase 3b: at PMU16 installation, move this one wire end from the relay
       board to PMU16 O8 (10A digital channel, power-distribution.wv spare output).
       PMU16 per-channel fusing replaces the discrete 10A ATM at that stage.
 
