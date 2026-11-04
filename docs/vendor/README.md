@@ -12,6 +12,7 @@ Saved so the correct version is accessible without internet on the bench.
 | `MaxxECU_RACE_REV9plus_Wiring.pdf` | https://www.maxxecu.se/files/Documentation/Wirings/MaxxECU%20RACE%20(REV9+)%20-%20Wiring-en.pdf | **Primary reference** — RACE variant REV9+. Contains wire color scheme and complete connector diagrams for C1 (48-pin) and C2 (32-pin). See `MaxxECU_GEN1_Pinout.md` for pin function table. |
 | `MaxxECU_GEN1_Pinout.md` | https://www.maxxecu.com/webhelp/wirings-maxxecu_pinout.html | Saved text of the GEN1 pinout webhelp page (JavaScript-rendered, cannot be saved as HTML). Contains C1, C2, and Molex part numbers. Archived from live page. |
 | `MaxxECU_M50_Terminated_Harness.md` | https://www.maxxecu.com/webhelp/wirings-terminated_engine_harness-bmw_m50.html | Saved text of the M50 terminated engine harness page. Source of truth for VANOS cam sensor swap requirement and which engine signals the pre-terminated harness covers. |
+| `MaxxECU_GEN2_SPORT.md` | https://www.maxxecu.com/products/gen2sport · https://www.maxxecu.com/webhelp/wirings-maxxecu_gen2_pinout.html | GEN2 SPORT specs (released 2026-11-04) and full signal-level analysis of adapting the M50 terminated harness from GEN1 RACE C1 (Molex CMC) to GEN2 SPORT MX1+MX2 (Superseal 1.0). Decision deferred to May 2027 build start. |
 
 **Wire color convention (from `MaxxECU_RACE_REV9plus_Wiring.pdf`):**
 
