@@ -217,6 +217,53 @@ Walbro F90000267 driven by a discrete high-current relay (via JDT Racing rewire 
 - **[`docs/loom-routing.md`](docs/loom-routing.md)** — Physical loom routing reference: engine bay trunk + sub-loom breakout points, cabin loom, tunnel/rear fuel run, sleeving spec by zone, breakout discipline. **Fill in during form-board layout / trial-fit session.**
 - **[`docs/harness-build.md`](docs/harness-build.md)** — Harness assembly discipline: pin count by connector family (~200–230 total), tool-to-connector matrix, per-family depin procedures (Molex/Deutsch/VW-PTS), 3B0973703G cam/crank label warning, crimp-verify-seat workflow, bench test sequence before sleeving.
 
+## GUI tools — formboard layout and DRC
+
+WireViz produces a **schematic/graph** view: connector boxes, annotated cable lines, wire colors, gauge, and length. The `.html` output is interactive and links to the BOM TSV. What WireViz does not produce:
+
+- Physical formboard layout — the harness laid out as it physically routes in 2D, to scale
+- Design rule checks — open pins, gauge mismatches, unconnected wires, contact limits
+- 1:1 printable formboard for the bench build
+
+Two GUI tools are worth evaluating as a **complement** to this repo (not a replacement — WireViz stays the git-tracked source of truth):
+
+### harness.design
+
+[harness.design](https://www.harness.design/) — HPA Academy recommended for motorsport. ([hpacademy.com](https://www.hpacademy.com/technical-articles/8-options-for-drawing-wiring-schematicsharnesses-in-motorsport-applications/): *"absolutely worth the cost for the few months you might use it"*.)
+
+- **Local `.harness` files** — plain pretty-printed JSON, git-versionable alongside `.wv` files. Desktop app edits the file on disk in real-time, fully offline. `$schema` key enables VS Code validation as you type. ([docs.harness.design/feature/local-files](https://docs.harness.design/feature/local-files))
+- **MCP server** — Claude, ChatGPT, or any MCP agent can read/edit harnesses live; AI agents can also edit the JSON format directly. Included on all plans.
+- **Formboard at 1:1 scale** — printable panels for bench build template
+- **Design rule checks** — gauge and contact limits
+- **Views:** schematic, layout, parts, connections/wiring table, pinout diagrams
+- **Excel import** with AI
+- **Pricing:** Free (unlimited harnesses, 100 connections per harness — covers small harnesses: EWS2 bypass, flex fuel sensor, EWP, etc.); Pro $29/month or $24/month billed annually — required for larger harnesses (07K, power-distribution likely exceed 100 connections)
+
+### wiring.studio
+
+[wiring.studio](https://wiring.studio/) — same category, more DRCs, cloud-only storage.
+
+- **Cloud-only** — no local file format; projects live in a web account; revisions are opaque snapshots, not text diffs
+- **MCP server** — 69 tools, included on all plans (Free → Team)
+- **39 design rule checks** running continuously
+- **Formboard** at 1:1 scale + **3D view** + cable cross-section editor with OD estimation
+- **Exports:** PDF, Excel, CSV; AI-assisted Excel import; photo-of-sketch import
+- **Pricing:** Free (3 projects, 1 sheet each — insufficient for this build); Lite $29/month (10 projects, 3 sheets each)
+
+### WireViz vs GUI tools — what each produces
+
+| Output | WireViz (current) | harness.design / wiring.studio |
+|---|---|---|
+| Schematic/graph | ✓ SVG + interactive HTML | ✓ |
+| BOM | ✓ TSV (per harness) | ✓ with pricing |
+| Physical formboard layout | — | ✓ 1:1 printable |
+| Design rule checks | — | ✓ |
+| 3D view | — | wiring.studio only |
+| Git-diffable source | ✓ YAML | harness.design only (.harness JSON) |
+| Offline / no subscription | ✓ | harness.design desktop only |
+
+**No WireViz import/export in either GUI tool.** Bridge path: WireViz BOM TSV → Excel → GUI tool's AI Excel importer (one-way, per harness, lossy).
+
 ## Setup
 
 ```bash
