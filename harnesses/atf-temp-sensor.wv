@@ -7,15 +7,16 @@
 # runs from the sensor along the transmission tunnel forward to the engine-bay
 # ECU — no firewall crossing into the cabin needed.
 #
-# OPTIONAL — mechanical thermostat (TCH-102-T2) handles overcooling protection
-# without ECU input. This sensor adds ATF temp to MaxxECU real-time data for
-# logging and cold-shift map conditioning only.
+# OPTIONAL — the mechanical thermostat in the TCA handles overcooling protection
+# without ECU input (TCH-102-T2 on the Dodge path, HPR Ultimate TCA on the BMW
+# path — same sensor position on either). This sensor adds ATF temp to MaxxECU
+# real-time data for logging and cold-shift map conditioning only.
 #
 # Hardware:
 #   Sensor:  MaxxECU 1/8 NPT NTC temp (ID 1280) — $48.39
 #            maxxecu.com/store/.../temperature-sensor-1-8-npt-clt-water-or-oil
 #   Adapter: Vibrant 16488 inline -8AN M→F union with 1/8 NPT port — ~$20
-#            Install in return line (Setrab cooler to TCH-102-T2 to trans)
+#            Install in return line (Setrab cooler → TCA → trans)
 #   Connector: 2-way DTM socket housing (MaxxECU store) — $5.53
 #
 # MaxxECU channel:
@@ -34,7 +35,8 @@ connectors:
     notes: >
       Non-polarity sensitive — either wire can be signal or GND.
       Sensor installed in Vibrant 16488 inline -8AN adapter, return line
-      (post-Setrab cooler, before TCH-102-T2 entry back to trans).
+      (post-Setrab cooler, before the TCA entry back to trans — TCH-102-T2 on
+      the Dodge path, HPR Ultimate TCA on the BMW path).
       Thread sealant on 1/8 NPT threads; do not apply to AN threads.
 
   ECU_CMC:
